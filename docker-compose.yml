@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  mtg-tournament-dashboard:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=production
+      - PYTHONUNBUFFERED=1
+    volumes:
+      # Mount Excel file so it can be easily updated
+      - ./July_CEDH_Event:/app/July_CEDH_Event
+    restart: unless-stopped
+    container_name: mtg-tournament-dashboard
+    
+    # Optional: Add resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M 
