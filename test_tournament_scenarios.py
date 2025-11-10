@@ -87,6 +87,79 @@ class TournamentTester:
             })
         return teams
     
+    def validate_no_repeat_matchups(self, tournament, swiss_rounds_count):
+        """
+        CRITICAL VALIDATION: Ensure no player faces the same opponent twice in Swiss rounds
+        This is the most important constraint for Swiss pairing
+        """
+        self.log(f"\n{'='*60}", "INFO")
+        self.log("CRITICAL VALIDATION: Checking for repeat matchups in Swiss rounds", "WARNING")
+        self.log(f"{'='*60}", "INFO")
+
+        # Track all matchups for each player
+        player_matchups = {}  # player_id -> set of opponent player_ids
+        violations = []
+
+        # Go through all Swiss rounds
+        for round_num in range(1, swiss_rounds_count + 1):
+            tables = tournament.tables.get(round_num, {})
+            self.log(f"\nRound {round_num}: Checking {len(tables)} tables", "INFO")
+
+            for table_name, players_list in tables.items():
+                # Get all player IDs at this table
+                player_ids = [p.get('Player ID', p.get('id')) for p in players_list]
+
+                # For each player, check if they've faced any opponent before
+                for i, player_id in enumerate(player_ids):
+                    if player_id not in player_matchups:
+                        player_matchups[player_id] = set()
+
+                    # Check against all other players at this table
+                    for j, opponent_id in enumerate(player_ids):
+                        if i != j:  # Don't compare player with themselves
+                            # Check if this matchup already exists
+                            if opponent_id in player_matchups[player_id]:
+                                violation = {
+                                    'round': round_num,
+                                    'table': table_name,
+                                    'player_id': player_id,
+                                    'opponent_id': opponent_id
+                                }
+                                violations.append(violation)
+                                self.log(
+                                    f"❌ VIOLATION: Player {player_id} faces Player {opponent_id} "
+                                    f"again in Round {round_num} at {table_name}!",
+                                    "ERROR"
+                                )
+                            else:
+                                # Record this matchup
+                                player_matchups[player_id].add(opponent_id)
+
+        # Report results
+        self.log(f"\n{'='*60}", "INFO")
+        if len(violations) == 0:
+            self.log("✅ PERFECT: No repeat matchups found in Swiss rounds!", "SUCCESS")
+            self.log(f"Total unique matchups tracked: {sum(len(opponents) for opponents in player_matchups.values())}", "INFO")
+            return True
+        else:
+            self.log(f"❌ CRITICAL FAILURE: Found {len(violations)} repeat matchup violations!", "ERROR")
+            for v in violations[:10]:  # Show first 10 violations
+                self.log(
+                    f"  - Round {v['round']}, {v['table']}: "
+                    f"Player {v['player_id']} vs Player {v['opponent_id']}",
+                    "ERROR"
+                )
+            if len(violations) > 10:
+                self.log(f"  ... and {len(violations) - 10} more violations", "ERROR")
+
+            self.test_results.append({
+                "test": self.current_test,
+                "message": "Repeat matchup validation",
+                "violations": len(violations),
+                "status": "FAIL"
+            })
+            return False
+
     def simulate_round_results(self, tournament, round_num, tables):
         """Simulate random results for a round"""
         import random
@@ -149,15 +222,21 @@ class TournamentTester:
             self.log(f"\n--- Simulating Swiss Round {round_num} ---", "INFO")
             tables = tournament.tables.get(round_num, [])
             self.assert_equal(len(tables), 8, f"Round {round_num} has 8 tables")
-            
+
             # Simulate results
             results = self.simulate_round_results(tournament, round_num, tables)
-            
+
             # Submit results
             for table_num, table_results in results.items():
                 for player_id, points in table_results.items():
                     tournament.player_scores[player_id] = tournament.player_scores.get(player_id, 0) + points
-        
+
+        # CRITICAL: Validate no repeat matchups in Swiss rounds
+        self.assert_true(
+            self.validate_no_repeat_matchups(tournament, 4),
+            "No player faces same opponent twice in Swiss rounds"
+        )
+
         # After round 4, finals should be generated
         self.log("\n--- Checking Finals Generation ---", "INFO")
         finals_data = tournament.generate_unified_finals(after_semifinals=False)
@@ -212,15 +291,21 @@ class TournamentTester:
             self.log(f"\n--- Simulating Swiss Round {round_num} ---", "INFO")
             tables = tournament.tables.get(round_num, [])
             self.assert_equal(len(tables), 8, f"Round {round_num} has 8 tables")
-            
+
             # Simulate results
             results = self.simulate_round_results(tournament, round_num, tables)
-            
+
             # Submit results
             for table_num, table_results in results.items():
                 for player_id, points in table_results.items():
                     tournament.player_scores[player_id] = tournament.player_scores.get(player_id, 0) + points
-        
+
+        # CRITICAL: Validate no repeat matchups in Swiss rounds
+        self.assert_true(
+            self.validate_no_repeat_matchups(tournament, 5),
+            "No player faces same opponent twice in Swiss rounds"
+        )
+
         # After round 5, finals should be generated
         self.log("\n--- Checking Finals Generation ---", "INFO")
         finals_data = tournament.generate_unified_finals(after_semifinals=False)
@@ -276,15 +361,21 @@ class TournamentTester:
             self.log(f"\n--- Simulating Swiss Round {round_num} ---", "INFO")
             tables = tournament.tables.get(round_num, [])
             self.assert_equal(len(tables), 16, f"Round {round_num} has 16 tables")
-            
+
             # Simulate results
             results = self.simulate_round_results(tournament, round_num, tables)
-            
+
             # Submit results
             for table_num, table_results in results.items():
                 for player_id, points in table_results.items():
                     tournament.player_scores[player_id] = tournament.player_scores.get(player_id, 0) + points
-        
+
+        # CRITICAL: Validate no repeat matchups in Swiss rounds
+        self.assert_true(
+            self.validate_no_repeat_matchups(tournament, 4),
+            "No player faces same opponent twice in Swiss rounds"
+        )
+
         # After round 4, semifinals should be generated
         self.log("\n--- Checking Semifinals Generation ---", "INFO")
         semifinals_data = tournament.generate_semifinals_round()
@@ -365,6 +456,12 @@ class TournamentTester:
             for table_num, table_results in results.items():
                 for player_id, points in table_results.items():
                     tournament.player_scores[player_id] = tournament.player_scores.get(player_id, 0) + points
+
+        # CRITICAL: Validate no repeat matchups in Swiss rounds
+        self.assert_true(
+            self.validate_no_repeat_matchups(tournament, 5),
+            "No player faces same opponent twice in Swiss rounds"
+        )
 
         # After round 5, semifinals should be generated
         self.log("\n--- Checking Semifinals Generation ---", "INFO")
