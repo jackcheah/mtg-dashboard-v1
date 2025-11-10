@@ -1,7 +1,7 @@
 # MTG Tournament Dashboard - Complete Documentation
 
-**Last Updated:** 2025-11-09
-**Version:** 1.0
+**Last Updated:** 2025-11-10
+**Version:** 1.1
 **Status:** Production Ready ✅
 
 ---
@@ -38,6 +38,9 @@ A comprehensive web-based tournament management system for Magic: The Gathering 
 - **💻 Ultra-Modern UI**: Glassmorphism design with responsive layout and smooth animations
 - **🏆 Championship Modal**: Beautiful winner celebration with MVP recognition
 - **⚡ Auto-Advance**: Automatic round progression after score submission
+- **📊 Tournament Progression Tracker**: Visual tracker showing current tournament phase (NEW - 2025-11-10)
+- **🎯 Bracket Visualization**: Semifinals and finals bracket display with matchups (NEW - 2025-11-10)
+- **⚡ Real-time Score Display**: Player scores appear next to names with instant updates (NEW - 2025-11-10)
 
 ### Technology Stack
 
@@ -405,6 +408,9 @@ CHAMPIONSHIP CELEBRATION:
 - [x] **Toast notifications** - Visual feedback for all actions
 - [x] **Responsive design** - Works on desktop, tablet, mobile
 - [x] **Landscape optimization** - Optimized for landscape displays
+- [x] **Tournament progression tracker** - Visual phase indicator (Swiss → Semifinals → Finals) ✅ NEW
+- [x] **Bracket visualization** - Semifinals and finals matchup display ✅ NEW
+- [x] **Inline score display** - Player scores shown next to names with real-time updates ✅ NEW
 
 ### ✅ UX Improvements
 
@@ -414,6 +420,9 @@ CHAMPIONSHIP CELEBRATION:
 - [x] **MVP recognition** - Highest scoring player highlighted
 - [x] **Tie-breaker display** - Swiss points shown for transparency
 - [x] **Team filtering** - Show only finalist teams in finals round
+- [x] **Visual tournament flow** - Progression tracker with phase highlighting ✅ NEW
+- [x] **Interactive brackets** - Matchup visualization for semifinals and finals ✅ NEW
+- [x] **Compact score layout** - Scores displayed inline to reduce visual repetition ✅ NEW
 
 ### ✅ Backend Features
 
@@ -781,6 +790,125 @@ Table 1:
 - ✅ Strategic (seat position can influence gameplay)
 
 **Note:** Pairings (which players face each other) are still pre-generated and locked. Only the seating order within each pod changes based on scores.
+
+---
+
+## UI Enhancements ✅ (NEW - 2025-11-10)
+
+### Tournament Progression Tracker
+
+**Visual Phase Indicator** showing tournament flow in real-time.
+
+**Features:**
+- **Dynamic Structure**: Automatically adjusts based on team count
+  - **8 teams**: Swiss Rounds (4 or 5) → Finals
+  - **16 teams**: Swiss Rounds (4 or 5) → Semifinals → Finals
+- **Phase States**:
+  - **Inactive**: Gray with low opacity (upcoming phases)
+  - **Active**: Purple gradient with glow effect (current phase)
+  - **Completed**: Green with checkmark icon (finished phases)
+- **Visual Flow**: Arrows connect phases to show progression
+- **Responsive**: Adapts to mobile and desktop layouts
+
+**Location:** Appears between stats grid and main content area
+
+**Example Display:**
+```
+Swiss Rounds (4) ──→ Semifinals (Top 8) ──→ Finals (Top 4)
+    [✓ Complete]         [● Active]           [  Upcoming  ]
+```
+
+### Bracket Visualization
+
+**Interactive matchup display** for semifinals and finals rounds.
+
+**Semifinals Bracket (16 teams only):**
+- Shows top 8 teams in 4 matchups
+- Seeding: 1v8, 2v7, 3v6, 4v5
+- 2-column grid layout
+- Each matchup displays:
+  - Team seed (circular badge)
+  - Team name
+  - Current total score
+  - VS indicator between opponents
+
+**Finals Bracket:**
+- Shows top 4 teams in 2 matchups
+- Seeding: 1v4, 2v3
+- Single column layout
+- Same matchup information as semifinals
+
+**Features:**
+- **Real-time Updates**: Fetches current standings from server
+- **Winner Highlighting**: Green background for winning teams (future enhancement)
+- **Hover Effects**: Cards lift slightly on hover
+- **Responsive**: Single column on mobile, multi-column on desktop
+
+**Location:** Appears between progression tracker and main content area (only visible during semifinals/finals)
+
+**Example Display:**
+```
+┌─────────────────────────────────┐
+│ Semifinals Bracket - Top 8      │
+├─────────────────────────────────┤
+│ Matchup 1                       │
+│ [1] Team Alpha - 45 pts         │
+│         VS                      │
+│ [8] Team Omega - 28 pts         │
+└─────────────────────────────────┘
+```
+
+### Inline Score Display
+
+**Real-time score updates** next to player names.
+
+**Features:**
+- **Compact Layout**: Scores appear on the right side of player info
+- **Real-time Updates**: Scores update instantly when clicking Win/Draw/Loss buttons
+- **Visual Styling**:
+  - Purple background with border
+  - Large, bold font for visibility
+  - Shows "-" initially, then "0 pts", "1 pt", or "5 pts"
+- **Reduced Repetition**: Eliminates duplicate score display below player info
+
+**Before:**
+```
+Player Name
+Team Name
+Score: 5 pts (repeated below)
+```
+
+**After:**
+```
+Player Name                    5 pts
+Team Name
+```
+
+**Benefits:**
+- ✅ Cleaner, more compact layout
+- ✅ Easier to scan scores at a glance
+- ✅ Reduces visual clutter
+- ✅ Professional tournament display
+
+### Implementation Details
+
+**CSS Architecture:**
+- Glassmorphism design with backdrop-filter blur
+- CSS custom properties for theming
+- Flexbox and grid layouts for responsive design
+- Smooth transitions and animations
+
+**JavaScript Integration:**
+- `updateProgressionTracker(currentRound)` - Updates phase indicator
+- `updateBracketVisualization(currentRound)` - Fetches and displays brackets
+- `setPlayerScore()` - Updates inline score display in real-time
+- Global state management with `window.tournamentSwissRounds` and `window.totalTeams`
+
+**Performance:**
+- Minimal DOM manipulation
+- Efficient API calls (only when needed)
+- Smooth 60fps animations
+- No impact on existing functionality
 
 ---
 
@@ -1229,7 +1357,15 @@ MTG-Tournament-Dashboard/
 
 ## Version History
 
-**v1.0 - Current (Production)**
+**v1.1 - Current (Production) - 2025-11-10**
+- ✅ Tournament progression tracker (visual phase indicator)
+- ✅ Bracket visualization (semifinals and finals matchups)
+- ✅ Inline score display (real-time updates next to player names)
+- ✅ Dynamic tournament structure (8 vs 16 teams)
+- ✅ Configurable Swiss rounds (4 or 5 rounds)
+- ✅ Semifinal logic based on team count
+
+**v1.0 - 2025-11-09**
 - ✅ 8/16 team tournaments
 - ✅ Advanced Swiss pairing
 - ✅ Modern glassmorphic UI
@@ -1238,10 +1374,9 @@ MTG-Tournament-Dashboard/
 - ✅ MVP recognition
 
 **v2.0 - Planned (See CLAUDE.md)**
-- 7-round structure (5 Swiss → Semifinals → Finals)
-- Intelligent seating (score-based)
 - Enhanced tiebreakers
-- UI enhancements
+- Database integration
+- Export functionality
 - Documentation cleanup
 
 ---
@@ -1251,12 +1386,18 @@ MTG-Tournament-Dashboard/
 The MTG Tournament Dashboard is a production-ready system for managing CEDH tournaments with 8 or 16 teams. It features:
 
 - **Advanced Swiss pairing** with minimal repeat matchups
-- **Ultra-modern UI** with glassmorphism design
+- **Ultra-modern UI** with glassmorphism design and visual enhancements
+- **Tournament progression tracker** showing current phase (Swiss → Semifinals → Finals)
+- **Bracket visualization** for semifinals and finals matchups
+- **Real-time score display** with inline updates next to player names
 - **Automatic round progression** for smooth tournament flow
 - **Beautiful championship celebration** with MVP recognition
+- **Dynamic tournament structure** based on team count (8 vs 16 teams)
+- **Configurable Swiss rounds** (4 or 5 rounds)
 - **Docker deployment** for easy setup and consistent performance
 
-**Current Status:** Fully functional and ready for tournament use
+**Current Status:** Fully functional and ready for tournament use (v1.1)
+**Latest Updates:** UI enhancements including progression tracker, bracket visualization, and inline scores (2025-11-10)
 **Next Steps:** Implement v2.0 enhancements (see CLAUDE.md)
 
 ---

@@ -902,25 +902,299 @@
             border-radius: var(--radius-sm);
             border-left: 3px solid var(--color-primary);
             transition: var(--transition-fast);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: var(--spacing-sm);
         }
-        
+
         .table-player:hover {
             background: rgba(255,255,255,0.1);
             border-left-color: var(--color-secondary);
             transform: translateX(4px);
         }
-        
+
+        .table-player-info {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            flex: 1;
+        }
+
+        .table-player-info i {
+            color: var(--color-accent);
+            flex-shrink: 0;
+        }
+
+        .table-player-details {
+            display: flex;
+            flex-direction: column;
+        }
+
         .table-player-name {
             font-weight: 600;
             color: white;
-            margin-bottom: var(--spacing-xs);
         }
-        
+
         .table-player-team {
             font-size: var(--text-sm);
             color: rgba(255,255,255,0.6);
         }
-        
+
+        .table-player-score {
+            font-weight: 700;
+            color: var(--color-accent);
+            font-size: var(--text-lg);
+            padding: var(--spacing-xs) var(--spacing-sm);
+            background: rgba(139, 92, 246, 0.1);
+            border-radius: var(--radius-sm);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            min-width: 50px;
+            text-align: center;
+        }
+
+        /* Tournament Progression Tracker */
+        .progression-tracker {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+            display: none;
+        }
+
+        .progression-title {
+            font-size: var(--text-lg);
+            font-weight: 700;
+            color: white;
+            margin-bottom: var(--spacing-lg);
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-sm);
+        }
+
+        .progression-steps {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-md);
+            flex-wrap: wrap;
+        }
+
+        .progression-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--spacing-sm);
+            position: relative;
+            flex: 1;
+            min-width: 120px;
+            max-width: 200px;
+        }
+
+        .progression-circle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--text-xl);
+            color: rgba(255,255,255,0.4);
+            transition: all 0.3s ease;
+        }
+
+        .progression-step.active .progression-circle {
+            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+            border-color: var(--color-accent);
+            color: white;
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+            transform: scale(1.1);
+        }
+
+        .progression-step.completed .progression-circle {
+            background: rgba(34, 197, 94, 0.2);
+            border-color: #22c55e;
+            color: #22c55e;
+        }
+
+        .progression-label {
+            font-size: var(--text-sm);
+            color: rgba(255,255,255,0.6);
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .progression-step.active .progression-label {
+            color: var(--color-accent);
+            font-weight: 700;
+        }
+
+        .progression-step.completed .progression-label {
+            color: #22c55e;
+        }
+
+        .progression-arrow {
+            color: rgba(255,255,255,0.3);
+            font-size: var(--text-xl);
+            margin: 0 var(--spacing-sm);
+        }
+
+        .progression-step.active ~ .progression-arrow {
+            color: rgba(255,255,255,0.2);
+        }
+
+        .progression-step.completed ~ .progression-arrow {
+            color: #22c55e;
+        }
+
+        /* Tournament Bracket Visualization */
+        .bracket-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            margin-bottom: var(--spacing-xl);
+            display: none;
+        }
+
+        .bracket-title {
+            font-size: var(--text-xl);
+            font-weight: 700;
+            color: white;
+            margin-bottom: var(--spacing-xl);
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-sm);
+        }
+
+        .bracket-grid {
+            display: grid;
+            gap: var(--spacing-lg);
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .bracket-grid.semifinals {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .bracket-grid.finals {
+            grid-template-columns: 1fr;
+            max-width: 600px;
+        }
+
+        .bracket-matchup {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-md);
+            transition: all 0.3s ease;
+        }
+
+        .bracket-matchup:hover {
+            background: rgba(255,255,255,0.08);
+            border-color: var(--color-accent);
+            transform: translateY(-2px);
+        }
+
+        .matchup-header {
+            font-size: var(--text-sm);
+            color: rgba(255,255,255,0.6);
+            margin-bottom: var(--spacing-sm);
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .matchup-teams {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+        }
+
+        .matchup-team {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: var(--radius-sm);
+            padding: var(--spacing-md);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.2s ease;
+        }
+
+        .matchup-team:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .matchup-team.winner {
+            background: rgba(34, 197, 94, 0.1);
+            border-color: #22c55e;
+        }
+
+        .team-info {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .team-seed {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--color-primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: var(--text-sm);
+        }
+
+        .team-name {
+            font-weight: 600;
+            color: white;
+            font-size: var(--text-md);
+        }
+
+        .team-score {
+            font-weight: 700;
+            color: var(--color-accent);
+            font-size: var(--text-lg);
+            padding: var(--spacing-xs) var(--spacing-md);
+            background: rgba(139, 92, 246, 0.1);
+            border-radius: var(--radius-sm);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+
+        .matchup-team.winner .team-score {
+            color: #22c55e;
+            background: rgba(34, 197, 94, 0.1);
+            border-color: #22c55e;
+        }
+
+        .bracket-vs {
+            text-align: center;
+            color: rgba(255,255,255,0.4);
+            font-weight: 700;
+            font-size: var(--text-sm);
+            margin: var(--spacing-xs) 0;
+        }
+
+        @media (max-width: 768px) {
+            .bracket-grid.semifinals {
+                grid-template-columns: 1fr;
+            }
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             .container {
@@ -1615,6 +1889,28 @@
             </div>
         </div>
 
+        <!-- Tournament Progression Tracker -->
+        <div class="progression-tracker" id="progression-tracker" style="display: none;">
+            <div class="progression-title">
+                <i class="fas fa-route"></i>
+                Tournament Progress
+            </div>
+            <div class="progression-steps" id="progression-steps">
+                <!-- Steps will be dynamically generated based on tournament structure -->
+            </div>
+        </div>
+
+        <!-- Tournament Bracket Visualization -->
+        <div class="bracket-container" id="bracket-container" style="display: none;">
+            <div class="bracket-title" id="bracket-title">
+                <i class="fas fa-sitemap"></i>
+                <span id="bracket-title-text">Tournament Bracket</span>
+            </div>
+            <div class="bracket-grid" id="bracket-grid">
+                <!-- Bracket matchups will be dynamically generated -->
+            </div>
+        </div>
+
         <!-- Main Content Area (Landscape Optimized) -->
         <div class="main-content">
             <!-- Teams Display (Left Column on Desktop) -->
@@ -2055,7 +2351,13 @@
                     // Update round selector with configured Swiss rounds and tournament structure
                     const hasSemifinals = data.has_semifinals || false;
                     const teamCount = data.tournament_teams ? data.tournament_teams.length : 0;
-                    updateRoundSelector(data.swiss_rounds_count || getSelectedSwissRounds(), hasSemifinals, teamCount);
+                    const swissRounds = data.swiss_rounds_count || getSelectedSwissRounds();
+
+                    // Store tournament configuration globally
+                    window.tournamentSwissRounds = swissRounds;
+                    window.totalTeams = teamCount;
+
+                    updateRoundSelector(swissRounds, hasSemifinals, teamCount);
 
                     // Update stats
                     document.getElementById('stat-teams').textContent = teamCount;
@@ -2141,6 +2443,199 @@
                 showToast('Error', 'Failed to load round tables: ' + error.message, 'error');
                 console.error(error);
             }
+
+            // Update progression tracker
+            updateProgressionTracker(parseInt(round));
+
+            // Update bracket visualization
+            updateBracketVisualization(parseInt(round));
+        }
+
+        // Update Tournament Progression Tracker
+        function updateProgressionTracker(currentRound) {
+            const tracker = document.getElementById('progression-tracker');
+            const stepsContainer = document.getElementById('progression-steps');
+
+            if (!tracker || !stepsContainer) return;
+
+            // Get tournament configuration
+            const swissRounds = window.tournamentSwissRounds || 4;
+            const totalTeams = window.totalTeams || 0;
+            const hasSemifinals = totalTeams === 16;
+
+            // Define tournament phases
+            const phases = [];
+
+            // Swiss rounds phase
+            phases.push({
+                id: 'swiss',
+                icon: 'fas fa-chess-board',
+                label: `Swiss Rounds (${swissRounds})`,
+                rounds: Array.from({length: swissRounds}, (_, i) => i + 1),
+                completed: currentRound > swissRounds,
+                active: currentRound >= 1 && currentRound <= swissRounds
+            });
+
+            // Semifinals phase (only for 16 teams)
+            if (hasSemifinals) {
+                const semifinalRound = swissRounds + 1;
+                phases.push({
+                    id: 'semifinals',
+                    icon: 'fas fa-trophy',
+                    label: 'Semifinals (Top 8)',
+                    rounds: [semifinalRound],
+                    completed: currentRound > semifinalRound,
+                    active: currentRound === semifinalRound
+                });
+            }
+
+            // Finals phase
+            const finalsRound = hasSemifinals ? swissRounds + 2 : swissRounds + 1;
+            phases.push({
+                id: 'finals',
+                icon: 'fas fa-crown',
+                label: 'Finals (Top 4)',
+                rounds: [finalsRound],
+                completed: false,
+                active: currentRound === finalsRound
+            });
+
+            // Build HTML
+            let html = '';
+            phases.forEach((phase, index) => {
+                const stateClass = phase.completed ? 'completed' : (phase.active ? 'active' : '');
+                html += `
+                    <div class="progression-step ${stateClass}">
+                        <div class="progression-circle">
+                            <i class="${phase.icon}"></i>
+                        </div>
+                        <div class="progression-label">${phase.label}</div>
+                    </div>
+                `;
+
+                // Add arrow between phases (except after last phase)
+                if (index < phases.length - 1) {
+                    html += `<i class="fas fa-arrow-right progression-arrow"></i>`;
+                }
+            });
+
+            stepsContainer.innerHTML = html;
+            tracker.style.display = 'block';
+        }
+
+        // Update Tournament Bracket Visualization
+        async function updateBracketVisualization(currentRound) {
+            const bracketContainer = document.getElementById('bracket-container');
+            const bracketGrid = document.getElementById('bracket-grid');
+            const bracketTitleText = document.getElementById('bracket-title-text');
+
+            if (!bracketContainer || !bracketGrid || !bracketTitleText) return;
+
+            // Get tournament configuration
+            const swissRounds = window.tournamentSwissRounds || 4;
+            const totalTeams = window.totalTeams || 0;
+            const hasSemifinals = totalTeams === 16;
+
+            const roundType = getRoundType(currentRound);
+
+            // Only show bracket for semifinals and finals
+            if (roundType !== 'semifinals' && roundType !== 'finals') {
+                bracketContainer.style.display = 'none';
+                return;
+            }
+
+            try {
+                // Fetch current standings to get team scores
+                const standingsResponse = await fetch('/get_standings');
+                const standingsData = await standingsResponse.json();
+
+                if (!standingsData.standings) {
+                    bracketContainer.style.display = 'none';
+                    return;
+                }
+
+                const standings = standingsData.standings;
+
+                if (roundType === 'semifinals') {
+                    // Show top 8 teams in semifinals bracket
+                    bracketTitleText.textContent = 'Semifinals Bracket - Top 8 Teams';
+                    bracketGrid.className = 'bracket-grid semifinals';
+
+                    const top8 = standings.slice(0, 8);
+
+                    // Create 4 matchups (1v8, 2v7, 3v6, 4v5)
+                    const matchups = [
+                        { teams: [top8[0], top8[7]], label: 'Matchup 1' },
+                        { teams: [top8[1], top8[6]], label: 'Matchup 2' },
+                        { teams: [top8[2], top8[5]], label: 'Matchup 3' },
+                        { teams: [top8[3], top8[4]], label: 'Matchup 4' }
+                    ];
+
+                    let html = '';
+                    matchups.forEach((matchup, index) => {
+                        html += generateMatchupHTML(matchup, index + 1);
+                    });
+
+                    bracketGrid.innerHTML = html;
+                    bracketContainer.style.display = 'block';
+
+                } else if (roundType === 'finals') {
+                    // Show top 4 teams in finals bracket
+                    bracketTitleText.textContent = 'Finals Bracket - Top 4 Teams';
+                    bracketGrid.className = 'bracket-grid finals';
+
+                    const top4 = standings.slice(0, 4);
+
+                    // Create 2 matchups (1v4, 2v3)
+                    const matchups = [
+                        { teams: [top4[0], top4[3]], label: 'Finals Matchup 1' },
+                        { teams: [top4[1], top4[2]], label: 'Finals Matchup 2' }
+                    ];
+
+                    let html = '';
+                    matchups.forEach((matchup, index) => {
+                        html += generateMatchupHTML(matchup, index + 1);
+                    });
+
+                    bracketGrid.innerHTML = html;
+                    bracketContainer.style.display = 'block';
+                }
+
+            } catch (error) {
+                console.error('Error updating bracket visualization:', error);
+                bracketContainer.style.display = 'none';
+            }
+        }
+
+        // Generate HTML for a single matchup
+        function generateMatchupHTML(matchup, matchupNumber) {
+            const team1 = matchup.teams[0];
+            const team2 = matchup.teams[1];
+
+            if (!team1 || !team2) return '';
+
+            return `
+                <div class="bracket-matchup">
+                    <div class="matchup-header">${matchup.label}</div>
+                    <div class="matchup-teams">
+                        <div class="matchup-team">
+                            <div class="team-info">
+                                <div class="team-seed">${team1.rank || '?'}</div>
+                                <div class="team-name">${team1.team || 'Unknown'}</div>
+                            </div>
+                            <div class="team-score">${team1.total_points || 0} pts</div>
+                        </div>
+                        <div class="bracket-vs">VS</div>
+                        <div class="matchup-team">
+                            <div class="team-info">
+                                <div class="team-seed">${team2.rank || '?'}</div>
+                                <div class="team-name">${team2.team || 'Unknown'}</div>
+                            </div>
+                            <div class="team-score">${team2.total_points || 0} pts</div>
+                        </div>
+                    </div>
+                </div>
+            `;
         }
 
         // Display Tables with Score Input
@@ -2254,17 +2749,28 @@
                         ${tableName}
                     </div>
                     <div class="table-players">
-                        ${players.map(player => `
-                            <div class="table-player">
-                                <div class="table-player-name">
-                                    <i class="fas fa-user"></i>
-                                    ${player['Player Name'] || player.name || 'Unknown'}
+                        ${players.map(player => {
+                            const playerId = player['Player ID'] || player.id;
+                            const playerScore = window.currentRoundScores?.[tableName]?.[playerId] ?? '-';
+                            return `
+                                <div class="table-player">
+                                    <div class="table-player-info">
+                                        <i class="fas fa-user"></i>
+                                        <div class="table-player-details">
+                                            <div class="table-player-name">
+                                                ${player['Player Name'] || player.name || 'Unknown'}
+                                            </div>
+                                            <div class="table-player-team">
+                                                ${player['Team Name'] || player.team || 'Unknown Team'}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="table-player-score" id="score-display-${playerId}">
+                                        ${playerScore === '-' ? '-' : playerScore + ' pts'}
+                                    </div>
                                 </div>
-                                <div class="table-player-team">
-                                    ${player['Team Name'] || player.team || 'Unknown Team'}
-                                </div>
-                            </div>
-                        `).join('')}
+                            `;
+                        }).join('')}
                     </div>
                     ${scoreInputHTML}
                 `;
@@ -2349,29 +2855,52 @@
             if (!tableScores[tableName]) {
                 tableScores[tableName] = {};
             }
-            
+
+            // Initialize global current round scores if needed
+            if (!window.currentRoundScores) {
+                window.currentRoundScores = {};
+            }
+            if (!window.currentRoundScores[tableName]) {
+                window.currentRoundScores[tableName] = {};
+            }
+
             // Check if this button is already active (allow deselect)
             if (button.classList.contains('active')) {
                 // Deselect - remove score
                 button.classList.remove('active');
                 delete tableScores[tableName][playerId];
+                delete window.currentRoundScores[tableName][playerId];
+
+                // Update score display next to player name
+                const scoreDisplay = document.getElementById(`score-display-${playerId}`);
+                if (scoreDisplay) {
+                    scoreDisplay.textContent = '-';
+                }
+
                 console.log(`Deselected score: Table ${tableName}, Player ${playerId}`);
                 showToast('Score Removed', 'Click a button to set the score again', 'info');
                 return;
             }
-            
+
             // Store the score
             tableScores[tableName][playerId] = points;
-            
+            window.currentRoundScores[tableName][playerId] = points;
+
+            // Update score display next to player name
+            const scoreDisplay = document.getElementById(`score-display-${playerId}`);
+            if (scoreDisplay) {
+                scoreDisplay.textContent = `${points} pts`;
+            }
+
             // Update button states (remove active from siblings)
             const parent = button.parentElement;
             parent.querySelectorAll('.score-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
-            
+
             // Make this button active
             button.classList.add('active');
-            
+
             console.log(`Set score: Table ${tableName}, Player ${playerId} = ${points} pts`);
         }
         
