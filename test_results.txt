@@ -1,0 +1,1178 @@
+﻿[INFO]  
+============================================================
+[INFO]  COMPREHENSIVE TOURNAMENT TEST SUITE
+[INFO]  ============================================================
+[INFO]  
+============================================================
+[INFO]  TEST: 8 Teams - 4 Swiss Rounds
+[INFO]  ============================================================
+Γ£ô Swiss rounds configured: 4 rounds
+Γ£ô Tournament structure will be determined when teams are loaded
+[PASS]  PASS: Configure 4 Swiss rounds
+Γ£ô Tournament structure: 8 teams
+  - Swiss rounds: 4
+  - Semifinals: NO (top 4 teams advance directly to Finals)
+  - Finals: YES (top 4 teams)
+  - Total rounds: 5
+[PASS]  PASS: No semifinals for 8 teams (expected: False, got: False)
+[PASS]  PASS: Total rounds = 5 (4 Swiss + 1 Finals) (expected: 5, got: 5)
+[PASS]  PASS: 8 teams loaded (expected: 8, got: 8)
+Γ£ô Tournament configuration: 8 teams (OPTIMAL), 4 Swiss rounds
+Γ£ô All teams will compete in ONE unified tournament group
+Γ£ô Pods per round: 8 (4 players each)
+Γ£ô This configuration guarantees perfect pairings with zero repeat matchups
+≡ƒöä RESETTING tournament state for new tournament...
+Γ£ô Tournament state reset complete
+Tournament Teams (8): ['Team_08', 'Team_07', 'Team_03', 'Team_06', 'Team_02', 'Team_05', 'Team_01', 'Team_04']
+=== GENERATING ALL 4 SWISS ROUNDS AT ONCE ===
+Generating complete Swiss tournament for 8 teams...
+Tournament teams: ['Team_08', 'Team_07', 'Team_03', 'Team_06', 'Team_02', 'Team_05', 'Team_01', 'Team_04']
+Swiss rounds: 4
+≡ƒöº Unified Swiss Pairing initialized
+   Teams: 8 (['Team_08', 'Team_07', 'Team_03', 'Team_06', 'Team_02', 'Team_05', 'Team_01', 'Team_04'])
+   Players: 32
+   Pods per round: 8
+   Incomplete pod size: 0
+   Swiss rounds: 4
+≡ƒÜÇ Generating all Swiss rounds with unified algorithm...
+
+--- Attempting Enhanced Constraint Satisfaction ---
+  Solving Round 1...
+    Using enhanced constraint satisfaction solver...
+    Backtrack stats: 9 nodes, 0 backtracks, 0 pruned
+    Γ£à Enhanced solver succeeded
+  Γ£à Round 1 solved (8 pods)
+  Solving Round 2...
+    Using enhanced constraint satisfaction solver...
+    Backtrack stats: 9 nodes, 0 backtracks, 0 pruned
+    Γ£à Enhanced solver succeeded
+  Γ£à Round 2 solved (8 pods)
+  Solving Round 3...
+    Using enhanced constraint satisfaction solver...
+    Backtrack stats: 9 nodes, 0 backtracks, 0 pruned
+    Γ£à Enhanced solver succeeded
+  Γ£à Round 3 solved (8 pods)
+  Solving Round 4...
+    Using enhanced constraint satisfaction solver...
+    Backtrack stats: 9 nodes, 0 backtracks, 0 pruned
+    Γ£à Enhanced solver succeeded
+  Γ£à Round 4 solved (8 pods)
+Γ£à Enhanced Constraint Satisfaction succeeded!
+   Generation time: 0.00 seconds
+   Total rounds: 4
+Γ£ô Tournament generated successfully!
+  Perfect tournament: True
+  Total violations: 0
+  Pairing efficiency: 100.0%
+  Generation time: 0.00 seconds
+   Round 1, Table 1: Random seating (no prior scores)
+   Round 1, Table 2: Random seating (no prior scores)
+   Round 1, Table 3: Random seating (no prior scores)
+   Round 1, Table 4: Random seating (no prior scores)
+   Round 1, Table 5: Random seating (no prior scores)
+   Round 1, Table 6: Random seating (no prior scores)
+   Round 1, Table 7: Random seating (no prior scores)
+   Round 1, Table 8: Random seating (no prior scores)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_07 (0pts) | Seat 3: Team_03 (0pts) | Seat 4: Team_06 (0pts)
+   Round 2, Table 1: Intelligent seating (score-based)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_07 (0pts) | Seat 3: Team_03 (0pts) | Seat 4: Team_06 (0pts)
+   Round 2, Table 2: Intelligent seating (score-based)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_07 (0pts) | Seat 3: Team_03 (0pts) | Seat 4: Team_06 (0pts)
+   Round 2, Table 3: Intelligent seating (score-based)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_07 (0pts) | Seat 3: Team_03 (0pts) | Seat 4: Team_06 (0pts)
+   Round 2, Table 4: Intelligent seating (score-based)
+      Seating: Seat 1: Team_02 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_04 (0pts)
+   Round 2, Table 5: Intelligent seating (score-based)
+      Seating: Seat 1: Team_02 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_04 (0pts)
+   Round 2, Table 6: Intelligent seating (score-based)
+      Seating: Seat 1: Team_02 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_04 (0pts)
+   Round 2, Table 7: Intelligent seating (score-based)
+      Seating: Seat 1: Team_02 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_04 (0pts)
+   Round 2, Table 8: Intelligent seating (score-based)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_07 (0pts) | Seat 3: Team_03 (0pts) | Seat 4: Team_06 (0pts)
+   Round 3, Table 1: Intelligent seating (score-based)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_07 (0pts) | Seat 3: Team_03 (0pts) | Seat 4: Team_06 (0pts)
+   Round 3, Table 2: Intelligent seating (score-based)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_07 (0pts) | Seat 3: Team_03 (0pts) | Seat 4: Team_06 (0pts)
+   Round 3, Table 3: Intelligent seating (score-based)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_07 (0pts) | Seat 3: Team_03 (0pts) | Seat 4: Team_06 (0pts)
+   Round 3, Table 4: Intelligent seating (score-based)
+      Seating: Seat 1: Team_02 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_04 (0pts)
+   Round 3, Table 5: Intelligent seating (score-based)
+      Seating: Seat 1: Team_02 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_04 (0pts)
+   Round 3, Table 6: Intelligent seating (score-based)
+      Seating: Seat 1: Team_02 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_04 (0pts)
+   Round 3, Table 7: Intelligent seating (score-based)
+      Seating: Seat 1: Team_02 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_04 (0pts)
+   Round 3, Table 8: Intelligent seating (score-based)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_07 (0pts) | Seat 3: Team_03 (0pts) | Seat 4: Team_06 (0pts)
+   Round 4, Table 1: Intelligent seating (score-based)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_07 (0pts) | Seat 3: Team_03 (0pts) | Seat 4: Team_06 (0pts)
+   Round 4, Table 2: Intelligent seating (score-based)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_07 (0pts) | Seat 3: Team_03 (0pts) | Seat 4: Team_06 (0pts)
+   Round 4, Table 3: Intelligent seating (score-based)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_07 (0pts) | Seat 3: Team_03 (0pts) | Seat 4: Team_06 (0pts)
+   Round 4, Table 4: Intelligent seating (score-based)
+      Seating: Seat 1: Team_02 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_04 (0pts)
+   Round 4, Table 5: Intelligent seating (score-based)
+      Seating: Seat 1: Team_02 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_04 (0pts)
+   Round 4, Table 6: Intelligent seating (score-based)
+      Seating: Seat 1: Team_02 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_04 (0pts)
+   Round 4, Table 7: Intelligent seating (score-based)
+      Seating: Seat 1: Team_02 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_04 (0pts)
+   Round 4, Table 8: Intelligent seating (score-based)
+Γ£ô Organized all rounds into tables structure with intelligent seating
+Γ£ô Tournament ready: 4 rounds with 8 tables each
+Γ£ô All 4 Swiss rounds generated successfully!
+Tournament pairings are now LOCKED for the entire event.
+[PASS]  PASS: 4 Swiss rounds generated (expected: 4, got: 4)
+[INFO]  
+--- Simulating Swiss Round 1 ---
+[PASS]  PASS: Round 1 has 8 tables (expected: 8, got: 8)
+[INFO]  
+--- Simulating Swiss Round 2 ---
+[PASS]  PASS: Round 2 has 8 tables (expected: 8, got: 8)
+[INFO]  
+--- Simulating Swiss Round 3 ---
+[PASS]  PASS: Round 3 has 8 tables (expected: 8, got: 8)
+[INFO]  
+--- Simulating Swiss Round 4 ---
+[PASS]  PASS: Round 4 has 8 tables (expected: 8, got: 8)
+[INFO]  
+--- Checking Finals Generation ---
+≡ƒÅå Generating FINALS after Swiss rounds (8-team tournament)
+   Top 4 teams advancing to finals:
+     1. Team_01: 0 pts
+     2. Team_02: 0 pts
+     3. Team_03: 0 pts
+     4. Team_04: 0 pts
+
+   Team_01 players (ranked by Swiss points):
+     Rank 1: Player_01 - 8 pts
+     Rank 2: Player_03 - 7 pts
+     Rank 3: Player_02 - 6 pts
+     Rank 4: Player_04 - 6 pts
+
+   Team_02 players (ranked by Swiss points):
+     Rank 1: Player_05 - 7 pts
+     Rank 2: Player_06 - 4 pts
+     Rank 3: Player_07 - 4 pts
+     Rank 4: Player_08 - 3 pts
+
+   Team_03 players (ranked by Swiss points):
+     Rank 1: Player_09 - 7 pts
+     Rank 2: Player_11 - 6 pts
+     Rank 3: Player_10 - 5 pts
+     Rank 4: Player_12 - 5 pts
+
+   Team_04 players (ranked by Swiss points):
+     Rank 1: Player_16 - 9 pts
+     Rank 2: Player_13 - 6 pts
+     Rank 3: Player_14 - 6 pts
+     Rank 4: Player_15 - 5 pts
+
+   Creating finals tables (Round 5) (NO teammates together, ordered by team ranking):
+     Finals Table 1 Seat 1: Player_01 (Team_01) - 8 pts (Team: 0 pts)
+     Finals Table 1 Seat 2: Player_05 (Team_02) - 7 pts (Team: 0 pts)
+     Finals Table 1 Seat 3: Player_09 (Team_03) - 7 pts (Team: 0 pts)
+     Finals Table 1 Seat 4: Player_16 (Team_04) - 9 pts (Team: 0 pts)
+     Finals Table 2 Seat 1: Player_03 (Team_01) - 7 pts (Team: 0 pts)
+     Finals Table 2 Seat 2: Player_06 (Team_02) - 4 pts (Team: 0 pts)
+     Finals Table 2 Seat 3: Player_11 (Team_03) - 6 pts (Team: 0 pts)
+     Finals Table 2 Seat 4: Player_13 (Team_04) - 6 pts (Team: 0 pts)
+     Finals Table 3 Seat 1: Player_02 (Team_01) - 6 pts (Team: 0 pts)
+     Finals Table 3 Seat 2: Player_07 (Team_02) - 4 pts (Team: 0 pts)
+     Finals Table 3 Seat 3: Player_10 (Team_03) - 5 pts (Team: 0 pts)
+     Finals Table 3 Seat 4: Player_14 (Team_04) - 6 pts (Team: 0 pts)
+     Finals Table 4 Seat 1: Player_04 (Team_01) - 6 pts (Team: 0 pts)
+     Finals Table 4 Seat 2: Player_08 (Team_02) - 3 pts (Team: 0 pts)
+     Finals Table 4 Seat 3: Player_12 (Team_03) - 5 pts (Team: 0 pts)
+     Finals Table 4 Seat 4: Player_15 (Team_04) - 5 pts (Team: 0 pts)
+
+Γ£à Finals created: 4 tables with strength-based matchups
+   - Table 1: Strongest player from each team (NO teammates)
+   - Table 2: 2nd strongest player from each team (NO teammates)
+   - Table 3: 3rd strongest player from each team (NO teammates)
+   - Table 4: 4th strongest player from each team (NO teammates)
+   Γ£à VERIFIED: No teammates are paired together!
+   Γ£à Seating order: Arranged by team ranking (highest team score = first seat)
+[PASS]  PASS: Finals generated after Swiss rounds
+[PASS]  PASS: Finals round (5) exists
+[PASS]  PASS: Finals has 4 tables (top 4 teams) (expected: 4, got: 4)
+[PASS]  
+Γ£à TEST PASSED: 8 Teams - 4 Swiss Rounds
+[INFO]  
+============================================================
+[INFO]  TEST: 8 Teams - 5 Swiss Rounds
+[INFO]  ============================================================
+Γ£ô Swiss rounds configured: 5 rounds
+Γ£ô Tournament structure will be determined when teams are loaded
+[PASS]  PASS: Configure 5 Swiss rounds
+Γ£ô Tournament structure: 8 teams
+  - Swiss rounds: 5
+  - Semifinals: NO (top 4 teams advance directly to Finals)
+  - Finals: YES (top 4 teams)
+  - Total rounds: 6
+[PASS]  PASS: No semifinals for 8 teams (expected: False, got: False)
+[PASS]  PASS: Total rounds = 6 (5 Swiss + 1 Finals) (expected: 6, got: 6)
+Γ£ô Tournament configuration: 8 teams (OPTIMAL), 5 Swiss rounds
+Γ£ô All teams will compete in ONE unified tournament group
+Γ£ô Pods per round: 8 (4 players each)
+Γ£ô This configuration guarantees perfect pairings with zero repeat matchups
+≡ƒöä RESETTING tournament state for new tournament...
+Γ£ô Tournament state reset complete
+Tournament Teams (8): ['Team_07', 'Team_05', 'Team_02', 'Team_04', 'Team_06', 'Team_08', 'Team_03', 'Team_01']
+=== GENERATING ALL 5 SWISS ROUNDS AT ONCE ===
+Generating complete Swiss tournament for 8 teams...
+Tournament teams: ['Team_07', 'Team_05', 'Team_02', 'Team_04', 'Team_06', 'Team_08', 'Team_03', 'Team_01']
+Swiss rounds: 5
+≡ƒöº Unified Swiss Pairing initialized
+   Teams: 8 (['Team_07', 'Team_05', 'Team_02', 'Team_04', 'Team_06', 'Team_08', 'Team_03', 'Team_01'])
+   Players: 32
+   Pods per round: 8
+   Incomplete pod size: 0
+   Swiss rounds: 5
+≡ƒÜÇ Generating all Swiss rounds with unified algorithm...
+
+--- Attempting Enhanced Constraint Satisfaction ---
+  Solving Round 1...
+    Using enhanced constraint satisfaction solver...
+    Backtrack stats: 9 nodes, 0 backtracks, 0 pruned
+    Γ£à Enhanced solver succeeded
+  Γ£à Round 1 solved (8 pods)
+  Solving Round 2...
+    Using enhanced constraint satisfaction solver...
+    Backtrack stats: 9 nodes, 0 backtracks, 0 pruned
+    Γ£à Enhanced solver succeeded
+  Γ£à Round 2 solved (8 pods)
+  Solving Round 3...
+    Using enhanced constraint satisfaction solver...
+    Backtrack stats: 9 nodes, 0 backtracks, 0 pruned
+    Γ£à Enhanced solver succeeded
+  Γ£à Round 3 solved (8 pods)
+  Solving Round 4...
+    Using enhanced constraint satisfaction solver...
+    Backtrack stats: 9 nodes, 0 backtracks, 0 pruned
+    Γ£à Enhanced solver succeeded
+  Γ£à Round 4 solved (8 pods)
+  Solving Round 5...
+    Using enhanced constraint satisfaction solver...
+    Backtrack stats: 1 nodes, 1 backtracks, 0 pruned
+    Γ¥î Enhanced solver failed, trying fallback...
+  Γ¥î Failed to solve Round 5
+Γ¥î Enhanced Constraint Satisfaction failed
+
+--- Attempting Dynamic Pairing with Backtracking ---
+    Trying Constraint-Guided Random strategy...
+      Attempt 100/500...
+      Attempt 200/500...
+      Attempt 300/500...
+      Attempt 400/500...
+      Attempt 500/500...
+    Γ¥î Constraint-Guided Random failed after 500 attempts
+    Trying Team-Balanced Random strategy...
+      Attempt 100/500...
+      Attempt 200/500...
+      Attempt 300/500...
+      Attempt 400/500...
+      Attempt 500/500...
+    Γ¥î Team-Balanced Random failed after 500 attempts
+    Trying Pure Random strategy...
+      Attempt 100/500...
+      Attempt 200/500...
+      Attempt 300/500...
+      Attempt 400/500...
+      Attempt 500/500...
+    Γ¥î Pure Random failed after 500 attempts
+Γ¥î Dynamic Pairing with Backtracking failed
+
+--- Attempting Relaxed Constraint Optimization ---
+  Using relaxed constraints - minimizing violations...
+    New best solution: 1 violations
+    Optimization attempt 10/50...
+    New best solution: 0 violations
+  Γ£à Relaxed constraint optimization succeeded with 0 violations
+Γ£à Relaxed Constraint Optimization succeeded!
+   Generation time: 1.94 seconds
+   Total rounds: 5
+Γ£ô Tournament generated successfully!
+  Perfect tournament: True
+  Total violations: 0
+  Pairing efficiency: 100.0%
+  Generation time: 1.94 seconds
+   Round 1, Table 1: Random seating (no prior scores)
+   Round 1, Table 2: Random seating (no prior scores)
+   Round 1, Table 3: Random seating (no prior scores)
+   Round 1, Table 4: Random seating (no prior scores)
+   Round 1, Table 5: Random seating (no prior scores)
+   Round 1, Table 6: Random seating (no prior scores)
+   Round 1, Table 7: Random seating (no prior scores)
+   Round 1, Table 8: Random seating (no prior scores)
+      Seating: Seat 1: Team_06 (0pts) | Seat 2: Team_07 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_02 (0pts)
+   Round 2, Table 1: Intelligent seating (score-based)
+      Seating: Seat 1: Team_06 (0pts) | Seat 2: Team_01 (0pts) | Seat 3: Team_02 (0pts) | Seat 4: Team_03 (0pts)
+   Round 2, Table 2: Intelligent seating (score-based)
+      Seating: Seat 1: Team_06 (0pts) | Seat 2: Team_03 (0pts) | Seat 3: Team_08 (0pts) | Seat 4: Team_05 (0pts)
+   Round 2, Table 3: Intelligent seating (score-based)
+      Seating: Seat 1: Team_06 (0pts) | Seat 2: Team_08 (0pts) | Seat 3: Team_05 (0pts) | Seat 4: Team_04 (0pts)
+   Round 2, Table 4: Intelligent seating (score-based)
+      Seating: Seat 1: Team_07 (0pts) | Seat 2: Team_03 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_04 (0pts)
+   Round 2, Table 5: Intelligent seating (score-based)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_02 (0pts) | Seat 3: Team_05 (0pts) | Seat 4: Team_01 (0pts)
+   Round 2, Table 6: Intelligent seating (score-based)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_07 (0pts) | Seat 3: Team_04 (0pts) | Seat 4: Team_05 (0pts)
+   Round 2, Table 7: Intelligent seating (score-based)
+      Seating: Seat 1: Team_07 (0pts) | Seat 2: Team_04 (0pts) | Seat 3: Team_03 (0pts) | Seat 4: Team_02 (0pts)
+   Round 2, Table 8: Intelligent seating (score-based)
+      Seating: Seat 1: Team_05 (0pts) | Seat 2: Team_02 (0pts) | Seat 3: Team_04 (0pts) | Seat 4: Team_08 (0pts)
+   Round 3, Table 1: Intelligent seating (score-based)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_07 (0pts) | Seat 3: Team_04 (0pts) | Seat 4: Team_01 (0pts)
+   Round 3, Table 2: Intelligent seating (score-based)
+      Seating: Seat 1: Team_03 (0pts) | Seat 2: Team_04 (0pts) | Seat 3: Team_05 (0pts) | Seat 4: Team_02 (0pts)
+   Round 3, Table 3: Intelligent seating (score-based)
+      Seating: Seat 1: Team_05 (0pts) | Seat 2: Team_03 (0pts) | Seat 3: Team_02 (0pts) | Seat 4: Team_01 (0pts)
+   Round 3, Table 4: Intelligent seating (score-based)
+      Seating: Seat 1: Team_03 (0pts) | Seat 2: Team_02 (0pts) | Seat 3: Team_07 (0pts) | Seat 4: Team_06 (0pts)
+   Round 3, Table 5: Intelligent seating (score-based)
+      Seating: Seat 1: Team_05 (0pts) | Seat 2: Team_07 (0pts) | Seat 3: Team_06 (0pts) | Seat 4: Team_04 (0pts)
+   Round 3, Table 6: Intelligent seating (score-based)
+      Seating: Seat 1: Team_01 (0pts) | Seat 2: Team_06 (0pts) | Seat 3: Team_08 (0pts) | Seat 4: Team_07 (0pts)
+   Round 3, Table 7: Intelligent seating (score-based)
+      Seating: Seat 1: Team_01 (0pts) | Seat 2: Team_08 (0pts) | Seat 3: Team_03 (0pts) | Seat 4: Team_06 (0pts)
+   Round 3, Table 8: Intelligent seating (score-based)
+      Seating: Seat 1: Team_07 (0pts) | Seat 2: Team_01 (0pts) | Seat 3: Team_06 (0pts) | Seat 4: Team_04 (0pts)
+   Round 4, Table 1: Intelligent seating (score-based)
+      Seating: Seat 1: Team_01 (0pts) | Seat 2: Team_04 (0pts) | Seat 3: Team_05 (0pts) | Seat 4: Team_02 (0pts)
+   Round 4, Table 2: Intelligent seating (score-based)
+      Seating: Seat 1: Team_05 (0pts) | Seat 2: Team_07 (0pts) | Seat 3: Team_03 (0pts) | Seat 4: Team_02 (0pts)
+   Round 4, Table 3: Intelligent seating (score-based)
+      Seating: Seat 1: Team_03 (0pts) | Seat 2: Team_06 (0pts) | Seat 3: Team_08 (0pts) | Seat 4: Team_01 (0pts)
+   Round 4, Table 4: Intelligent seating (score-based)
+      Seating: Seat 1: Team_03 (0pts) | Seat 2: Team_08 (0pts) | Seat 3: Team_06 (0pts) | Seat 4: Team_07 (0pts)
+   Round 4, Table 5: Intelligent seating (score-based)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_03 (0pts) | Seat 3: Team_04 (0pts) | Seat 4: Team_02 (0pts)
+   Round 4, Table 6: Intelligent seating (score-based)
+      Seating: Seat 1: Team_04 (0pts) | Seat 2: Team_02 (0pts) | Seat 3: Team_05 (0pts) | Seat 4: Team_07 (0pts)
+   Round 4, Table 7: Intelligent seating (score-based)
+      Seating: Seat 1: Team_06 (0pts) | Seat 2: Team_01 (0pts) | Seat 3: Team_05 (0pts) | Seat 4: Team_08 (0pts)
+   Round 4, Table 8: Intelligent seating (score-based)
+      Seating: Seat 1: Team_02 (0pts) | Seat 2: Team_07 (0pts) | Seat 3: Team_06 (0pts) | Seat 4: Team_08 (0pts)
+   Round 5, Table 1: Intelligent seating (score-based)
+      Seating: Seat 1: Team_06 (0pts) | Seat 2: Team_08 (0pts) | Seat 3: Team_04 (0pts) | Seat 4: Team_02 (0pts)
+   Round 5, Table 2: Intelligent seating (score-based)
+      Seating: Seat 1: Team_04 (0pts) | Seat 2: Team_06 (0pts) | Seat 3: Team_07 (0pts) | Seat 4: Team_08 (0pts)
+   Round 5, Table 3: Intelligent seating (score-based)
+      Seating: Seat 1: Team_04 (0pts) | Seat 2: Team_07 (0pts) | Seat 3: Team_03 (0pts) | Seat 4: Team_05 (0pts)
+   Round 5, Table 4: Intelligent seating (score-based)
+      Seating: Seat 1: Team_07 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_03 (0pts)
+   Round 5, Table 5: Intelligent seating (score-based)
+      Seating: Seat 1: Team_01 (0pts) | Seat 2: Team_02 (0pts) | Seat 3: Team_03 (0pts) | Seat 4: Team_08 (0pts)
+   Round 5, Table 6: Intelligent seating (score-based)
+      Seating: Seat 1: Team_01 (0pts) | Seat 2: Team_03 (0pts) | Seat 3: Team_02 (0pts) | Seat 4: Team_05 (0pts)
+   Round 5, Table 7: Intelligent seating (score-based)
+      Seating: Seat 1: Team_01 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_06 (0pts) | Seat 4: Team_04 (0pts)
+   Round 5, Table 8: Intelligent seating (score-based)
+Γ£ô Organized all rounds into tables structure with intelligent seating
+Γ£ô Tournament ready: 5 rounds with 8 tables each
+Γ£ô All 5 Swiss rounds generated successfully!
+Tournament pairings are now LOCKED for the entire event.
+[PASS]  PASS: 5 Swiss rounds generated (expected: 5, got: 5)
+[INFO]  
+--- Simulating Swiss Round 1 ---
+[PASS]  PASS: Round 1 has 8 tables (expected: 8, got: 8)
+[INFO]  
+--- Simulating Swiss Round 2 ---
+[PASS]  PASS: Round 2 has 8 tables (expected: 8, got: 8)
+[INFO]  
+--- Simulating Swiss Round 3 ---
+[PASS]  PASS: Round 3 has 8 tables (expected: 8, got: 8)
+[INFO]  
+--- Simulating Swiss Round 4 ---
+[PASS]  PASS: Round 4 has 8 tables (expected: 8, got: 8)
+[INFO]  
+--- Simulating Swiss Round 5 ---
+[PASS]  PASS: Round 5 has 8 tables (expected: 8, got: 8)
+[INFO]  
+--- Checking Finals Generation ---
+≡ƒÅå Generating FINALS after Swiss rounds (8-team tournament)
+   Top 4 teams advancing to finals:
+     1. Team_01: 0 pts
+     2. Team_02: 0 pts
+     3. Team_03: 0 pts
+     4. Team_04: 0 pts
+
+   Team_01 players (ranked by Swiss points):
+     Rank 1: Player_01 - 11 pts
+     Rank 2: Player_04 - 10 pts
+     Rank 3: Player_03 - 6 pts
+     Rank 4: Player_02 - 5 pts
+
+   Team_02 players (ranked by Swiss points):
+     Rank 1: Player_05 - 10 pts
+     Rank 2: Player_06 - 8 pts
+     Rank 3: Player_07 - 6 pts
+     Rank 4: Player_08 - 4 pts
+
+   Team_03 players (ranked by Swiss points):
+     Rank 1: Player_09 - 11 pts
+     Rank 2: Player_10 - 9 pts
+     Rank 3: Player_12 - 7 pts
+     Rank 4: Player_11 - 5 pts
+
+   Team_04 players (ranked by Swiss points):
+     Rank 1: Player_13 - 11 pts
+     Rank 2: Player_16 - 11 pts
+     Rank 3: Player_14 - 7 pts
+     Rank 4: Player_15 - 6 pts
+
+   Creating finals tables (Round 6) (NO teammates together, ordered by team ranking):
+     Finals Table 1 Seat 1: Player_01 (Team_01) - 11 pts (Team: 0 pts)
+     Finals Table 1 Seat 2: Player_05 (Team_02) - 10 pts (Team: 0 pts)
+     Finals Table 1 Seat 3: Player_09 (Team_03) - 11 pts (Team: 0 pts)
+     Finals Table 1 Seat 4: Player_13 (Team_04) - 11 pts (Team: 0 pts)
+     Finals Table 2 Seat 1: Player_04 (Team_01) - 10 pts (Team: 0 pts)
+     Finals Table 2 Seat 2: Player_06 (Team_02) - 8 pts (Team: 0 pts)
+     Finals Table 2 Seat 3: Player_10 (Team_03) - 9 pts (Team: 0 pts)
+     Finals Table 2 Seat 4: Player_16 (Team_04) - 11 pts (Team: 0 pts)
+     Finals Table 3 Seat 1: Player_03 (Team_01) - 6 pts (Team: 0 pts)
+     Finals Table 3 Seat 2: Player_07 (Team_02) - 6 pts (Team: 0 pts)
+     Finals Table 3 Seat 3: Player_12 (Team_03) - 7 pts (Team: 0 pts)
+     Finals Table 3 Seat 4: Player_14 (Team_04) - 7 pts (Team: 0 pts)
+     Finals Table 4 Seat 1: Player_02 (Team_01) - 5 pts (Team: 0 pts)
+     Finals Table 4 Seat 2: Player_08 (Team_02) - 4 pts (Team: 0 pts)
+     Finals Table 4 Seat 3: Player_11 (Team_03) - 5 pts (Team: 0 pts)
+     Finals Table 4 Seat 4: Player_15 (Team_04) - 6 pts (Team: 0 pts)
+
+Γ£à Finals created: 4 tables with strength-based matchups
+   - Table 1: Strongest player from each team (NO teammates)
+   - Table 2: 2nd strongest player from each team (NO teammates)
+   - Table 3: 3rd strongest player from each team (NO teammates)
+   - Table 4: 4th strongest player from each team (NO teammates)
+   Γ£à VERIFIED: No teammates are paired together!
+   Γ£à Seating order: Arranged by team ranking (highest team score = first seat)
+[PASS]  PASS: Finals generated after Swiss rounds
+[PASS]  PASS: Finals round (6) exists
+[PASS]  PASS: Finals has 4 tables (top 4 teams) (expected: 4, got: 4)
+[PASS]  
+Γ£à TEST PASSED: 8 Teams - 5 Swiss Rounds
+[INFO]  
+============================================================
+[INFO]  TEST: 16 Teams - 4 Swiss Rounds
+[INFO]  ============================================================
+Γ£ô Swiss rounds configured: 4 rounds
+Γ£ô Tournament structure will be determined when teams are loaded
+[PASS]  PASS: Configure 4 Swiss rounds
+Γ£ô Tournament structure: 16 teams
+  - Swiss rounds: 4
+  - Semifinals: YES (top 8 teams)
+  - Finals: YES (top 4 teams)
+  - Total rounds: 6
+[PASS]  PASS: Semifinals enabled for 16 teams (expected: True, got: True)
+[PASS]  PASS: Total rounds = 6 (4 Swiss + 1 Semifinals + 1 Finals) (expected: 6, got: 6)
+[PASS]  PASS: 16 teams loaded (expected: 16, got: 16)
+Γ£ô Tournament configuration: 16 teams (OPTIMAL), 4 Swiss rounds
+Γ£ô All teams will compete in ONE unified tournament group
+Γ£ô Pods per round: 16 (4 players each)
+Γ£ô This configuration guarantees perfect pairings with zero repeat matchups
+≡ƒöä RESETTING tournament state for new tournament...
+Γ£ô Tournament state reset complete
+Tournament Teams (16): ['Team_07', 'Team_04', 'Team_15', 'Team_14', 'Team_08', 'Team_06', 'Team_03', 'Team_09', 'Team_05', 'Team_11', 'Team_01', 'Team_16', 'Team_13', 'Team_02', 'Team_12', 'Team_10']
+=== GENERATING ALL 4 SWISS ROUNDS AT ONCE ===
+Generating complete Swiss tournament for 16 teams...
+Tournament teams: ['Team_07', 'Team_04', 'Team_15', 'Team_14', 'Team_08', 'Team_06', 'Team_03', 'Team_09', 'Team_05', 'Team_11', 'Team_01', 'Team_16', 'Team_13', 'Team_02', 'Team_12', 'Team_10']
+Swiss rounds: 4
+≡ƒöº Unified Swiss Pairing initialized
+   Teams: 16 (['Team_07', 'Team_04', 'Team_15', 'Team_14', 'Team_08', 'Team_06', 'Team_03', 'Team_09', 'Team_05', 'Team_11', 'Team_01', 'Team_16', 'Team_13', 'Team_02', 'Team_12', 'Team_10'])
+   Players: 64
+   Pods per round: 16
+   Incomplete pod size: 0
+   Swiss rounds: 4
+≡ƒÜÇ Generating all Swiss rounds with unified algorithm...
+
+--- Attempting Enhanced Constraint Satisfaction ---
+  Solving Round 1...
+    Using enhanced constraint satisfaction solver...
+    Backtrack stats: 17 nodes, 0 backtracks, 0 pruned
+    Γ£à Enhanced solver succeeded
+  Γ£à Round 1 solved (16 pods)
+  Solving Round 2...
+    Using enhanced constraint satisfaction solver...
+    Backtrack stats: 17 nodes, 0 backtracks, 0 pruned
+    Γ£à Enhanced solver succeeded
+  Γ£à Round 2 solved (16 pods)
+  Solving Round 3...
+    Using enhanced constraint satisfaction solver...
+    Backtrack stats: 17 nodes, 0 backtracks, 0 pruned
+    Γ£à Enhanced solver succeeded
+  Γ£à Round 3 solved (16 pods)
+  Solving Round 4...
+    Using enhanced constraint satisfaction solver...
+    Backtrack stats: 17 nodes, 0 backtracks, 0 pruned
+    Γ£à Enhanced solver succeeded
+  Γ£à Round 4 solved (16 pods)
+Γ£à Enhanced Constraint Satisfaction succeeded!
+   Generation time: 0.00 seconds
+   Total rounds: 4
+Γ£ô Tournament generated successfully!
+  Perfect tournament: True
+  Total violations: 0
+  Pairing efficiency: 100.0%
+  Generation time: 0.01 seconds
+   Round 1, Table 1: Random seating (no prior scores)
+   Round 1, Table 2: Random seating (no prior scores)
+   Round 1, Table 3: Random seating (no prior scores)
+   Round 1, Table 4: Random seating (no prior scores)
+   Round 1, Table 5: Random seating (no prior scores)
+   Round 1, Table 6: Random seating (no prior scores)
+   Round 1, Table 7: Random seating (no prior scores)
+   Round 1, Table 8: Random seating (no prior scores)
+   Round 1, Table 9: Random seating (no prior scores)
+   Round 1, Table 10: Random seating (no prior scores)
+   Round 1, Table 11: Random seating (no prior scores)
+   Round 1, Table 12: Random seating (no prior scores)
+   Round 1, Table 13: Random seating (no prior scores)
+   Round 1, Table 14: Random seating (no prior scores)
+   Round 1, Table 15: Random seating (no prior scores)
+   Round 1, Table 16: Random seating (no prior scores)
+      Seating: Seat 1: Team_07 (0pts) | Seat 2: Team_04 (0pts) | Seat 3: Team_15 (0pts) | Seat 4: Team_14 (0pts)
+   Round 2, Table 1: Intelligent seating (score-based)
+      Seating: Seat 1: Team_07 (0pts) | Seat 2: Team_04 (0pts) | Seat 3: Team_15 (0pts) | Seat 4: Team_14 (0pts)
+   Round 2, Table 2: Intelligent seating (score-based)
+      Seating: Seat 1: Team_07 (0pts) | Seat 2: Team_04 (0pts) | Seat 3: Team_15 (0pts) | Seat 4: Team_14 (0pts)
+   Round 2, Table 3: Intelligent seating (score-based)
+      Seating: Seat 1: Team_07 (0pts) | Seat 2: Team_04 (0pts) | Seat 3: Team_15 (0pts) | Seat 4: Team_14 (0pts)
+   Round 2, Table 4: Intelligent seating (score-based)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_06 (0pts) | Seat 3: Team_03 (0pts) | Seat 4: Team_09 (0pts)
+   Round 2, Table 5: Intelligent seating (score-based)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_06 (0pts) | Seat 3: Team_03 (0pts) | Seat 4: Team_09 (0pts)
+   Round 2, Table 6: Intelligent seating (score-based)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_06 (0pts) | Seat 3: Team_03 (0pts) | Seat 4: Team_09 (0pts)
+   Round 2, Table 7: Intelligent seating (score-based)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_06 (0pts) | Seat 3: Team_03 (0pts) | Seat 4: Team_09 (0pts)
+   Round 2, Table 8: Intelligent seating (score-based)
+      Seating: Seat 1: Team_05 (0pts) | Seat 2: Team_11 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_16 (0pts)
+   Round 2, Table 9: Intelligent seating (score-based)
+      Seating: Seat 1: Team_05 (0pts) | Seat 2: Team_11 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_16 (0pts)
+   Round 2, Table 10: Intelligent seating (score-based)
+      Seating: Seat 1: Team_05 (0pts) | Seat 2: Team_11 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_16 (0pts)
+   Round 2, Table 11: Intelligent seating (score-based)
+      Seating: Seat 1: Team_05 (0pts) | Seat 2: Team_11 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_16 (0pts)
+   Round 2, Table 12: Intelligent seating (score-based)
+      Seating: Seat 1: Team_13 (0pts) | Seat 2: Team_02 (0pts) | Seat 3: Team_12 (0pts) | Seat 4: Team_10 (0pts)
+   Round 2, Table 13: Intelligent seating (score-based)
+      Seating: Seat 1: Team_13 (0pts) | Seat 2: Team_02 (0pts) | Seat 3: Team_12 (0pts) | Seat 4: Team_10 (0pts)
+   Round 2, Table 14: Intelligent seating (score-based)
+      Seating: Seat 1: Team_13 (0pts) | Seat 2: Team_02 (0pts) | Seat 3: Team_12 (0pts) | Seat 4: Team_10 (0pts)
+   Round 2, Table 15: Intelligent seating (score-based)
+      Seating: Seat 1: Team_13 (0pts) | Seat 2: Team_02 (0pts) | Seat 3: Team_12 (0pts) | Seat 4: Team_10 (0pts)
+   Round 2, Table 16: Intelligent seating (score-based)
+      Seating: Seat 1: Team_07 (0pts) | Seat 2: Team_04 (0pts) | Seat 3: Team_15 (0pts) | Seat 4: Team_14 (0pts)
+   Round 3, Table 1: Intelligent seating (score-based)
+      Seating: Seat 1: Team_07 (0pts) | Seat 2: Team_04 (0pts) | Seat 3: Team_15 (0pts) | Seat 4: Team_14 (0pts)
+   Round 3, Table 2: Intelligent seating (score-based)
+      Seating: Seat 1: Team_07 (0pts) | Seat 2: Team_04 (0pts) | Seat 3: Team_15 (0pts) | Seat 4: Team_14 (0pts)
+   Round 3, Table 3: Intelligent seating (score-based)
+      Seating: Seat 1: Team_07 (0pts) | Seat 2: Team_04 (0pts) | Seat 3: Team_15 (0pts) | Seat 4: Team_14 (0pts)
+   Round 3, Table 4: Intelligent seating (score-based)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_06 (0pts) | Seat 3: Team_03 (0pts) | Seat 4: Team_09 (0pts)
+   Round 3, Table 5: Intelligent seating (score-based)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_06 (0pts) | Seat 3: Team_03 (0pts) | Seat 4: Team_09 (0pts)
+   Round 3, Table 6: Intelligent seating (score-based)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_06 (0pts) | Seat 3: Team_03 (0pts) | Seat 4: Team_09 (0pts)
+   Round 3, Table 7: Intelligent seating (score-based)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_06 (0pts) | Seat 3: Team_03 (0pts) | Seat 4: Team_09 (0pts)
+   Round 3, Table 8: Intelligent seating (score-based)
+      Seating: Seat 1: Team_05 (0pts) | Seat 2: Team_11 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_16 (0pts)
+   Round 3, Table 9: Intelligent seating (score-based)
+      Seating: Seat 1: Team_05 (0pts) | Seat 2: Team_11 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_16 (0pts)
+   Round 3, Table 10: Intelligent seating (score-based)
+      Seating: Seat 1: Team_05 (0pts) | Seat 2: Team_11 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_16 (0pts)
+   Round 3, Table 11: Intelligent seating (score-based)
+      Seating: Seat 1: Team_05 (0pts) | Seat 2: Team_11 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_16 (0pts)
+   Round 3, Table 12: Intelligent seating (score-based)
+      Seating: Seat 1: Team_13 (0pts) | Seat 2: Team_02 (0pts) | Seat 3: Team_12 (0pts) | Seat 4: Team_10 (0pts)
+   Round 3, Table 13: Intelligent seating (score-based)
+      Seating: Seat 1: Team_13 (0pts) | Seat 2: Team_02 (0pts) | Seat 3: Team_12 (0pts) | Seat 4: Team_10 (0pts)
+   Round 3, Table 14: Intelligent seating (score-based)
+      Seating: Seat 1: Team_13 (0pts) | Seat 2: Team_02 (0pts) | Seat 3: Team_12 (0pts) | Seat 4: Team_10 (0pts)
+   Round 3, Table 15: Intelligent seating (score-based)
+      Seating: Seat 1: Team_13 (0pts) | Seat 2: Team_02 (0pts) | Seat 3: Team_12 (0pts) | Seat 4: Team_10 (0pts)
+   Round 3, Table 16: Intelligent seating (score-based)
+      Seating: Seat 1: Team_07 (0pts) | Seat 2: Team_04 (0pts) | Seat 3: Team_15 (0pts) | Seat 4: Team_14 (0pts)
+   Round 4, Table 1: Intelligent seating (score-based)
+      Seating: Seat 1: Team_07 (0pts) | Seat 2: Team_04 (0pts) | Seat 3: Team_15 (0pts) | Seat 4: Team_14 (0pts)
+   Round 4, Table 2: Intelligent seating (score-based)
+      Seating: Seat 1: Team_07 (0pts) | Seat 2: Team_04 (0pts) | Seat 3: Team_15 (0pts) | Seat 4: Team_14 (0pts)
+   Round 4, Table 3: Intelligent seating (score-based)
+      Seating: Seat 1: Team_07 (0pts) | Seat 2: Team_04 (0pts) | Seat 3: Team_15 (0pts) | Seat 4: Team_14 (0pts)
+   Round 4, Table 4: Intelligent seating (score-based)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_06 (0pts) | Seat 3: Team_03 (0pts) | Seat 4: Team_09 (0pts)
+   Round 4, Table 5: Intelligent seating (score-based)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_06 (0pts) | Seat 3: Team_03 (0pts) | Seat 4: Team_09 (0pts)
+   Round 4, Table 6: Intelligent seating (score-based)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_06 (0pts) | Seat 3: Team_03 (0pts) | Seat 4: Team_09 (0pts)
+   Round 4, Table 7: Intelligent seating (score-based)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_06 (0pts) | Seat 3: Team_03 (0pts) | Seat 4: Team_09 (0pts)
+   Round 4, Table 8: Intelligent seating (score-based)
+      Seating: Seat 1: Team_05 (0pts) | Seat 2: Team_11 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_16 (0pts)
+   Round 4, Table 9: Intelligent seating (score-based)
+      Seating: Seat 1: Team_05 (0pts) | Seat 2: Team_11 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_16 (0pts)
+   Round 4, Table 10: Intelligent seating (score-based)
+      Seating: Seat 1: Team_05 (0pts) | Seat 2: Team_11 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_16 (0pts)
+   Round 4, Table 11: Intelligent seating (score-based)
+      Seating: Seat 1: Team_05 (0pts) | Seat 2: Team_11 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_16 (0pts)
+   Round 4, Table 12: Intelligent seating (score-based)
+      Seating: Seat 1: Team_13 (0pts) | Seat 2: Team_02 (0pts) | Seat 3: Team_12 (0pts) | Seat 4: Team_10 (0pts)
+   Round 4, Table 13: Intelligent seating (score-based)
+      Seating: Seat 1: Team_13 (0pts) | Seat 2: Team_02 (0pts) | Seat 3: Team_12 (0pts) | Seat 4: Team_10 (0pts)
+   Round 4, Table 14: Intelligent seating (score-based)
+      Seating: Seat 1: Team_13 (0pts) | Seat 2: Team_02 (0pts) | Seat 3: Team_12 (0pts) | Seat 4: Team_10 (0pts)
+   Round 4, Table 15: Intelligent seating (score-based)
+      Seating: Seat 1: Team_13 (0pts) | Seat 2: Team_02 (0pts) | Seat 3: Team_12 (0pts) | Seat 4: Team_10 (0pts)
+   Round 4, Table 16: Intelligent seating (score-based)
+Γ£ô Organized all rounds into tables structure with intelligent seating
+Γ£ô Tournament ready: 4 rounds with 16 tables each
+Γ£ô All 4 Swiss rounds generated successfully!
+Tournament pairings are now LOCKED for the entire event.
+[PASS]  PASS: 4 Swiss rounds generated (expected: 4, got: 4)
+[INFO]  
+--- Simulating Swiss Round 1 ---
+[PASS]  PASS: Round 1 has 16 tables (expected: 16, got: 16)
+[INFO]  
+--- Simulating Swiss Round 2 ---
+[PASS]  PASS: Round 2 has 16 tables (expected: 16, got: 16)
+[INFO]  
+--- Simulating Swiss Round 3 ---
+[PASS]  PASS: Round 3 has 16 tables (expected: 16, got: 16)
+[INFO]  
+--- Simulating Swiss Round 4 ---
+[PASS]  PASS: Round 4 has 16 tables (expected: 16, got: 16)
+[INFO]  
+--- Checking Semifinals Generation ---
+≡ƒÅå Generating SEMIFINALS for 16-team tournament
+   Top 8 teams advancing to semifinals:
+     1. Team_01: 0 pts
+     2. Team_02: 0 pts
+     3. Team_03: 0 pts
+     4. Team_04: 0 pts
+     5. Team_05: 0 pts
+     6. Team_06: 0 pts
+     7. Team_07: 0 pts
+     8. Team_08: 0 pts
+
+   Team_01 player rankings:
+     Rank 1: Player_01 - 7 pts
+     Rank 2: Player_02 - 7 pts
+     Rank 3: Player_04 - 6 pts
+     Rank 4: Player_03 - 4 pts
+
+   Team_02 player rankings:
+     Rank 1: Player_05 - 6 pts
+     Rank 2: Player_06 - 6 pts
+     Rank 3: Player_07 - 6 pts
+     Rank 4: Player_08 - 6 pts
+
+   Team_03 player rankings:
+     Rank 1: Player_12 - 6 pts
+     Rank 2: Player_09 - 5 pts
+     Rank 3: Player_10 - 3 pts
+     Rank 4: Player_11 - 3 pts
+
+   Team_04 player rankings:
+     Rank 1: Player_13 - 11 pts
+     Rank 2: Player_15 - 8 pts
+     Rank 3: Player_14 - 5 pts
+     Rank 4: Player_16 - 5 pts
+
+   Team_05 player rankings:
+     Rank 1: Player_19 - 10 pts
+     Rank 2: Player_17 - 7 pts
+     Rank 3: Player_18 - 6 pts
+     Rank 4: Player_20 - 6 pts
+
+   Team_06 player rankings:
+     Rank 1: Player_21 - 9 pts
+     Rank 2: Player_22 - 6 pts
+     Rank 3: Player_23 - 6 pts
+     Rank 4: Player_24 - 4 pts
+
+   Team_07 player rankings:
+     Rank 1: Player_26 - 7 pts
+     Rank 2: Player_27 - 4 pts
+     Rank 3: Player_28 - 4 pts
+     Rank 4: Player_25 - 3 pts
+
+   Team_08 player rankings:
+     Rank 1: Player_31 - 8 pts
+     Rank 2: Player_30 - 7 pts
+     Rank 3: Player_32 - 7 pts
+     Rank 4: Player_29 - 4 pts
+
+   Creating semifinals tables (Round 5):
+   Group 1 teams: ['Team_01', 'Team_03', 'Team_05', 'Team_07']
+   Group 2 teams: ['Team_02', 'Team_04', 'Team_06', 'Team_08']
+     Semifinals Table 1: ['Player_01', 'Player_12', 'Player_19', 'Player_26']
+     Semifinals Table 2: ['Player_02', 'Player_09', 'Player_17', 'Player_27']
+     Semifinals Table 3: ['Player_04', 'Player_10', 'Player_18', 'Player_28']
+     Semifinals Table 4: ['Player_03', 'Player_11', 'Player_20', 'Player_25']
+     Semifinals Table 5: ['Player_05', 'Player_13', 'Player_21', 'Player_31']
+     Semifinals Table 6: ['Player_06', 'Player_15', 'Player_22', 'Player_30']
+     Semifinals Table 7: ['Player_07', 'Player_14', 'Player_23', 'Player_32']
+     Semifinals Table 8: ['Player_08', 'Player_16', 'Player_24', 'Player_29']
+
+Γ£à Semifinals created: 8 tables with strength-based matchups
+   - Top 8 teams (32 players total)
+   - Each table: 4 players from 4 different teams (NO teammates)
+   - Players matched by skill level
+[PASS]  PASS: Semifinals generated after Swiss rounds
+[PASS]  PASS: Semifinals round (5) exists
+[PASS]  PASS: Semifinals has 8 tables (top 8 teams) (expected: 8, got: 8)
+[INFO]  
+--- Simulating Semifinals ---
+[INFO]  
+--- Checking Finals Generation ---
+≡ƒÅå Generating FINALS after semifinals (16-team tournament)
+   Top 4 teams advancing to finals:
+     1. Team_01: 0 pts
+     2. Team_02: 0 pts
+     3. Team_03: 0 pts
+     4. Team_04: 0 pts
+
+   Team_01 players (ranked by Swiss points):
+     Rank 1: Player_01 - 10 pts
+     Rank 2: Player_02 - 10 pts
+     Rank 3: Player_03 - 7 pts
+     Rank 4: Player_04 - 6 pts
+
+   Team_02 players (ranked by Swiss points):
+     Rank 1: Player_05 - 9 pts
+     Rank 2: Player_06 - 9 pts
+     Rank 3: Player_07 - 6 pts
+     Rank 4: Player_08 - 6 pts
+
+   Team_03 players (ranked by Swiss points):
+     Rank 1: Player_12 - 8 pts
+     Rank 2: Player_09 - 6 pts
+     Rank 3: Player_10 - 5 pts
+     Rank 4: Player_11 - 4 pts
+
+   Team_04 players (ranked by Swiss points):
+     Rank 1: Player_13 - 13 pts
+     Rank 2: Player_15 - 8 pts
+     Rank 3: Player_14 - 7 pts
+     Rank 4: Player_16 - 6 pts
+
+   Creating finals tables (Round 6) (NO teammates together, ordered by team ranking):
+     Finals Table 1 Seat 1: Player_01 (Team_01) - 10 pts (Team: 0 pts)
+     Finals Table 1 Seat 2: Player_05 (Team_02) - 9 pts (Team: 0 pts)
+     Finals Table 1 Seat 3: Player_12 (Team_03) - 8 pts (Team: 0 pts)
+     Finals Table 1 Seat 4: Player_13 (Team_04) - 13 pts (Team: 0 pts)
+     Finals Table 2 Seat 1: Player_02 (Team_01) - 10 pts (Team: 0 pts)
+     Finals Table 2 Seat 2: Player_06 (Team_02) - 9 pts (Team: 0 pts)
+     Finals Table 2 Seat 3: Player_09 (Team_03) - 6 pts (Team: 0 pts)
+     Finals Table 2 Seat 4: Player_15 (Team_04) - 8 pts (Team: 0 pts)
+     Finals Table 3 Seat 1: Player_03 (Team_01) - 7 pts (Team: 0 pts)
+     Finals Table 3 Seat 2: Player_07 (Team_02) - 6 pts (Team: 0 pts)
+     Finals Table 3 Seat 3: Player_10 (Team_03) - 5 pts (Team: 0 pts)
+     Finals Table 3 Seat 4: Player_14 (Team_04) - 7 pts (Team: 0 pts)
+     Finals Table 4 Seat 1: Player_04 (Team_01) - 6 pts (Team: 0 pts)
+     Finals Table 4 Seat 2: Player_08 (Team_02) - 6 pts (Team: 0 pts)
+     Finals Table 4 Seat 3: Player_11 (Team_03) - 4 pts (Team: 0 pts)
+     Finals Table 4 Seat 4: Player_16 (Team_04) - 6 pts (Team: 0 pts)
+
+Γ£à Finals created: 4 tables with strength-based matchups
+   - Table 1: Strongest player from each team (NO teammates)
+   - Table 2: 2nd strongest player from each team (NO teammates)
+   - Table 3: 3rd strongest player from each team (NO teammates)
+   - Table 4: 4th strongest player from each team (NO teammates)
+   Γ£à VERIFIED: No teammates are paired together!
+   Γ£à Seating order: Arranged by team ranking (highest team score = first seat)
+[PASS]  PASS: Finals generated after Semifinals
+[PASS]  PASS: Finals round (6) exists
+[PASS]  PASS: Finals has 4 tables (top 4 teams) (expected: 4, got: 4)
+[PASS]  
+Γ£à TEST PASSED: 16 Teams - 4 Swiss Rounds
+[INFO]  
+============================================================
+[INFO]  TEST: 16 Teams - 5 Swiss Rounds
+[INFO]  ============================================================
+Γ£ô Swiss rounds configured: 5 rounds
+Γ£ô Tournament structure will be determined when teams are loaded
+[PASS]  PASS: Configure 5 Swiss rounds
+Γ£ô Tournament structure: 16 teams
+  - Swiss rounds: 5
+  - Semifinals: YES (top 8 teams)
+  - Finals: YES (top 4 teams)
+  - Total rounds: 7
+[PASS]  PASS: Semifinals enabled for 16 teams (expected: True, got: True)
+[PASS]  PASS: Total rounds = 7 (5 Swiss + 1 Semifinals + 1 Finals) (expected: 7, got: 7)
+[PASS]  PASS: 16 teams loaded (expected: 16, got: 16)
+Γ£ô Tournament configuration: 16 teams (OPTIMAL), 5 Swiss rounds
+Γ£ô All teams will compete in ONE unified tournament group
+Γ£ô Pods per round: 16 (4 players each)
+Γ£ô This configuration guarantees perfect pairings with zero repeat matchups
+≡ƒöä RESETTING tournament state for new tournament...
+Γ£ô Tournament state reset complete
+Tournament Teams (16): ['Team_14', 'Team_05', 'Team_06', 'Team_03', 'Team_12', 'Team_15', 'Team_09', 'Team_13', 'Team_07', 'Team_08', 'Team_01', 'Team_11', 'Team_04', 'Team_10', 'Team_16', 'Team_02']
+=== GENERATING ALL 5 SWISS ROUNDS AT ONCE ===
+Generating complete Swiss tournament for 16 teams...
+Tournament teams: ['Team_14', 'Team_05', 'Team_06', 'Team_03', 'Team_12', 'Team_15', 'Team_09', 'Team_13', 'Team_07', 'Team_08', 'Team_01', 'Team_11', 'Team_04', 'Team_10', 'Team_16', 'Team_02']
+Swiss rounds: 5
+≡ƒöº Unified Swiss Pairing initialized
+   Teams: 16 (['Team_14', 'Team_05', 'Team_06', 'Team_03', 'Team_12', 'Team_15', 'Team_09', 'Team_13', 'Team_07', 'Team_08', 'Team_01', 'Team_11', 'Team_04', 'Team_10', 'Team_16', 'Team_02'])
+   Players: 64
+   Pods per round: 16
+   Incomplete pod size: 0
+   Swiss rounds: 5
+≡ƒÜÇ Generating all Swiss rounds with unified algorithm...
+
+--- Attempting Enhanced Constraint Satisfaction ---
+  Solving Round 1...
+    Using enhanced constraint satisfaction solver...
+    Backtrack stats: 17 nodes, 0 backtracks, 0 pruned
+    Γ£à Enhanced solver succeeded
+  Γ£à Round 1 solved (16 pods)
+  Solving Round 2...
+    Using enhanced constraint satisfaction solver...
+    Backtrack stats: 17 nodes, 0 backtracks, 0 pruned
+    Γ£à Enhanced solver succeeded
+  Γ£à Round 2 solved (16 pods)
+  Solving Round 3...
+    Using enhanced constraint satisfaction solver...
+    Backtrack stats: 17 nodes, 0 backtracks, 0 pruned
+    Γ£à Enhanced solver succeeded
+  Γ£à Round 3 solved (16 pods)
+  Solving Round 4...
+    Using enhanced constraint satisfaction solver...
+    Backtrack stats: 17 nodes, 0 backtracks, 0 pruned
+    Γ£à Enhanced solver succeeded
+  Γ£à Round 4 solved (16 pods)
+  Solving Round 5...
+    Using enhanced constraint satisfaction solver...
+    Backtrack stats: 17 nodes, 0 backtracks, 0 pruned
+    Γ£à Enhanced solver succeeded
+  Γ£à Round 5 solved (16 pods)
+Γ£à Enhanced Constraint Satisfaction succeeded!
+   Generation time: 0.02 seconds
+   Total rounds: 5
+Γ£ô Tournament generated successfully!
+  Perfect tournament: True
+  Total violations: 0
+  Pairing efficiency: 100.0%
+  Generation time: 0.02 seconds
+   Round 1, Table 1: Random seating (no prior scores)
+   Round 1, Table 2: Random seating (no prior scores)
+   Round 1, Table 3: Random seating (no prior scores)
+   Round 1, Table 4: Random seating (no prior scores)
+   Round 1, Table 5: Random seating (no prior scores)
+   Round 1, Table 6: Random seating (no prior scores)
+   Round 1, Table 7: Random seating (no prior scores)
+   Round 1, Table 8: Random seating (no prior scores)
+   Round 1, Table 9: Random seating (no prior scores)
+   Round 1, Table 10: Random seating (no prior scores)
+   Round 1, Table 11: Random seating (no prior scores)
+   Round 1, Table 12: Random seating (no prior scores)
+   Round 1, Table 13: Random seating (no prior scores)
+   Round 1, Table 14: Random seating (no prior scores)
+   Round 1, Table 15: Random seating (no prior scores)
+   Round 1, Table 16: Random seating (no prior scores)
+      Seating: Seat 1: Team_14 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_06 (0pts) | Seat 4: Team_03 (0pts)
+   Round 2, Table 1: Intelligent seating (score-based)
+      Seating: Seat 1: Team_14 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_06 (0pts) | Seat 4: Team_03 (0pts)
+   Round 2, Table 2: Intelligent seating (score-based)
+      Seating: Seat 1: Team_14 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_06 (0pts) | Seat 4: Team_03 (0pts)
+   Round 2, Table 3: Intelligent seating (score-based)
+      Seating: Seat 1: Team_14 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_06 (0pts) | Seat 4: Team_03 (0pts)
+   Round 2, Table 4: Intelligent seating (score-based)
+      Seating: Seat 1: Team_12 (0pts) | Seat 2: Team_15 (0pts) | Seat 3: Team_09 (0pts) | Seat 4: Team_13 (0pts)
+   Round 2, Table 5: Intelligent seating (score-based)
+      Seating: Seat 1: Team_12 (0pts) | Seat 2: Team_15 (0pts) | Seat 3: Team_09 (0pts) | Seat 4: Team_13 (0pts)
+   Round 2, Table 6: Intelligent seating (score-based)
+      Seating: Seat 1: Team_12 (0pts) | Seat 2: Team_15 (0pts) | Seat 3: Team_09 (0pts) | Seat 4: Team_13 (0pts)
+   Round 2, Table 7: Intelligent seating (score-based)
+      Seating: Seat 1: Team_12 (0pts) | Seat 2: Team_15 (0pts) | Seat 3: Team_09 (0pts) | Seat 4: Team_13 (0pts)
+   Round 2, Table 8: Intelligent seating (score-based)
+      Seating: Seat 1: Team_07 (0pts) | Seat 2: Team_08 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_11 (0pts)
+   Round 2, Table 9: Intelligent seating (score-based)
+      Seating: Seat 1: Team_07 (0pts) | Seat 2: Team_08 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_11 (0pts)
+   Round 2, Table 10: Intelligent seating (score-based)
+      Seating: Seat 1: Team_07 (0pts) | Seat 2: Team_08 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_11 (0pts)
+   Round 2, Table 11: Intelligent seating (score-based)
+      Seating: Seat 1: Team_07 (0pts) | Seat 2: Team_08 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_11 (0pts)
+   Round 2, Table 12: Intelligent seating (score-based)
+      Seating: Seat 1: Team_04 (0pts) | Seat 2: Team_10 (0pts) | Seat 3: Team_16 (0pts) | Seat 4: Team_02 (0pts)
+   Round 2, Table 13: Intelligent seating (score-based)
+      Seating: Seat 1: Team_04 (0pts) | Seat 2: Team_10 (0pts) | Seat 3: Team_16 (0pts) | Seat 4: Team_02 (0pts)
+   Round 2, Table 14: Intelligent seating (score-based)
+      Seating: Seat 1: Team_04 (0pts) | Seat 2: Team_10 (0pts) | Seat 3: Team_16 (0pts) | Seat 4: Team_02 (0pts)
+   Round 2, Table 15: Intelligent seating (score-based)
+      Seating: Seat 1: Team_04 (0pts) | Seat 2: Team_10 (0pts) | Seat 3: Team_16 (0pts) | Seat 4: Team_02 (0pts)
+   Round 2, Table 16: Intelligent seating (score-based)
+      Seating: Seat 1: Team_14 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_06 (0pts) | Seat 4: Team_03 (0pts)
+   Round 3, Table 1: Intelligent seating (score-based)
+      Seating: Seat 1: Team_14 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_06 (0pts) | Seat 4: Team_03 (0pts)
+   Round 3, Table 2: Intelligent seating (score-based)
+      Seating: Seat 1: Team_14 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_06 (0pts) | Seat 4: Team_03 (0pts)
+   Round 3, Table 3: Intelligent seating (score-based)
+      Seating: Seat 1: Team_14 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_06 (0pts) | Seat 4: Team_03 (0pts)
+   Round 3, Table 4: Intelligent seating (score-based)
+      Seating: Seat 1: Team_12 (0pts) | Seat 2: Team_15 (0pts) | Seat 3: Team_09 (0pts) | Seat 4: Team_13 (0pts)
+   Round 3, Table 5: Intelligent seating (score-based)
+      Seating: Seat 1: Team_12 (0pts) | Seat 2: Team_15 (0pts) | Seat 3: Team_09 (0pts) | Seat 4: Team_13 (0pts)
+   Round 3, Table 6: Intelligent seating (score-based)
+      Seating: Seat 1: Team_12 (0pts) | Seat 2: Team_15 (0pts) | Seat 3: Team_09 (0pts) | Seat 4: Team_13 (0pts)
+   Round 3, Table 7: Intelligent seating (score-based)
+      Seating: Seat 1: Team_12 (0pts) | Seat 2: Team_15 (0pts) | Seat 3: Team_09 (0pts) | Seat 4: Team_13 (0pts)
+   Round 3, Table 8: Intelligent seating (score-based)
+      Seating: Seat 1: Team_07 (0pts) | Seat 2: Team_08 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_11 (0pts)
+   Round 3, Table 9: Intelligent seating (score-based)
+      Seating: Seat 1: Team_07 (0pts) | Seat 2: Team_08 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_11 (0pts)
+   Round 3, Table 10: Intelligent seating (score-based)
+      Seating: Seat 1: Team_07 (0pts) | Seat 2: Team_08 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_11 (0pts)
+   Round 3, Table 11: Intelligent seating (score-based)
+      Seating: Seat 1: Team_07 (0pts) | Seat 2: Team_08 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_11 (0pts)
+   Round 3, Table 12: Intelligent seating (score-based)
+      Seating: Seat 1: Team_04 (0pts) | Seat 2: Team_10 (0pts) | Seat 3: Team_16 (0pts) | Seat 4: Team_02 (0pts)
+   Round 3, Table 13: Intelligent seating (score-based)
+      Seating: Seat 1: Team_04 (0pts) | Seat 2: Team_10 (0pts) | Seat 3: Team_16 (0pts) | Seat 4: Team_02 (0pts)
+   Round 3, Table 14: Intelligent seating (score-based)
+      Seating: Seat 1: Team_04 (0pts) | Seat 2: Team_10 (0pts) | Seat 3: Team_16 (0pts) | Seat 4: Team_02 (0pts)
+   Round 3, Table 15: Intelligent seating (score-based)
+      Seating: Seat 1: Team_04 (0pts) | Seat 2: Team_10 (0pts) | Seat 3: Team_16 (0pts) | Seat 4: Team_02 (0pts)
+   Round 3, Table 16: Intelligent seating (score-based)
+      Seating: Seat 1: Team_14 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_06 (0pts) | Seat 4: Team_03 (0pts)
+   Round 4, Table 1: Intelligent seating (score-based)
+      Seating: Seat 1: Team_14 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_06 (0pts) | Seat 4: Team_03 (0pts)
+   Round 4, Table 2: Intelligent seating (score-based)
+      Seating: Seat 1: Team_14 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_06 (0pts) | Seat 4: Team_03 (0pts)
+   Round 4, Table 3: Intelligent seating (score-based)
+      Seating: Seat 1: Team_14 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_06 (0pts) | Seat 4: Team_03 (0pts)
+   Round 4, Table 4: Intelligent seating (score-based)
+      Seating: Seat 1: Team_12 (0pts) | Seat 2: Team_15 (0pts) | Seat 3: Team_09 (0pts) | Seat 4: Team_13 (0pts)
+   Round 4, Table 5: Intelligent seating (score-based)
+      Seating: Seat 1: Team_12 (0pts) | Seat 2: Team_15 (0pts) | Seat 3: Team_09 (0pts) | Seat 4: Team_13 (0pts)
+   Round 4, Table 6: Intelligent seating (score-based)
+      Seating: Seat 1: Team_12 (0pts) | Seat 2: Team_15 (0pts) | Seat 3: Team_09 (0pts) | Seat 4: Team_13 (0pts)
+   Round 4, Table 7: Intelligent seating (score-based)
+      Seating: Seat 1: Team_12 (0pts) | Seat 2: Team_15 (0pts) | Seat 3: Team_09 (0pts) | Seat 4: Team_13 (0pts)
+   Round 4, Table 8: Intelligent seating (score-based)
+      Seating: Seat 1: Team_07 (0pts) | Seat 2: Team_08 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_11 (0pts)
+   Round 4, Table 9: Intelligent seating (score-based)
+      Seating: Seat 1: Team_07 (0pts) | Seat 2: Team_08 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_11 (0pts)
+   Round 4, Table 10: Intelligent seating (score-based)
+      Seating: Seat 1: Team_07 (0pts) | Seat 2: Team_08 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_11 (0pts)
+   Round 4, Table 11: Intelligent seating (score-based)
+      Seating: Seat 1: Team_07 (0pts) | Seat 2: Team_08 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_11 (0pts)
+   Round 4, Table 12: Intelligent seating (score-based)
+      Seating: Seat 1: Team_04 (0pts) | Seat 2: Team_10 (0pts) | Seat 3: Team_16 (0pts) | Seat 4: Team_02 (0pts)
+   Round 4, Table 13: Intelligent seating (score-based)
+      Seating: Seat 1: Team_04 (0pts) | Seat 2: Team_10 (0pts) | Seat 3: Team_16 (0pts) | Seat 4: Team_02 (0pts)
+   Round 4, Table 14: Intelligent seating (score-based)
+      Seating: Seat 1: Team_04 (0pts) | Seat 2: Team_10 (0pts) | Seat 3: Team_16 (0pts) | Seat 4: Team_02 (0pts)
+   Round 4, Table 15: Intelligent seating (score-based)
+      Seating: Seat 1: Team_04 (0pts) | Seat 2: Team_10 (0pts) | Seat 3: Team_16 (0pts) | Seat 4: Team_02 (0pts)
+   Round 4, Table 16: Intelligent seating (score-based)
+      Seating: Seat 1: Team_14 (0pts) | Seat 2: Team_12 (0pts) | Seat 3: Team_07 (0pts) | Seat 4: Team_04 (0pts)
+   Round 5, Table 1: Intelligent seating (score-based)
+      Seating: Seat 1: Team_14 (0pts) | Seat 2: Team_12 (0pts) | Seat 3: Team_07 (0pts) | Seat 4: Team_04 (0pts)
+   Round 5, Table 2: Intelligent seating (score-based)
+      Seating: Seat 1: Team_14 (0pts) | Seat 2: Team_12 (0pts) | Seat 3: Team_07 (0pts) | Seat 4: Team_04 (0pts)
+   Round 5, Table 3: Intelligent seating (score-based)
+      Seating: Seat 1: Team_14 (0pts) | Seat 2: Team_12 (0pts) | Seat 3: Team_07 (0pts) | Seat 4: Team_04 (0pts)
+   Round 5, Table 4: Intelligent seating (score-based)
+      Seating: Seat 1: Team_05 (0pts) | Seat 2: Team_15 (0pts) | Seat 3: Team_08 (0pts) | Seat 4: Team_10 (0pts)
+   Round 5, Table 5: Intelligent seating (score-based)
+      Seating: Seat 1: Team_05 (0pts) | Seat 2: Team_15 (0pts) | Seat 3: Team_08 (0pts) | Seat 4: Team_10 (0pts)
+   Round 5, Table 6: Intelligent seating (score-based)
+      Seating: Seat 1: Team_05 (0pts) | Seat 2: Team_15 (0pts) | Seat 3: Team_08 (0pts) | Seat 4: Team_10 (0pts)
+   Round 5, Table 7: Intelligent seating (score-based)
+      Seating: Seat 1: Team_05 (0pts) | Seat 2: Team_15 (0pts) | Seat 3: Team_08 (0pts) | Seat 4: Team_10 (0pts)
+   Round 5, Table 8: Intelligent seating (score-based)
+      Seating: Seat 1: Team_06 (0pts) | Seat 2: Team_09 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_16 (0pts)
+   Round 5, Table 9: Intelligent seating (score-based)
+      Seating: Seat 1: Team_06 (0pts) | Seat 2: Team_09 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_16 (0pts)
+   Round 5, Table 10: Intelligent seating (score-based)
+      Seating: Seat 1: Team_06 (0pts) | Seat 2: Team_09 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_16 (0pts)
+   Round 5, Table 11: Intelligent seating (score-based)
+      Seating: Seat 1: Team_06 (0pts) | Seat 2: Team_09 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_16 (0pts)
+   Round 5, Table 12: Intelligent seating (score-based)
+      Seating: Seat 1: Team_03 (0pts) | Seat 2: Team_13 (0pts) | Seat 3: Team_11 (0pts) | Seat 4: Team_02 (0pts)
+   Round 5, Table 13: Intelligent seating (score-based)
+      Seating: Seat 1: Team_03 (0pts) | Seat 2: Team_13 (0pts) | Seat 3: Team_11 (0pts) | Seat 4: Team_02 (0pts)
+   Round 5, Table 14: Intelligent seating (score-based)
+      Seating: Seat 1: Team_03 (0pts) | Seat 2: Team_13 (0pts) | Seat 3: Team_11 (0pts) | Seat 4: Team_02 (0pts)
+   Round 5, Table 15: Intelligent seating (score-based)
+      Seating: Seat 1: Team_03 (0pts) | Seat 2: Team_13 (0pts) | Seat 3: Team_11 (0pts) | Seat 4: Team_02 (0pts)
+   Round 5, Table 16: Intelligent seating (score-based)
+Γ£ô Organized all rounds into tables structure with intelligent seating
+Γ£ô Tournament ready: 5 rounds with 16 tables each
+Γ£ô All 5 Swiss rounds generated successfully!
+Tournament pairings are now LOCKED for the entire event.
+[PASS]  PASS: 5 Swiss rounds generated (expected: 5, got: 5)
+[INFO]  
+--- Simulating Swiss Round 1 ---
+[PASS]  PASS: Round 1 has 16 tables (expected: 16, got: 16)
+[INFO]  
+--- Simulating Swiss Round 2 ---
+[PASS]  PASS: Round 2 has 16 tables (expected: 16, got: 16)
+[INFO]  
+--- Simulating Swiss Round 3 ---
+[PASS]  PASS: Round 3 has 16 tables (expected: 16, got: 16)
+[INFO]  
+--- Simulating Swiss Round 4 ---
+[PASS]  PASS: Round 4 has 16 tables (expected: 16, got: 16)
+[INFO]  
+--- Simulating Swiss Round 5 ---
+[PASS]  PASS: Round 5 has 16 tables (expected: 16, got: 16)
+[INFO]  
+--- Checking Semifinals Generation ---
+≡ƒÅå Generating SEMIFINALS for 16-team tournament
+   Top 8 teams advancing to semifinals:
+     1. Team_01: 0 pts
+     2. Team_02: 0 pts
+     3. Team_03: 0 pts
+     4. Team_04: 0 pts
+     5. Team_05: 0 pts
+     6. Team_06: 0 pts
+     7. Team_07: 0 pts
+     8. Team_08: 0 pts
+
+   Team_01 player rankings:
+     Rank 1: Player_02 - 10 pts
+     Rank 2: Player_01 - 5 pts
+     Rank 3: Player_03 - 5 pts
+     Rank 4: Player_04 - 4 pts
+
+   Team_02 player rankings:
+     Rank 1: Player_05 - 12 pts
+     Rank 2: Player_07 - 10 pts
+     Rank 3: Player_06 - 7 pts
+     Rank 4: Player_08 - 6 pts
+
+   Team_03 player rankings:
+     Rank 1: Player_11 - 8 pts
+     Rank 2: Player_12 - 8 pts
+     Rank 3: Player_10 - 7 pts
+     Rank 4: Player_09 - 4 pts
+
+   Team_04 player rankings:
+     Rank 1: Player_15 - 10 pts
+     Rank 2: Player_14 - 9 pts
+     Rank 3: Player_16 - 8 pts
+     Rank 4: Player_13 - 4 pts
+
+   Team_05 player rankings:
+     Rank 1: Player_17 - 11 pts
+     Rank 2: Player_18 - 8 pts
+     Rank 3: Player_19 - 7 pts
+     Rank 4: Player_20 - 7 pts
+
+   Team_06 player rankings:
+     Rank 1: Player_21 - 9 pts
+     Rank 2: Player_24 - 9 pts
+     Rank 3: Player_22 - 8 pts
+     Rank 4: Player_23 - 8 pts
+
+   Team_07 player rankings:
+     Rank 1: Player_26 - 11 pts
+     Rank 2: Player_27 - 9 pts
+     Rank 3: Player_25 - 8 pts
+     Rank 4: Player_28 - 8 pts
+
+   Team_08 player rankings:
+     Rank 1: Player_32 - 14 pts
+     Rank 2: Player_29 - 10 pts
+     Rank 3: Player_30 - 7 pts
+     Rank 4: Player_31 - 7 pts
+
+   Creating semifinals tables (Round 6):
+   Group 1 teams: ['Team_01', 'Team_03', 'Team_05', 'Team_07']
+   Group 2 teams: ['Team_02', 'Team_04', 'Team_06', 'Team_08']
+     Semifinals Table 1: ['Player_02', 'Player_11', 'Player_17', 'Player_26']
+     Semifinals Table 2: ['Player_01', 'Player_12', 'Player_18', 'Player_27']
+     Semifinals Table 3: ['Player_03', 'Player_10', 'Player_19', 'Player_25']
+     Semifinals Table 4: ['Player_04', 'Player_09', 'Player_20', 'Player_28']
+     Semifinals Table 5: ['Player_05', 'Player_15', 'Player_21', 'Player_32']
+     Semifinals Table 6: ['Player_07', 'Player_14', 'Player_24', 'Player_29']
+     Semifinals Table 7: ['Player_06', 'Player_16', 'Player_22', 'Player_30']
+     Semifinals Table 8: ['Player_08', 'Player_13', 'Player_23', 'Player_31']
+
+Γ£à Semifinals created: 8 tables with strength-based matchups
+   - Top 8 teams (32 players total)
+   - Each table: 4 players from 4 different teams (NO teammates)
+   - Players matched by skill level
+[PASS]  PASS: Semifinals generated after Swiss rounds
+[PASS]  PASS: Semifinals round (6) exists
+[PASS]  PASS: Semifinals has 8 tables (top 8 teams) (expected: 8, got: 8)
+[INFO]  
+--- Simulating Semifinals ---
+[INFO]  
+--- Checking Finals Generation ---
+≡ƒÅå Generating FINALS after semifinals (16-team tournament)
+   Top 4 teams advancing to finals:
+     1. Team_01: 0 pts
+     2. Team_02: 0 pts
+     3. Team_03: 0 pts
+     4. Team_04: 0 pts
+
+   Team_01 players (ranked by Swiss points):
+     Rank 1: Player_02 - 12 pts
+     Rank 2: Player_01 - 6 pts
+     Rank 3: Player_03 - 5 pts
+     Rank 4: Player_04 - 4 pts
+
+   Team_02 players (ranked by Swiss points):
+     Rank 1: Player_05 - 12 pts
+     Rank 2: Player_07 - 10 pts
+     Rank 3: Player_06 - 7 pts
+     Rank 4: Player_08 - 6 pts
+
+   Team_03 players (ranked by Swiss points):
+     Rank 1: Player_11 - 11 pts
+     Rank 2: Player_10 - 10 pts
+     Rank 3: Player_12 - 8 pts
+     Rank 4: Player_09 - 5 pts
+
+   Team_04 players (ranked by Swiss points):
+     Rank 1: Player_15 - 12 pts
+     Rank 2: Player_16 - 11 pts
+     Rank 3: Player_14 - 10 pts
+     Rank 4: Player_13 - 5 pts
+
+   Creating finals tables (Round 7) (NO teammates together, ordered by team ranking):
+     Finals Table 1 Seat 1: Player_02 (Team_01) - 12 pts (Team: 0 pts)
+     Finals Table 1 Seat 2: Player_05 (Team_02) - 12 pts (Team: 0 pts)
+     Finals Table 1 Seat 3: Player_11 (Team_03) - 11 pts (Team: 0 pts)
+     Finals Table 1 Seat 4: Player_15 (Team_04) - 12 pts (Team: 0 pts)
+     Finals Table 2 Seat 1: Player_01 (Team_01) - 6 pts (Team: 0 pts)
+     Finals Table 2 Seat 2: Player_07 (Team_02) - 10 pts (Team: 0 pts)
+     Finals Table 2 Seat 3: Player_10 (Team_03) - 10 pts (Team: 0 pts)
+     Finals Table 2 Seat 4: Player_16 (Team_04) - 11 pts (Team: 0 pts)
+     Finals Table 3 Seat 1: Player_03 (Team_01) - 5 pts (Team: 0 pts)
+     Finals Table 3 Seat 2: Player_06 (Team_02) - 7 pts (Team: 0 pts)
+     Finals Table 3 Seat 3: Player_12 (Team_03) - 8 pts (Team: 0 pts)
+     Finals Table 3 Seat 4: Player_14 (Team_04) - 10 pts (Team: 0 pts)
+     Finals Table 4 Seat 1: Player_04 (Team_01) - 4 pts (Team: 0 pts)
+     Finals Table 4 Seat 2: Player_08 (Team_02) - 6 pts (Team: 0 pts)
+     Finals Table 4 Seat 3: Player_09 (Team_03) - 5 pts (Team: 0 pts)
+     Finals Table 4 Seat 4: Player_13 (Team_04) - 5 pts (Team: 0 pts)
+
+Γ£à Finals created: 4 tables with strength-based matchups
+   - Table 1: Strongest player from each team (NO teammates)
+   - Table 2: 2nd strongest player from each team (NO teammates)
+   - Table 3: 3rd strongest player from each team (NO teammates)
+   - Table 4: 4th strongest player from each team (NO teammates)
+   Γ£à VERIFIED: No teammates are paired together!
+   Γ£à Seating order: Arranged by team ranking (highest team score = first seat)
+[PASS]  PASS: Finals generated after Semifinals
+[PASS]  PASS: Finals round (7) exists
+[PASS]  PASS: Finals has 4 tables (top 4 teams) (expected: 4, got: 4)
+[PASS]  
+Γ£à TEST PASSED: 16 Teams - 5 Swiss Rounds
+[INFO]  
+============================================================
+[INFO]  TEST SUMMARY
+[INFO]  ============================================================
+[INFO]  Total Tests: 4
+[PASS]  Passed: 4
+[INFO]  Failed: 0

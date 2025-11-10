@@ -318,7 +318,182 @@
             box-shadow: 0 0 20px rgba(107, 114, 128, 0.6);
             transform: translateY(-2px);
         }
-        
+
+        /* Swiss Rounds Configuration Panel */
+        .config-panel {
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .config-header {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .config-icon {
+            font-size: 1.5rem;
+            color: var(--color-primary);
+        }
+
+        .config-header h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .config-section {
+            margin-top: var(--spacing-md);
+        }
+
+        .config-label {
+            display: block;
+            font-size: 1rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .config-description {
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: var(--spacing-md);
+        }
+
+        /* Radio Group */
+        .radio-group {
+            display: flex;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .radio-option {
+            flex: 1;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .radio-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .radio-content {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-md);
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-md);
+            transition: var(--transition-base);
+        }
+
+        .radio-option:hover .radio-content {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(139, 92, 246, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .radio-option input[type="radio"]:checked ~ .radio-content {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(6, 182, 212, 0.2));
+            border-color: var(--color-primary);
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+        }
+
+        .radio-check {
+            width: 24px;
+            height: 24px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition-base);
+        }
+
+        .radio-option input[type="radio"]:checked ~ .radio-content .radio-check {
+            background: var(--color-primary);
+            border-color: var(--color-primary);
+        }
+
+        .radio-check i {
+            font-size: 0.75rem;
+            color: white;
+            opacity: 0;
+            transition: var(--transition-fast);
+        }
+
+        .radio-option input[type="radio"]:checked ~ .radio-content .radio-check i {
+            opacity: 1;
+        }
+
+        .radio-details {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .radio-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .radio-subtitle {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .config-info {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            padding: var(--spacing-sm) var(--spacing-md);
+            background: rgba(6, 182, 212, 0.1);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            border-radius: var(--radius-sm);
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .config-info i {
+            color: var(--color-secondary);
+        }
+
+        /* Locked State */
+        .config-panel.locked {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .config-panel.locked .radio-option {
+            cursor: not-allowed;
+        }
+
+        .config-panel.locked .config-info {
+            background: rgba(245, 158, 11, 0.1);
+            border-color: rgba(245, 158, 11, 0.3);
+        }
+
+        .config-panel.locked .config-info i {
+            color: var(--color-warning);
+        }
+
+        /* Responsive Design for Config Panel */
+        @media (max-width: 768px) {
+            .radio-group {
+                flex-direction: column;
+            }
+        }
+
         /* Control Panel */
         .control-panel {
             background: var(--glass-bg);
@@ -1346,6 +1521,52 @@
             </div>
         </section>
 
+        <!-- Swiss Rounds Configuration Panel -->
+        <section class="config-panel glass-card" id="swiss-config-panel">
+            <div class="config-header">
+                <i class="fas fa-cog config-icon"></i>
+                <h3>Tournament Configuration</h3>
+            </div>
+
+            <div class="config-section">
+                <label class="config-label">Swiss Rounds</label>
+                <p class="config-description">Select the number of Swiss rounds before finals</p>
+
+                <div class="radio-group" id="swiss-rounds-selector">
+                    <label class="radio-option" data-rounds="4">
+                        <input type="radio" name="swiss-rounds" value="4" checked>
+                        <div class="radio-content">
+                            <div class="radio-check">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div class="radio-details">
+                                <span class="radio-title">4 Rounds</span>
+                                <span class="radio-subtitle">Standard (2-3 hours)</span>
+                            </div>
+                        </div>
+                    </label>
+
+                    <label class="radio-option" data-rounds="5">
+                        <input type="radio" name="swiss-rounds" value="5">
+                        <div class="radio-content">
+                            <div class="radio-check">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div class="radio-details">
+                                <span class="radio-title">5 Rounds</span>
+                                <span class="radio-subtitle">Extended (3-4 hours)</span>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+
+                <div class="config-info">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Configuration will be locked after loading participants</span>
+                </div>
+            </div>
+        </section>
+
         <!-- Control Panel -->
         <section class="control-panel">
             <div class="control-grid">
@@ -1495,30 +1716,176 @@
             }, 3000);
         }
 
+        // Swiss Rounds Configuration State
+        let swissRoundsConfig = {
+            selected: 4,
+            locked: false
+        };
+
+        // Initialize Swiss Rounds Selector
+        function initializeSwissRoundsSelector() {
+            const radioOptions = document.querySelectorAll('.radio-option');
+            const radioInputs = document.querySelectorAll('input[name="swiss-rounds"]');
+
+            // Handle radio option clicks
+            radioOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    if (!swissRoundsConfig.locked) {
+                        const rounds = parseInt(this.dataset.rounds);
+                        swissRoundsConfig.selected = rounds;
+
+                        // Update radio inputs
+                        radioInputs.forEach(input => {
+                            input.checked = parseInt(input.value) === rounds;
+                        });
+
+                        // Show toast
+                        showToast('Configuration Updated', `${rounds} Swiss rounds selected`, 'info');
+                    }
+                });
+            });
+        }
+
+        // Lock Swiss Rounds Configuration
+        function lockSwissRoundsConfig() {
+            swissRoundsConfig.locked = true;
+            const configPanel = document.getElementById('swiss-config-panel');
+            configPanel.classList.add('locked');
+
+            // Update info text
+            const configInfo = configPanel.querySelector('.config-info span');
+            configInfo.textContent = `Configuration locked: ${swissRoundsConfig.selected} Swiss rounds`;
+        }
+
+        // Get Selected Swiss Rounds
+        function getSelectedSwissRounds() {
+            return swissRoundsConfig.selected;
+        }
+
+        // Determine round type based on round number
+        function getRoundType(roundNum) {
+            const swissRounds = getSelectedSwissRounds();
+            const roundSelect = document.getElementById('round-select');
+            const selectedOption = roundSelect.options[roundSelect.selectedIndex];
+            const roundText = selectedOption ? selectedOption.textContent : '';
+
+            // Check if it's labeled as Semifinals or Finals
+            if (roundText.includes('Semifinals')) {
+                return 'semifinals';
+            } else if (roundText.includes('Finals')) {
+                return 'finals';
+            } else if (roundNum <= swissRounds) {
+                return 'swiss';
+            }
+
+            // Fallback logic
+            if (roundNum > swissRounds) {
+                return 'finals';  // Assume finals if beyond Swiss rounds
+            }
+            return 'swiss';
+        }
+
+        // Update Round Selector Dropdown
+        function updateRoundSelector(swissRounds, hasSemifinals = false, teamCount = null) {
+            const roundSelect = document.getElementById('round-select');
+            const currentValue = roundSelect.value;
+
+            // Clear existing options
+            roundSelect.innerHTML = '<option value="">Select Round</option>';
+
+            // Add Swiss rounds
+            for (let i = 1; i <= swissRounds; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = `Swiss Round ${i}`;
+                roundSelect.appendChild(option);
+            }
+
+            // Add Semifinals if applicable (16 teams)
+            if (hasSemifinals) {
+                const semifinalsOption = document.createElement('option');
+                semifinalsOption.value = swissRounds + 1;
+                semifinalsOption.textContent = 'Semifinals';
+                roundSelect.appendChild(semifinalsOption);
+
+                // Add Finals
+                const finalsOption = document.createElement('option');
+                finalsOption.value = swissRounds + 2;
+                finalsOption.textContent = 'Finals';
+                roundSelect.appendChild(finalsOption);
+            } else {
+                // No semifinals (8 teams) - Finals directly after Swiss
+                const finalsOption = document.createElement('option');
+                finalsOption.value = swissRounds + 1;
+                finalsOption.textContent = 'Finals';
+                roundSelect.appendChild(finalsOption);
+            }
+
+            // Restore previous selection if valid
+            const maxRounds = hasSemifinals ? swissRounds + 2 : swissRounds + 1;
+            if (currentValue && parseInt(currentValue) <= maxRounds) {
+                roundSelect.value = currentValue;
+            }
+
+            console.log(`Round selector updated: ${swissRounds} Swiss rounds, Semifinals: ${hasSemifinals}, Team count: ${teamCount}`);
+        }
+
         // Load Participants
         async function loadParticipants() {
             try {
                 showToast('Loading...', 'Loading participant data', 'info');
-                
-                const response = await fetch('/load_data');
+
+                const response = await fetch('/load_data', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        swiss_rounds: getSelectedSwissRounds()
+                    })
+                });
                 const data = await response.json();
                 
                 console.log('Load data response:', data);
-                
+
                 if (data.success && data.teams) {
+                    // Lock the Swiss rounds configuration
+                    lockSwissRoundsConfig();
+
+                    // Update round selector with configured Swiss rounds and tournament structure
+                    const hasSemifinals = data.has_semifinals || false;
+                    const teamCount = data.team_count || Object.keys(data.teams).length;
+                    updateRoundSelector(data.swiss_rounds || 4, hasSemifinals, teamCount);
+
                     displayTeams(data.teams, data.player_scores);
                     updateStats(data);
-                    showToast('Success!', `Loaded ${data.team_count} teams (${data.participant_count} players)`, 'success');
+
+                    const structureMsg = hasSemifinals ?
+                        `${teamCount} teams - ${data.swiss_rounds} Swiss rounds → Semifinals → Finals` :
+                        `${teamCount} teams - ${data.swiss_rounds} Swiss rounds → Finals`;
+                    showToast('Success!', `Loaded ${data.team_count} teams (${data.player_count} players) | ${structureMsg}`, 'success');
                     document.getElementById('empty-state').style.display = 'none';
                 } else {
                     // If no Excel file, sample data might be loaded
                     if (data.teams && Object.keys(data.teams).length > 0) {
+                        // Lock the Swiss rounds configuration
+                        lockSwissRoundsConfig();
+
+                        // Update round selector with configured Swiss rounds and tournament structure
+                        const hasSemifinals = data.has_semifinals || false;
+                        const teamCount = Object.keys(data.teams).length;
+                        updateRoundSelector(data.swiss_rounds || 4, hasSemifinals, teamCount);
+
                         displayTeams(data.teams, data.player_scores);
                         updateStats(data);
-                        showToast('Sample Data Loaded', `Loaded ${Object.keys(data.teams).length} sample teams`, 'warning');
+
+                        const structureMsg = hasSemifinals ?
+                            `${teamCount} teams - ${data.swiss_rounds} Swiss rounds → Semifinals → Finals` :
+                            `${teamCount} teams - ${data.swiss_rounds} Swiss rounds → Finals`;
+                        showToast('Sample Data Loaded', `Loaded ${teamCount} sample teams | ${structureMsg}`, 'warning');
                         document.getElementById('empty-state').style.display = 'none';
                     } else {
-                        showToast('Error', 'Failed to load participants', 'error');
+                        showToast('Error', data.message || 'Failed to load participants', 'error');
                     }
                 }
             } catch (error) {
@@ -1671,25 +2038,30 @@
         async function setupTournament() {
             try {
                 showToast('Generating...', 'Setting up tournament and generating Swiss rounds', 'info');
-                
+
                 const response = await fetch('/setup_tournament', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ swiss_rounds: 4 })
+                    body: JSON.stringify({ swiss_rounds: getSelectedSwissRounds() })
                 });
-                
+
                 const data = await response.json();
-                
+
                 console.log('Setup tournament response:', data);
-                
+
                 if (data.success) {
                     showToast('Tournament Ready!', data.message, 'success');
-                    
+
+                    // Update round selector with configured Swiss rounds and tournament structure
+                    const hasSemifinals = data.has_semifinals || false;
+                    const teamCount = data.tournament_teams ? data.tournament_teams.length : 0;
+                    updateRoundSelector(data.swiss_rounds_count || getSelectedSwissRounds(), hasSemifinals, teamCount);
+
                     // Update stats
-                    document.getElementById('stat-teams').textContent = data.tournament_teams ? data.tournament_teams.length : 0;
+                    document.getElementById('stat-teams').textContent = teamCount;
                     document.getElementById('stat-round').textContent = '1';
                     document.getElementById('stat-status').textContent = 'Active';
-                    
+
                     // Load Round 1 automatically
                     document.getElementById('round-select').value = '1';
                     loadRound();
@@ -1718,15 +2090,25 @@
                 if (data.tables) {
                     // Store tables globally
                     window.currentTables = data.tables;
-                    
+
                     displayTables(data.tables, round);
-                    showToast('Round Loaded', `Loaded ${Object.keys(data.tables).length} tables for Round ${round}`, 'success');
-                    
+
+                    // Determine round type
+                    const roundType = getRoundType(parseInt(round));
+                    let roundLabel = round;
+                    if (roundType === 'semifinals') {
+                        roundLabel = 'Semifinals';
+                    } else if (roundType === 'finals') {
+                        roundLabel = 'Finals';
+                    }
+
+                    showToast('Round Loaded', `Loaded ${Object.keys(data.tables).length} tables for ${roundLabel}`, 'success');
+
                     // Update current round stat
-                    document.getElementById('stat-round').textContent = round === '5' ? 'Finals' : round;
-                    
-                    // If finals (round 5), show only advancing teams
-                    if (round === '5' || round === 5) {
+                    document.getElementById('stat-round').textContent = roundLabel;
+
+                    // If finals, show only advancing teams (top 4)
+                    if (roundType === 'finals') {
                         // Get advancing teams from tables
                         const finalsTeams = new Set();
                         Object.values(data.tables).forEach(players => {
@@ -1737,19 +2119,19 @@
                                 }
                             });
                         });
-                        
+
                         window.finalsAdvancingTeams = Array.from(finalsTeams);
-                        
+
                         console.log('=== FINALS MODE ACTIVATED ===');
                         console.log('Finals teams extracted from tables:', window.finalsAdvancingTeams);
                         console.log('Total teams in finals:', window.finalsAdvancingTeams.length);
                         console.log('Team names (normalized):', window.finalsAdvancingTeams.map(t => `"${t}"`));
-                        
+
                         // Refresh team display (will filter to finals teams only)
                         refreshTeamScores(true);  // Pass true for finals mode
                     } else {
                         window.finalsAdvancingTeams = null;
-                        console.log('Swiss round - showing all teams');
+                        console.log(`${roundLabel} - showing all teams`);
                         refreshTeamScores(false);  // Explicitly show all teams
                     }
                 } else {
@@ -2103,39 +2485,74 @@
                     // Clear table scores for next round
                     Object.keys(tableScores).forEach(key => delete tableScores[key]);
                     
-                    // Check if finals were generated (after Round 4)
+                    // Check if semifinals or finals were generated
                     if (data.semifinals) {
-                        console.log('Finals generated!', data.semifinals);
-                        showToast('Finals Ready!', 'Top 4 teams advance to finals! Select "Finals" from dropdown', 'success');
-                        
-                        // Auto-select finals
-                        setTimeout(() => {
-                            document.getElementById('round-select').value = '5';
-                            loadRound();
-                        }, 2000);
+                        const roundType = getRoundType(parseInt(currentRound));
+
+                        if (roundType === 'swiss') {
+                            // Just finished Swiss rounds
+                            const roundSelect = document.getElementById('round-select');
+                            const nextOption = roundSelect.options[roundSelect.selectedIndex + 1];
+
+                            if (nextOption) {
+                                const nextRoundText = nextOption.textContent;
+                                if (nextRoundText.includes('Semifinals')) {
+                                    console.log('Semifinals generated!', data.semifinals);
+                                    showToast('Semifinals Ready!', 'Top 8 teams advance to semifinals!', 'success');
+                                } else if (nextRoundText.includes('Finals')) {
+                                    console.log('Finals generated!', data.semifinals);
+                                    showToast('Finals Ready!', 'Top 4 teams advance to finals!', 'success');
+                                }
+
+                                // Auto-select next round
+                                setTimeout(() => {
+                                    document.getElementById('round-select').value = nextOption.value;
+                                    loadRound();
+                                }, 2000);
+                            }
+                        } else if (roundType === 'semifinals') {
+                            // Just finished Semifinals
+                            console.log('Finals generated after semifinals!', data.semifinals);
+                            showToast('Finals Ready!', 'Top 4 teams advance to finals!', 'success');
+
+                            // Auto-select finals
+                            const roundSelect = document.getElementById('round-select');
+                            const nextOption = roundSelect.options[roundSelect.selectedIndex + 1];
+                            if (nextOption) {
+                                setTimeout(() => {
+                                    document.getElementById('round-select').value = nextOption.value;
+                                    loadRound();
+                                }, 2000);
+                            }
+                        }
                     }
-                    
+
                     // Check if tournament complete (after Finals)
                     if (data.tournament_winner) {
                         console.log('Tournament complete!', data.tournament_winner);
-                        showToast('Tournament Complete!', 
-                                `Champion: ${data.tournament_winner.winning_team}!`, 
+                        showToast('Tournament Complete!',
+                                `Champion: ${data.tournament_winner.winning_team}!`,
                                 'success');
-                        
+
                         // Show championship modal
                         setTimeout(() => {
                             showChampionshipModal(data.tournament_winner);
                         }, 1000);
-                    } else {
-                        // Auto-advance to next round (if not finals)
-                        if (currentRound < 4) {
+                    } else if (!data.semifinals) {
+                        // Auto-advance to next round (if still in Swiss rounds and no special round generated)
+                        const roundType = getRoundType(parseInt(currentRound));
+                        if (roundType === 'swiss') {
                             const nextRound = parseInt(currentRound) + 1;
-                            showToast('Loading Next Round...', `Moving to Swiss Round ${nextRound}`, 'info');
-                            
-                            setTimeout(() => {
-                                document.getElementById('round-select').value = String(nextRound);
-                                loadRound();
-                            }, 1500);
+                            const swissRounds = getSelectedSwissRounds();
+
+                            if (nextRound <= swissRounds) {
+                                showToast('Loading Next Round...', `Moving to Swiss Round ${nextRound}`, 'info');
+
+                                setTimeout(() => {
+                                    document.getElementById('round-select').value = String(nextRound);
+                                    loadRound();
+                                }, 1500);
+                            }
                         }
                     }
                     
@@ -2214,6 +2631,9 @@
 
         // Auto-load on page load
         window.addEventListener('DOMContentLoaded', () => {
+            // Initialize Swiss Rounds Selector
+            initializeSwissRoundsSelector();
+
             // Optional: Auto-load participants
             // loadParticipants();
         });
