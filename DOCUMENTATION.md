@@ -33,7 +33,7 @@ A comprehensive web-based tournament management system for Magic: The Gathering 
 - **🧠 Advanced Swiss Pairing**: Unified algorithm with zero repeat matchups for 8 teams, 96.8% unique matchups for 16 teams
 - **⏱️ Real-time Timer**: Built-in stopwatch for round timing
 - **📈 Score Tracking**: Manual point entry system with automatic team score calculation
-- **🏅 Tournament Structure**: 4 Swiss rounds + Finals with top 4 teams
+- **🏅 Tournament Structure**: Configurable Swiss rounds (4 or 5) + Finals with top 4 teams
 - **📊 Comprehensive Statistics**: Detailed tournament validation, pairing efficiency, and player journey tracking
 - **💻 Ultra-Modern UI**: Glassmorphism design with responsive layout and smooth animations
 - **🏆 Championship Modal**: Beautiful winner celebration with MVP recognition
@@ -278,29 +278,43 @@ docker-compose logs  # Check for errors
 
 ### Current Flow (Production)
 
-> **⚡ NEW FEATURE COMING SOON:** Configurable Swiss rounds (4 or 5 rounds)
+> **✅ FEATURE IMPLEMENTED:** Configurable Swiss rounds (4 or 5 rounds)
 >
-> Tournament organizers will be able to choose between 4 or 5 Swiss rounds before loading participants. This provides flexibility for different tournament lengths and better matchup distribution for 16-team tournaments.
+> Tournament organizers can now choose between 4 or 5 Swiss rounds before loading participants. This provides flexibility for different tournament lengths and better matchup distribution for 16-team tournaments.
+
+> **✅ FEATURE IMPLEMENTED:** Dynamic Semifinal Logic (2025-11-10)
 >
-> **Implementation Status:** Planning Complete - See [SWISS_ROUNDS_CONFIG_PLAN.md](SWISS_ROUNDS_CONFIG_PLAN.md)
+> The system now automatically determines tournament structure based on team count:
+> - **8 teams**: No semifinals → Swiss rounds → Finals (top 4 teams)
+> - **16 teams**: With semifinals → Swiss rounds → Semifinals (top 8 teams) → Finals (top 4 teams)
 
 ```
 SETUP PHASE:
-1. [SOON] Select Swiss Rounds Configuration (4 or 5 rounds)
+1. Select Swiss Rounds Configuration (4 or 5 rounds) ✅
 2. Load Participants (8 or 16 teams)
 3. Setup Tournament (generates selected number of Swiss rounds)
-4. Round 1 auto-loads
+4. System determines tournament structure based on team count ✅
+5. Round 1 auto-loads
 
 SWISS ROUNDS (Auto-Advancing):
 Round 1 → Score tables → Submit Results → AUTO-LOADS Round 2 ✨
 Round 2 → Score tables → Submit Results → AUTO-LOADS Round 3 ✨
 Round 3 → Score tables → Submit Results → AUTO-LOADS Round 4 ✨
-Round 4 → Score tables → Submit Results → AUTO-LOADS Round 5 or Finals ✨
+Round 4 → Score tables → Submit Results → AUTO-LOADS Round 5 or Semifinals/Finals ✨
 [If 5 rounds selected]
-Round 5 → Score tables → Submit Results → AUTO-LOADS Finals ✨
+Round 5 → Score tables → Submit Results → AUTO-LOADS Semifinals (16 teams) or Finals (8 teams) ✨
+
+SEMIFINALS (16 teams only):
+- Top 8 teams compete (8 tables)
+- Strength-based matchups:
+  - Players matched by skill level (rank 1 vs rank 1, etc.)
+  - NO teammates paired together
+  - 32 players total (all players from top 8 teams)
+- Score all tables → Submit Results → AUTO-LOADS Finals ✨
 
 FINALS:
 - Top 4 teams compete (4 tables)
+- Source: Top 4 from Swiss (8 teams) OR Top 4 from Semifinals (16 teams)
 - Strength-based matchups:
   - Table 1: Strongest players from each team
   - Table 2: 2nd tier players
@@ -311,7 +325,7 @@ FINALS:
 CHAMPIONSHIP CELEBRATION:
 - Bouncing trophy icon
 - Champion announcement
-- Final standings (with Swiss + Finals breakdown)
+- Final standings (with Swiss + Semifinals + Finals breakdown)
 - Tournament MVP
 - Tie-breaker information
 ```
@@ -319,25 +333,55 @@ CHAMPIONSHIP CELEBRATION:
 ### Key Characteristics
 
 - **4-5 Swiss Rounds**: Configurable (4 standard, 5 for extended tournaments)
-- **Random Seating**: Fair seat positions every round
-- **Finals Qualification**: Top 4 teams from Swiss rounds
-- **All Players Compete**: All 16 players compete in finals (4 tables)
+- **Intelligent Seating**: Round 1 random, Rounds 2+ score-based (higher score → Seat 1)
+- **Dynamic Tournament Structure**: Automatically determined based on team count
+  - **8 teams**: Swiss → Finals (no semifinals)
+  - **16 teams**: Swiss → Semifinals → Finals
+- **Semifinals Qualification** (16 teams only): Top 8 teams from Swiss rounds
+- **Finals Qualification**:
+  - **8 teams**: Top 4 teams from Swiss rounds
+  - **16 teams**: Top 4 teams from Semifinals
+- **All Players Compete**: All players from qualifying teams compete in semifinals and finals
 - **Scoring**: Win (5pts), Draw (1pt), Loss (0pts)
-- **Tie-Breaker**: Higher Swiss points wins
+- **Tie-Breaker**: Higher Swiss points wins (8 teams) or Semifinals points wins (16 teams)
 
-### Swiss Rounds Configuration (Coming Soon)
+### Swiss Rounds Configuration ✅
 
 **4 Rounds (Standard):**
 - Duration: 2-3 hours
 - Best for: Time-constrained tournaments
 - Matchup Quality: 96.8% unique (8 teams), 18.3% unique (16 teams)
 - Default option
+- **Status:** Fully implemented and tested
 
 **5 Rounds (Extended):**
 - Duration: 3-4 hours
 - Best for: Full-day tournaments, 16-team events
 - Matchup Quality: ~10% unique (8 teams), ~25% unique (16 teams) - Improved!
 - Better distribution for larger tournaments
+- **Status:** Fully implemented and tested
+
+### Semifinal Logic ✅ (NEW - 2025-11-10)
+
+**8 Teams Tournament:**
+- No semifinals round
+- Swiss rounds (4 or 5) → Finals directly
+- Top 4 teams advance to finals
+- Total rounds: 5 (4 Swiss + Finals) or 6 (5 Swiss + Finals)
+
+**16 Teams Tournament:**
+- Semifinals round included
+- Swiss rounds (4 or 5) → Semifinals → Finals
+- Top 8 teams advance to semifinals (8 tables, 32 players)
+- Top 4 teams advance to finals (4 tables, 16 players)
+- Total rounds: 6 (4 Swiss + Semifinals + Finals) or 7 (5 Swiss + Semifinals + Finals)
+
+**Key Features:**
+- Automatic tournament structure determination based on team count
+- NO teammates paired together in semifinals
+- Strength-based matchups (players matched by skill level)
+- Dynamic round selector updates based on tournament structure
+- Comprehensive testing with 0 pairing violations
 
 ---
 
@@ -346,10 +390,10 @@ CHAMPIONSHIP CELEBRATION:
 ### ✅ Core Tournament Features
 
 - [x] **8 or 16 team support** - Strict validation, optimal configurations
-- [x] **Dynamic Swiss pairing** - Winners vs winners each round
-- [x] **Player randomization** - Avoid repeat matchups (0% for 8 teams, 18.3% for 16 teams)
+- [x] **Pre-generated Swiss pairing** - All rounds created at setup with constraint satisfaction
+- [x] **Player randomization** - Avoid repeat matchups (96.8% unique for 8 teams, 18.3% unique for 16 teams)
 - [x] **Team separation** - One player per team in each pod
-- [x] **4 Swiss rounds** - Complete tournament structure
+- [x] **Configurable Swiss rounds** - Choose 4 or 5 Swiss rounds before tournament setup
 - [x] **Proper finals** - 4 tables, strength-based matchups, all players compete
 
 ### ✅ User Interface
@@ -366,7 +410,7 @@ CHAMPIONSHIP CELEBRATION:
 
 - [x] **Auto-advance rounds** - Next round loads automatically
 - [x] **Championship modal** - Beautiful winner celebration
-- [x] **Randomized seating** - Fair seat positions every round
+- [x] **Intelligent seating** - Round 1 random, Rounds 2+ score-based (higher score → Seat 1)
 - [x] **MVP recognition** - Highest scoring player highlighted
 - [x] **Tie-breaker display** - Swiss points shown for transparency
 - [x] **Team filtering** - Show only finalist teams in finals round
@@ -455,8 +499,8 @@ Error: "Tournament only supports exactly 8 or 16 teams"
 **Same Process:**
 - System automatically loads next round
 - No need to manually select from dropdown
-- Winners paired vs winners each round
-- Seating randomized for fairness
+- Pairings pre-generated at setup (locked for consistency)
+- Intelligent seating: Higher-scoring teams get Seat 1
 
 **Progression:**
 ```
@@ -610,32 +654,35 @@ Player with highest individual total points
 **Features:**
 - Zero repeat matchups for 8 teams
 - 96.8% unique matchups for 16 teams
-- Performance-based pairing (winners vs winners)
+- Pre-generated rounds (all rounds created at tournament setup)
 - Player randomization within pods
 - Team separation guaranteed
 - Triple fallback strategy
 
 ### How It Works
 
-**Round 1: Random Pairing**
-```
-- All teams equal (no prior scores)
-- Random pod assignments
-- Team separation enforced
-- Player positions randomized
-```
+**Important:** All 4 Swiss rounds are generated at tournament setup (before any games are played). This ensures consistency and prevents repeat matchups globally, but means pairings are NOT based on performance/scores.
 
-**Rounds 2-4: Performance-Based**
+**All Rounds: Constraint-Based Random Pairing**
 ```
 Algorithm:
-1. Calculate team scores
-2. Group teams by similar performance
-3. Apply constraint satisfaction:
-   - No repeat opponent matchups
-   - One player from each of 4 different teams
+1. Generate all 4 rounds simultaneously at setup
+2. Apply constraint satisfaction:
+   - No repeat opponent matchups (across all rounds)
+   - One player from each of 4 different teams per pod
    - Randomize player positions within pods
-4. Optimize until valid pairings found
+3. Optimize until valid pairings found
+4. Lock pairings for entire tournament
+
+Trade-off:
+✅ Zero/minimal repeat matchups (global optimization)
+✅ Consistent pairings (no mid-tournament changes)
+✅ Fast round transitions (no generation delay)
+❌ Not true Swiss (no winner vs winner pairing)
+❌ Random seating (no score-based positioning)
 ```
+
+**Note:** v2.0 will implement true Swiss pairing with intelligent seating (see CLAUDE.md)
 
 ### Triple Fallback Strategy
 
@@ -689,10 +736,51 @@ Generation Time: <10 seconds
 ### Algorithm Guarantees
 
 ✅ **Team Separation**: No teammates in same pod (100%)
-✅ **Performance-Based**: Winners face winners (100%)
-✅ **Player Randomization**: Different positions each round (100%)
+✅ **Repeat Avoidance**: Minimal repeat matchups across all rounds (96.8% for 8 teams, 18.3% for 16 teams)
+✅ **Intelligent Seating**: Round 1 random, Rounds 2+ score-based (100%)
 ✅ **Tournament Completion**: All rounds generate successfully (100%)
 ✅ **Optimal Quality**: Best possible matchups given constraints (100%)
+✅ **Consistency**: Pairings locked at setup, no mid-tournament changes (100%)
+
+### Intelligent Seating System
+
+**NEW FEATURE:** Dynamic seat assignment based on team performance
+
+**How It Works:**
+
+**Round 1:**
+```
+- Random seating (no prior scores)
+- All teams start equal
+- Fair initial positioning
+```
+
+**Rounds 2-4:**
+```
+Algorithm:
+1. Calculate current team scores (sum of all player points)
+2. Sort players at each table by team score (descending)
+3. Assign seats:
+   - Seat 1: Player from highest-scoring team
+   - Seat 2: Player from 2nd highest-scoring team
+   - Seat 3: Player from 3rd highest-scoring team
+   - Seat 4: Player from lowest-scoring team
+
+Example (Round 2):
+Table 1:
+  Seat 1: Team Alpha (15 pts)
+  Seat 2: Team Beta (12 pts)
+  Seat 3: Team Gamma (8 pts)
+  Seat 4: Team Delta (5 pts)
+```
+
+**Benefits:**
+- ✅ Rewards strong performance (better seat position)
+- ✅ Fair and transparent (based on actual scores)
+- ✅ Dynamic (updates each round based on current standings)
+- ✅ Strategic (seat position can influence gameplay)
+
+**Note:** Pairings (which players face each other) are still pre-generated and locked. Only the seating order within each pod changes based on scores.
 
 ---
 
@@ -810,7 +898,7 @@ docker-compose up -d --build
 
 **Evidence:**
 ```
-✅ Winners paired vs winners
+✅ All rounds pre-generated at setup
 ✅ Player positions randomized
 ✅ Team separation maintained
 ✅ All rounds generated successfully

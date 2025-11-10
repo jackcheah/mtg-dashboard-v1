@@ -410,11 +410,11 @@ class UnifiedSwissPairing:
     def __init__(self, teams: Dict[str, List[Dict]], tournament_teams: List[str], swiss_rounds_count: int = 4):
         """
         Initialize the unified Swiss pairing system.
-        
+
         Args:
             teams: Dictionary mapping team names to lists of player dictionaries
             tournament_teams: List of team names for the tournament (4-20 teams)
-            swiss_rounds_count: Number of Swiss rounds to generate (3 or 4)
+            swiss_rounds_count: Number of Swiss rounds to generate (3, 4, or 5)
         """
         self.teams = teams
         self.tournament_teams = tournament_teams
@@ -469,9 +469,9 @@ class UnifiedSwissPairing:
         
         if team_count > 20:
             raise ValueError(f"Maximum 20 teams supported, got {team_count}")
-        
-        if self.swiss_rounds_count not in [3, 4]:
-            raise ValueError(f"Swiss rounds must be 3 or 4, got {self.swiss_rounds_count}")
+
+        if self.swiss_rounds_count not in [3, 4, 5]:
+            raise ValueError(f"Swiss rounds must be 3, 4, or 5, got {self.swiss_rounds_count}")
         
         # Validate that all teams exist in the teams dictionary
         for team_name in self.tournament_teams:
