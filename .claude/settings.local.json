@@ -4,7 +4,9 @@
       "Bash(python test:*)",
       "Bash(python3:*)",
       "Bash(pip3 install:*)",
-      "Bash(pip install:*)"
+      "Bash(pip install:*)",
+      "Bash(python test_tournament_comprehensive.py:*)",
+      "Bash(python -X utf8:*)"
     ],
     "deny": []
   }
