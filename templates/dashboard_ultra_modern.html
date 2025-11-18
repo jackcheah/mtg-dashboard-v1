@@ -1027,6 +1027,35 @@
                 min-width: 50px !important;
             }
 
+            /* Compact table score legend */
+            .table-score-legend {
+                padding: 0.375rem 0.75rem !important;
+                margin-bottom: 0.5rem !important;
+                font-size: 0.75rem !important;
+            }
+
+            /* Compact inline score buttons */
+            .score-buttons-inline {
+                gap: 0.25rem !important;
+            }
+
+            .score-buttons-inline .score-btn {
+                width: 32px !important;
+                height: 32px !important;
+                font-size: 0.75rem !important;
+            }
+
+            /* Compact submit container */
+            .table-submit-container {
+                margin-top: 0.5rem !important;
+                padding-top: 0.5rem !important;
+            }
+
+            .table-submit-container .submit-table-btn {
+                padding: 0.5rem !important;
+                font-size: 0.875rem !important;
+            }
+
             /* Two-column layout for landscape laptops */
             @media (min-width: 1280px) {
                 .main-content {
@@ -1323,10 +1352,10 @@
             border-radius: var(--radius-sm);
             border-left: 3px solid var(--color-primary);
             transition: var(--transition-fast);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            display: grid;
+            grid-template-columns: 1fr auto auto;
             gap: var(--spacing-sm);
+            align-items: center;
         }
 
         .table-player:hover {
@@ -1372,6 +1401,132 @@
             border: 1px solid rgba(139, 92, 246, 0.3);
             min-width: 50px;
             text-align: center;
+        }
+
+        /* Table Score Legend */
+        .table-score-legend {
+            font-size: var(--text-sm);
+            color: rgba(255,255,255,0.7);
+            text-align: center;
+            padding: var(--spacing-sm) var(--spacing-md);
+            background: rgba(139, 92, 246, 0.1);
+            border-radius: var(--radius-sm);
+            margin-bottom: var(--spacing-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-xs);
+        }
+
+        .table-score-legend i {
+            color: var(--color-accent);
+        }
+
+        /* Inline Score Buttons */
+        .score-buttons-inline {
+            display: flex;
+            gap: var(--spacing-xs);
+            flex-shrink: 0;
+        }
+
+        .score-buttons-inline .score-btn {
+            width: 36px;
+            height: 36px;
+            border: 2px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.05);
+            color: white;
+            border-radius: var(--radius-sm);
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .score-buttons-inline .score-btn:hover {
+            background: rgba(255,255,255,0.15);
+            border-color: var(--color-primary-light);
+            transform: scale(1.05);
+        }
+
+        .score-buttons-inline .score-btn.active {
+            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+            border-color: var(--color-primary-light);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .score-buttons-inline .score-btn-win {
+            border-color: var(--color-success);
+        }
+
+        .score-buttons-inline .score-btn-win:hover {
+            border-color: var(--color-success);
+            background: rgba(16, 185, 129, 0.2);
+        }
+
+        .score-buttons-inline .score-btn-win.active {
+            background: linear-gradient(135deg, var(--color-success), #059669);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
+        }
+
+        .score-buttons-inline .score-btn-draw {
+            border-color: var(--color-warning);
+        }
+
+        .score-buttons-inline .score-btn-draw:hover {
+            border-color: var(--color-warning);
+            background: rgba(245, 158, 11, 0.2);
+        }
+
+        .score-buttons-inline .score-btn-draw.active {
+            background: linear-gradient(135deg, var(--color-warning), #d97706);
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.5);
+        }
+
+        .score-buttons-inline .score-btn-loss {
+            border-color: var(--color-danger);
+        }
+
+        .score-buttons-inline .score-btn-loss:hover {
+            border-color: var(--color-danger);
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        .score-buttons-inline .score-btn-loss.active {
+            background: linear-gradient(135deg, var(--color-danger), #dc2626);
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
+        }
+
+        /* Table Submit Container */
+        .table-submit-container {
+            margin-top: var(--spacing-md);
+            padding-top: var(--spacing-md);
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .table-submit-container .submit-table-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--color-success), #059669);
+            color: white;
+            border: none;
+            padding: var(--spacing-md);
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition-base);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-sm);
+            font-size: var(--text-base);
+        }
+
+        .table-submit-container .submit-table-btn:hover {
+            background: linear-gradient(135deg, #059669, #047857);
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.6);
+            transform: translateY(-2px);
         }
 
         /* Tournament Progression Tracker */
@@ -3115,59 +3270,14 @@
                 card.className = 'table-card';
                 card.id = `table-${tableName.replace(/\s+/g, '-')}`;
                 
-                // Create score input interface
-                let scoreInputHTML = `
-                    <div class="score-input-container">
-                        <div class="score-input-label">
-                            <i class="fas fa-star"></i> Enter Results (Win=5pts, Draw=1pt, Loss=0pts)
-                        </div>
-                        <div class="score-input-grid">
-                `;
-                
-                players.forEach((player, idx) => {
-                    const playerId = player['Player ID'] || player.id;
-                    const playerName = player['Player Name'] || player.name || 'Unknown';
-                    const teamName = player['Team Name'] || player.team || 'Unknown Team';
-                    
-                    scoreInputHTML += `
-                        <div class="player-score-row">
-                            <div class="player-score-info">
-                                <div class="player-score-name">${playerName}</div>
-                                <div class="player-score-team">${teamName}</div>
-                            </div>
-                            <div class="score-buttons">
-                                <button class="score-btn score-btn-win" 
-                                        onclick="setPlayerScore('${tableName}', ${playerId}, 5, this)"
-                                        title="Win (5 points)">
-                                    5
-                                </button>
-                                <button class="score-btn score-btn-draw" 
-                                        onclick="setPlayerScore('${tableName}', ${playerId}, 1, this)"
-                                        title="Draw (1 point)">
-                                    1
-                                </button>
-                                <button class="score-btn score-btn-loss" 
-                                        onclick="setPlayerScore('${tableName}', ${playerId}, 0, this)"
-                                        title="Loss (0 points)">
-                                    0
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                });
-                
-                scoreInputHTML += `
-                        </div>
-                        <button class="submit-table-btn" onclick="submitTableResults('${tableName}')">
-                            <i class="fas fa-check-circle"></i> Submit Table Results
-                        </button>
-                    </div>
-                `;
-                
+                // Create card with inline score buttons
                 card.innerHTML = `
                     <div class="table-header">
                         <i class="fas fa-chair"></i>
                         ${tableName}
+                    </div>
+                    <div class="table-score-legend">
+                        <i class="fas fa-star"></i> Win=5pts | Draw=1pt | Loss=0pts
                     </div>
                     <div class="table-players">
                         ${players.map(player => {
@@ -3189,11 +3299,32 @@
                                     <div class="table-player-score" id="score-display-${playerId}">
                                         ${playerScore === '-' ? '-' : playerScore + ' pts'}
                                     </div>
+                                    <div class="score-buttons-inline">
+                                        <button class="score-btn score-btn-win"
+                                                onclick="setPlayerScore('${tableName}', ${playerId}, 5, this)"
+                                                title="Win (5 points)">
+                                            W
+                                        </button>
+                                        <button class="score-btn score-btn-draw"
+                                                onclick="setPlayerScore('${tableName}', ${playerId}, 1, this)"
+                                                title="Draw (1 point)">
+                                            D
+                                        </button>
+                                        <button class="score-btn score-btn-loss"
+                                                onclick="setPlayerScore('${tableName}', ${playerId}, 0, this)"
+                                                title="Loss (0 points)">
+                                            L
+                                        </button>
+                                    </div>
                                 </div>
                             `;
                         }).join('')}
                     </div>
-                    ${scoreInputHTML}
+                    <div class="table-submit-container">
+                        <button class="submit-table-btn" onclick="submitTableResults('${tableName}')">
+                            <i class="fas fa-check-circle"></i> Submit Table Results
+                        </button>
+                    </div>
                 `;
                 
                 tablesGrid.appendChild(card);
