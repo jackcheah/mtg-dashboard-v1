@@ -64,32 +64,40 @@ class HybridConstraintSolver:
     def build_constraint_graph(self, available_players: List[Dict]) -> Dict[int, Set[int]]:
         """
         Build a constraint graph showing which players cannot be paired together.
-        
+
         Args:
             available_players: List of players to build constraints for
-            
+
         Returns:
             Dictionary mapping player IDs to sets of forbidden opponent IDs
         """
         constraint_graph = {}
-        
+
         for player in available_players:
             player_id = player['Player ID']
+            player_team = player['Team Name']
             forbidden = set()
-            
+
             # Add teammates as forbidden opponents
             for other_player in available_players:
                 other_id = other_player['Player ID']
-                if (other_id != player_id and 
-                    other_player['Team Name'] == player['Team Name']):
-                    forbidden.add(other_id)
-            
-            # Add previous opponents as forbidden
+                other_team = other_player['Team Name']
+
+                if other_id != player_id:
+                    # Forbid teammates
+                    if other_team == player_team:
+                        forbidden.add(other_id)
+
+                    # NEW: Forbid players from teams that have already faced each other
+                    if other_team in self.pairing_system.team_matchups.get(player_team, set()):
+                        forbidden.add(other_id)
+
+            # Add previous individual opponents as forbidden
             if player_id in self.pairing_system.player_opponents:
                 forbidden.update(self.pairing_system.player_opponents[player_id])
-            
+
             constraint_graph[player_id] = forbidden
-        
+
         return constraint_graph
     
     def calculate_constraint_degrees(self, available_players: List[Dict], constraint_graph: Dict[int, Set[int]]) -> Dict[int, int]:
@@ -444,14 +452,19 @@ class UnifiedSwissPairing:
         # Initialize constraint tracking
         self.used_pairings: Set[Tuple[int, int]] = set()
         self.player_opponents: Dict[int, Set[int]] = {}
+        self.team_matchups: Dict[str, Set[str]] = {}  # NEW: Track team-level matchups
         self.round_solutions: List[List[List[Dict]]] = []
-        
+
         # Initialize enhanced constraint solver
         self.constraint_solver = HybridConstraintSolver(self)
-        
+
         # Initialize player opponent tracking
         for player in self.players:
             self.player_opponents[player['Player ID']] = set()
+
+        # Initialize team matchup tracking
+        for team_name in self.tournament_teams:
+            self.team_matchups[team_name] = set()
         
         print(f"🔧 Unified Swiss Pairing initialized")
         print(f"   Teams: {len(tournament_teams)} ({tournament_teams})")
@@ -542,6 +555,8 @@ class UnifiedSwissPairing:
         self.used_pairings.clear()
         for player_id in self.player_opponents:
             self.player_opponents[player_id].clear()
+        for team_name in self.team_matchups:
+            self.team_matchups[team_name].clear()
         self.round_solutions.clear()
     
     def _solve_with_constraint_satisfaction(self) -> Tuple[bool, List[List[List[Dict]]]]:
@@ -717,47 +732,68 @@ class UnifiedSwissPairing:
         """Check if a pod satisfies all hard constraints."""
         if len(pod) < 3 or len(pod) > 4:
             return False
-        
+
         # For 4-player pods, check team separation
         if len(pod) == 4:
             teams = {player['Team Name'] for player in pod}
             if len(teams) != 4:
                 return False
-        
-        # Check for repeat opponents
+
+        # NEW: Check for repeat team matchups across all Swiss rounds
+        teams_in_pod = [player['Team Name'] for player in pod]
+        for i in range(len(teams_in_pod)):
+            for j in range(i + 1, len(teams_in_pod)):
+                team1 = teams_in_pod[i]
+                team2 = teams_in_pod[j]
+
+                # If these teams have already faced each other, pod is invalid
+                if team2 in self.team_matchups.get(team1, set()):
+                    return False
+
+        # Check for repeat player opponents
         for i in range(len(pod)):
             for j in range(i + 1, len(pod)):
                 player1_id = pod[i]['Player ID']
                 player2_id = pod[j]['Player ID']
-                
+
                 if player2_id in self.player_opponents.get(player1_id, set()):
                     return False
-        
+
         return True
     
     def _count_pod_violations(self, pod: List[Dict]) -> int:
         """Count constraint violations in a pod."""
         violations = 0
-        
+
         # Count teammate violations
         teams = [player['Team Name'] for player in pod]
         team_counts = {}
         for team in teams:
             team_counts[team] = team_counts.get(team, 0) + 1
-        
+
         for count in team_counts.values():
             if count > 1:
                 violations += count - 1
-        
-        # Count repeat opponent violations
+
+        # NEW: Count repeat team matchup violations
+        teams_in_pod = [player['Team Name'] for player in pod]
+        for i in range(len(teams_in_pod)):
+            for j in range(i + 1, len(teams_in_pod)):
+                team1 = teams_in_pod[i]
+                team2 = teams_in_pod[j]
+
+                if team2 in self.team_matchups.get(team1, set()):
+                    violations += 1
+
+        # Count repeat player opponent violations
         for i in range(len(pod)):
             for j in range(i + 1, len(pod)):
                 player1_id = pod[i]['Player ID']
                 player2_id = pod[j]['Player ID']
-                
+
                 if player2_id in self.player_opponents.get(player1_id, set()):
                     violations += 1
-        
+
         return violations
     
     def _count_valid_opponents(self, player: Dict) -> int:
@@ -1250,14 +1286,25 @@ class UnifiedSwissPairing:
                 for j in range(i + 1, len(pod)):
                     player1_id = pod[i]['Player ID']
                     player2_id = pod[j]['Player ID']
-                    
+
                     # Add to used pairings
                     pair = tuple(sorted([player1_id, player2_id]))
                     self.used_pairings.add(pair)
-                    
+
                     # Add to opponent tracking
                     self.player_opponents[player1_id].add(player2_id)
                     self.player_opponents[player2_id].add(player1_id)
+
+            # NEW: Update team matchup tracking for each team in the pod
+            teams_in_pod = [player['Team Name'] for player in pod]
+            for i in range(len(teams_in_pod)):
+                for j in range(i + 1, len(teams_in_pod)):
+                    team1 = teams_in_pod[i]
+                    team2 = teams_in_pod[j]
+
+                    # Record that these teams have faced each other
+                    self.team_matchups[team1].add(team2)
+                    self.team_matchups[team2].add(team1)
     
     def validate_solution(self, solution: List[List[List[Dict]]]) -> ValidationReport:
         """
