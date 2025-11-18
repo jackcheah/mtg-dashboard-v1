@@ -751,7 +751,428 @@
                 padding: var(--spacing-xs) 0;
             }
         }
-        
+
+        /* ============================================
+           LAPTOP DISPLAY OPTIMIZATION
+           Optimized for 1280px - 1920px displays
+           Reduces whitespace and maximizes content
+           ============================================ */
+        @media (min-width: 1024px) {
+            /* Ultra-compact spacing variables for laptops */
+            :root {
+                --spacing-xs: 0.25rem;
+                --spacing-sm: 0.5rem;
+                --spacing-md: 0.75rem;
+                --spacing-lg: 1rem;
+                --spacing-xl: 1.25rem;
+                --spacing-2xl: 1.5rem;
+            }
+
+            /* Maximize container width */
+            .container {
+                max-width: 98% !important;
+                padding: 0.75rem !important;
+                margin: 0 auto;
+            }
+
+            /* Ultra-compact header */
+            .header {
+                padding: 0.75rem 1rem !important;
+                margin-bottom: 0.75rem !important;
+                border-radius: 0.75rem;
+            }
+
+            .header h1 {
+                font-size: 1.75rem !important;
+                margin-bottom: 0.25rem !important;
+            }
+
+            .header p {
+                font-size: 0.875rem !important;
+            }
+
+            /* Compact timer section */
+            .timer-section {
+                padding: 1rem !important;
+                margin-bottom: 0.75rem !important;
+                border-radius: 0.75rem;
+            }
+
+            .timer-display {
+                font-size: 3rem !important;
+                margin-bottom: 0.5rem !important;
+            }
+
+            .timer-controls {
+                gap: 0.5rem !important;
+            }
+
+            .timer-controls .btn {
+                padding: 0.5rem 1rem !important;
+                font-size: 0.875rem !important;
+            }
+
+            /* Compact configuration panel */
+            .config-panel {
+                padding: 0.75rem !important;
+                margin-bottom: 0.75rem !important;
+                border-radius: 0.75rem;
+            }
+
+            .config-header {
+                margin-bottom: 0.5rem !important;
+            }
+
+            .config-header h3 {
+                font-size: 1rem !important;
+            }
+
+            .radio-group {
+                gap: 0.5rem !important;
+                margin-bottom: 0.5rem !important;
+            }
+
+            .radio-content {
+                padding: 0.5rem !important;
+            }
+
+            /* Compact control panel */
+            .control-panel {
+                padding: 0.75rem 1rem !important;
+                margin-bottom: 0.75rem !important;
+                border-radius: 0.75rem;
+            }
+
+            .controls-grid {
+                gap: 0.5rem !important;
+                margin-bottom: 0 !important;
+            }
+
+            .round-selector select,
+            .btn {
+                padding: 0.5rem 1rem !important;
+                font-size: 0.875rem !important;
+            }
+
+            /* Compact progression tracker */
+            .progression-tracker {
+                padding: 0.75rem !important;
+                margin: 0.5rem 0 !important;
+                gap: 0.75rem !important;
+                border-radius: 0.75rem;
+            }
+
+            .phase {
+                padding: 0.5rem !important;
+                gap: 0.25rem !important;
+            }
+
+            .phase-icon {
+                font-size: 1.5rem !important;
+            }
+
+            .phase-label {
+                font-size: 0.875rem !important;
+            }
+
+            .phase-count {
+                font-size: 0.75rem !important;
+            }
+
+            /* Compact bracket visualization */
+            .bracket-container {
+                padding: 0.75rem !important;
+                margin: 0.5rem 0 !important;
+                border-radius: 0.75rem;
+            }
+
+            .bracket-grid {
+                gap: 0.75rem !important;
+            }
+
+            .bracket-matchup {
+                padding: 0.5rem !important;
+            }
+
+            .matchup-title {
+                margin-bottom: 0.5rem !important;
+                font-size: 0.875rem !important;
+            }
+
+            .bracket-team {
+                padding: 0.5rem !important;
+                font-size: 0.875rem !important;
+            }
+
+            /* Optimize teams section */
+            .teams-section {
+                margin-bottom: 0.75rem !important;
+            }
+
+            .section-title {
+                font-size: 1.25rem !important;
+                margin-bottom: 0.75rem !important;
+            }
+
+            /* Compact team cards */
+            .teams-grid {
+                gap: 0.5rem !important;
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
+            }
+
+            .team-card {
+                padding: 0.75rem !important;
+                border-radius: 0.75rem;
+            }
+
+            .team-rank {
+                font-size: 1.25rem !important;
+                width: 32px !important;
+                height: 32px !important;
+            }
+
+            .team-name {
+                font-size: 1rem !important;
+            }
+
+            .team-score {
+                padding: 0.375rem 0.75rem !important;
+                font-size: 0.875rem !important;
+            }
+
+            .team-members {
+                gap: 0.375rem !important;
+                padding: 0.375rem !important;
+                margin-top: 0.5rem !important;
+            }
+
+            .team-member {
+                font-size: 0.75rem !important;
+                padding: 0.25rem 0.5rem !important;
+            }
+
+            /* Optimize tables section */
+            .tables-section {
+                margin-bottom: 0.75rem !important;
+            }
+
+            /* Compact table cards - maximize horizontal space */
+            .tables-grid {
+                gap: 0.5rem !important;
+                grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important;
+            }
+
+            .table-card {
+                padding: 0.75rem !important;
+                border-radius: 0.75rem;
+                margin-bottom: 0 !important;
+            }
+
+            .table-header {
+                padding: 0.5rem !important;
+                margin-bottom: 0.5rem !important;
+                font-size: 1rem !important;
+            }
+
+            .table-players {
+                padding: 0 !important;
+                gap: 0.375rem !important;
+            }
+
+            .table-player {
+                padding: 0.5rem !important;
+                border-radius: 0.5rem;
+            }
+
+            .player-name {
+                font-size: 0.875rem !important;
+            }
+
+            .player-team {
+                font-size: 0.75rem !important;
+            }
+
+            .table-player-score {
+                padding: 0.25rem 0.5rem !important;
+                font-size: 0.75rem !important;
+            }
+
+            /* Compact score input */
+            .score-input-container {
+                margin-top: 0.5rem !important;
+                padding-top: 0.5rem !important;
+            }
+
+            .score-input-title {
+                font-size: 0.875rem !important;
+                margin-bottom: 0.375rem !important;
+            }
+
+            .player-score-row {
+                padding: 0.375rem 0.5rem !important;
+                margin-bottom: 0.25rem !important;
+            }
+
+            .player-score-name {
+                font-size: 0.8125rem !important;
+            }
+
+            .score-buttons {
+                gap: 0.25rem !important;
+            }
+
+            .score-btn {
+                padding: 0.375rem 0.625rem !important;
+                font-size: 0.75rem !important;
+                min-width: 50px !important;
+            }
+
+            /* Two-column layout for landscape laptops */
+            @media (min-width: 1280px) {
+                .main-content {
+                    display: grid;
+                    grid-template-columns: 280px 1fr;
+                    gap: 0.75rem;
+                    align-items: start;
+                }
+
+                .teams-section {
+                    position: sticky;
+                    top: 0.75rem;
+                    max-height: calc(100vh - 1.5rem);
+                    overflow-y: auto;
+                    padding-right: 0.5rem;
+                }
+
+                .teams-grid {
+                    grid-template-columns: 1fr !important;
+                }
+
+                .tables-section {
+                    margin-bottom: 0 !important;
+                }
+
+                /* Show 4 columns for tables on wide screens */
+                .tables-grid {
+                    grid-template-columns: repeat(4, 1fr) !important;
+                }
+            }
+
+            /* Ultra-wide displays - 5 table columns */
+            @media (min-width: 1600px) {
+                .main-content {
+                    grid-template-columns: 300px 1fr;
+                    gap: 1rem;
+                }
+
+                .tables-grid {
+                    grid-template-columns: repeat(5, 1fr) !important;
+                }
+            }
+
+            /* Even wider displays - maximize space */
+            @media (min-width: 1920px) {
+                .container {
+                    max-width: 99% !important;
+                    padding: 0.5rem !important;
+                }
+
+                .main-content {
+                    grid-template-columns: 320px 1fr;
+                    gap: 1rem;
+                }
+
+                .tables-grid {
+                    grid-template-columns: repeat(6, 1fr) !important;
+                    gap: 0.75rem !important;
+                }
+
+                .table-card {
+                    padding: 1rem !important;
+                }
+            }
+
+            /* Compact modals */
+            .modal-content {
+                padding: 1.5rem !important;
+                max-width: 700px !important;
+            }
+
+            .modal-content h2 {
+                font-size: 2rem !important;
+                margin-bottom: 1rem !important;
+            }
+
+            .championship-trophy {
+                font-size: 4rem !important;
+                margin-bottom: 0.75rem !important;
+            }
+
+            .winner-name {
+                font-size: 2rem !important;
+                margin-bottom: 0.75rem !important;
+            }
+
+            .standings-section {
+                padding: 0.75rem !important;
+                margin-bottom: 0.75rem !important;
+            }
+
+            .standings-title {
+                font-size: 1.25rem !important;
+                margin-bottom: 0.75rem !important;
+            }
+
+            .standing-row {
+                padding: 0.5rem !important;
+                margin-bottom: 0.375rem !important;
+                font-size: 0.875rem !important;
+            }
+
+            .mvp-section {
+                padding: 0.75rem !important;
+            }
+
+            .mvp-title {
+                font-size: 1.25rem !important;
+                margin-bottom: 0.5rem !important;
+            }
+
+            /* Compact toast notifications */
+            .toast {
+                padding: 0.75rem !important;
+                max-width: 350px !important;
+            }
+
+            .toast-title {
+                font-size: 0.875rem !important;
+                margin-bottom: 0.25rem !important;
+            }
+
+            .toast-message {
+                font-size: 0.8125rem !important;
+            }
+
+            /* Custom scrollbar for better aesthetics */
+            .teams-section::-webkit-scrollbar {
+                width: 6px;
+            }
+
+            .teams-section::-webkit-scrollbar-track {
+                background: rgba(255, 255, 255, 0.05);
+                border-radius: 3px;
+            }
+
+            .teams-section::-webkit-scrollbar-thumb {
+                background: rgba(139, 92, 246, 0.5);
+                border-radius: 3px;
+            }
+
+            .teams-section::-webkit-scrollbar-thumb:hover {
+                background: rgba(139, 92, 246, 0.7);
+            }
+        }
+
         .team-card {
             background: var(--glass-bg);
             backdrop-filter: blur(20px) saturate(180%);
