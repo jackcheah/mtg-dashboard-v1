@@ -84,13 +84,15 @@ class HybridConstraintSolver:
                 other_team = other_player['Team Name']
 
                 if other_id != player_id:
-                    # Forbid teammates
+                    # Forbid teammates (always enforced)
                     if other_team == player_team:
                         forbidden.add(other_id)
 
                     # NEW: Forbid players from teams that have already faced each other
-                    if other_team in self.pairing_system.team_matchups.get(player_team, set()):
-                        forbidden.add(other_id)
+                    # Only enforce if strict team matchup constraint is enabled
+                    if self.pairing_system.enforce_strict_team_matchups:
+                        if other_team in self.pairing_system.team_matchups.get(player_team, set()):
+                            forbidden.add(other_id)
 
             # Add previous individual opponents as forbidden
             if player_id in self.pairing_system.player_opponents:
@@ -465,13 +467,24 @@ class UnifiedSwissPairing:
         # Initialize team matchup tracking
         for team_name in self.tournament_teams:
             self.team_matchups[team_name] = set()
-        
+
+        # Calculate if strict team matchup constraint is feasible
+        # For N teams over R rounds, each team faces 3 opponents per round
+        # Total matchups needed: R × 3, Available opponents: N - 1
+        # Strict constraint only if: R × 3 <= N - 1
+        self.enforce_strict_team_matchups = (self.swiss_rounds_count * 3) <= (len(self.tournament_teams) - 1)
+
         print(f"🔧 Unified Swiss Pairing initialized")
         print(f"   Teams: {len(tournament_teams)} ({tournament_teams})")
         print(f"   Players: {self.total_players}")
         print(f"   Pods per round: {self.pods_per_round}")
         print(f"   Incomplete pod size: {self.incomplete_pod_size}")
         print(f"   Swiss rounds: {swiss_rounds_count}")
+
+        if self.enforce_strict_team_matchups:
+            print(f"   ✓ Team matchup policy: STRICT (each team faces unique opponents)")
+        else:
+            print(f"   ⚠️  Team matchup policy: RELAXED (repeat matchups allowed when necessary)")
     
     def _validate_tournament_configuration(self):
         """Validate that the tournament configuration is valid."""
@@ -740,15 +753,17 @@ class UnifiedSwissPairing:
                 return False
 
         # NEW: Check for repeat team matchups across all Swiss rounds
-        teams_in_pod = [player['Team Name'] for player in pod]
-        for i in range(len(teams_in_pod)):
-            for j in range(i + 1, len(teams_in_pod)):
-                team1 = teams_in_pod[i]
-                team2 = teams_in_pod[j]
+        # Only enforce if strict team matchup constraint is enabled
+        if self.enforce_strict_team_matchups:
+            teams_in_pod = [player['Team Name'] for player in pod]
+            for i in range(len(teams_in_pod)):
+                for j in range(i + 1, len(teams_in_pod)):
+                    team1 = teams_in_pod[i]
+                    team2 = teams_in_pod[j]
 
-                # If these teams have already faced each other, pod is invalid
-                if team2 in self.team_matchups.get(team1, set()):
-                    return False
+                    # If these teams have already faced each other, pod is invalid
+                    if team2 in self.team_matchups.get(team1, set()):
+                        return False
 
         # Check for repeat player opponents
         for i in range(len(pod)):
@@ -776,14 +791,16 @@ class UnifiedSwissPairing:
                 violations += count - 1
 
         # NEW: Count repeat team matchup violations
-        teams_in_pod = [player['Team Name'] for player in pod]
-        for i in range(len(teams_in_pod)):
-            for j in range(i + 1, len(teams_in_pod)):
-                team1 = teams_in_pod[i]
-                team2 = teams_in_pod[j]
+        # Only count if strict team matchup constraint is enabled
+        if self.enforce_strict_team_matchups:
+            teams_in_pod = [player['Team Name'] for player in pod]
+            for i in range(len(teams_in_pod)):
+                for j in range(i + 1, len(teams_in_pod)):
+                    team1 = teams_in_pod[i]
+                    team2 = teams_in_pod[j]
 
-                if team2 in self.team_matchups.get(team1, set()):
-                    violations += 1
+                    if team2 in self.team_matchups.get(team1, set()):
+                        violations += 1
 
         # Count repeat player opponent violations
         for i in range(len(pod)):
