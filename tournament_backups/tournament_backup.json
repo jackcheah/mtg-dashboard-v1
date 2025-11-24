@@ -1,0 +1,2210 @@
+{
+  "timestamp": "2025-11-25T01:36:03.788686",
+  "participants": [
+    {
+      "Team Name": "Anti-Keithing",
+      "Player Name": "Glenn",
+      "Player ID": 1
+    },
+    {
+      "Team Name": "Anti-Keithing",
+      "Player Name": "Clement",
+      "Player ID": 2
+    },
+    {
+      "Team Name": "Anti-Keithing",
+      "Player Name": "Faiz",
+      "Player ID": 3
+    },
+    {
+      "Team Name": "Anti-Keithing",
+      "Player Name": "Jeremiah",
+      "Player ID": 4
+    },
+    {
+      "Team Name": "Team Last Chance (TLC)",
+      "Player Name": "Jack Cheah",
+      "Player ID": 5
+    },
+    {
+      "Team Name": "Team Last Chance (TLC)",
+      "Player Name": "HandsomeMAN",
+      "Player ID": 6
+    },
+    {
+      "Team Name": "Team Last Chance (TLC)",
+      "Player Name": "Louis",
+      "Player ID": 7
+    },
+    {
+      "Team Name": "Team Last Chance (TLC)",
+      "Player Name": "Daniel",
+      "Player ID": 8
+    },
+    {
+      "Team Name": "Try To Win",
+      "Player Name": "Aron",
+      "Player ID": 9
+    },
+    {
+      "Team Name": "Try To Win",
+      "Player Name": "Terry",
+      "Player ID": 10
+    },
+    {
+      "Team Name": "Try To Win",
+      "Player Name": "Smith",
+      "Player ID": 11
+    },
+    {
+      "Team Name": "Try To Win",
+      "Player Name": "Yun",
+      "Player ID": 12
+    },
+    {
+      "Team Name": "Cardfight!! Vanguard",
+      "Player Name": "Royden",
+      "Player ID": 13
+    },
+    {
+      "Team Name": "Cardfight!! Vanguard",
+      "Player Name": "De Huang",
+      "Player ID": 14
+    },
+    {
+      "Team Name": "Cardfight!! Vanguard",
+      "Player Name": "Jarod",
+      "Player ID": 15
+    },
+    {
+      "Team Name": "Cardfight!! Vanguard",
+      "Player Name": "Tim",
+      "Player ID": 16
+    },
+    {
+      "Team Name": "YX and his beaches",
+      "Player Name": "YX",
+      "Player ID": 17
+    },
+    {
+      "Team Name": "YX and his beaches",
+      "Player Name": "CJ",
+      "Player ID": 18
+    },
+    {
+      "Team Name": "YX and his beaches",
+      "Player Name": "Kim",
+      "Player ID": 19
+    },
+    {
+      "Team Name": "YX and his beaches",
+      "Player Name": "Kaiseng",
+      "Player ID": 20
+    },
+    {
+      "Team Name": "Springleaf Prata",
+      "Player Name": "Axel",
+      "Player ID": 21
+    },
+    {
+      "Team Name": "Springleaf Prata",
+      "Player Name": "Derek",
+      "Player ID": 22
+    },
+    {
+      "Team Name": "Springleaf Prata",
+      "Player Name": "Haiquan",
+      "Player ID": 23
+    },
+    {
+      "Team Name": "Springleaf Prata",
+      "Player Name": "Lucas",
+      "Player ID": 24
+    },
+    {
+      "Team Name": "Lumra ETB on the stack",
+      "Player Name": "Xiang Yu",
+      "Player ID": 25
+    },
+    {
+      "Team Name": "Lumra ETB on the stack",
+      "Player Name": "Colby",
+      "Player ID": 26
+    },
+    {
+      "Team Name": "Lumra ETB on the stack",
+      "Player Name": "Elvis",
+      "Player ID": 27
+    },
+    {
+      "Team Name": "Lumra ETB on the stack",
+      "Player Name": "Bryan",
+      "Player ID": 28
+    },
+    {
+      "Team Name": "The Loyal Retainers",
+      "Player Name": "Chuan Chew",
+      "Player ID": 29
+    },
+    {
+      "Team Name": "The Loyal Retainers",
+      "Player Name": "Jed",
+      "Player ID": 30
+    },
+    {
+      "Team Name": "The Loyal Retainers",
+      "Player Name": "Xavier",
+      "Player ID": 31
+    },
+    {
+      "Team Name": "The Loyal Retainers",
+      "Player Name": "Andrew",
+      "Player ID": 32
+    },
+    {
+      "Team Name": "Laksa & Logic",
+      "Player Name": "Wei Ming",
+      "Player ID": 33
+    },
+    {
+      "Team Name": "Laksa & Logic",
+      "Player Name": "Jonathan",
+      "Player ID": 34
+    },
+    {
+      "Team Name": "Laksa & Logic",
+      "Player Name": "Samuel",
+      "Player ID": 35
+    },
+    {
+      "Team Name": "Laksa & Logic",
+      "Player Name": "Yi Xuan",
+      "Player ID": 36
+    },
+    {
+      "Team Name": "Kopi C Kosong",
+      "Player Name": "Jun Hao",
+      "Player ID": 37
+    },
+    {
+      "Team Name": "Kopi C Kosong",
+      "Player Name": "Kelvin",
+      "Player ID": 38
+    },
+    {
+      "Team Name": "Kopi C Kosong",
+      "Player Name": "Wei Jie",
+      "Player ID": 39
+    },
+    {
+      "Team Name": "Kopi C Kosong",
+      "Player Name": "Amanda",
+      "Player ID": 40
+    },
+    {
+      "Team Name": "System Override",
+      "Player Name": "Ming Han",
+      "Player ID": 41
+    },
+    {
+      "Team Name": "System Override",
+      "Player Name": "Shaun",
+      "Player ID": 42
+    },
+    {
+      "Team Name": "System Override",
+      "Player Name": "Tiffany",
+      "Player ID": 43
+    },
+    {
+      "Team Name": "System Override",
+      "Player Name": "Aloysius",
+      "Player ID": 44
+    },
+    {
+      "Team Name": "West Mall Warriors",
+      "Player Name": "Zhi Cong",
+      "Player ID": 45
+    },
+    {
+      "Team Name": "West Mall Warriors",
+      "Player Name": "Darren",
+      "Player ID": 46
+    },
+    {
+      "Team Name": "West Mall Warriors",
+      "Player Name": "Sarah",
+      "Player ID": 47
+    },
+    {
+      "Team Name": "West Mall Warriors",
+      "Player Name": "Benjamin",
+      "Player ID": 48
+    },
+    {
+      "Team Name": "Infinite Loop",
+      "Player Name": "Wen Long",
+      "Player ID": 49
+    },
+    {
+      "Team Name": "Infinite Loop",
+      "Player Name": "Isaac",
+      "Player ID": 50
+    },
+    {
+      "Team Name": "Infinite Loop",
+      "Player Name": "Rachel",
+      "Player ID": 51
+    },
+    {
+      "Team Name": "Infinite Loop",
+      "Player Name": "Khairul",
+      "Player ID": 52
+    },
+    {
+      "Team Name": "Chicken Rice lobang",
+      "Player Name": "Gabriel",
+      "Player ID": 53
+    },
+    {
+      "Team Name": "Chicken Rice lobang",
+      "Player Name": "Nicholas",
+      "Player ID": 54
+    },
+    {
+      "Team Name": "Chicken Rice lobang",
+      "Player Name": "Zi Wei",
+      "Player ID": 55
+    },
+    {
+      "Team Name": "Chicken Rice lobang",
+      "Player Name": "Hafiz",
+      "Player ID": 56
+    },
+    {
+      "Team Name": "Error 404 Found",
+      "Player Name": "Jian Hong",
+      "Player ID": 57
+    },
+    {
+      "Team Name": "Error 404 Found",
+      "Player Name": "Lewis",
+      "Player ID": 58
+    },
+    {
+      "Team Name": "Error 404 Found",
+      "Player Name": "Stanley",
+      "Player ID": 59
+    },
+    {
+      "Team Name": "Error 404 Found",
+      "Player Name": "Wei Ting",
+      "Player ID": 60
+    },
+    {
+      "Team Name": "The Git Committers",
+      "Player Name": "Leon",
+      "Player ID": 61
+    },
+    {
+      "Team Name": "The Git Committers",
+      "Player Name": "Marcus",
+      "Player ID": 62
+    },
+    {
+      "Team Name": "The Git Committers",
+      "Player Name": "Sheng",
+      "Player ID": 63
+    },
+    {
+      "Team Name": "The Git Committers",
+      "Player Name": "Bala",
+      "Player ID": 64
+    }
+  ],
+  "teams": {
+    "Anti-Keithing": [
+      {
+        "Team Name": "Anti-Keithing",
+        "Player Name": "Glenn",
+        "Player ID": 1
+      },
+      {
+        "Team Name": "Anti-Keithing",
+        "Player Name": "Clement",
+        "Player ID": 2
+      },
+      {
+        "Team Name": "Anti-Keithing",
+        "Player Name": "Faiz",
+        "Player ID": 3
+      },
+      {
+        "Team Name": "Anti-Keithing",
+        "Player Name": "Jeremiah",
+        "Player ID": 4
+      }
+    ],
+    "Team Last Chance (TLC)": [
+      {
+        "Team Name": "Team Last Chance (TLC)",
+        "Player Name": "Jack Cheah",
+        "Player ID": 5
+      },
+      {
+        "Team Name": "Team Last Chance (TLC)",
+        "Player Name": "HandsomeMAN",
+        "Player ID": 6
+      },
+      {
+        "Team Name": "Team Last Chance (TLC)",
+        "Player Name": "Louis",
+        "Player ID": 7
+      },
+      {
+        "Team Name": "Team Last Chance (TLC)",
+        "Player Name": "Daniel",
+        "Player ID": 8
+      }
+    ],
+    "Try To Win": [
+      {
+        "Team Name": "Try To Win",
+        "Player Name": "Aron",
+        "Player ID": 9
+      },
+      {
+        "Team Name": "Try To Win",
+        "Player Name": "Terry",
+        "Player ID": 10
+      },
+      {
+        "Team Name": "Try To Win",
+        "Player Name": "Smith",
+        "Player ID": 11
+      },
+      {
+        "Team Name": "Try To Win",
+        "Player Name": "Yun",
+        "Player ID": 12
+      }
+    ],
+    "Cardfight!! Vanguard": [
+      {
+        "Team Name": "Cardfight!! Vanguard",
+        "Player Name": "Royden",
+        "Player ID": 13
+      },
+      {
+        "Team Name": "Cardfight!! Vanguard",
+        "Player Name": "De Huang",
+        "Player ID": 14
+      },
+      {
+        "Team Name": "Cardfight!! Vanguard",
+        "Player Name": "Jarod",
+        "Player ID": 15
+      },
+      {
+        "Team Name": "Cardfight!! Vanguard",
+        "Player Name": "Tim",
+        "Player ID": 16
+      }
+    ],
+    "YX and his beaches": [
+      {
+        "Team Name": "YX and his beaches",
+        "Player Name": "YX",
+        "Player ID": 17
+      },
+      {
+        "Team Name": "YX and his beaches",
+        "Player Name": "CJ",
+        "Player ID": 18
+      },
+      {
+        "Team Name": "YX and his beaches",
+        "Player Name": "Kim",
+        "Player ID": 19
+      },
+      {
+        "Team Name": "YX and his beaches",
+        "Player Name": "Kaiseng",
+        "Player ID": 20
+      }
+    ],
+    "Springleaf Prata": [
+      {
+        "Team Name": "Springleaf Prata",
+        "Player Name": "Axel",
+        "Player ID": 21
+      },
+      {
+        "Team Name": "Springleaf Prata",
+        "Player Name": "Derek",
+        "Player ID": 22
+      },
+      {
+        "Team Name": "Springleaf Prata",
+        "Player Name": "Haiquan",
+        "Player ID": 23
+      },
+      {
+        "Team Name": "Springleaf Prata",
+        "Player Name": "Lucas",
+        "Player ID": 24
+      }
+    ],
+    "Lumra ETB on the stack": [
+      {
+        "Team Name": "Lumra ETB on the stack",
+        "Player Name": "Xiang Yu",
+        "Player ID": 25
+      },
+      {
+        "Team Name": "Lumra ETB on the stack",
+        "Player Name": "Colby",
+        "Player ID": 26
+      },
+      {
+        "Team Name": "Lumra ETB on the stack",
+        "Player Name": "Elvis",
+        "Player ID": 27
+      },
+      {
+        "Team Name": "Lumra ETB on the stack",
+        "Player Name": "Bryan",
+        "Player ID": 28
+      }
+    ],
+    "The Loyal Retainers": [
+      {
+        "Team Name": "The Loyal Retainers",
+        "Player Name": "Chuan Chew",
+        "Player ID": 29
+      },
+      {
+        "Team Name": "The Loyal Retainers",
+        "Player Name": "Jed",
+        "Player ID": 30
+      },
+      {
+        "Team Name": "The Loyal Retainers",
+        "Player Name": "Xavier",
+        "Player ID": 31
+      },
+      {
+        "Team Name": "The Loyal Retainers",
+        "Player Name": "Andrew",
+        "Player ID": 32
+      }
+    ],
+    "Laksa & Logic": [
+      {
+        "Team Name": "Laksa & Logic",
+        "Player Name": "Wei Ming",
+        "Player ID": 33
+      },
+      {
+        "Team Name": "Laksa & Logic",
+        "Player Name": "Jonathan",
+        "Player ID": 34
+      },
+      {
+        "Team Name": "Laksa & Logic",
+        "Player Name": "Samuel",
+        "Player ID": 35
+      },
+      {
+        "Team Name": "Laksa & Logic",
+        "Player Name": "Yi Xuan",
+        "Player ID": 36
+      }
+    ],
+    "Kopi C Kosong": [
+      {
+        "Team Name": "Kopi C Kosong",
+        "Player Name": "Jun Hao",
+        "Player ID": 37
+      },
+      {
+        "Team Name": "Kopi C Kosong",
+        "Player Name": "Kelvin",
+        "Player ID": 38
+      },
+      {
+        "Team Name": "Kopi C Kosong",
+        "Player Name": "Wei Jie",
+        "Player ID": 39
+      },
+      {
+        "Team Name": "Kopi C Kosong",
+        "Player Name": "Amanda",
+        "Player ID": 40
+      }
+    ],
+    "System Override": [
+      {
+        "Team Name": "System Override",
+        "Player Name": "Ming Han",
+        "Player ID": 41
+      },
+      {
+        "Team Name": "System Override",
+        "Player Name": "Shaun",
+        "Player ID": 42
+      },
+      {
+        "Team Name": "System Override",
+        "Player Name": "Tiffany",
+        "Player ID": 43
+      },
+      {
+        "Team Name": "System Override",
+        "Player Name": "Aloysius",
+        "Player ID": 44
+      }
+    ],
+    "West Mall Warriors": [
+      {
+        "Team Name": "West Mall Warriors",
+        "Player Name": "Zhi Cong",
+        "Player ID": 45
+      },
+      {
+        "Team Name": "West Mall Warriors",
+        "Player Name": "Darren",
+        "Player ID": 46
+      },
+      {
+        "Team Name": "West Mall Warriors",
+        "Player Name": "Sarah",
+        "Player ID": 47
+      },
+      {
+        "Team Name": "West Mall Warriors",
+        "Player Name": "Benjamin",
+        "Player ID": 48
+      }
+    ],
+    "Infinite Loop": [
+      {
+        "Team Name": "Infinite Loop",
+        "Player Name": "Wen Long",
+        "Player ID": 49
+      },
+      {
+        "Team Name": "Infinite Loop",
+        "Player Name": "Isaac",
+        "Player ID": 50
+      },
+      {
+        "Team Name": "Infinite Loop",
+        "Player Name": "Rachel",
+        "Player ID": 51
+      },
+      {
+        "Team Name": "Infinite Loop",
+        "Player Name": "Khairul",
+        "Player ID": 52
+      }
+    ],
+    "Chicken Rice lobang": [
+      {
+        "Team Name": "Chicken Rice lobang",
+        "Player Name": "Gabriel",
+        "Player ID": 53
+      },
+      {
+        "Team Name": "Chicken Rice lobang",
+        "Player Name": "Nicholas",
+        "Player ID": 54
+      },
+      {
+        "Team Name": "Chicken Rice lobang",
+        "Player Name": "Zi Wei",
+        "Player ID": 55
+      },
+      {
+        "Team Name": "Chicken Rice lobang",
+        "Player Name": "Hafiz",
+        "Player ID": 56
+      }
+    ],
+    "Error 404 Found": [
+      {
+        "Team Name": "Error 404 Found",
+        "Player Name": "Jian Hong",
+        "Player ID": 57
+      },
+      {
+        "Team Name": "Error 404 Found",
+        "Player Name": "Lewis",
+        "Player ID": 58
+      },
+      {
+        "Team Name": "Error 404 Found",
+        "Player Name": "Stanley",
+        "Player ID": 59
+      },
+      {
+        "Team Name": "Error 404 Found",
+        "Player Name": "Wei Ting",
+        "Player ID": 60
+      }
+    ],
+    "The Git Committers": [
+      {
+        "Team Name": "The Git Committers",
+        "Player Name": "Leon",
+        "Player ID": 61
+      },
+      {
+        "Team Name": "The Git Committers",
+        "Player Name": "Marcus",
+        "Player ID": 62
+      },
+      {
+        "Team Name": "The Git Committers",
+        "Player Name": "Sheng",
+        "Player ID": 63
+      },
+      {
+        "Team Name": "The Git Committers",
+        "Player Name": "Bala",
+        "Player ID": 64
+      }
+    ]
+  },
+  "tournament_teams": [
+    "West Mall Warriors",
+    "YX and his beaches",
+    "Team Last Chance (TLC)",
+    "System Override",
+    "Chicken Rice lobang",
+    "Laksa & Logic",
+    "Lumra ETB on the stack",
+    "Kopi C Kosong",
+    "Cardfight!! Vanguard",
+    "Try To Win",
+    "Infinite Loop",
+    "The Git Committers",
+    "Anti-Keithing",
+    "The Loyal Retainers",
+    "Springleaf Prata",
+    "Error 404 Found"
+  ],
+  "scores": {
+    "Anti-Keithing": 0,
+    "Team Last Chance (TLC)": 0,
+    "Try To Win": 0,
+    "Cardfight!! Vanguard": 0,
+    "YX and his beaches": 0,
+    "Springleaf Prata": 0,
+    "Lumra ETB on the stack": 0,
+    "The Loyal Retainers": 0,
+    "Laksa & Logic": 0,
+    "Kopi C Kosong": 0,
+    "System Override": 0,
+    "West Mall Warriors": 0,
+    "Infinite Loop": 0,
+    "Chicken Rice lobang": 0,
+    "Error 404 Found": 0,
+    "The Git Committers": 0
+  },
+  "player_scores": {
+    "1": 0,
+    "2": 0,
+    "3": 0,
+    "4": 0,
+    "5": 0,
+    "6": 0,
+    "7": 0,
+    "8": 0,
+    "9": 0,
+    "10": 0,
+    "11": 0,
+    "12": 0,
+    "13": 0,
+    "14": 0,
+    "15": 0,
+    "16": 0,
+    "17": 0,
+    "18": 0,
+    "19": 0,
+    "20": 0,
+    "21": 0,
+    "22": 0,
+    "23": 0,
+    "24": 0,
+    "25": 0,
+    "26": 0,
+    "27": 0,
+    "28": 0,
+    "29": 0,
+    "30": 0,
+    "31": 0,
+    "32": 0,
+    "33": 0,
+    "34": 0,
+    "35": 0,
+    "36": 0,
+    "37": 0,
+    "38": 0,
+    "39": 0,
+    "40": 0,
+    "41": 0,
+    "42": 0,
+    "43": 0,
+    "44": 0,
+    "45": 0,
+    "46": 0,
+    "47": 0,
+    "48": 0,
+    "49": 0,
+    "50": 0,
+    "51": 0,
+    "52": 0,
+    "53": 0,
+    "54": 0,
+    "55": 0,
+    "56": 0,
+    "57": 0,
+    "58": 0,
+    "59": 0,
+    "60": 0,
+    "61": 0,
+    "62": 0,
+    "63": 0,
+    "64": 0
+  },
+  "current_round": 1,
+  "swiss_rounds_count": 4,
+  "swiss_rounds_configured": true,
+  "max_rounds": 6,
+  "round_results": {},
+  "tables": {
+    "1": {
+      "Table 1": [
+        {
+          "Team Name": "West Mall Warriors",
+          "Player Name": "Zhi Cong",
+          "Player ID": 45
+        },
+        {
+          "Team Name": "YX and his beaches",
+          "Player Name": "YX",
+          "Player ID": 17
+        },
+        {
+          "Team Name": "System Override",
+          "Player Name": "Ming Han",
+          "Player ID": 41
+        },
+        {
+          "Team Name": "Team Last Chance (TLC)",
+          "Player Name": "Jack Cheah",
+          "Player ID": 5
+        }
+      ],
+      "Table 2": [
+        {
+          "Team Name": "Team Last Chance (TLC)",
+          "Player Name": "HandsomeMAN",
+          "Player ID": 6
+        },
+        {
+          "Team Name": "West Mall Warriors",
+          "Player Name": "Darren",
+          "Player ID": 46
+        },
+        {
+          "Team Name": "YX and his beaches",
+          "Player Name": "CJ",
+          "Player ID": 18
+        },
+        {
+          "Team Name": "System Override",
+          "Player Name": "Shaun",
+          "Player ID": 42
+        }
+      ],
+      "Table 3": [
+        {
+          "Team Name": "System Override",
+          "Player Name": "Tiffany",
+          "Player ID": 43
+        },
+        {
+          "Team Name": "West Mall Warriors",
+          "Player Name": "Sarah",
+          "Player ID": 47
+        },
+        {
+          "Team Name": "Team Last Chance (TLC)",
+          "Player Name": "Louis",
+          "Player ID": 7
+        },
+        {
+          "Team Name": "YX and his beaches",
+          "Player Name": "Kim",
+          "Player ID": 19
+        }
+      ],
+      "Table 4": [
+        {
+          "Team Name": "YX and his beaches",
+          "Player Name": "Kaiseng",
+          "Player ID": 20
+        },
+        {
+          "Team Name": "System Override",
+          "Player Name": "Aloysius",
+          "Player ID": 44
+        },
+        {
+          "Team Name": "Team Last Chance (TLC)",
+          "Player Name": "Daniel",
+          "Player ID": 8
+        },
+        {
+          "Team Name": "West Mall Warriors",
+          "Player Name": "Benjamin",
+          "Player ID": 48
+        }
+      ],
+      "Table 5": [
+        {
+          "Team Name": "Kopi C Kosong",
+          "Player Name": "Jun Hao",
+          "Player ID": 37
+        },
+        {
+          "Team Name": "Chicken Rice lobang",
+          "Player Name": "Gabriel",
+          "Player ID": 53
+        },
+        {
+          "Team Name": "Lumra ETB on the stack",
+          "Player Name": "Xiang Yu",
+          "Player ID": 25
+        },
+        {
+          "Team Name": "Laksa & Logic",
+          "Player Name": "Wei Ming",
+          "Player ID": 33
+        }
+      ],
+      "Table 6": [
+        {
+          "Team Name": "Chicken Rice lobang",
+          "Player Name": "Nicholas",
+          "Player ID": 54
+        },
+        {
+          "Team Name": "Kopi C Kosong",
+          "Player Name": "Kelvin",
+          "Player ID": 38
+        },
+        {
+          "Team Name": "Lumra ETB on the stack",
+          "Player Name": "Colby",
+          "Player ID": 26
+        },
+        {
+          "Team Name": "Laksa & Logic",
+          "Player Name": "Jonathan",
+          "Player ID": 34
+        }
+      ],
+      "Table 7": [
+        {
+          "Team Name": "Lumra ETB on the stack",
+          "Player Name": "Elvis",
+          "Player ID": 27
+        },
+        {
+          "Team Name": "Chicken Rice lobang",
+          "Player Name": "Zi Wei",
+          "Player ID": 55
+        },
+        {
+          "Team Name": "Laksa & Logic",
+          "Player Name": "Samuel",
+          "Player ID": 35
+        },
+        {
+          "Team Name": "Kopi C Kosong",
+          "Player Name": "Wei Jie",
+          "Player ID": 39
+        }
+      ],
+      "Table 8": [
+        {
+          "Team Name": "Chicken Rice lobang",
+          "Player Name": "Hafiz",
+          "Player ID": 56
+        },
+        {
+          "Team Name": "Laksa & Logic",
+          "Player Name": "Yi Xuan",
+          "Player ID": 36
+        },
+        {
+          "Team Name": "Kopi C Kosong",
+          "Player Name": "Amanda",
+          "Player ID": 40
+        },
+        {
+          "Team Name": "Lumra ETB on the stack",
+          "Player Name": "Bryan",
+          "Player ID": 28
+        }
+      ],
+      "Table 9": [
+        {
+          "Team Name": "Infinite Loop",
+          "Player Name": "Wen Long",
+          "Player ID": 49
+        },
+        {
+          "Team Name": "Try To Win",
+          "Player Name": "Aron",
+          "Player ID": 9
+        },
+        {
+          "Team Name": "The Git Committers",
+          "Player Name": "Leon",
+          "Player ID": 61
+        },
+        {
+          "Team Name": "Cardfight!! Vanguard",
+          "Player Name": "Royden",
+          "Player ID": 13
+        }
+      ],
+      "Table 10": [
+        {
+          "Team Name": "Try To Win",
+          "Player Name": "Terry",
+          "Player ID": 10
+        },
+        {
+          "Team Name": "Infinite Loop",
+          "Player Name": "Isaac",
+          "Player ID": 50
+        },
+        {
+          "Team Name": "The Git Committers",
+          "Player Name": "Marcus",
+          "Player ID": 62
+        },
+        {
+          "Team Name": "Cardfight!! Vanguard",
+          "Player Name": "De Huang",
+          "Player ID": 14
+        }
+      ],
+      "Table 11": [
+        {
+          "Team Name": "The Git Committers",
+          "Player Name": "Sheng",
+          "Player ID": 63
+        },
+        {
+          "Team Name": "Try To Win",
+          "Player Name": "Smith",
+          "Player ID": 11
+        },
+        {
+          "Team Name": "Cardfight!! Vanguard",
+          "Player Name": "Jarod",
+          "Player ID": 15
+        },
+        {
+          "Team Name": "Infinite Loop",
+          "Player Name": "Rachel",
+          "Player ID": 51
+        }
+      ],
+      "Table 12": [
+        {
+          "Team Name": "Try To Win",
+          "Player Name": "Yun",
+          "Player ID": 12
+        },
+        {
+          "Team Name": "Cardfight!! Vanguard",
+          "Player Name": "Tim",
+          "Player ID": 16
+        },
+        {
+          "Team Name": "The Git Committers",
+          "Player Name": "Bala",
+          "Player ID": 64
+        },
+        {
+          "Team Name": "Infinite Loop",
+          "Player Name": "Khairul",
+          "Player ID": 52
+        }
+      ],
+      "Table 13": [
+        {
+          "Team Name": "The Loyal Retainers",
+          "Player Name": "Chuan Chew",
+          "Player ID": 29
+        },
+        {
+          "Team Name": "Anti-Keithing",
+          "Player Name": "Glenn",
+          "Player ID": 1
+        },
+        {
+          "Team Name": "Springleaf Prata",
+          "Player Name": "Axel",
+          "Player ID": 21
+        },
+        {
+          "Team Name": "Error 404 Found",
+          "Player Name": "Jian Hong",
+          "Player ID": 57
+        }
+      ],
+      "Table 14": [
+        {
+          "Team Name": "Anti-Keithing",
+          "Player Name": "Clement",
+          "Player ID": 2
+        },
+        {
+          "Team Name": "The Loyal Retainers",
+          "Player Name": "Jed",
+          "Player ID": 30
+        },
+        {
+          "Team Name": "Springleaf Prata",
+          "Player Name": "Derek",
+          "Player ID": 22
+        },
+        {
+          "Team Name": "Error 404 Found",
+          "Player Name": "Lewis",
+          "Player ID": 58
+        }
+      ],
+      "Table 15": [
+        {
+          "Team Name": "Error 404 Found",
+          "Player Name": "Stanley",
+          "Player ID": 59
+        },
+        {
+          "Team Name": "Springleaf Prata",
+          "Player Name": "Haiquan",
+          "Player ID": 23
+        },
+        {
+          "Team Name": "The Loyal Retainers",
+          "Player Name": "Xavier",
+          "Player ID": 31
+        },
+        {
+          "Team Name": "Anti-Keithing",
+          "Player Name": "Faiz",
+          "Player ID": 3
+        }
+      ],
+      "Table 16": [
+        {
+          "Team Name": "Error 404 Found",
+          "Player Name": "Wei Ting",
+          "Player ID": 60
+        },
+        {
+          "Team Name": "Anti-Keithing",
+          "Player Name": "Jeremiah",
+          "Player ID": 4
+        },
+        {
+          "Team Name": "Springleaf Prata",
+          "Player Name": "Lucas",
+          "Player ID": 24
+        },
+        {
+          "Team Name": "The Loyal Retainers",
+          "Player Name": "Andrew",
+          "Player ID": 32
+        }
+      ]
+    },
+    "2": {
+      "Table 1": [
+        {
+          "Team Name": "West Mall Warriors",
+          "Player Name": "Zhi Cong",
+          "Player ID": 45
+        },
+        {
+          "Team Name": "Chicken Rice lobang",
+          "Player Name": "Gabriel",
+          "Player ID": 53
+        },
+        {
+          "Team Name": "Cardfight!! Vanguard",
+          "Player Name": "Royden",
+          "Player ID": 13
+        },
+        {
+          "Team Name": "Anti-Keithing",
+          "Player Name": "Glenn",
+          "Player ID": 1
+        }
+      ],
+      "Table 2": [
+        {
+          "Team Name": "West Mall Warriors",
+          "Player Name": "Darren",
+          "Player ID": 46
+        },
+        {
+          "Team Name": "Chicken Rice lobang",
+          "Player Name": "Nicholas",
+          "Player ID": 54
+        },
+        {
+          "Team Name": "Cardfight!! Vanguard",
+          "Player Name": "De Huang",
+          "Player ID": 14
+        },
+        {
+          "Team Name": "Anti-Keithing",
+          "Player Name": "Clement",
+          "Player ID": 2
+        }
+      ],
+      "Table 3": [
+        {
+          "Team Name": "West Mall Warriors",
+          "Player Name": "Sarah",
+          "Player ID": 47
+        },
+        {
+          "Team Name": "Chicken Rice lobang",
+          "Player Name": "Zi Wei",
+          "Player ID": 55
+        },
+        {
+          "Team Name": "Cardfight!! Vanguard",
+          "Player Name": "Jarod",
+          "Player ID": 15
+        },
+        {
+          "Team Name": "Anti-Keithing",
+          "Player Name": "Faiz",
+          "Player ID": 3
+        }
+      ],
+      "Table 4": [
+        {
+          "Team Name": "West Mall Warriors",
+          "Player Name": "Benjamin",
+          "Player ID": 48
+        },
+        {
+          "Team Name": "Chicken Rice lobang",
+          "Player Name": "Hafiz",
+          "Player ID": 56
+        },
+        {
+          "Team Name": "Cardfight!! Vanguard",
+          "Player Name": "Tim",
+          "Player ID": 16
+        },
+        {
+          "Team Name": "Anti-Keithing",
+          "Player Name": "Jeremiah",
+          "Player ID": 4
+        }
+      ],
+      "Table 5": [
+        {
+          "Team Name": "YX and his beaches",
+          "Player Name": "YX",
+          "Player ID": 17
+        },
+        {
+          "Team Name": "Laksa & Logic",
+          "Player Name": "Wei Ming",
+          "Player ID": 33
+        },
+        {
+          "Team Name": "Try To Win",
+          "Player Name": "Aron",
+          "Player ID": 9
+        },
+        {
+          "Team Name": "The Loyal Retainers",
+          "Player Name": "Chuan Chew",
+          "Player ID": 29
+        }
+      ],
+      "Table 6": [
+        {
+          "Team Name": "YX and his beaches",
+          "Player Name": "CJ",
+          "Player ID": 18
+        },
+        {
+          "Team Name": "Laksa & Logic",
+          "Player Name": "Jonathan",
+          "Player ID": 34
+        },
+        {
+          "Team Name": "Try To Win",
+          "Player Name": "Terry",
+          "Player ID": 10
+        },
+        {
+          "Team Name": "The Loyal Retainers",
+          "Player Name": "Jed",
+          "Player ID": 30
+        }
+      ],
+      "Table 7": [
+        {
+          "Team Name": "YX and his beaches",
+          "Player Name": "Kim",
+          "Player ID": 19
+        },
+        {
+          "Team Name": "Laksa & Logic",
+          "Player Name": "Samuel",
+          "Player ID": 35
+        },
+        {
+          "Team Name": "Try To Win",
+          "Player Name": "Smith",
+          "Player ID": 11
+        },
+        {
+          "Team Name": "The Loyal Retainers",
+          "Player Name": "Xavier",
+          "Player ID": 31
+        }
+      ],
+      "Table 8": [
+        {
+          "Team Name": "YX and his beaches",
+          "Player Name": "Kaiseng",
+          "Player ID": 20
+        },
+        {
+          "Team Name": "Laksa & Logic",
+          "Player Name": "Yi Xuan",
+          "Player ID": 36
+        },
+        {
+          "Team Name": "Try To Win",
+          "Player Name": "Yun",
+          "Player ID": 12
+        },
+        {
+          "Team Name": "The Loyal Retainers",
+          "Player Name": "Andrew",
+          "Player ID": 32
+        }
+      ],
+      "Table 9": [
+        {
+          "Team Name": "Team Last Chance (TLC)",
+          "Player Name": "Jack Cheah",
+          "Player ID": 5
+        },
+        {
+          "Team Name": "Lumra ETB on the stack",
+          "Player Name": "Xiang Yu",
+          "Player ID": 25
+        },
+        {
+          "Team Name": "Infinite Loop",
+          "Player Name": "Wen Long",
+          "Player ID": 49
+        },
+        {
+          "Team Name": "Springleaf Prata",
+          "Player Name": "Axel",
+          "Player ID": 21
+        }
+      ],
+      "Table 10": [
+        {
+          "Team Name": "Team Last Chance (TLC)",
+          "Player Name": "HandsomeMAN",
+          "Player ID": 6
+        },
+        {
+          "Team Name": "Lumra ETB on the stack",
+          "Player Name": "Colby",
+          "Player ID": 26
+        },
+        {
+          "Team Name": "Infinite Loop",
+          "Player Name": "Isaac",
+          "Player ID": 50
+        },
+        {
+          "Team Name": "Springleaf Prata",
+          "Player Name": "Derek",
+          "Player ID": 22
+        }
+      ],
+      "Table 11": [
+        {
+          "Team Name": "Team Last Chance (TLC)",
+          "Player Name": "Louis",
+          "Player ID": 7
+        },
+        {
+          "Team Name": "Lumra ETB on the stack",
+          "Player Name": "Elvis",
+          "Player ID": 27
+        },
+        {
+          "Team Name": "Infinite Loop",
+          "Player Name": "Rachel",
+          "Player ID": 51
+        },
+        {
+          "Team Name": "Springleaf Prata",
+          "Player Name": "Haiquan",
+          "Player ID": 23
+        }
+      ],
+      "Table 12": [
+        {
+          "Team Name": "Team Last Chance (TLC)",
+          "Player Name": "Daniel",
+          "Player ID": 8
+        },
+        {
+          "Team Name": "Lumra ETB on the stack",
+          "Player Name": "Bryan",
+          "Player ID": 28
+        },
+        {
+          "Team Name": "Infinite Loop",
+          "Player Name": "Khairul",
+          "Player ID": 52
+        },
+        {
+          "Team Name": "Springleaf Prata",
+          "Player Name": "Lucas",
+          "Player ID": 24
+        }
+      ],
+      "Table 13": [
+        {
+          "Team Name": "System Override",
+          "Player Name": "Ming Han",
+          "Player ID": 41
+        },
+        {
+          "Team Name": "Kopi C Kosong",
+          "Player Name": "Jun Hao",
+          "Player ID": 37
+        },
+        {
+          "Team Name": "The Git Committers",
+          "Player Name": "Leon",
+          "Player ID": 61
+        },
+        {
+          "Team Name": "Error 404 Found",
+          "Player Name": "Jian Hong",
+          "Player ID": 57
+        }
+      ],
+      "Table 14": [
+        {
+          "Team Name": "System Override",
+          "Player Name": "Shaun",
+          "Player ID": 42
+        },
+        {
+          "Team Name": "Kopi C Kosong",
+          "Player Name": "Kelvin",
+          "Player ID": 38
+        },
+        {
+          "Team Name": "The Git Committers",
+          "Player Name": "Marcus",
+          "Player ID": 62
+        },
+        {
+          "Team Name": "Error 404 Found",
+          "Player Name": "Lewis",
+          "Player ID": 58
+        }
+      ],
+      "Table 15": [
+        {
+          "Team Name": "System Override",
+          "Player Name": "Tiffany",
+          "Player ID": 43
+        },
+        {
+          "Team Name": "Kopi C Kosong",
+          "Player Name": "Wei Jie",
+          "Player ID": 39
+        },
+        {
+          "Team Name": "The Git Committers",
+          "Player Name": "Sheng",
+          "Player ID": 63
+        },
+        {
+          "Team Name": "Error 404 Found",
+          "Player Name": "Stanley",
+          "Player ID": 59
+        }
+      ],
+      "Table 16": [
+        {
+          "Team Name": "System Override",
+          "Player Name": "Aloysius",
+          "Player ID": 44
+        },
+        {
+          "Team Name": "Kopi C Kosong",
+          "Player Name": "Amanda",
+          "Player ID": 40
+        },
+        {
+          "Team Name": "The Git Committers",
+          "Player Name": "Bala",
+          "Player ID": 64
+        },
+        {
+          "Team Name": "Error 404 Found",
+          "Player Name": "Wei Ting",
+          "Player ID": 60
+        }
+      ]
+    },
+    "3": {
+      "Table 1": [
+        {
+          "Team Name": "West Mall Warriors",
+          "Player Name": "Zhi Cong",
+          "Player ID": 45
+        },
+        {
+          "Team Name": "Laksa & Logic",
+          "Player Name": "Wei Ming",
+          "Player ID": 33
+        },
+        {
+          "Team Name": "Infinite Loop",
+          "Player Name": "Wen Long",
+          "Player ID": 49
+        },
+        {
+          "Team Name": "Error 404 Found",
+          "Player Name": "Jian Hong",
+          "Player ID": 57
+        }
+      ],
+      "Table 2": [
+        {
+          "Team Name": "West Mall Warriors",
+          "Player Name": "Darren",
+          "Player ID": 46
+        },
+        {
+          "Team Name": "Laksa & Logic",
+          "Player Name": "Jonathan",
+          "Player ID": 34
+        },
+        {
+          "Team Name": "Infinite Loop",
+          "Player Name": "Isaac",
+          "Player ID": 50
+        },
+        {
+          "Team Name": "Error 404 Found",
+          "Player Name": "Lewis",
+          "Player ID": 58
+        }
+      ],
+      "Table 3": [
+        {
+          "Team Name": "West Mall Warriors",
+          "Player Name": "Sarah",
+          "Player ID": 47
+        },
+        {
+          "Team Name": "Laksa & Logic",
+          "Player Name": "Samuel",
+          "Player ID": 35
+        },
+        {
+          "Team Name": "Infinite Loop",
+          "Player Name": "Rachel",
+          "Player ID": 51
+        },
+        {
+          "Team Name": "Error 404 Found",
+          "Player Name": "Stanley",
+          "Player ID": 59
+        }
+      ],
+      "Table 4": [
+        {
+          "Team Name": "West Mall Warriors",
+          "Player Name": "Benjamin",
+          "Player ID": 48
+        },
+        {
+          "Team Name": "Laksa & Logic",
+          "Player Name": "Yi Xuan",
+          "Player ID": 36
+        },
+        {
+          "Team Name": "Infinite Loop",
+          "Player Name": "Khairul",
+          "Player ID": 52
+        },
+        {
+          "Team Name": "Error 404 Found",
+          "Player Name": "Wei Ting",
+          "Player ID": 60
+        }
+      ],
+      "Table 5": [
+        {
+          "Team Name": "YX and his beaches",
+          "Player Name": "YX",
+          "Player ID": 17
+        },
+        {
+          "Team Name": "Chicken Rice lobang",
+          "Player Name": "Gabriel",
+          "Player ID": 53
+        },
+        {
+          "Team Name": "The Git Committers",
+          "Player Name": "Leon",
+          "Player ID": 61
+        },
+        {
+          "Team Name": "Springleaf Prata",
+          "Player Name": "Axel",
+          "Player ID": 21
+        }
+      ],
+      "Table 6": [
+        {
+          "Team Name": "YX and his beaches",
+          "Player Name": "CJ",
+          "Player ID": 18
+        },
+        {
+          "Team Name": "Chicken Rice lobang",
+          "Player Name": "Nicholas",
+          "Player ID": 54
+        },
+        {
+          "Team Name": "The Git Committers",
+          "Player Name": "Marcus",
+          "Player ID": 62
+        },
+        {
+          "Team Name": "Springleaf Prata",
+          "Player Name": "Derek",
+          "Player ID": 22
+        }
+      ],
+      "Table 7": [
+        {
+          "Team Name": "YX and his beaches",
+          "Player Name": "Kim",
+          "Player ID": 19
+        },
+        {
+          "Team Name": "Chicken Rice lobang",
+          "Player Name": "Zi Wei",
+          "Player ID": 55
+        },
+        {
+          "Team Name": "The Git Committers",
+          "Player Name": "Sheng",
+          "Player ID": 63
+        },
+        {
+          "Team Name": "Springleaf Prata",
+          "Player Name": "Haiquan",
+          "Player ID": 23
+        }
+      ],
+      "Table 8": [
+        {
+          "Team Name": "YX and his beaches",
+          "Player Name": "Kaiseng",
+          "Player ID": 20
+        },
+        {
+          "Team Name": "Chicken Rice lobang",
+          "Player Name": "Hafiz",
+          "Player ID": 56
+        },
+        {
+          "Team Name": "The Git Committers",
+          "Player Name": "Bala",
+          "Player ID": 64
+        },
+        {
+          "Team Name": "Springleaf Prata",
+          "Player Name": "Lucas",
+          "Player ID": 24
+        }
+      ],
+      "Table 9": [
+        {
+          "Team Name": "Team Last Chance (TLC)",
+          "Player Name": "Jack Cheah",
+          "Player ID": 5
+        },
+        {
+          "Team Name": "Kopi C Kosong",
+          "Player Name": "Jun Hao",
+          "Player ID": 37
+        },
+        {
+          "Team Name": "Cardfight!! Vanguard",
+          "Player Name": "Royden",
+          "Player ID": 13
+        },
+        {
+          "Team Name": "The Loyal Retainers",
+          "Player Name": "Chuan Chew",
+          "Player ID": 29
+        }
+      ],
+      "Table 10": [
+        {
+          "Team Name": "Team Last Chance (TLC)",
+          "Player Name": "HandsomeMAN",
+          "Player ID": 6
+        },
+        {
+          "Team Name": "Kopi C Kosong",
+          "Player Name": "Kelvin",
+          "Player ID": 38
+        },
+        {
+          "Team Name": "Cardfight!! Vanguard",
+          "Player Name": "De Huang",
+          "Player ID": 14
+        },
+        {
+          "Team Name": "The Loyal Retainers",
+          "Player Name": "Jed",
+          "Player ID": 30
+        }
+      ],
+      "Table 11": [
+        {
+          "Team Name": "Team Last Chance (TLC)",
+          "Player Name": "Louis",
+          "Player ID": 7
+        },
+        {
+          "Team Name": "Kopi C Kosong",
+          "Player Name": "Wei Jie",
+          "Player ID": 39
+        },
+        {
+          "Team Name": "Cardfight!! Vanguard",
+          "Player Name": "Jarod",
+          "Player ID": 15
+        },
+        {
+          "Team Name": "The Loyal Retainers",
+          "Player Name": "Xavier",
+          "Player ID": 31
+        }
+      ],
+      "Table 12": [
+        {
+          "Team Name": "Team Last Chance (TLC)",
+          "Player Name": "Daniel",
+          "Player ID": 8
+        },
+        {
+          "Team Name": "Kopi C Kosong",
+          "Player Name": "Amanda",
+          "Player ID": 40
+        },
+        {
+          "Team Name": "Cardfight!! Vanguard",
+          "Player Name": "Tim",
+          "Player ID": 16
+        },
+        {
+          "Team Name": "The Loyal Retainers",
+          "Player Name": "Andrew",
+          "Player ID": 32
+        }
+      ],
+      "Table 13": [
+        {
+          "Team Name": "System Override",
+          "Player Name": "Ming Han",
+          "Player ID": 41
+        },
+        {
+          "Team Name": "Lumra ETB on the stack",
+          "Player Name": "Xiang Yu",
+          "Player ID": 25
+        },
+        {
+          "Team Name": "Try To Win",
+          "Player Name": "Aron",
+          "Player ID": 9
+        },
+        {
+          "Team Name": "Anti-Keithing",
+          "Player Name": "Glenn",
+          "Player ID": 1
+        }
+      ],
+      "Table 14": [
+        {
+          "Team Name": "System Override",
+          "Player Name": "Shaun",
+          "Player ID": 42
+        },
+        {
+          "Team Name": "Lumra ETB on the stack",
+          "Player Name": "Colby",
+          "Player ID": 26
+        },
+        {
+          "Team Name": "Try To Win",
+          "Player Name": "Terry",
+          "Player ID": 10
+        },
+        {
+          "Team Name": "Anti-Keithing",
+          "Player Name": "Clement",
+          "Player ID": 2
+        }
+      ],
+      "Table 15": [
+        {
+          "Team Name": "System Override",
+          "Player Name": "Tiffany",
+          "Player ID": 43
+        },
+        {
+          "Team Name": "Lumra ETB on the stack",
+          "Player Name": "Elvis",
+          "Player ID": 27
+        },
+        {
+          "Team Name": "Try To Win",
+          "Player Name": "Smith",
+          "Player ID": 11
+        },
+        {
+          "Team Name": "Anti-Keithing",
+          "Player Name": "Faiz",
+          "Player ID": 3
+        }
+      ],
+      "Table 16": [
+        {
+          "Team Name": "System Override",
+          "Player Name": "Aloysius",
+          "Player ID": 44
+        },
+        {
+          "Team Name": "Lumra ETB on the stack",
+          "Player Name": "Bryan",
+          "Player ID": 28
+        },
+        {
+          "Team Name": "Try To Win",
+          "Player Name": "Yun",
+          "Player ID": 12
+        },
+        {
+          "Team Name": "Anti-Keithing",
+          "Player Name": "Jeremiah",
+          "Player ID": 4
+        }
+      ]
+    },
+    "4": {
+      "Table 1": [
+        {
+          "Team Name": "West Mall Warriors",
+          "Player Name": "Zhi Cong",
+          "Player ID": 45
+        },
+        {
+          "Team Name": "Lumra ETB on the stack",
+          "Player Name": "Xiang Yu",
+          "Player ID": 25
+        },
+        {
+          "Team Name": "The Git Committers",
+          "Player Name": "Leon",
+          "Player ID": 61
+        },
+        {
+          "Team Name": "The Loyal Retainers",
+          "Player Name": "Chuan Chew",
+          "Player ID": 29
+        }
+      ],
+      "Table 2": [
+        {
+          "Team Name": "West Mall Warriors",
+          "Player Name": "Darren",
+          "Player ID": 46
+        },
+        {
+          "Team Name": "Lumra ETB on the stack",
+          "Player Name": "Colby",
+          "Player ID": 26
+        },
+        {
+          "Team Name": "The Git Committers",
+          "Player Name": "Marcus",
+          "Player ID": 62
+        },
+        {
+          "Team Name": "The Loyal Retainers",
+          "Player Name": "Jed",
+          "Player ID": 30
+        }
+      ],
+      "Table 3": [
+        {
+          "Team Name": "West Mall Warriors",
+          "Player Name": "Sarah",
+          "Player ID": 47
+        },
+        {
+          "Team Name": "Lumra ETB on the stack",
+          "Player Name": "Elvis",
+          "Player ID": 27
+        },
+        {
+          "Team Name": "The Git Committers",
+          "Player Name": "Sheng",
+          "Player ID": 63
+        },
+        {
+          "Team Name": "The Loyal Retainers",
+          "Player Name": "Xavier",
+          "Player ID": 31
+        }
+      ],
+      "Table 4": [
+        {
+          "Team Name": "West Mall Warriors",
+          "Player Name": "Benjamin",
+          "Player ID": 48
+        },
+        {
+          "Team Name": "Lumra ETB on the stack",
+          "Player Name": "Bryan",
+          "Player ID": 28
+        },
+        {
+          "Team Name": "The Git Committers",
+          "Player Name": "Bala",
+          "Player ID": 64
+        },
+        {
+          "Team Name": "The Loyal Retainers",
+          "Player Name": "Andrew",
+          "Player ID": 32
+        }
+      ],
+      "Table 5": [
+        {
+          "Team Name": "YX and his beaches",
+          "Player Name": "YX",
+          "Player ID": 17
+        },
+        {
+          "Team Name": "Kopi C Kosong",
+          "Player Name": "Jun Hao",
+          "Player ID": 37
+        },
+        {
+          "Team Name": "Infinite Loop",
+          "Player Name": "Wen Long",
+          "Player ID": 49
+        },
+        {
+          "Team Name": "Anti-Keithing",
+          "Player Name": "Glenn",
+          "Player ID": 1
+        }
+      ],
+      "Table 6": [
+        {
+          "Team Name": "YX and his beaches",
+          "Player Name": "CJ",
+          "Player ID": 18
+        },
+        {
+          "Team Name": "Kopi C Kosong",
+          "Player Name": "Kelvin",
+          "Player ID": 38
+        },
+        {
+          "Team Name": "Infinite Loop",
+          "Player Name": "Isaac",
+          "Player ID": 50
+        },
+        {
+          "Team Name": "Anti-Keithing",
+          "Player Name": "Clement",
+          "Player ID": 2
+        }
+      ],
+      "Table 7": [
+        {
+          "Team Name": "YX and his beaches",
+          "Player Name": "Kim",
+          "Player ID": 19
+        },
+        {
+          "Team Name": "Kopi C Kosong",
+          "Player Name": "Wei Jie",
+          "Player ID": 39
+        },
+        {
+          "Team Name": "Infinite Loop",
+          "Player Name": "Rachel",
+          "Player ID": 51
+        },
+        {
+          "Team Name": "Anti-Keithing",
+          "Player Name": "Faiz",
+          "Player ID": 3
+        }
+      ],
+      "Table 8": [
+        {
+          "Team Name": "YX and his beaches",
+          "Player Name": "Kaiseng",
+          "Player ID": 20
+        },
+        {
+          "Team Name": "Kopi C Kosong",
+          "Player Name": "Amanda",
+          "Player ID": 40
+        },
+        {
+          "Team Name": "Infinite Loop",
+          "Player Name": "Khairul",
+          "Player ID": 52
+        },
+        {
+          "Team Name": "Anti-Keithing",
+          "Player Name": "Jeremiah",
+          "Player ID": 4
+        }
+      ],
+      "Table 9": [
+        {
+          "Team Name": "Team Last Chance (TLC)",
+          "Player Name": "Jack Cheah",
+          "Player ID": 5
+        },
+        {
+          "Team Name": "Chicken Rice lobang",
+          "Player Name": "Gabriel",
+          "Player ID": 53
+        },
+        {
+          "Team Name": "Try To Win",
+          "Player Name": "Aron",
+          "Player ID": 9
+        },
+        {
+          "Team Name": "Error 404 Found",
+          "Player Name": "Jian Hong",
+          "Player ID": 57
+        }
+      ],
+      "Table 10": [
+        {
+          "Team Name": "Team Last Chance (TLC)",
+          "Player Name": "HandsomeMAN",
+          "Player ID": 6
+        },
+        {
+          "Team Name": "Chicken Rice lobang",
+          "Player Name": "Nicholas",
+          "Player ID": 54
+        },
+        {
+          "Team Name": "Try To Win",
+          "Player Name": "Terry",
+          "Player ID": 10
+        },
+        {
+          "Team Name": "Error 404 Found",
+          "Player Name": "Lewis",
+          "Player ID": 58
+        }
+      ],
+      "Table 11": [
+        {
+          "Team Name": "Team Last Chance (TLC)",
+          "Player Name": "Louis",
+          "Player ID": 7
+        },
+        {
+          "Team Name": "Chicken Rice lobang",
+          "Player Name": "Zi Wei",
+          "Player ID": 55
+        },
+        {
+          "Team Name": "Try To Win",
+          "Player Name": "Smith",
+          "Player ID": 11
+        },
+        {
+          "Team Name": "Error 404 Found",
+          "Player Name": "Stanley",
+          "Player ID": 59
+        }
+      ],
+      "Table 12": [
+        {
+          "Team Name": "Team Last Chance (TLC)",
+          "Player Name": "Daniel",
+          "Player ID": 8
+        },
+        {
+          "Team Name": "Chicken Rice lobang",
+          "Player Name": "Hafiz",
+          "Player ID": 56
+        },
+        {
+          "Team Name": "Try To Win",
+          "Player Name": "Yun",
+          "Player ID": 12
+        },
+        {
+          "Team Name": "Error 404 Found",
+          "Player Name": "Wei Ting",
+          "Player ID": 60
+        }
+      ],
+      "Table 13": [
+        {
+          "Team Name": "System Override",
+          "Player Name": "Ming Han",
+          "Player ID": 41
+        },
+        {
+          "Team Name": "Laksa & Logic",
+          "Player Name": "Wei Ming",
+          "Player ID": 33
+        },
+        {
+          "Team Name": "Cardfight!! Vanguard",
+          "Player Name": "Royden",
+          "Player ID": 13
+        },
+        {
+          "Team Name": "Springleaf Prata",
+          "Player Name": "Axel",
+          "Player ID": 21
+        }
+      ],
+      "Table 14": [
+        {
+          "Team Name": "System Override",
+          "Player Name": "Shaun",
+          "Player ID": 42
+        },
+        {
+          "Team Name": "Laksa & Logic",
+          "Player Name": "Jonathan",
+          "Player ID": 34
+        },
+        {
+          "Team Name": "Cardfight!! Vanguard",
+          "Player Name": "De Huang",
+          "Player ID": 14
+        },
+        {
+          "Team Name": "Springleaf Prata",
+          "Player Name": "Derek",
+          "Player ID": 22
+        }
+      ],
+      "Table 15": [
+        {
+          "Team Name": "System Override",
+          "Player Name": "Tiffany",
+          "Player ID": 43
+        },
+        {
+          "Team Name": "Laksa & Logic",
+          "Player Name": "Samuel",
+          "Player ID": 35
+        },
+        {
+          "Team Name": "Cardfight!! Vanguard",
+          "Player Name": "Jarod",
+          "Player ID": 15
+        },
+        {
+          "Team Name": "Springleaf Prata",
+          "Player Name": "Haiquan",
+          "Player ID": 23
+        }
+      ],
+      "Table 16": [
+        {
+          "Team Name": "System Override",
+          "Player Name": "Aloysius",
+          "Player ID": 44
+        },
+        {
+          "Team Name": "Laksa & Logic",
+          "Player Name": "Yi Xuan",
+          "Player ID": 36
+        },
+        {
+          "Team Name": "Cardfight!! Vanguard",
+          "Player Name": "Tim",
+          "Player ID": 16
+        },
+        {
+          "Team Name": "Springleaf Prata",
+          "Player Name": "Lucas",
+          "Player ID": 24
+        }
+      ]
+    }
+  },
+  "final_round_scores": {},
+  "semifinal_round_scores": {},
+  "swiss_round_scores": {},
+  "has_semifinals": true,
+  "submitted_rounds": [],
+  "finalized_rounds": []
+}

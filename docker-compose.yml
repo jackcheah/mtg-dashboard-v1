@@ -11,6 +11,8 @@ services:
     volumes:
       # Mount Excel file so it can be easily updated
       - ./July_CEDH_Event:/app/July_CEDH_Event
+      # Mount backup directory to persist tournament state across container restarts
+      - ./tournament_backups:/app/tournament_backups
     restart: unless-stopped
     container_name: mtg-tournament-dashboard
     

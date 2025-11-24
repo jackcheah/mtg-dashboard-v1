@@ -1,9 +1,9 @@
 # MTG Tournament Dashboard - Complete System Documentation
 
-**Last Updated:** 2025-11-24  
-**Version:** 2.0 (Production Ready)  
-**Test Coverage:** 100% (All 29 API tests + All 6 Core Gaps)  
-**Status:** ✅ **PRODUCTION READY**
+**Last Updated:** 2025-11-24
+**Version:** 2.1 (Production Ready + Data Persistence)
+**Test Coverage:** 100% (All 29 API tests + All 6 Core Gaps)
+**Status:** ✅ **PRODUCTION READY** 🛡️ **CRASH-PROTECTED**
 
 ---
 
@@ -13,14 +13,15 @@
 2. [Quick Start](#quick-start)
 3. [System Requirements](#system-requirements)
 4. [Installation](#installation)
-5. [Tournament Structure](#tournament-structure)
-6. [Core Features](#core-features)
-7. [API Endpoints](#api-endpoints)
-8. [Testing & Validation](#testing--validation)
-9. [Usage Guide](#usage-guide)
-10. [Troubleshooting](#troubleshooting)
-11. [Architecture](#architecture)
-12. [Future Enhancements](#future-enhancements)
+5. [Data Persistence & Backup](#data-persistence--backup) 🆕
+6. [Tournament Structure](#tournament-structure)
+7. [Core Features](#core-features)
+8. [API Endpoints](#api-endpoints)
+9. [Testing & Validation](#testing--validation)
+10. [Usage Guide](#usage-guide)
+11. [Troubleshooting](#troubleshooting)
+12. [Architecture](#architecture)
+13. [Future Enhancements](#future-enhancements)
 
 ---
 
@@ -53,7 +54,13 @@ A comprehensive web-based tournament management system for Magic: The Gathering 
    - Duplicate submission prevention
    - Championship determination with tiebreakers
 
-5. **Modern Web Interface**
+5. **Data Persistence & Crash Recovery** 🆕
+   - Automatic backup after every important operation
+   - Auto-restore on container restart
+   - Survives Docker crashes, restarts, and rebuilds
+   - Zero data loss during tournament day
+
+6. **Modern Web Interface**
    - Ultra-modern glassmorphism UI
    - Real-time updates
    - Mobile-responsive design
@@ -63,9 +70,10 @@ A comprehensive web-based tournament management system for Magic: The Gathering 
 
 - **Backend**: Flask 3.0.0 (Python)
 - **Frontend**: Vanilla JavaScript + Modern CSS
-- **Data**: Excel (openpyxl) + In-memory state
+- **Data**: Excel (openpyxl) + In-memory state + JSON auto-backup
 - **Deployment**: Docker + Local Python
 - **Testing**: unittest + Custom test suites
+- **Persistence**: Auto-save to JSON with Docker volume mounting
 
 ---
 
@@ -199,6 +207,113 @@ Choose one installation method:
 
 ---
 
+## 🛡️ Data Persistence & Backup
+
+### Overview
+
+**Version 2.1** introduces automatic data persistence to protect your tournament data from Docker crashes, container restarts, and unexpected shutdowns.
+
+### Key Features
+
+✅ **Auto-Save**: Automatically saves tournament state after every important operation
+✅ **Auto-Restore**: Automatically restores data when container starts
+✅ **Crash Recovery**: Survives Docker crashes, restarts, and rebuilds
+✅ **Zero Data Loss**: Tournament data persists across all container lifecycle events
+✅ **Persistent Storage**: Backup file stored outside container (survives everything!)
+
+### How It Works
+
+**Auto-Save Triggers:**
+- After loading participants
+- After setting up tournament
+- After submitting round results
+- Manual save via API endpoint (optional)
+
+**Backup Location:**
+```
+./tournament_backups/tournament_backup.json
+```
+
+This folder is mounted from your host machine, so backups survive:
+- ✅ Docker container crashes
+- ✅ `docker-compose restart`
+- ✅ `docker-compose down` + `docker-compose up`
+- ✅ Container rebuilds
+- ✅ Computer restarts (if Docker restarts)
+
+### What's Protected
+
+All tournament data is automatically backed up:
+- ✅ Teams and players
+- ✅ All scores (team and individual)
+- ✅ Round results and submissions
+- ✅ Tournament configuration
+- ✅ Current round state
+- ✅ Playoff data (semifinals, finals)
+
+### Recovery Scenarios
+
+**Scenario 1: Docker Container Crashes**
+```powershell
+# Container crashed - just restart it
+docker-compose restart
+
+# Open browser - your data is back! ✅
+http://localhost:5000
+```
+
+**Scenario 2: Accidental Stop**
+```powershell
+# Accidentally stopped container
+docker-compose down
+
+# Start it again
+docker-compose up -d
+
+# Open browser - your data is back! ✅
+http://localhost:5000
+```
+
+**Scenario 3: Container Rebuild**
+```powershell
+# Need to rebuild with new code
+docker-compose down
+docker-compose up -d --build
+
+# Open browser - your data is back! ✅
+http://localhost:5000
+```
+
+### Console Messages
+
+You'll see these messages in the logs:
+
+```
+✅ Auto-saved tournament state at 14:23:45
+✅ Restored tournament state from backup (saved: 2025-11-24T14:23:45)
+ℹ️ No backup file found - starting fresh
+```
+
+### Manual Backup (Optional)
+
+Trigger a manual save anytime:
+
+```bash
+curl -X POST http://localhost:5000/save_backup
+```
+
+### Complete Documentation
+
+For detailed information, see: **[DATA_PERSISTENCE_GUIDE.md](DATA_PERSISTENCE_GUIDE.md)**
+
+Includes:
+- Complete recovery scenarios
+- Troubleshooting guide
+- Best practices for tournament day
+- Manual backup instructions
+
+---
+
 ## 🏆 Tournament Structure
 
 ### Supported Configurations
@@ -249,6 +364,7 @@ Load Data → Configure Swiss (4 or 5) → Swiss Rounds → Semifinals (Top 8) �
 - **Sample Data**: Built-in sample data for testing (8 or 16 teams)
 - **Team Validation**: Ensures exactly 4 players per team
 - **Data Persistence**: Maintains state throughout tournament
+- **Auto-Backup**: Automatic save after loading participants 🆕
 
 ### 2. Swiss Pairing Algorithm
 - **Zero Repeat Matchups**: 100% unique for 8 teams, 96.8% for 16 teams
@@ -263,6 +379,7 @@ Load Data → Configure Swiss (4 or 5) → Swiss Rounds → Semifinals (Top 8) �
 - **Live Standings**: Real-time leaderboard updates
 - **Score Validation**: Prevents invalid scores and duplicates
 - **Duplicate Prevention**: Blocks re-submission of finalized rounds
+- **Auto-Backup**: Automatic save after each round submission 🆕
 
 ### 4. Playoff System
 - **Automatic Qualification**: Top teams advance based on Swiss standings
@@ -277,8 +394,16 @@ Load Data → Configure Swiss (4 or 5) → Swiss Rounds → Semifinals (Top 8) �
 - **Round Timer**: Built-in stopwatch for time management
 - **Visual Feedback**: Clear status indicators and alerts
 
-### 6. API Integration
-- **RESTful Endpoints**: 20+ API endpoints for all operations
+### 6. Data Persistence & Crash Recovery 🆕
+- **Auto-Save**: Automatic backup after every important operation
+- **Auto-Restore**: Seamless recovery on container restart
+- **Crash Protection**: Survives Docker crashes and restarts
+- **Persistent Storage**: Backup file stored outside container
+- **Zero Data Loss**: Tournament data protected at all times
+- **Manual Backup**: Optional manual save endpoint
+
+### 7. API Integration
+- **RESTful Endpoints**: 30+ API endpoints for all operations
 - **JSON Responses**: Structured data for easy integration
 - **Error Handling**: Comprehensive validation and error messages
 - **State Management**: Consistent state across all endpoints
@@ -292,6 +417,7 @@ Load Data → Configure Swiss (4 or 5) → Swiss Rounds → Semifinals (Top 8) �
 - `POST /configure_swiss_rounds` - Configure Swiss rounds (4 or 5)
 - `POST /setup_tournament` - Generate all tournament rounds
 - `POST /reset_tournament` - Reset tournament state
+- `POST /save_backup` - Manually trigger backup save 🆕
 
 ### Round Management
 - `GET /setup_round/<round_num>` - Get round tables and setup

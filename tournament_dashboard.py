@@ -30,6 +30,89 @@ class TournamentManager:
         self.submitted_rounds = set()  # Track which rounds have been submitted
         self.finalized_rounds = set()  # Track which rounds have been finalized
 
+        # Setup backup directory and file
+        self.backup_dir = 'tournament_backups'
+        os.makedirs(self.backup_dir, exist_ok=True)
+        self.backup_file = os.path.join(self.backup_dir, 'tournament_backup.json')
+
+        # Try to restore from backup on startup
+        self.restore_from_backup()
+
+    def save_backup(self):
+        """
+        Auto-save tournament state to JSON file.
+        Called automatically after important operations.
+        """
+        try:
+            backup_data = {
+                'timestamp': datetime.now().isoformat(),
+                'participants': self.participants,
+                'teams': self.teams,
+                'tournament_teams': self.tournament_teams,
+                'scores': self.scores,
+                'player_scores': self.player_scores,
+                'current_round': self.current_round,
+                'swiss_rounds_count': self.swiss_rounds_count,
+                'swiss_rounds_configured': self.swiss_rounds_configured,
+                'max_rounds': self.max_rounds,
+                'round_results': self.round_results,
+                'tables': self.tables,
+                'final_round_scores': self.final_round_scores,
+                'semifinal_round_scores': self.semifinal_round_scores,
+                'swiss_round_scores': self.swiss_round_scores,
+                'has_semifinals': self.has_semifinals,
+                'submitted_rounds': list(self.submitted_rounds),
+                'finalized_rounds': list(self.finalized_rounds)
+            }
+
+            with open(self.backup_file, 'w') as f:
+                json.dump(backup_data, f, indent=2)
+
+            print(f"✅ Auto-saved tournament state at {datetime.now().strftime('%H:%M:%S')}")
+            return True
+        except Exception as e:
+            print(f"⚠️ Warning: Could not save backup: {e}")
+            return False
+
+    def restore_from_backup(self):
+        """
+        Restore tournament state from JSON backup file.
+        Called automatically on startup.
+        """
+        try:
+            if not os.path.exists(self.backup_file):
+                print("ℹ️ No backup file found - starting fresh")
+                return False
+
+            with open(self.backup_file, 'r') as f:
+                backup_data = json.load(f)
+
+            # Restore all state
+            self.participants = backup_data.get('participants', [])
+            self.teams = backup_data.get('teams', {})
+            self.tournament_teams = backup_data.get('tournament_teams', [])
+            self.scores = backup_data.get('scores', {})
+            self.player_scores = backup_data.get('player_scores', {})
+            self.current_round = backup_data.get('current_round', 1)
+            self.swiss_rounds_count = backup_data.get('swiss_rounds_count', 4)
+            self.swiss_rounds_configured = backup_data.get('swiss_rounds_configured', False)
+            self.max_rounds = backup_data.get('max_rounds', 6)
+            self.round_results = backup_data.get('round_results', {})
+            self.tables = backup_data.get('tables', {})
+            self.final_round_scores = backup_data.get('final_round_scores', {})
+            self.semifinal_round_scores = backup_data.get('semifinal_round_scores', {})
+            self.swiss_round_scores = backup_data.get('swiss_round_scores', {})
+            self.has_semifinals = backup_data.get('has_semifinals', False)
+            self.submitted_rounds = set(backup_data.get('submitted_rounds', []))
+            self.finalized_rounds = set(backup_data.get('finalized_rounds', []))
+
+            timestamp = backup_data.get('timestamp', 'unknown')
+            print(f"✅ Restored tournament state from backup (saved: {timestamp})")
+            return True
+        except Exception as e:
+            print(f"⚠️ Warning: Could not restore backup: {e}")
+            return False
+
     def configure_swiss_rounds(self, rounds):
         """
         Configure the number of Swiss rounds before tournament setup.
@@ -1284,6 +1367,9 @@ def load_data():
             print(f"Team scores: {tournament.scores}")
             print(f"Player scores (first 5): {dict(list(tournament.player_scores.items())[:5])}")
 
+        # Auto-save after loading data
+        tournament.save_backup()
+
         return jsonify({
             'success': success,
             'teams': tournament.teams,
@@ -1368,7 +1454,10 @@ def setup_tournament():
         
         # Get validation issues for Round 1
         validation_issues = tournament.validate_swiss_pairings(1) if hasattr(tournament, 'validate_swiss_pairings') else []
-        
+
+        # Auto-save after tournament setup
+        tournament.save_backup()
+
         return jsonify({
             'success': success,
             'message': message,
@@ -1513,7 +1602,10 @@ def submit_player_results():
         if tournament_winner_data:
             response_data['tournament_winner'] = tournament_winner_data
             response_data['message'] += f" | 🏆 Tournament Complete! Champion: {tournament_winner_data['winning_team']}"
-        
+
+        # Auto-save tournament state after successful submission
+        tournament.save_backup()
+
         return jsonify(response_data)
     else:
         print(f"Round {round_num} has NO table submissions - using legacy point addition method")
@@ -2430,6 +2522,21 @@ def validate_integrity():
         'passed_checks': len(checks_performed) - len(issues)
     })
 
+@app.route('/save_backup', methods=['POST'])
+def save_backup_endpoint():
+    """Manually trigger backup save"""
+    try:
+        success = tournament.save_backup()
+        return jsonify({
+            'success': success,
+            'message': 'Tournament state saved successfully' if success else 'Failed to save backup'
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error saving backup: {str(e)}'
+        }), 500
+
 @app.route('/reset_tournament', methods=['POST'])
 def reset_tournament():
     """Reset tournament to initial state"""
@@ -2458,6 +2565,11 @@ def reset_tournament():
 
         if hasattr(tournament, 'finalized_rounds'):
             tournament.finalized_rounds = set()
+
+        # Delete backup file on reset
+        if os.path.exists(tournament.backup_file):
+            os.remove(tournament.backup_file)
+            print("🗑️ Backup file deleted")
 
         return jsonify({
             'success': True,

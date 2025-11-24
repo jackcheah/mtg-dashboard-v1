@@ -24,7 +24,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application files
 COPY tournament_dashboard.py .
 COPY unified_swiss_pairing.py .
-COPY dynamic_swiss_pairing.py .
 COPY templates/ ./templates/
 COPY July_CEDH_Event/ ./July_CEDH_Event/
 
