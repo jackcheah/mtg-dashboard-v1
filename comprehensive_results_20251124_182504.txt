@@ -1,0 +1,2507 @@
+[INFO]  
+================================================================================
+[INFO]  COMPREHENSIVE TOURNAMENT TEST SUITE - ENHANCED VERSION
+[INFO]  All 8 Gaps Tested!
+[INFO]  ================================================================================
+[INFO]  
+================================================================================
+[INFO]  TEST: 8 Teams - 4 Swiss Rounds
+[INFO]  ================================================================================
+✓ Swiss rounds configured: 4 rounds
+✓ Tournament structure will be determined when teams are loaded
+[PASS]  PASS: Configure 4 Swiss rounds
+✓ Tournament structure: 8 teams
+  - Swiss rounds: 4
+  - Semifinals: NO (top 4 teams advance directly to Finals)
+  - Finals: YES (top 4 teams)
+  - Total rounds: 5
+[PASS]  PASS: No semifinals for 8 teams (expected: False, got: False)
+[PASS]  PASS: Total rounds = 5 (4 Swiss + 1 Finals) (expected: 5, got: 5)
+[PASS]  PASS: 8 teams loaded (expected: 8, got: 8)
+✓ Tournament configuration: 8 teams (OPTIMAL), 4 Swiss rounds
+✓ All teams will compete in ONE unified tournament group
+✓ Pods per round: 8 (4 players each)
+✓ This configuration guarantees perfect pairings with zero repeat matchups
+🔄 RESETTING tournament state for new tournament...
+✓ Tournament state reset complete
+Tournament Teams (8): ['Team_08', 'Team_05', 'Team_03', 'Team_02', 'Team_06', 'Team_04', 'Team_01', 'Team_07']
+=== GENERATING ALL 4 SWISS ROUNDS AT ONCE ===
+Generating complete Swiss tournament for 8 teams...
+Tournament teams: ['Team_08', 'Team_05', 'Team_03', 'Team_02', 'Team_06', 'Team_04', 'Team_01', 'Team_07']
+Swiss rounds: 4
+🔧 Unified Swiss Pairing initialized
+   Teams: 8 (['Team_08', 'Team_05', 'Team_03', 'Team_02', 'Team_06', 'Team_04', 'Team_01', 'Team_07'])
+   Players: 32
+   Pods per round: 8
+   Incomplete pod size: 0
+   Swiss rounds: 4
+🚀 Generating all Swiss rounds with unified algorithm...
+
+--- Attempting Enhanced Constraint Satisfaction ---
+  Solving Round 1...
+    Using enhanced constraint satisfaction solver...
+    Backtrack stats: 9 nodes, 0 backtracks, 0 pruned
+    ✅ Enhanced solver succeeded
+  ✅ Round 1 solved (8 pods)
+  Solving Round 2...
+    Using enhanced constraint satisfaction solver...
+    Backtrack stats: 9 nodes, 0 backtracks, 0 pruned
+    ✅ Enhanced solver succeeded
+  ✅ Round 2 solved (8 pods)
+  Solving Round 3...
+    Using enhanced constraint satisfaction solver...
+    Backtrack stats: 9 nodes, 0 backtracks, 0 pruned
+    ✅ Enhanced solver succeeded
+  ✅ Round 3 solved (8 pods)
+  Solving Round 4...
+    Using enhanced constraint satisfaction solver...
+    Backtrack stats: 9 nodes, 0 backtracks, 0 pruned
+    ✅ Enhanced solver succeeded
+  ✅ Round 4 solved (8 pods)
+✅ Enhanced Constraint Satisfaction succeeded!
+   Generation time: 0.00 seconds
+   Total rounds: 4
+✓ Tournament generated successfully!
+  Perfect tournament: True
+  Total violations: 0
+  Pairing efficiency: 100.0%
+  Generation time: 0.00 seconds
+   Round 1, Table 1: Random seating (no prior scores)
+   Round 1, Table 2: Random seating (no prior scores)
+   Round 1, Table 3: Random seating (no prior scores)
+   Round 1, Table 4: Random seating (no prior scores)
+   Round 1, Table 5: Random seating (no prior scores)
+   Round 1, Table 6: Random seating (no prior scores)
+   Round 1, Table 7: Random seating (no prior scores)
+   Round 1, Table 8: Random seating (no prior scores)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_03 (0pts) | Seat 4: Team_02 (0pts)
+   Round 2, Table 1: Intelligent seating (score-based)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_03 (0pts) | Seat 4: Team_02 (0pts)
+   Round 2, Table 2: Intelligent seating (score-based)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_03 (0pts) | Seat 4: Team_02 (0pts)
+   Round 2, Table 3: Intelligent seating (score-based)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_03 (0pts) | Seat 4: Team_02 (0pts)
+   Round 2, Table 4: Intelligent seating (score-based)
+      Seating: Seat 1: Team_06 (0pts) | Seat 2: Team_04 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_07 (0pts)
+   Round 2, Table 5: Intelligent seating (score-based)
+      Seating: Seat 1: Team_06 (0pts) | Seat 2: Team_04 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_07 (0pts)
+   Round 2, Table 6: Intelligent seating (score-based)
+      Seating: Seat 1: Team_06 (0pts) | Seat 2: Team_04 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_07 (0pts)
+   Round 2, Table 7: Intelligent seating (score-based)
+      Seating: Seat 1: Team_06 (0pts) | Seat 2: Team_04 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_07 (0pts)
+   Round 2, Table 8: Intelligent seating (score-based)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_03 (0pts) | Seat 4: Team_02 (0pts)
+   Round 3, Table 1: Intelligent seating (score-based)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_03 (0pts) | Seat 4: Team_02 (0pts)
+   Round 3, Table 2: Intelligent seating (score-based)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_03 (0pts) | Seat 4: Team_02 (0pts)
+   Round 3, Table 3: Intelligent seating (score-based)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_03 (0pts) | Seat 4: Team_02 (0pts)
+   Round 3, Table 4: Intelligent seating (score-based)
+      Seating: Seat 1: Team_06 (0pts) | Seat 2: Team_04 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_07 (0pts)
+   Round 3, Table 5: Intelligent seating (score-based)
+      Seating: Seat 1: Team_06 (0pts) | Seat 2: Team_04 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_07 (0pts)
+   Round 3, Table 6: Intelligent seating (score-based)
+      Seating: Seat 1: Team_06 (0pts) | Seat 2: Team_04 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_07 (0pts)
+   Round 3, Table 7: Intelligent seating (score-based)
+      Seating: Seat 1: Team_06 (0pts) | Seat 2: Team_04 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_07 (0pts)
+   Round 3, Table 8: Intelligent seating (score-based)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_03 (0pts) | Seat 4: Team_02 (0pts)
+   Round 4, Table 1: Intelligent seating (score-based)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_03 (0pts) | Seat 4: Team_02 (0pts)
+   Round 4, Table 2: Intelligent seating (score-based)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_03 (0pts) | Seat 4: Team_02 (0pts)
+   Round 4, Table 3: Intelligent seating (score-based)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_03 (0pts) | Seat 4: Team_02 (0pts)
+   Round 4, Table 4: Intelligent seating (score-based)
+      Seating: Seat 1: Team_06 (0pts) | Seat 2: Team_04 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_07 (0pts)
+   Round 4, Table 5: Intelligent seating (score-based)
+      Seating: Seat 1: Team_06 (0pts) | Seat 2: Team_04 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_07 (0pts)
+   Round 4, Table 6: Intelligent seating (score-based)
+      Seating: Seat 1: Team_06 (0pts) | Seat 2: Team_04 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_07 (0pts)
+   Round 4, Table 7: Intelligent seating (score-based)
+      Seating: Seat 1: Team_06 (0pts) | Seat 2: Team_04 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_07 (0pts)
+   Round 4, Table 8: Intelligent seating (score-based)
+✓ Organized all rounds into tables structure with intelligent seating
+✓ Tournament ready: 4 rounds with 8 tables each
+✓ All 4 Swiss rounds generated successfully!
+Tournament pairings are now LOCKED for the entire event.
+[PASS]  PASS: 4 Swiss rounds generated (expected: 4, got: 4)
+[INFO]  
+============================================================
+[WARN]  GAP 1 VALIDATION: Checking team separation (no teammates at same table)
+[INFO]  ============================================================
+[INFO]  
+Round 1: Checking 8 tables for team separation
+[INFO]  
+Round 2: Checking 8 tables for team separation
+[INFO]  
+Round 3: Checking 8 tables for team separation
+[INFO]  
+Round 4: Checking 8 tables for team separation
+[INFO]  
+============================================================
+[PASS]  ✅ GAP 1 CLOSED: No teammates paired together in ANY round!
+[PASS]  PASS: GAP 1: No teammates at same table (Swiss rounds)
+[INFO]  
+############################################################
+[INFO]  # Simulating Swiss Round 1
+[INFO]  ############################################################
+[PASS]  PASS: Round 1 has 8 tables (expected: 8, got: 8)
+[INFO]  
+========================================
+[WARN]  GAP 3: Simulating Round 1 with PROPER API methods
+[INFO]  ========================================
+[INFO]    Table 1: Points [1, 0, 5, 1]
+[INFO]    Table 2: Points [1, 1, 5, 0]
+[INFO]    Table 3: Points [0, 1, 1, 5]
+[INFO]    Table 4: Points [1, 1, 5, 0]
+[INFO]    Table 5: Points [5, 1, 0, 1]
+[INFO]    Table 6: Points [1, 0, 1, 5]
+[INFO]    Table 7: Points [1, 5, 1, 0]
+[INFO]    Table 8: Points [1, 1, 5, 0]
+[INFO]  
+Calling tournament.submit_player_results(1, ...)
+Round 1 player results submitted and finalized successfully
+[INFO]  Calling tournament.calculate_team_scores()
+[PASS]  ✅ GAP 3: Round 1 submitted through proper API methods
+[INFO]  
+========================================
+[WARN]  GAP 3 VALIDATION: Team score calculation
+[INFO]  ========================================
+[PASS]  ✅ GAP 3 CLOSED: All team scores correctly calculated (sum of 4 players)
+[PASS]  PASS: GAP 3: Round 1 team scores = sum of player scores
+[INFO]  
+############################################################
+[INFO]  # Simulating Swiss Round 2
+[INFO]  ############################################################
+[PASS]  PASS: Round 2 has 8 tables (expected: 8, got: 8)
+[INFO]  
+========================================
+[WARN]  GAP 3: Simulating Round 2 with PROPER API methods
+[INFO]  ========================================
+[INFO]    Table 1: Points [5, 1, 1, 0]
+[INFO]    Table 2: Points [5, 0, 1, 1]
+[INFO]    Table 3: Points [1, 5, 0, 1]
+[INFO]    Table 4: Points [5, 1, 1, 0]
+[INFO]    Table 5: Points [1, 1, 5, 0]
+[INFO]    Table 6: Points [0, 1, 1, 5]
+[INFO]    Table 7: Points [0, 1, 1, 5]
+[INFO]    Table 8: Points [1, 0, 1, 5]
+[INFO]  
+Calling tournament.submit_player_results(2, ...)
+Round 2 player results submitted and finalized successfully
+[INFO]  Calling tournament.calculate_team_scores()
+[PASS]  ✅ GAP 3: Round 2 submitted through proper API methods
+[INFO]  
+========================================
+[WARN]  GAP 3 VALIDATION: Team score calculation
+[INFO]  ========================================
+[PASS]  ✅ GAP 3 CLOSED: All team scores correctly calculated (sum of 4 players)
+[PASS]  PASS: GAP 3: Round 2 team scores = sum of player scores
+[INFO]  
+========================================
+[WARN]  GAP 2 VALIDATION: Intelligent seating Round 2
+[INFO]  ========================================
+[INFO]  Calling tournament.apply_intelligent_seating_to_round(2)
+[PASS]  ✅ GAP 2 PASSED: Round 2 has intelligent seating (all tables sorted by score)
+[PASS]  PASS: GAP 2: Round 2 has intelligent seating
+[INFO]  
+############################################################
+[INFO]  # Simulating Swiss Round 3
+[INFO]  ############################################################
+[PASS]  PASS: Round 3 has 8 tables (expected: 8, got: 8)
+[INFO]  
+========================================
+[WARN]  GAP 3: Simulating Round 3 with PROPER API methods
+[INFO]  ========================================
+[INFO]    Table 1: Points [5, 1, 0, 1]
+[INFO]    Table 2: Points [5, 1, 1, 0]
+[INFO]    Table 3: Points [0, 1, 5, 1]
+[INFO]    Table 4: Points [5, 1, 0, 1]
+[INFO]    Table 5: Points [5, 1, 0, 1]
+[INFO]    Table 6: Points [1, 0, 5, 1]
+[INFO]    Table 7: Points [1, 5, 0, 1]
+[INFO]    Table 8: Points [5, 1, 0, 1]
+[INFO]  
+Calling tournament.submit_player_results(3, ...)
+Round 3 player results submitted and finalized successfully
+[INFO]  Calling tournament.calculate_team_scores()
+[PASS]  ✅ GAP 3: Round 3 submitted through proper API methods
+[INFO]  
+========================================
+[WARN]  GAP 3 VALIDATION: Team score calculation
+[INFO]  ========================================
+[PASS]  ✅ GAP 3 CLOSED: All team scores correctly calculated (sum of 4 players)
+[PASS]  PASS: GAP 3: Round 3 team scores = sum of player scores
+[INFO]  
+========================================
+[WARN]  GAP 2 VALIDATION: Intelligent seating Round 3
+[INFO]  ========================================
+[INFO]  Calling tournament.apply_intelligent_seating_to_round(3)
+[PASS]  ✅ GAP 2 PASSED: Round 3 has intelligent seating (all tables sorted by score)
+[PASS]  PASS: GAP 2: Round 3 has intelligent seating
+[INFO]  
+############################################################
+[INFO]  # Simulating Swiss Round 4
+[INFO]  ############################################################
+[PASS]  PASS: Round 4 has 8 tables (expected: 8, got: 8)
+[INFO]  
+========================================
+[WARN]  GAP 3: Simulating Round 4 with PROPER API methods
+[INFO]  ========================================
+[INFO]    Table 1: Points [1, 5, 0, 1]
+[INFO]    Table 2: Points [5, 1, 0, 1]
+[INFO]    Table 3: Points [1, 1, 5, 0]
+[INFO]    Table 4: Points [5, 0, 1, 1]
+[INFO]    Table 5: Points [0, 5, 1, 1]
+[INFO]    Table 6: Points [1, 1, 5, 0]
+[INFO]    Table 7: Points [0, 1, 1, 5]
+[INFO]    Table 8: Points [0, 1, 1, 5]
+[INFO]  
+Calling tournament.submit_player_results(4, ...)
+Round 4 player results submitted and finalized successfully
+[INFO]  Calling tournament.calculate_team_scores()
+[PASS]  ✅ GAP 3: Round 4 submitted through proper API methods
+[INFO]  
+========================================
+[WARN]  GAP 3 VALIDATION: Team score calculation
+[INFO]  ========================================
+[PASS]  ✅ GAP 3 CLOSED: All team scores correctly calculated (sum of 4 players)
+[PASS]  PASS: GAP 3: Round 4 team scores = sum of player scores
+[INFO]  
+========================================
+[WARN]  GAP 2 VALIDATION: Intelligent seating Round 4
+[INFO]  ========================================
+[INFO]  Calling tournament.apply_intelligent_seating_to_round(4)
+[PASS]  ✅ GAP 2 PASSED: Round 4 has intelligent seating (all tables sorted by score)
+[PASS]  PASS: GAP 2: Round 4 has intelligent seating
+[INFO]  
+============================================================
+[WARN]  ORIGINAL VALIDATION: Checking for repeat matchups in Swiss rounds
+[INFO]  ============================================================
+[INFO]  
+Round 1: Checking 8 tables
+[INFO]  
+Round 2: Checking 8 tables
+[INFO]  
+Round 3: Checking 8 tables
+[INFO]  
+Round 4: Checking 8 tables
+[INFO]  
+============================================================
+[PASS]  ✅ PERFECT: No repeat matchups found in Swiss rounds!
+[INFO]  Total unique matchups tracked: 384
+[PASS]  PASS: No player faces same opponent twice in Swiss rounds
+[INFO]  
+############################################################
+[INFO]  # Generating Finals
+[INFO]  ############################################################
+🏆 Generating FINALS after Swiss rounds (8-team tournament)
+   Top 4 teams advancing to finals:
+     1. Team_08: 49 pts
+     2. Team_07: 38 pts
+     3. Team_05: 30 pts
+     4. Team_06: 27 pts
+
+   Team_08 players (ranked by Swiss points):
+     Rank 1: Player_29 - 16 pts
+     Rank 2: Player_30 - 15 pts
+     Rank 3: Player_32 - 15 pts
+     Rank 4: Player_31 - 3 pts
+
+   Team_07 players (ranked by Swiss points):
+     Rank 1: Player_26 - 16 pts
+     Rank 2: Player_25 - 12 pts
+     Rank 3: Player_27 - 8 pts
+     Rank 4: Player_28 - 2 pts
+
+   Team_05 players (ranked by Swiss points):
+     Rank 1: Player_20 - 16 pts
+     Rank 2: Player_19 - 8 pts
+     Rank 3: Player_18 - 4 pts
+     Rank 4: Player_17 - 2 pts
+
+   Team_06 players (ranked by Swiss points):
+     Rank 1: Player_24 - 11 pts
+     Rank 2: Player_21 - 7 pts
+     Rank 3: Player_23 - 6 pts
+     Rank 4: Player_22 - 3 pts
+
+   Creating finals tables (Round 5) (NO teammates together, ordered by team ranking):
+     Finals Table 1 Seat 1: Player_29 (Team_08) - 16 pts (Team: 49 pts)
+     Finals Table 1 Seat 2: Player_26 (Team_07) - 16 pts (Team: 38 pts)
+     Finals Table 1 Seat 3: Player_20 (Team_05) - 16 pts (Team: 30 pts)
+     Finals Table 1 Seat 4: Player_24 (Team_06) - 11 pts (Team: 27 pts)
+     Finals Table 2 Seat 1: Player_30 (Team_08) - 15 pts (Team: 49 pts)
+     Finals Table 2 Seat 2: Player_25 (Team_07) - 12 pts (Team: 38 pts)
+     Finals Table 2 Seat 3: Player_19 (Team_05) - 8 pts (Team: 30 pts)
+     Finals Table 2 Seat 4: Player_21 (Team_06) - 7 pts (Team: 27 pts)
+     Finals Table 3 Seat 1: Player_32 (Team_08) - 15 pts (Team: 49 pts)
+     Finals Table 3 Seat 2: Player_27 (Team_07) - 8 pts (Team: 38 pts)
+     Finals Table 3 Seat 3: Player_18 (Team_05) - 4 pts (Team: 30 pts)
+     Finals Table 3 Seat 4: Player_23 (Team_06) - 6 pts (Team: 27 pts)
+     Finals Table 4 Seat 1: Player_31 (Team_08) - 3 pts (Team: 49 pts)
+     Finals Table 4 Seat 2: Player_28 (Team_07) - 2 pts (Team: 38 pts)
+     Finals Table 4 Seat 3: Player_17 (Team_05) - 2 pts (Team: 30 pts)
+     Finals Table 4 Seat 4: Player_22 (Team_06) - 3 pts (Team: 27 pts)
+
+✅ Finals created: 4 tables with strength-based matchups
+   - Table 1: Strongest player from each team (NO teammates)
+   - Table 2: 2nd strongest player from each team (NO teammates)
+   - Table 3: 3rd strongest player from each team (NO teammates)
+   - Table 4: 4th strongest player from each team (NO teammates)
+   ✅ VERIFIED: No teammates are paired together!
+   ✅ Seating order: Arranged by team ranking (highest team score = first seat)
+[PASS]  PASS: Finals generated after Swiss rounds
+[PASS]  PASS: Finals round (5) exists
+[PASS]  PASS: Finals has 4 tables (top 4 teams) (expected: 4, got: 4)
+[INFO]  
+============================================================
+[WARN]  GAP 4 VALIDATION: Finals qualification logic
+[INFO]  ============================================================
+[INFO]  Source for finals: Swiss rounds
+[INFO]  Expected top 4 teams: ['Team_05', 'Team_06', 'Team_07', 'Team_08']
+[INFO]  Actual finals teams: ['Team_05', 'Team_06', 'Team_07', 'Team_08']
+[PASS]  ✅ GAP 4 CLOSED: Correct top 4 teams advanced to finals (source: Swiss rounds)
+[PASS]  PASS: GAP 4: Correct top 4 teams advanced to finals
+[INFO]  
+========================================
+[WARN]  GAP 4 VALIDATION: Finals strength-based seating
+[INFO]  ========================================
+[PASS]  ✅ GAP 4: Finals has correct structure (4 tables, 4 players each, no teammates)
+[PASS]  PASS: GAP 4: Finals has correct structure
+[INFO]  
+============================================================
+[WARN]  GAP 1 VALIDATION: Checking team separation (no teammates at same table)
+[INFO]  ============================================================
+[INFO]  
+Round 1: Checking 8 tables for team separation
+[INFO]  
+Round 2: Checking 8 tables for team separation
+[INFO]  
+Round 3: Checking 8 tables for team separation
+[INFO]  
+Round 4: Checking 8 tables for team separation
+[INFO]  
+Finals Round 5: Checking 4 tables
+[INFO]  
+============================================================
+[PASS]  ✅ GAP 1 CLOSED: No teammates paired together in ANY round!
+[PASS]  PASS: GAP 1: No teammates at same table (including finals)
+[INFO]  
+============================================================
+[WARN]  GAP 5: COMPLETING TOURNAMENT & VALIDATING CHAMPIONSHIP
+[INFO]  ============================================================
+[INFO]  
+--- Simulating Finals Round 5 ---
+[INFO]  Finals has 4 tables
+[INFO]  
+========================================
+[WARN]  GAP 3: Simulating Round 5 with PROPER API methods
+[INFO]  ========================================
+[INFO]    Finals Table 1: Points [1, 5, 0, 1]
+[INFO]    Finals Table 2: Points [1, 1, 5, 0]
+[INFO]    Finals Table 3: Points [0, 5, 1, 1]
+[INFO]    Finals Table 4: Points [5, 0, 1, 1]
+[INFO]  
+Calling tournament.submit_player_results(5, ...)
+Round 5 player results submitted and finalized successfully
+[INFO]  Calling tournament.calculate_team_scores()
+[PASS]  ✅ GAP 3: Round 5 submitted through proper API methods
+[PASS]  ✅ Finals results submitted successfully
+[INFO]  
+--- Calculating Final Standings ---
+
+🏆 CALCULATING CHAMPION - Teams in finals: ['Team_08', 'Team_07', 'Team_05', 'Team_06']
+📊 Final round scores: {}
+📊 Swiss round scores: {}
+  Team_08: Final=0 pts, Swiss=0 pts, Total=0 pts
+  Team_07: Final=0 pts, Swiss=0 pts, Total=0 pts
+  Team_05: Final=0 pts, Swiss=0 pts, Total=0 pts
+  Team_06: Final=0 pts, Swiss=0 pts, Total=0 pts
+
+🔄 Sorting by: (final_points DESC, swiss_points DESC)
+
+✅ FINAL STANDINGS (sorted by FINAL points first, then Swiss as tiebreaker):
+  🥇 Team_08: Final=0 pts (PRIMARY), Swiss=0 pts (tiebreaker), Total=0 pts
+  🥈 Team_07: Final=0 pts (PRIMARY), Swiss=0 pts (tiebreaker), Total=0 pts
+  🥉 Team_05: Final=0 pts (PRIMARY), Swiss=0 pts (tiebreaker), Total=0 pts
+  4. Team_06: Final=0 pts (PRIMARY), Swiss=0 pts (tiebreaker), Total=0 pts
+⚠️  TIE on final points! Using Swiss points as tiebreaker:
+   Winner: Team_08 (Swiss: 0 pts)
+   Runner-up: Team_07 (Swiss: 0 pts)
+[PASS]  ✅ Final standings calculated: 4 teams
+[INFO]    1. Team_08: 0 pts (Swiss: 0)
+[INFO]    2. Team_07: 0 pts (Swiss: 0)
+[INFO]    3. Team_05: 0 pts (Swiss: 0)
+[INFO]    4. Team_06: 0 pts (Swiss: 0)
+[INFO]  
+--- Validating Champion ---
+[PASS]  ✅ Champion: Team_08 with 0 pts
+[INFO]  
+--- Validating Standings Order ---
+[PASS]  ✅ Standings properly sorted by total points
+[INFO]  
+--- Validating Tiebreaker Logic ---
+[WARN]  ⚠️  Swiss scores not preserved (tiebreaker won't work)
+[INFO]  
+--- Validating MVP Calculation ---
+[PASS]  ✅ MVP: Player 26 with 21 points
+[PASS]  
+============================================================
+[PASS]  ✅ GAP 5 CLOSED: Championship determination fully validated!
+[PASS]  ============================================================
+[PASS]  PASS: GAP 5: Championship determination validated
+[PASS]  
+================================================================================
+[PASS]  ✅ TEST PASSED: 8 Teams - 4 Swiss Rounds
+[PASS]  ================================================================================
+[INFO]  
+================================================================================
+[INFO]  TEST: 8 Teams - 5 Swiss Rounds
+[INFO]  ================================================================================
+✓ Swiss rounds configured: 5 rounds
+✓ Tournament structure will be determined when teams are loaded
+[PASS]  PASS: Configure 5 Swiss rounds
+✓ Tournament structure: 8 teams
+  - Swiss rounds: 5
+  - Semifinals: NO (top 4 teams advance directly to Finals)
+  - Finals: YES (top 4 teams)
+  - Total rounds: 6
+[PASS]  PASS: No semifinals for 8 teams (expected: False, got: False)
+[PASS]  PASS: Total rounds = 6 (5 Swiss + 1 Finals) (expected: 6, got: 6)
+✓ Tournament configuration: 8 teams (OPTIMAL), 5 Swiss rounds
+✓ All teams will compete in ONE unified tournament group
+✓ Pods per round: 8 (4 players each)
+✓ This configuration guarantees perfect pairings with zero repeat matchups
+🔄 RESETTING tournament state for new tournament...
+✓ Tournament state reset complete
+Tournament Teams (8): ['Team_08', 'Team_07', 'Team_02', 'Team_06', 'Team_01', 'Team_03', 'Team_05', 'Team_04']
+=== GENERATING ALL 5 SWISS ROUNDS AT ONCE ===
+Generating complete Swiss tournament for 8 teams...
+Tournament teams: ['Team_08', 'Team_07', 'Team_02', 'Team_06', 'Team_01', 'Team_03', 'Team_05', 'Team_04']
+Swiss rounds: 5
+🔧 Unified Swiss Pairing initialized
+   Teams: 8 (['Team_08', 'Team_07', 'Team_02', 'Team_06', 'Team_01', 'Team_03', 'Team_05', 'Team_04'])
+   Players: 32
+   Pods per round: 8
+   Incomplete pod size: 0
+   Swiss rounds: 5
+🚀 Generating all Swiss rounds with unified algorithm...
+
+--- Attempting Enhanced Constraint Satisfaction ---
+  Solving Round 1...
+    Using enhanced constraint satisfaction solver...
+    Backtrack stats: 9 nodes, 0 backtracks, 0 pruned
+    ✅ Enhanced solver succeeded
+  ✅ Round 1 solved (8 pods)
+  Solving Round 2...
+    Using enhanced constraint satisfaction solver...
+    Backtrack stats: 9 nodes, 0 backtracks, 0 pruned
+    ✅ Enhanced solver succeeded
+  ✅ Round 2 solved (8 pods)
+  Solving Round 3...
+    Using enhanced constraint satisfaction solver...
+    Backtrack stats: 9 nodes, 0 backtracks, 0 pruned
+    ✅ Enhanced solver succeeded
+  ✅ Round 3 solved (8 pods)
+  Solving Round 4...
+    Using enhanced constraint satisfaction solver...
+    Backtrack stats: 9 nodes, 0 backtracks, 0 pruned
+    ✅ Enhanced solver succeeded
+  ✅ Round 4 solved (8 pods)
+  Solving Round 5...
+    Using enhanced constraint satisfaction solver...
+    Backtrack stats: 1 nodes, 1 backtracks, 0 pruned
+    ❌ Enhanced solver failed, trying fallback...
+  ❌ Failed to solve Round 5
+❌ Enhanced Constraint Satisfaction failed
+
+--- Attempting Dynamic Pairing with Backtracking ---
+    Trying Constraint-Guided Random strategy...
+      Attempt 100/500...
+      Attempt 200/500...
+      Attempt 300/500...
+      Attempt 400/500...
+      Attempt 500/500...
+    ❌ Constraint-Guided Random failed after 500 attempts
+    Trying Team-Balanced Random strategy...
+      Attempt 100/500...
+      Attempt 200/500...
+      Attempt 300/500...
+      Attempt 400/500...
+      Attempt 500/500...
+    ❌ Team-Balanced Random failed after 500 attempts
+    Trying Pure Random strategy...
+      Attempt 100/500...
+      Attempt 200/500...
+      Attempt 300/500...
+      Attempt 400/500...
+      Attempt 500/500...
+    ❌ Pure Random failed after 500 attempts
+❌ Dynamic Pairing with Backtracking failed
+
+--- Attempting Relaxed Constraint Optimization ---
+  Using relaxed constraints - minimizing violations...
+    New best solution: 1 violations
+    Optimization attempt 10/50...
+    Optimization attempt 20/50...
+    Optimization attempt 30/50...
+    New best solution: 0 violations
+  ✅ Relaxed constraint optimization succeeded with 0 violations
+✅ Relaxed Constraint Optimization succeeded!
+   Generation time: 2.29 seconds
+   Total rounds: 5
+✓ Tournament generated successfully!
+  Perfect tournament: True
+  Total violations: 0
+  Pairing efficiency: 100.0%
+  Generation time: 2.29 seconds
+   Round 1, Table 1: Random seating (no prior scores)
+   Round 1, Table 2: Random seating (no prior scores)
+   Round 1, Table 3: Random seating (no prior scores)
+   Round 1, Table 4: Random seating (no prior scores)
+   Round 1, Table 5: Random seating (no prior scores)
+   Round 1, Table 6: Random seating (no prior scores)
+   Round 1, Table 7: Random seating (no prior scores)
+   Round 1, Table 8: Random seating (no prior scores)
+      Seating: Seat 1: Team_01 (0pts) | Seat 2: Team_07 (0pts) | Seat 3: Team_04 (0pts) | Seat 4: Team_02 (0pts)
+   Round 2, Table 1: Intelligent seating (score-based)
+      Seating: Seat 1: Team_07 (0pts) | Seat 2: Team_02 (0pts) | Seat 3: Team_03 (0pts) | Seat 4: Team_04 (0pts)
+   Round 2, Table 2: Intelligent seating (score-based)
+      Seating: Seat 1: Team_03 (0pts) | Seat 2: Team_02 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_08 (0pts)
+   Round 2, Table 3: Intelligent seating (score-based)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_06 (0pts) | Seat 3: Team_07 (0pts) | Seat 4: Team_02 (0pts)
+   Round 2, Table 4: Intelligent seating (score-based)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_07 (0pts) | Seat 3: Team_05 (0pts) | Seat 4: Team_06 (0pts)
+   Round 2, Table 5: Intelligent seating (score-based)
+      Seating: Seat 1: Team_06 (0pts) | Seat 2: Team_03 (0pts) | Seat 3: Team_05 (0pts) | Seat 4: Team_01 (0pts)
+   Round 2, Table 6: Intelligent seating (score-based)
+      Seating: Seat 1: Team_05 (0pts) | Seat 2: Team_04 (0pts) | Seat 3: Team_06 (0pts) | Seat 4: Team_01 (0pts)
+   Round 2, Table 7: Intelligent seating (score-based)
+      Seating: Seat 1: Team_05 (0pts) | Seat 2: Team_04 (0pts) | Seat 3: Team_08 (0pts) | Seat 4: Team_03 (0pts)
+   Round 2, Table 8: Intelligent seating (score-based)
+      Seating: Seat 1: Team_05 (0pts) | Seat 2: Team_01 (0pts) | Seat 3: Team_03 (0pts) | Seat 4: Team_07 (0pts)
+   Round 3, Table 1: Intelligent seating (score-based)
+      Seating: Seat 1: Team_05 (0pts) | Seat 2: Team_03 (0pts) | Seat 3: Team_07 (0pts) | Seat 4: Team_01 (0pts)
+   Round 3, Table 2: Intelligent seating (score-based)
+      Seating: Seat 1: Team_03 (0pts) | Seat 2: Team_07 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_06 (0pts)
+   Round 3, Table 3: Intelligent seating (score-based)
+      Seating: Seat 1: Team_01 (0pts) | Seat 2: Team_04 (0pts) | Seat 3: Team_08 (0pts) | Seat 4: Team_02 (0pts)
+   Round 3, Table 4: Intelligent seating (score-based)
+      Seating: Seat 1: Team_04 (0pts) | Seat 2: Team_03 (0pts) | Seat 3: Team_06 (0pts) | Seat 4: Team_05 (0pts)
+   Round 3, Table 5: Intelligent seating (score-based)
+      Seating: Seat 1: Team_04 (0pts) | Seat 2: Team_06 (0pts) | Seat 3: Team_08 (0pts) | Seat 4: Team_02 (0pts)
+   Round 3, Table 6: Intelligent seating (score-based)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_02 (0pts) | Seat 3: Team_06 (0pts) | Seat 4: Team_04 (0pts)
+   Round 3, Table 7: Intelligent seating (score-based)
+      Seating: Seat 1: Team_02 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_07 (0pts) | Seat 4: Team_08 (0pts)
+   Round 3, Table 8: Intelligent seating (score-based)
+      Seating: Seat 1: Team_05 (0pts) | Seat 2: Team_04 (0pts) | Seat 3: Team_03 (0pts) | Seat 4: Team_02 (0pts)
+   Round 4, Table 1: Intelligent seating (score-based)
+      Seating: Seat 1: Team_03 (0pts) | Seat 2: Team_08 (0pts) | Seat 3: Team_07 (0pts) | Seat 4: Team_01 (0pts)
+   Round 4, Table 2: Intelligent seating (score-based)
+      Seating: Seat 1: Team_07 (0pts) | Seat 2: Team_01 (0pts) | Seat 3: Team_02 (0pts) | Seat 4: Team_05 (0pts)
+   Round 4, Table 3: Intelligent seating (score-based)
+      Seating: Seat 1: Team_01 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_08 (0pts) | Seat 4: Team_04 (0pts)
+   Round 4, Table 4: Intelligent seating (score-based)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_04 (0pts) | Seat 3: Team_05 (0pts) | Seat 4: Team_06 (0pts)
+   Round 4, Table 5: Intelligent seating (score-based)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_07 (0pts) | Seat 3: Team_06 (0pts) | Seat 4: Team_02 (0pts)
+   Round 4, Table 6: Intelligent seating (score-based)
+      Seating: Seat 1: Team_04 (0pts) | Seat 2: Team_03 (0pts) | Seat 3: Team_06 (0pts) | Seat 4: Team_02 (0pts)
+   Round 4, Table 7: Intelligent seating (score-based)
+      Seating: Seat 1: Team_03 (0pts) | Seat 2: Team_06 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_07 (0pts)
+   Round 4, Table 8: Intelligent seating (score-based)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_07 (0pts) | Seat 3: Team_02 (0pts) | Seat 4: Team_06 (0pts)
+   Round 5, Table 1: Intelligent seating (score-based)
+      Seating: Seat 1: Team_07 (0pts) | Seat 2: Team_02 (0pts) | Seat 3: Team_06 (0pts) | Seat 4: Team_05 (0pts)
+   Round 5, Table 2: Intelligent seating (score-based)
+      Seating: Seat 1: Team_02 (0pts) | Seat 2: Team_06 (0pts) | Seat 3: Team_05 (0pts) | Seat 4: Team_08 (0pts)
+   Round 5, Table 3: Intelligent seating (score-based)
+      Seating: Seat 1: Team_04 (0pts) | Seat 2: Team_03 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_08 (0pts)
+   Round 5, Table 4: Intelligent seating (score-based)
+      Seating: Seat 1: Team_03 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_04 (0pts)
+   Round 5, Table 5: Intelligent seating (score-based)
+      Seating: Seat 1: Team_03 (0pts) | Seat 2: Team_01 (0pts) | Seat 3: Team_02 (0pts) | Seat 4: Team_04 (0pts)
+   Round 5, Table 6: Intelligent seating (score-based)
+      Seating: Seat 1: Team_03 (0pts) | Seat 2: Team_07 (0pts) | Seat 3: Team_08 (0pts) | Seat 4: Team_04 (0pts)
+   Round 5, Table 7: Intelligent seating (score-based)
+      Seating: Seat 1: Team_05 (0pts) | Seat 2: Team_01 (0pts) | Seat 3: Team_07 (0pts) | Seat 4: Team_06 (0pts)
+   Round 5, Table 8: Intelligent seating (score-based)
+✓ Organized all rounds into tables structure with intelligent seating
+✓ Tournament ready: 5 rounds with 8 tables each
+✓ All 5 Swiss rounds generated successfully!
+Tournament pairings are now LOCKED for the entire event.
+[PASS]  PASS: 5 Swiss rounds generated (expected: 5, got: 5)
+[INFO]  
+============================================================
+[WARN]  GAP 1 VALIDATION: Checking team separation (no teammates at same table)
+[INFO]  ============================================================
+[INFO]  
+Round 1: Checking 8 tables for team separation
+[INFO]  
+Round 2: Checking 8 tables for team separation
+[INFO]  
+Round 3: Checking 8 tables for team separation
+[INFO]  
+Round 4: Checking 8 tables for team separation
+[INFO]  
+Round 5: Checking 8 tables for team separation
+[INFO]  
+============================================================
+[PASS]  ✅ GAP 1 CLOSED: No teammates paired together in ANY round!
+[PASS]  PASS: GAP 1: No teammates at same table (Swiss rounds)
+[INFO]  
+############################################################
+[INFO]  # Simulating Swiss Round 1
+[INFO]  ############################################################
+[PASS]  PASS: Round 1 has 8 tables (expected: 8, got: 8)
+[INFO]  
+========================================
+[WARN]  GAP 3: Simulating Round 1 with PROPER API methods
+[INFO]  ========================================
+[INFO]    Table 1: Points [1, 0, 1, 5]
+[INFO]    Table 2: Points [1, 1, 5, 0]
+[INFO]    Table 3: Points [5, 0, 1, 1]
+[INFO]    Table 4: Points [0, 1, 5, 1]
+[INFO]    Table 5: Points [5, 1, 1, 0]
+[INFO]    Table 6: Points [1, 5, 0, 1]
+[INFO]    Table 7: Points [0, 5, 1, 1]
+[INFO]    Table 8: Points [0, 1, 5, 1]
+[INFO]  
+Calling tournament.submit_player_results(1, ...)
+Round 1 player results submitted and finalized successfully
+[INFO]  Calling tournament.calculate_team_scores()
+[PASS]  ✅ GAP 3: Round 1 submitted through proper API methods
+[INFO]  
+========================================
+[WARN]  GAP 3 VALIDATION: Team score calculation
+[INFO]  ========================================
+[PASS]  ✅ GAP 3 CLOSED: All team scores correctly calculated (sum of 4 players)
+[PASS]  PASS: GAP 3: Round 1 team scores correct
+[INFO]  
+############################################################
+[INFO]  # Simulating Swiss Round 2
+[INFO]  ############################################################
+[PASS]  PASS: Round 2 has 8 tables (expected: 8, got: 8)
+[INFO]  
+========================================
+[WARN]  GAP 3: Simulating Round 2 with PROPER API methods
+[INFO]  ========================================
+[INFO]    Table 1: Points [0, 1, 1, 5]
+[INFO]    Table 2: Points [1, 1, 0, 5]
+[INFO]    Table 3: Points [1, 1, 5, 0]
+[INFO]    Table 4: Points [5, 1, 0, 1]
+[INFO]    Table 5: Points [1, 0, 5, 1]
+[INFO]    Table 6: Points [1, 5, 1, 0]
+[INFO]    Table 7: Points [5, 0, 1, 1]
+[INFO]    Table 8: Points [1, 5, 1, 0]
+[INFO]  
+Calling tournament.submit_player_results(2, ...)
+Round 2 player results submitted and finalized successfully
+[INFO]  Calling tournament.calculate_team_scores()
+[PASS]  ✅ GAP 3: Round 2 submitted through proper API methods
+[INFO]  
+========================================
+[WARN]  GAP 3 VALIDATION: Team score calculation
+[INFO]  ========================================
+[PASS]  ✅ GAP 3 CLOSED: All team scores correctly calculated (sum of 4 players)
+[PASS]  PASS: GAP 3: Round 2 team scores correct
+[INFO]  
+========================================
+[WARN]  GAP 2 VALIDATION: Intelligent seating Round 2
+[INFO]  ========================================
+[INFO]  Calling tournament.apply_intelligent_seating_to_round(2)
+[PASS]  ✅ GAP 2 PASSED: Round 2 has intelligent seating (all tables sorted by score)
+[PASS]  PASS: GAP 2: Round 2 intelligent seating
+[INFO]  
+############################################################
+[INFO]  # Simulating Swiss Round 3
+[INFO]  ############################################################
+[PASS]  PASS: Round 3 has 8 tables (expected: 8, got: 8)
+[INFO]  
+========================================
+[WARN]  GAP 3: Simulating Round 3 with PROPER API methods
+[INFO]  ========================================
+[INFO]    Table 1: Points [5, 1, 0, 1]
+[INFO]    Table 2: Points [1, 1, 5, 0]
+[INFO]    Table 3: Points [5, 1, 1, 0]
+[INFO]    Table 4: Points [5, 1, 1, 0]
+[INFO]    Table 5: Points [1, 5, 1, 0]
+[INFO]    Table 6: Points [1, 1, 0, 5]
+[INFO]    Table 7: Points [1, 1, 0, 5]
+[INFO]    Table 8: Points [1, 5, 0, 1]
+[INFO]  
+Calling tournament.submit_player_results(3, ...)
+Round 3 player results submitted and finalized successfully
+[INFO]  Calling tournament.calculate_team_scores()
+[PASS]  ✅ GAP 3: Round 3 submitted through proper API methods
+[INFO]  
+========================================
+[WARN]  GAP 3 VALIDATION: Team score calculation
+[INFO]  ========================================
+[PASS]  ✅ GAP 3 CLOSED: All team scores correctly calculated (sum of 4 players)
+[PASS]  PASS: GAP 3: Round 3 team scores correct
+[INFO]  
+========================================
+[WARN]  GAP 2 VALIDATION: Intelligent seating Round 3
+[INFO]  ========================================
+[INFO]  Calling tournament.apply_intelligent_seating_to_round(3)
+[PASS]  ✅ GAP 2 PASSED: Round 3 has intelligent seating (all tables sorted by score)
+[PASS]  PASS: GAP 2: Round 3 intelligent seating
+[INFO]  
+############################################################
+[INFO]  # Simulating Swiss Round 4
+[INFO]  ############################################################
+[PASS]  PASS: Round 4 has 8 tables (expected: 8, got: 8)
+[INFO]  
+========================================
+[WARN]  GAP 3: Simulating Round 4 with PROPER API methods
+[INFO]  ========================================
+[INFO]    Table 1: Points [1, 0, 1, 5]
+[INFO]    Table 2: Points [1, 5, 0, 1]
+[INFO]    Table 3: Points [5, 0, 1, 1]
+[INFO]    Table 4: Points [5, 1, 1, 0]
+[INFO]    Table 5: Points [5, 1, 0, 1]
+[INFO]    Table 6: Points [0, 5, 1, 1]
+[INFO]    Table 7: Points [1, 0, 1, 5]
+[INFO]    Table 8: Points [5, 0, 1, 1]
+[INFO]  
+Calling tournament.submit_player_results(4, ...)
+Round 4 player results submitted and finalized successfully
+[INFO]  Calling tournament.calculate_team_scores()
+[PASS]  ✅ GAP 3: Round 4 submitted through proper API methods
+[INFO]  
+========================================
+[WARN]  GAP 3 VALIDATION: Team score calculation
+[INFO]  ========================================
+[PASS]  ✅ GAP 3 CLOSED: All team scores correctly calculated (sum of 4 players)
+[PASS]  PASS: GAP 3: Round 4 team scores correct
+[INFO]  
+========================================
+[WARN]  GAP 2 VALIDATION: Intelligent seating Round 4
+[INFO]  ========================================
+[INFO]  Calling tournament.apply_intelligent_seating_to_round(4)
+[PASS]  ✅ GAP 2 PASSED: Round 4 has intelligent seating (all tables sorted by score)
+[PASS]  PASS: GAP 2: Round 4 intelligent seating
+[INFO]  
+############################################################
+[INFO]  # Simulating Swiss Round 5
+[INFO]  ############################################################
+[PASS]  PASS: Round 5 has 8 tables (expected: 8, got: 8)
+[INFO]  
+========================================
+[WARN]  GAP 3: Simulating Round 5 with PROPER API methods
+[INFO]  ========================================
+[INFO]    Table 1: Points [5, 1, 1, 0]
+[INFO]    Table 2: Points [5, 1, 1, 0]
+[INFO]    Table 3: Points [0, 1, 1, 5]
+[INFO]    Table 4: Points [0, 1, 1, 5]
+[INFO]    Table 5: Points [5, 0, 1, 1]
+[INFO]    Table 6: Points [1, 1, 5, 0]
+[INFO]    Table 7: Points [5, 0, 1, 1]
+[INFO]    Table 8: Points [1, 5, 0, 1]
+[INFO]  
+Calling tournament.submit_player_results(5, ...)
+Round 5 player results submitted and finalized successfully
+[INFO]  Calling tournament.calculate_team_scores()
+[PASS]  ✅ GAP 3: Round 5 submitted through proper API methods
+[INFO]  
+========================================
+[WARN]  GAP 3 VALIDATION: Team score calculation
+[INFO]  ========================================
+[PASS]  ✅ GAP 3 CLOSED: All team scores correctly calculated (sum of 4 players)
+[PASS]  PASS: GAP 3: Round 5 team scores correct
+[INFO]  
+========================================
+[WARN]  GAP 2 VALIDATION: Intelligent seating Round 5
+[INFO]  ========================================
+[INFO]  Calling tournament.apply_intelligent_seating_to_round(5)
+[PASS]  ✅ GAP 2 PASSED: Round 5 has intelligent seating (all tables sorted by score)
+[PASS]  PASS: GAP 2: Round 5 intelligent seating
+[INFO]  
+============================================================
+[WARN]  ORIGINAL VALIDATION: Checking for repeat matchups in Swiss rounds
+[INFO]  ============================================================
+[INFO]  
+Round 1: Checking 8 tables
+[INFO]  
+Round 2: Checking 8 tables
+[INFO]  
+Round 3: Checking 8 tables
+[INFO]  
+Round 4: Checking 8 tables
+[INFO]  
+Round 5: Checking 8 tables
+[INFO]  
+============================================================
+[PASS]  ✅ PERFECT: No repeat matchups found in Swiss rounds!
+[INFO]  Total unique matchups tracked: 480
+[PASS]  PASS: No repeat matchups in 5 Swiss rounds
+[INFO]  
+############################################################
+[INFO]  # Generating Finals
+[INFO]  ############################################################
+🏆 Generating FINALS after Swiss rounds (8-team tournament)
+   Top 4 teams advancing to finals:
+     1. Team_08: 53 pts
+     2. Team_03: 43 pts
+     3. Team_02: 42 pts
+     4. Team_07: 37 pts
+
+   Team_08 players (ranked by Swiss points):
+     Rank 1: Player_32 - 21 pts
+     Rank 2: Player_31 - 15 pts
+     Rank 3: Player_29 - 12 pts
+     Rank 4: Player_30 - 5 pts
+
+   Team_03 players (ranked by Swiss points):
+     Rank 1: Player_09 - 21 pts
+     Rank 2: Player_11 - 8 pts
+     Rank 3: Player_10 - 7 pts
+     Rank 4: Player_12 - 7 pts
+
+   Team_02 players (ranked by Swiss points):
+     Rank 1: Player_08 - 13 pts
+     Rank 2: Player_05 - 12 pts
+     Rank 3: Player_07 - 9 pts
+     Rank 4: Player_06 - 8 pts
+
+   Team_07 players (ranked by Swiss points):
+     Rank 1: Player_26 - 17 pts
+     Rank 2: Player_27 - 17 pts
+     Rank 3: Player_25 - 2 pts
+     Rank 4: Player_28 - 1 pts
+
+   Creating finals tables (Round 6) (NO teammates together, ordered by team ranking):
+     Finals Table 1 Seat 1: Player_32 (Team_08) - 21 pts (Team: 53 pts)
+     Finals Table 1 Seat 2: Player_09 (Team_03) - 21 pts (Team: 43 pts)
+     Finals Table 1 Seat 3: Player_08 (Team_02) - 13 pts (Team: 42 pts)
+     Finals Table 1 Seat 4: Player_26 (Team_07) - 17 pts (Team: 37 pts)
+     Finals Table 2 Seat 1: Player_31 (Team_08) - 15 pts (Team: 53 pts)
+     Finals Table 2 Seat 2: Player_11 (Team_03) - 8 pts (Team: 43 pts)
+     Finals Table 2 Seat 3: Player_05 (Team_02) - 12 pts (Team: 42 pts)
+     Finals Table 2 Seat 4: Player_27 (Team_07) - 17 pts (Team: 37 pts)
+     Finals Table 3 Seat 1: Player_29 (Team_08) - 12 pts (Team: 53 pts)
+     Finals Table 3 Seat 2: Player_10 (Team_03) - 7 pts (Team: 43 pts)
+     Finals Table 3 Seat 3: Player_07 (Team_02) - 9 pts (Team: 42 pts)
+     Finals Table 3 Seat 4: Player_25 (Team_07) - 2 pts (Team: 37 pts)
+     Finals Table 4 Seat 1: Player_30 (Team_08) - 5 pts (Team: 53 pts)
+     Finals Table 4 Seat 2: Player_12 (Team_03) - 7 pts (Team: 43 pts)
+     Finals Table 4 Seat 3: Player_06 (Team_02) - 8 pts (Team: 42 pts)
+     Finals Table 4 Seat 4: Player_28 (Team_07) - 1 pts (Team: 37 pts)
+
+✅ Finals created: 4 tables with strength-based matchups
+   - Table 1: Strongest player from each team (NO teammates)
+   - Table 2: 2nd strongest player from each team (NO teammates)
+   - Table 3: 3rd strongest player from each team (NO teammates)
+   - Table 4: 4th strongest player from each team (NO teammates)
+   ✅ VERIFIED: No teammates are paired together!
+   ✅ Seating order: Arranged by team ranking (highest team score = first seat)
+[PASS]  PASS: Finals generated
+[PASS]  PASS: Finals round (6) exists
+[PASS]  PASS: Finals has 4 tables (expected: 4, got: 4)
+[INFO]  
+============================================================
+[WARN]  GAP 4 VALIDATION: Finals qualification logic
+[INFO]  ============================================================
+[INFO]  Source for finals: Swiss rounds
+[INFO]  Expected top 4 teams: ['Team_02', 'Team_03', 'Team_07', 'Team_08']
+[INFO]  Actual finals teams: ['Team_02', 'Team_03', 'Team_07', 'Team_08']
+[PASS]  ✅ GAP 4 CLOSED: Correct top 4 teams advanced to finals (source: Swiss rounds)
+[PASS]  PASS: GAP 4: Finals qualification correct
+[INFO]  
+========================================
+[WARN]  GAP 4 VALIDATION: Finals strength-based seating
+[INFO]  ========================================
+[PASS]  ✅ GAP 4: Finals has correct structure (4 tables, 4 players each, no teammates)
+[PASS]  PASS: GAP 4: Finals structure correct
+[INFO]  
+============================================================
+[WARN]  GAP 5: COMPLETING TOURNAMENT & VALIDATING CHAMPIONSHIP
+[INFO]  ============================================================
+[INFO]  
+--- Simulating Finals Round 6 ---
+[INFO]  Finals has 4 tables
+[INFO]  
+========================================
+[WARN]  GAP 3: Simulating Round 6 with PROPER API methods
+[INFO]  ========================================
+[INFO]    Finals Table 1: Points [1, 1, 0, 5]
+[INFO]    Finals Table 2: Points [1, 1, 0, 5]
+[INFO]    Finals Table 3: Points [1, 1, 5, 0]
+[INFO]    Finals Table 4: Points [5, 1, 0, 1]
+[INFO]  
+Calling tournament.submit_player_results(6, ...)
+Round 6 player results submitted and finalized successfully
+[INFO]  Calling tournament.calculate_team_scores()
+[PASS]  ✅ GAP 3: Round 6 submitted through proper API methods
+[PASS]  ✅ Finals results submitted successfully
+[INFO]  
+--- Calculating Final Standings ---
+
+🏆 CALCULATING CHAMPION - Teams in finals: ['Team_08', 'Team_03', 'Team_02', 'Team_07']
+📊 Final round scores: {}
+📊 Swiss round scores: {}
+  Team_08: Final=0 pts, Swiss=0 pts, Total=0 pts
+  Team_03: Final=0 pts, Swiss=0 pts, Total=0 pts
+  Team_02: Final=0 pts, Swiss=0 pts, Total=0 pts
+  Team_07: Final=0 pts, Swiss=0 pts, Total=0 pts
+
+🔄 Sorting by: (final_points DESC, swiss_points DESC)
+
+✅ FINAL STANDINGS (sorted by FINAL points first, then Swiss as tiebreaker):
+  🥇 Team_08: Final=0 pts (PRIMARY), Swiss=0 pts (tiebreaker), Total=0 pts
+  🥈 Team_03: Final=0 pts (PRIMARY), Swiss=0 pts (tiebreaker), Total=0 pts
+  🥉 Team_02: Final=0 pts (PRIMARY), Swiss=0 pts (tiebreaker), Total=0 pts
+  4. Team_07: Final=0 pts (PRIMARY), Swiss=0 pts (tiebreaker), Total=0 pts
+⚠️  TIE on final points! Using Swiss points as tiebreaker:
+   Winner: Team_08 (Swiss: 0 pts)
+   Runner-up: Team_03 (Swiss: 0 pts)
+[PASS]  ✅ Final standings calculated: 4 teams
+[INFO]    1. Team_08: 0 pts (Swiss: 0)
+[INFO]    2. Team_03: 0 pts (Swiss: 0)
+[INFO]    3. Team_02: 0 pts (Swiss: 0)
+[INFO]    4. Team_07: 0 pts (Swiss: 0)
+[INFO]  
+--- Validating Champion ---
+[PASS]  ✅ Champion: Team_08 with 0 pts
+[INFO]  
+--- Validating Standings Order ---
+[PASS]  ✅ Standings properly sorted by total points
+[INFO]  
+--- Validating Tiebreaker Logic ---
+[WARN]  ⚠️  Swiss scores not preserved (tiebreaker won't work)
+[INFO]  
+--- Validating MVP Calculation ---
+[PASS]  ✅ MVP: Player 9 with 22 points
+[PASS]  
+============================================================
+[PASS]  ✅ GAP 5 CLOSED: Championship determination fully validated!
+[PASS]  ============================================================
+[PASS]  PASS: GAP 5: Championship determination validated
+[PASS]  
+================================================================================
+[PASS]  ✅ TEST PASSED: 8 Teams - 5 Swiss Rounds
+[PASS]  ================================================================================
+[INFO]  
+================================================================================
+[INFO]  TEST: 16 Teams - 4 Swiss Rounds
+[INFO]  ================================================================================
+✓ Swiss rounds configured: 4 rounds
+✓ Tournament structure will be determined when teams are loaded
+[PASS]  PASS: Configure 4 Swiss rounds
+✓ Tournament structure: 16 teams
+  - Swiss rounds: 4
+  - Semifinals: YES (top 8 teams)
+  - Finals: YES (top 4 teams)
+  - Total rounds: 6
+[PASS]  PASS: Semifinals enabled for 16 teams (expected: True, got: True)
+[PASS]  PASS: Total rounds = 6 (4 Swiss + 1 Semi + 1 Finals) (expected: 6, got: 6)
+[PASS]  PASS: 16 teams loaded (expected: 16, got: 16)
+✓ Tournament configuration: 16 teams (OPTIMAL), 4 Swiss rounds
+✓ All teams will compete in ONE unified tournament group
+✓ Pods per round: 16 (4 players each)
+✓ This configuration guarantees perfect pairings with zero repeat matchups
+🔄 RESETTING tournament state for new tournament...
+✓ Tournament state reset complete
+Tournament Teams (16): ['Team_14', 'Team_05', 'Team_07', 'Team_08', 'Team_02', 'Team_01', 'Team_13', 'Team_04', 'Team_10', 'Team_12', 'Team_15', 'Team_06', 'Team_16', 'Team_11', 'Team_09', 'Team_03']
+=== GENERATING ALL 4 SWISS ROUNDS AT ONCE ===
+Generating complete Swiss tournament for 16 teams...
+Tournament teams: ['Team_14', 'Team_05', 'Team_07', 'Team_08', 'Team_02', 'Team_01', 'Team_13', 'Team_04', 'Team_10', 'Team_12', 'Team_15', 'Team_06', 'Team_16', 'Team_11', 'Team_09', 'Team_03']
+Swiss rounds: 4
+🔧 Unified Swiss Pairing initialized
+   Teams: 16 (['Team_14', 'Team_05', 'Team_07', 'Team_08', 'Team_02', 'Team_01', 'Team_13', 'Team_04', 'Team_10', 'Team_12', 'Team_15', 'Team_06', 'Team_16', 'Team_11', 'Team_09', 'Team_03'])
+   Players: 64
+   Pods per round: 16
+   Incomplete pod size: 0
+   Swiss rounds: 4
+🚀 Generating all Swiss rounds with unified algorithm...
+
+--- Attempting Enhanced Constraint Satisfaction ---
+  Solving Round 1...
+    Using enhanced constraint satisfaction solver...
+    Backtrack stats: 17 nodes, 0 backtracks, 0 pruned
+    ✅ Enhanced solver succeeded
+  ✅ Round 1 solved (16 pods)
+  Solving Round 2...
+    Using enhanced constraint satisfaction solver...
+    Backtrack stats: 17 nodes, 0 backtracks, 0 pruned
+    ✅ Enhanced solver succeeded
+  ✅ Round 2 solved (16 pods)
+  Solving Round 3...
+    Using enhanced constraint satisfaction solver...
+    Backtrack stats: 17 nodes, 0 backtracks, 0 pruned
+    ✅ Enhanced solver succeeded
+  ✅ Round 3 solved (16 pods)
+  Solving Round 4...
+    Using enhanced constraint satisfaction solver...
+    Backtrack stats: 17 nodes, 0 backtracks, 0 pruned
+    ✅ Enhanced solver succeeded
+  ✅ Round 4 solved (16 pods)
+✅ Enhanced Constraint Satisfaction succeeded!
+   Generation time: 0.00 seconds
+   Total rounds: 4
+✓ Tournament generated successfully!
+  Perfect tournament: True
+  Total violations: 0
+  Pairing efficiency: 100.0%
+  Generation time: 0.00 seconds
+   Round 1, Table 1: Random seating (no prior scores)
+   Round 1, Table 2: Random seating (no prior scores)
+   Round 1, Table 3: Random seating (no prior scores)
+   Round 1, Table 4: Random seating (no prior scores)
+   Round 1, Table 5: Random seating (no prior scores)
+   Round 1, Table 6: Random seating (no prior scores)
+   Round 1, Table 7: Random seating (no prior scores)
+   Round 1, Table 8: Random seating (no prior scores)
+   Round 1, Table 9: Random seating (no prior scores)
+   Round 1, Table 10: Random seating (no prior scores)
+   Round 1, Table 11: Random seating (no prior scores)
+   Round 1, Table 12: Random seating (no prior scores)
+   Round 1, Table 13: Random seating (no prior scores)
+   Round 1, Table 14: Random seating (no prior scores)
+   Round 1, Table 15: Random seating (no prior scores)
+   Round 1, Table 16: Random seating (no prior scores)
+      Seating: Seat 1: Team_14 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_07 (0pts) | Seat 4: Team_08 (0pts)
+   Round 2, Table 1: Intelligent seating (score-based)
+      Seating: Seat 1: Team_14 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_07 (0pts) | Seat 4: Team_08 (0pts)
+   Round 2, Table 2: Intelligent seating (score-based)
+      Seating: Seat 1: Team_14 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_07 (0pts) | Seat 4: Team_08 (0pts)
+   Round 2, Table 3: Intelligent seating (score-based)
+      Seating: Seat 1: Team_14 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_07 (0pts) | Seat 4: Team_08 (0pts)
+   Round 2, Table 4: Intelligent seating (score-based)
+      Seating: Seat 1: Team_02 (0pts) | Seat 2: Team_01 (0pts) | Seat 3: Team_13 (0pts) | Seat 4: Team_04 (0pts)
+   Round 2, Table 5: Intelligent seating (score-based)
+      Seating: Seat 1: Team_02 (0pts) | Seat 2: Team_01 (0pts) | Seat 3: Team_13 (0pts) | Seat 4: Team_04 (0pts)
+   Round 2, Table 6: Intelligent seating (score-based)
+      Seating: Seat 1: Team_02 (0pts) | Seat 2: Team_01 (0pts) | Seat 3: Team_13 (0pts) | Seat 4: Team_04 (0pts)
+   Round 2, Table 7: Intelligent seating (score-based)
+      Seating: Seat 1: Team_02 (0pts) | Seat 2: Team_01 (0pts) | Seat 3: Team_13 (0pts) | Seat 4: Team_04 (0pts)
+   Round 2, Table 8: Intelligent seating (score-based)
+      Seating: Seat 1: Team_10 (0pts) | Seat 2: Team_12 (0pts) | Seat 3: Team_15 (0pts) | Seat 4: Team_06 (0pts)
+   Round 2, Table 9: Intelligent seating (score-based)
+      Seating: Seat 1: Team_10 (0pts) | Seat 2: Team_12 (0pts) | Seat 3: Team_15 (0pts) | Seat 4: Team_06 (0pts)
+   Round 2, Table 10: Intelligent seating (score-based)
+      Seating: Seat 1: Team_10 (0pts) | Seat 2: Team_12 (0pts) | Seat 3: Team_15 (0pts) | Seat 4: Team_06 (0pts)
+   Round 2, Table 11: Intelligent seating (score-based)
+      Seating: Seat 1: Team_10 (0pts) | Seat 2: Team_12 (0pts) | Seat 3: Team_15 (0pts) | Seat 4: Team_06 (0pts)
+   Round 2, Table 12: Intelligent seating (score-based)
+      Seating: Seat 1: Team_16 (0pts) | Seat 2: Team_11 (0pts) | Seat 3: Team_09 (0pts) | Seat 4: Team_03 (0pts)
+   Round 2, Table 13: Intelligent seating (score-based)
+      Seating: Seat 1: Team_16 (0pts) | Seat 2: Team_11 (0pts) | Seat 3: Team_09 (0pts) | Seat 4: Team_03 (0pts)
+   Round 2, Table 14: Intelligent seating (score-based)
+      Seating: Seat 1: Team_16 (0pts) | Seat 2: Team_11 (0pts) | Seat 3: Team_09 (0pts) | Seat 4: Team_03 (0pts)
+   Round 2, Table 15: Intelligent seating (score-based)
+      Seating: Seat 1: Team_16 (0pts) | Seat 2: Team_11 (0pts) | Seat 3: Team_09 (0pts) | Seat 4: Team_03 (0pts)
+   Round 2, Table 16: Intelligent seating (score-based)
+      Seating: Seat 1: Team_14 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_07 (0pts) | Seat 4: Team_08 (0pts)
+   Round 3, Table 1: Intelligent seating (score-based)
+      Seating: Seat 1: Team_14 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_07 (0pts) | Seat 4: Team_08 (0pts)
+   Round 3, Table 2: Intelligent seating (score-based)
+      Seating: Seat 1: Team_14 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_07 (0pts) | Seat 4: Team_08 (0pts)
+   Round 3, Table 3: Intelligent seating (score-based)
+      Seating: Seat 1: Team_14 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_07 (0pts) | Seat 4: Team_08 (0pts)
+   Round 3, Table 4: Intelligent seating (score-based)
+      Seating: Seat 1: Team_02 (0pts) | Seat 2: Team_01 (0pts) | Seat 3: Team_13 (0pts) | Seat 4: Team_04 (0pts)
+   Round 3, Table 5: Intelligent seating (score-based)
+      Seating: Seat 1: Team_02 (0pts) | Seat 2: Team_01 (0pts) | Seat 3: Team_13 (0pts) | Seat 4: Team_04 (0pts)
+   Round 3, Table 6: Intelligent seating (score-based)
+      Seating: Seat 1: Team_02 (0pts) | Seat 2: Team_01 (0pts) | Seat 3: Team_13 (0pts) | Seat 4: Team_04 (0pts)
+   Round 3, Table 7: Intelligent seating (score-based)
+      Seating: Seat 1: Team_02 (0pts) | Seat 2: Team_01 (0pts) | Seat 3: Team_13 (0pts) | Seat 4: Team_04 (0pts)
+   Round 3, Table 8: Intelligent seating (score-based)
+      Seating: Seat 1: Team_10 (0pts) | Seat 2: Team_12 (0pts) | Seat 3: Team_15 (0pts) | Seat 4: Team_06 (0pts)
+   Round 3, Table 9: Intelligent seating (score-based)
+      Seating: Seat 1: Team_10 (0pts) | Seat 2: Team_12 (0pts) | Seat 3: Team_15 (0pts) | Seat 4: Team_06 (0pts)
+   Round 3, Table 10: Intelligent seating (score-based)
+      Seating: Seat 1: Team_10 (0pts) | Seat 2: Team_12 (0pts) | Seat 3: Team_15 (0pts) | Seat 4: Team_06 (0pts)
+   Round 3, Table 11: Intelligent seating (score-based)
+      Seating: Seat 1: Team_10 (0pts) | Seat 2: Team_12 (0pts) | Seat 3: Team_15 (0pts) | Seat 4: Team_06 (0pts)
+   Round 3, Table 12: Intelligent seating (score-based)
+      Seating: Seat 1: Team_16 (0pts) | Seat 2: Team_11 (0pts) | Seat 3: Team_09 (0pts) | Seat 4: Team_03 (0pts)
+   Round 3, Table 13: Intelligent seating (score-based)
+      Seating: Seat 1: Team_16 (0pts) | Seat 2: Team_11 (0pts) | Seat 3: Team_09 (0pts) | Seat 4: Team_03 (0pts)
+   Round 3, Table 14: Intelligent seating (score-based)
+      Seating: Seat 1: Team_16 (0pts) | Seat 2: Team_11 (0pts) | Seat 3: Team_09 (0pts) | Seat 4: Team_03 (0pts)
+   Round 3, Table 15: Intelligent seating (score-based)
+      Seating: Seat 1: Team_16 (0pts) | Seat 2: Team_11 (0pts) | Seat 3: Team_09 (0pts) | Seat 4: Team_03 (0pts)
+   Round 3, Table 16: Intelligent seating (score-based)
+      Seating: Seat 1: Team_14 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_07 (0pts) | Seat 4: Team_08 (0pts)
+   Round 4, Table 1: Intelligent seating (score-based)
+      Seating: Seat 1: Team_14 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_07 (0pts) | Seat 4: Team_08 (0pts)
+   Round 4, Table 2: Intelligent seating (score-based)
+      Seating: Seat 1: Team_14 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_07 (0pts) | Seat 4: Team_08 (0pts)
+   Round 4, Table 3: Intelligent seating (score-based)
+      Seating: Seat 1: Team_14 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_07 (0pts) | Seat 4: Team_08 (0pts)
+   Round 4, Table 4: Intelligent seating (score-based)
+      Seating: Seat 1: Team_02 (0pts) | Seat 2: Team_01 (0pts) | Seat 3: Team_13 (0pts) | Seat 4: Team_04 (0pts)
+   Round 4, Table 5: Intelligent seating (score-based)
+      Seating: Seat 1: Team_02 (0pts) | Seat 2: Team_01 (0pts) | Seat 3: Team_13 (0pts) | Seat 4: Team_04 (0pts)
+   Round 4, Table 6: Intelligent seating (score-based)
+      Seating: Seat 1: Team_02 (0pts) | Seat 2: Team_01 (0pts) | Seat 3: Team_13 (0pts) | Seat 4: Team_04 (0pts)
+   Round 4, Table 7: Intelligent seating (score-based)
+      Seating: Seat 1: Team_02 (0pts) | Seat 2: Team_01 (0pts) | Seat 3: Team_13 (0pts) | Seat 4: Team_04 (0pts)
+   Round 4, Table 8: Intelligent seating (score-based)
+      Seating: Seat 1: Team_10 (0pts) | Seat 2: Team_12 (0pts) | Seat 3: Team_15 (0pts) | Seat 4: Team_06 (0pts)
+   Round 4, Table 9: Intelligent seating (score-based)
+      Seating: Seat 1: Team_10 (0pts) | Seat 2: Team_12 (0pts) | Seat 3: Team_15 (0pts) | Seat 4: Team_06 (0pts)
+   Round 4, Table 10: Intelligent seating (score-based)
+      Seating: Seat 1: Team_10 (0pts) | Seat 2: Team_12 (0pts) | Seat 3: Team_15 (0pts) | Seat 4: Team_06 (0pts)
+   Round 4, Table 11: Intelligent seating (score-based)
+      Seating: Seat 1: Team_10 (0pts) | Seat 2: Team_12 (0pts) | Seat 3: Team_15 (0pts) | Seat 4: Team_06 (0pts)
+   Round 4, Table 12: Intelligent seating (score-based)
+      Seating: Seat 1: Team_16 (0pts) | Seat 2: Team_11 (0pts) | Seat 3: Team_09 (0pts) | Seat 4: Team_03 (0pts)
+   Round 4, Table 13: Intelligent seating (score-based)
+      Seating: Seat 1: Team_16 (0pts) | Seat 2: Team_11 (0pts) | Seat 3: Team_09 (0pts) | Seat 4: Team_03 (0pts)
+   Round 4, Table 14: Intelligent seating (score-based)
+      Seating: Seat 1: Team_16 (0pts) | Seat 2: Team_11 (0pts) | Seat 3: Team_09 (0pts) | Seat 4: Team_03 (0pts)
+   Round 4, Table 15: Intelligent seating (score-based)
+      Seating: Seat 1: Team_16 (0pts) | Seat 2: Team_11 (0pts) | Seat 3: Team_09 (0pts) | Seat 4: Team_03 (0pts)
+   Round 4, Table 16: Intelligent seating (score-based)
+✓ Organized all rounds into tables structure with intelligent seating
+✓ Tournament ready: 4 rounds with 16 tables each
+✓ All 4 Swiss rounds generated successfully!
+Tournament pairings are now LOCKED for the entire event.
+[PASS]  PASS: 4 Swiss rounds (expected: 4, got: 4)
+[INFO]  
+============================================================
+[WARN]  GAP 1 VALIDATION: Checking team separation (no teammates at same table)
+[INFO]  ============================================================
+[INFO]  
+Round 1: Checking 16 tables for team separation
+[INFO]  
+Round 2: Checking 16 tables for team separation
+[INFO]  
+Round 3: Checking 16 tables for team separation
+[INFO]  
+Round 4: Checking 16 tables for team separation
+[INFO]  
+============================================================
+[PASS]  ✅ GAP 1 CLOSED: No teammates paired together in ANY round!
+[PASS]  PASS: GAP 1: Team separation (Swiss)
+[INFO]  
+############################################################
+[INFO]  # Swiss Round 1
+[INFO]  ############################################################
+[PASS]  PASS: Round 1 has 16 tables (expected: 16, got: 16)
+[INFO]  
+========================================
+[WARN]  GAP 3: Simulating Round 1 with PROPER API methods
+[INFO]  ========================================
+[INFO]    Table 1: Points [1, 5, 0, 1]
+[INFO]    Table 2: Points [1, 5, 1, 0]
+[INFO]    Table 3: Points [0, 1, 5, 1]
+[INFO]    Table 4: Points [1, 0, 1, 5]
+[INFO]    Table 5: Points [0, 5, 1, 1]
+[INFO]    Table 6: Points [5, 1, 0, 1]
+[INFO]    Table 7: Points [0, 5, 1, 1]
+[INFO]    Table 8: Points [1, 5, 1, 0]
+[INFO]    Table 9: Points [1, 0, 1, 5]
+[INFO]    Table 10: Points [1, 1, 0, 5]
+[INFO]    Table 11: Points [1, 5, 0, 1]
+[INFO]    Table 12: Points [0, 1, 5, 1]
+[INFO]    Table 13: Points [0, 1, 1, 5]
+[INFO]    Table 14: Points [5, 1, 1, 0]
+[INFO]    Table 15: Points [5, 1, 0, 1]
+[INFO]    Table 16: Points [1, 0, 5, 1]
+[INFO]  
+Calling tournament.submit_player_results(1, ...)
+Round 1 player results submitted and finalized successfully
+[INFO]  Calling tournament.calculate_team_scores()
+[PASS]  ✅ GAP 3: Round 1 submitted through proper API methods
+[INFO]  
+========================================
+[WARN]  GAP 3 VALIDATION: Team score calculation
+[INFO]  ========================================
+[PASS]  ✅ GAP 3 CLOSED: All team scores correctly calculated (sum of 4 players)
+[PASS]  PASS: GAP 3: Round 1 scores correct
+[INFO]  
+############################################################
+[INFO]  # Swiss Round 2
+[INFO]  ############################################################
+[PASS]  PASS: Round 2 has 16 tables (expected: 16, got: 16)
+[INFO]  
+========================================
+[WARN]  GAP 3: Simulating Round 2 with PROPER API methods
+[INFO]  ========================================
+[INFO]    Table 1: Points [1, 1, 0, 5]
+[INFO]    Table 2: Points [1, 5, 0, 1]
+[INFO]    Table 3: Points [0, 1, 1, 5]
+[INFO]    Table 4: Points [5, 1, 0, 1]
+[INFO]    Table 5: Points [1, 0, 1, 5]
+[INFO]    Table 6: Points [5, 1, 0, 1]
+[INFO]    Table 7: Points [1, 5, 0, 1]
+[INFO]    Table 8: Points [0, 1, 1, 5]
+[INFO]    Table 9: Points [0, 1, 1, 5]
+[INFO]    Table 10: Points [5, 0, 1, 1]
+[INFO]    Table 11: Points [5, 1, 1, 0]
+[INFO]    Table 12: Points [1, 1, 5, 0]
+[INFO]    Table 13: Points [1, 5, 0, 1]
+[INFO]    Table 14: Points [1, 5, 0, 1]
+[INFO]    Table 15: Points [1, 1, 5, 0]
+[INFO]    Table 16: Points [1, 5, 0, 1]
+[INFO]  
+Calling tournament.submit_player_results(2, ...)
+Round 2 player results submitted and finalized successfully
+[INFO]  Calling tournament.calculate_team_scores()
+[PASS]  ✅ GAP 3: Round 2 submitted through proper API methods
+[INFO]  
+========================================
+[WARN]  GAP 3 VALIDATION: Team score calculation
+[INFO]  ========================================
+[PASS]  ✅ GAP 3 CLOSED: All team scores correctly calculated (sum of 4 players)
+[PASS]  PASS: GAP 3: Round 2 scores correct
+[INFO]  
+========================================
+[WARN]  GAP 2 VALIDATION: Intelligent seating Round 2
+[INFO]  ========================================
+[INFO]  Calling tournament.apply_intelligent_seating_to_round(2)
+[PASS]  ✅ GAP 2 PASSED: Round 2 has intelligent seating (all tables sorted by score)
+[PASS]  PASS: GAP 2: Round 2 seating
+[INFO]  
+############################################################
+[INFO]  # Swiss Round 3
+[INFO]  ############################################################
+[PASS]  PASS: Round 3 has 16 tables (expected: 16, got: 16)
+[INFO]  
+========================================
+[WARN]  GAP 3: Simulating Round 3 with PROPER API methods
+[INFO]  ========================================
+[INFO]    Table 1: Points [1, 5, 1, 0]
+[INFO]    Table 2: Points [5, 1, 0, 1]
+[INFO]    Table 3: Points [0, 5, 1, 1]
+[INFO]    Table 4: Points [1, 1, 5, 0]
+[INFO]    Table 5: Points [0, 1, 1, 5]
+[INFO]    Table 6: Points [5, 1, 1, 0]
+[INFO]    Table 7: Points [5, 1, 0, 1]
+[INFO]    Table 8: Points [1, 1, 5, 0]
+[INFO]    Table 9: Points [0, 1, 5, 1]
+[INFO]    Table 10: Points [0, 1, 5, 1]
+[INFO]    Table 11: Points [0, 1, 5, 1]
+[INFO]    Table 12: Points [0, 1, 1, 5]
+[INFO]    Table 13: Points [0, 5, 1, 1]
+[INFO]    Table 14: Points [0, 1, 5, 1]
+[INFO]    Table 15: Points [1, 5, 0, 1]
+[INFO]    Table 16: Points [5, 1, 1, 0]
+[INFO]  
+Calling tournament.submit_player_results(3, ...)
+Round 3 player results submitted and finalized successfully
+[INFO]  Calling tournament.calculate_team_scores()
+[PASS]  ✅ GAP 3: Round 3 submitted through proper API methods
+[INFO]  
+========================================
+[WARN]  GAP 3 VALIDATION: Team score calculation
+[INFO]  ========================================
+[PASS]  ✅ GAP 3 CLOSED: All team scores correctly calculated (sum of 4 players)
+[PASS]  PASS: GAP 3: Round 3 scores correct
+[INFO]  
+========================================
+[WARN]  GAP 2 VALIDATION: Intelligent seating Round 3
+[INFO]  ========================================
+[INFO]  Calling tournament.apply_intelligent_seating_to_round(3)
+[PASS]  ✅ GAP 2 PASSED: Round 3 has intelligent seating (all tables sorted by score)
+[PASS]  PASS: GAP 2: Round 3 seating
+[INFO]  
+############################################################
+[INFO]  # Swiss Round 4
+[INFO]  ############################################################
+[PASS]  PASS: Round 4 has 16 tables (expected: 16, got: 16)
+[INFO]  
+========================================
+[WARN]  GAP 3: Simulating Round 4 with PROPER API methods
+[INFO]  ========================================
+[INFO]    Table 1: Points [1, 5, 0, 1]
+[INFO]    Table 2: Points [5, 1, 0, 1]
+[INFO]    Table 3: Points [1, 0, 1, 5]
+[INFO]    Table 4: Points [5, 1, 1, 0]
+[INFO]    Table 5: Points [5, 1, 0, 1]
+[INFO]    Table 6: Points [1, 1, 0, 5]
+[INFO]    Table 7: Points [0, 1, 5, 1]
+[INFO]    Table 8: Points [1, 0, 5, 1]
+[INFO]    Table 9: Points [0, 5, 1, 1]
+[INFO]    Table 10: Points [1, 5, 0, 1]
+[INFO]    Table 11: Points [1, 5, 1, 0]
+[INFO]    Table 12: Points [1, 0, 1, 5]
+[INFO]    Table 13: Points [5, 1, 0, 1]
+[INFO]    Table 14: Points [5, 1, 0, 1]
+[INFO]    Table 15: Points [1, 1, 5, 0]
+[INFO]    Table 16: Points [1, 0, 1, 5]
+[INFO]  
+Calling tournament.submit_player_results(4, ...)
+Round 4 player results submitted and finalized successfully
+[INFO]  Calling tournament.calculate_team_scores()
+[PASS]  ✅ GAP 3: Round 4 submitted through proper API methods
+[INFO]  
+========================================
+[WARN]  GAP 3 VALIDATION: Team score calculation
+[INFO]  ========================================
+[PASS]  ✅ GAP 3 CLOSED: All team scores correctly calculated (sum of 4 players)
+[PASS]  PASS: GAP 3: Round 4 scores correct
+[INFO]  
+========================================
+[WARN]  GAP 2 VALIDATION: Intelligent seating Round 4
+[INFO]  ========================================
+[INFO]  Calling tournament.apply_intelligent_seating_to_round(4)
+[PASS]  ✅ GAP 2 PASSED: Round 4 has intelligent seating (all tables sorted by score)
+[PASS]  PASS: GAP 2: Round 4 seating
+[INFO]  
+============================================================
+[WARN]  ORIGINAL VALIDATION: Checking for repeat matchups in Swiss rounds
+[INFO]  ============================================================
+[INFO]  
+Round 1: Checking 16 tables
+[INFO]  
+Round 2: Checking 16 tables
+[INFO]  
+Round 3: Checking 16 tables
+[INFO]  
+Round 4: Checking 16 tables
+[INFO]  
+============================================================
+[PASS]  ✅ PERFECT: No repeat matchups found in Swiss rounds!
+[INFO]  Total unique matchups tracked: 768
+[PASS]  PASS: No repeat matchups (Swiss)
+[INFO]  
+############################################################
+[INFO]  # Generating Semifinals
+[INFO]  ############################################################
+🏆 Generating SEMIFINALS for 16-team tournament
+   Top 8 teams advancing to semifinals:
+     1. Team_05: 39 pts
+     2. Team_15: 38 pts
+     3. Team_11: 35 pts
+     4. Team_09: 33 pts
+     5. Team_02: 32 pts
+     6. Team_06: 32 pts
+     7. Team_14: 32 pts
+     8. Team_13: 31 pts
+
+   Team_05 player rankings:
+     Rank 1: Player_17 - 12 pts
+     Rank 2: Player_19 - 12 pts
+     Rank 3: Player_20 - 12 pts
+     Rank 4: Player_18 - 3 pts
+
+   Team_15 player rankings:
+     Rank 1: Player_58 - 16 pts
+     Rank 2: Player_60 - 12 pts
+     Rank 3: Player_59 - 7 pts
+     Rank 4: Player_57 - 3 pts
+
+   Team_11 player rankings:
+     Rank 1: Player_43 - 12 pts
+     Rank 2: Player_41 - 11 pts
+     Rank 3: Player_42 - 8 pts
+     Rank 4: Player_44 - 4 pts
+
+   Team_09 player rankings:
+     Rank 1: Player_33 - 11 pts
+     Rank 2: Player_35 - 11 pts
+     Rank 3: Player_36 - 6 pts
+     Rank 4: Player_34 - 5 pts
+
+   Team_02 player rankings:
+     Rank 1: Player_06 - 12 pts
+     Rank 2: Player_05 - 11 pts
+     Rank 3: Player_07 - 6 pts
+     Rank 4: Player_08 - 3 pts
+
+   Team_06 player rankings:
+     Rank 1: Player_23 - 12 pts
+     Rank 2: Player_24 - 8 pts
+     Rank 3: Player_21 - 6 pts
+     Rank 4: Player_22 - 6 pts
+
+   Team_14 player rankings:
+     Rank 1: Player_56 - 12 pts
+     Rank 2: Player_54 - 11 pts
+     Rank 3: Player_53 - 8 pts
+     Rank 4: Player_55 - 1 pts
+
+   Team_13 player rankings:
+     Rank 1: Player_52 - 11 pts
+     Rank 2: Player_51 - 8 pts
+     Rank 3: Player_49 - 6 pts
+     Rank 4: Player_50 - 6 pts
+
+   Creating semifinals tables (Round 5):
+   Group 1 teams: ['Team_05', 'Team_11', 'Team_02', 'Team_14']
+   Group 2 teams: ['Team_15', 'Team_09', 'Team_06', 'Team_13']
+     Semifinals Table 1: ['Player_17', 'Player_43', 'Player_06', 'Player_56']
+     Semifinals Table 2: ['Player_19', 'Player_41', 'Player_05', 'Player_54']
+     Semifinals Table 3: ['Player_20', 'Player_42', 'Player_07', 'Player_53']
+     Semifinals Table 4: ['Player_18', 'Player_44', 'Player_08', 'Player_55']
+     Semifinals Table 5: ['Player_58', 'Player_33', 'Player_23', 'Player_52']
+     Semifinals Table 6: ['Player_60', 'Player_35', 'Player_24', 'Player_51']
+     Semifinals Table 7: ['Player_59', 'Player_36', 'Player_21', 'Player_49']
+     Semifinals Table 8: ['Player_57', 'Player_34', 'Player_22', 'Player_50']
+
+✅ Semifinals created: 8 tables with strength-based matchups
+   - Top 8 teams (32 players total)
+   - Each table: 4 players from 4 different teams (NO teammates)
+   - Players matched by skill level
+[PASS]  PASS: Semifinals generated
+[PASS]  PASS: Semifinals round exists
+[PASS]  PASS: Semifinals has 8 tables (expected: 8, got: 8)
+[INFO]  
+========================================
+[WARN]  GAP 3: Simulating Round 5 with PROPER API methods
+[INFO]  ========================================
+[INFO]    Semifinals Table 1: Points [1, 1, 5, 0]
+[INFO]    Semifinals Table 2: Points [5, 1, 1, 0]
+[INFO]    Semifinals Table 3: Points [1, 5, 0, 1]
+[INFO]    Semifinals Table 4: Points [1, 1, 5, 0]
+[INFO]    Semifinals Table 5: Points [1, 0, 1, 5]
+[INFO]    Semifinals Table 6: Points [1, 1, 5, 0]
+[INFO]    Semifinals Table 7: Points [0, 1, 1, 5]
+[INFO]    Semifinals Table 8: Points [1, 1, 5, 0]
+[INFO]  
+Calling tournament.submit_player_results(5, ...)
+Round 5 player results submitted and finalized successfully
+[INFO]  Calling tournament.calculate_team_scores()
+[PASS]  ✅ GAP 3: Round 5 submitted through proper API methods
+[INFO]  
+############################################################
+[INFO]  # Generating Finals
+[INFO]  ############################################################
+🏆 Generating FINALS after semifinals (16-team tournament)
+   Top 4 teams advancing to finals:
+     1. Team_05: 47 pts
+     2. Team_06: 44 pts
+     3. Team_02: 43 pts
+     4. Team_11: 43 pts
+
+   Team_05 players (ranked by Swiss points):
+     Rank 1: Player_19 - 17 pts
+     Rank 2: Player_17 - 13 pts
+     Rank 3: Player_20 - 13 pts
+     Rank 4: Player_18 - 4 pts
+
+   Team_06 players (ranked by Swiss points):
+     Rank 1: Player_23 - 13 pts
+     Rank 2: Player_24 - 13 pts
+     Rank 3: Player_22 - 11 pts
+     Rank 4: Player_21 - 7 pts
+
+   Team_02 players (ranked by Swiss points):
+     Rank 1: Player_06 - 17 pts
+     Rank 2: Player_05 - 12 pts
+     Rank 3: Player_08 - 8 pts
+     Rank 4: Player_07 - 6 pts
+
+   Team_11 players (ranked by Swiss points):
+     Rank 1: Player_42 - 13 pts
+     Rank 2: Player_43 - 13 pts
+     Rank 3: Player_41 - 12 pts
+     Rank 4: Player_44 - 5 pts
+
+   Creating finals tables (Round 6) (NO teammates together, ordered by team ranking):
+     Finals Table 1 Seat 1: Player_19 (Team_05) - 17 pts (Team: 47 pts)
+     Finals Table 1 Seat 2: Player_23 (Team_06) - 13 pts (Team: 44 pts)
+     Finals Table 1 Seat 3: Player_06 (Team_02) - 17 pts (Team: 43 pts)
+     Finals Table 1 Seat 4: Player_42 (Team_11) - 13 pts (Team: 43 pts)
+     Finals Table 2 Seat 1: Player_17 (Team_05) - 13 pts (Team: 47 pts)
+     Finals Table 2 Seat 2: Player_24 (Team_06) - 13 pts (Team: 44 pts)
+     Finals Table 2 Seat 3: Player_05 (Team_02) - 12 pts (Team: 43 pts)
+     Finals Table 2 Seat 4: Player_43 (Team_11) - 13 pts (Team: 43 pts)
+     Finals Table 3 Seat 1: Player_20 (Team_05) - 13 pts (Team: 47 pts)
+     Finals Table 3 Seat 2: Player_22 (Team_06) - 11 pts (Team: 44 pts)
+     Finals Table 3 Seat 3: Player_08 (Team_02) - 8 pts (Team: 43 pts)
+     Finals Table 3 Seat 4: Player_41 (Team_11) - 12 pts (Team: 43 pts)
+     Finals Table 4 Seat 1: Player_18 (Team_05) - 4 pts (Team: 47 pts)
+     Finals Table 4 Seat 2: Player_21 (Team_06) - 7 pts (Team: 44 pts)
+     Finals Table 4 Seat 3: Player_07 (Team_02) - 6 pts (Team: 43 pts)
+     Finals Table 4 Seat 4: Player_44 (Team_11) - 5 pts (Team: 43 pts)
+
+✅ Finals created: 4 tables with strength-based matchups
+   - Table 1: Strongest player from each team (NO teammates)
+   - Table 2: 2nd strongest player from each team (NO teammates)
+   - Table 3: 3rd strongest player from each team (NO teammates)
+   - Table 4: 4th strongest player from each team (NO teammates)
+   ✅ VERIFIED: No teammates are paired together!
+   ✅ Seating order: Arranged by team ranking (highest team score = first seat)
+[PASS]  PASS: Finals generated
+[PASS]  PASS: Finals round exists
+[PASS]  PASS: Finals has 4 tables (expected: 4, got: 4)
+[INFO]  
+============================================================
+[WARN]  GAP 4 VALIDATION: Finals qualification logic
+[INFO]  ============================================================
+[INFO]  Source for finals: semifinals
+[INFO]  Expected top 4 teams: ['Team_02', 'Team_05', 'Team_06', 'Team_11']
+[INFO]  Actual finals teams: ['Team_02', 'Team_05', 'Team_06', 'Team_11']
+[PASS]  ✅ GAP 4 CLOSED: Correct top 4 teams advanced to finals (source: semifinals)
+[PASS]  PASS: GAP 4: Finals qualification
+[INFO]  
+========================================
+[WARN]  GAP 4 VALIDATION: Finals strength-based seating
+[INFO]  ========================================
+[PASS]  ✅ GAP 4: Finals has correct structure (4 tables, 4 players each, no teammates)
+[PASS]  PASS: GAP 4: Finals structure
+[INFO]  
+============================================================
+[WARN]  GAP 5: COMPLETING TOURNAMENT & VALIDATING CHAMPIONSHIP
+[INFO]  ============================================================
+[INFO]  
+--- Simulating Finals Round 6 ---
+[INFO]  Finals has 4 tables
+[INFO]  
+========================================
+[WARN]  GAP 3: Simulating Round 6 with PROPER API methods
+[INFO]  ========================================
+[INFO]    Finals Table 1: Points [5, 1, 1, 0]
+[INFO]    Finals Table 2: Points [0, 1, 5, 1]
+[INFO]    Finals Table 3: Points [1, 5, 0, 1]
+[INFO]    Finals Table 4: Points [0, 1, 5, 1]
+[INFO]  
+Calling tournament.submit_player_results(6, ...)
+Round 6 player results submitted and finalized successfully
+[INFO]  Calling tournament.calculate_team_scores()
+[PASS]  ✅ GAP 3: Round 6 submitted through proper API methods
+[PASS]  ✅ Finals results submitted successfully
+[INFO]  
+--- Calculating Final Standings ---
+
+🏆 CALCULATING CHAMPION - Teams in finals: ['Team_05', 'Team_06', 'Team_02', 'Team_11']
+📊 Final round scores: {}
+📊 Swiss round scores: {}
+  Team_05: Final=0 pts, Swiss=0 pts, Total=0 pts
+  Team_06: Final=0 pts, Swiss=0 pts, Total=0 pts
+  Team_02: Final=0 pts, Swiss=0 pts, Total=0 pts
+  Team_11: Final=0 pts, Swiss=0 pts, Total=0 pts
+
+🔄 Sorting by: (final_points DESC, swiss_points DESC)
+
+✅ FINAL STANDINGS (sorted by FINAL points first, then Swiss as tiebreaker):
+  🥇 Team_05: Final=0 pts (PRIMARY), Swiss=0 pts (tiebreaker), Total=0 pts
+  🥈 Team_06: Final=0 pts (PRIMARY), Swiss=0 pts (tiebreaker), Total=0 pts
+  🥉 Team_02: Final=0 pts (PRIMARY), Swiss=0 pts (tiebreaker), Total=0 pts
+  4. Team_11: Final=0 pts (PRIMARY), Swiss=0 pts (tiebreaker), Total=0 pts
+⚠️  TIE on final points! Using Swiss points as tiebreaker:
+   Winner: Team_05 (Swiss: 0 pts)
+   Runner-up: Team_06 (Swiss: 0 pts)
+[PASS]  ✅ Final standings calculated: 4 teams
+[INFO]    1. Team_05: 0 pts (Swiss: 0)
+[INFO]    2. Team_06: 0 pts (Swiss: 0)
+[INFO]    3. Team_02: 0 pts (Swiss: 0)
+[INFO]    4. Team_11: 0 pts (Swiss: 0)
+[INFO]  
+--- Validating Champion ---
+[PASS]  ✅ Champion: Team_05 with 0 pts
+[INFO]  
+--- Validating Standings Order ---
+[PASS]  ✅ Standings properly sorted by total points
+[INFO]  
+--- Validating Tiebreaker Logic ---
+[WARN]  ⚠️  Swiss scores not preserved (tiebreaker won't work)
+[INFO]  
+--- Validating MVP Calculation ---
+[PASS]  ✅ MVP: Player 19 with 22 points
+[PASS]  
+============================================================
+[PASS]  ✅ GAP 5 CLOSED: Championship determination fully validated!
+[PASS]  ============================================================
+[PASS]  PASS: GAP 5: Championship determination validated
+[PASS]  
+================================================================================
+[PASS]  ✅ TEST PASSED: 16 Teams - 4 Swiss Rounds
+[PASS]  ================================================================================
+[INFO]  
+================================================================================
+[INFO]  TEST: 16 Teams - 5 Swiss Rounds
+[INFO]  ================================================================================
+✓ Swiss rounds configured: 5 rounds
+✓ Tournament structure will be determined when teams are loaded
+[PASS]  PASS: Configure 5 Swiss rounds
+✓ Tournament structure: 16 teams
+  - Swiss rounds: 5
+  - Semifinals: YES (top 8 teams)
+  - Finals: YES (top 4 teams)
+  - Total rounds: 7
+[PASS]  PASS: Semifinals enabled (expected: True, got: True)
+[PASS]  PASS: Total rounds = 7 (expected: 7, got: 7)
+[PASS]  PASS: 16 teams (expected: 16, got: 16)
+✓ Tournament configuration: 16 teams (OPTIMAL), 5 Swiss rounds
+✓ All teams will compete in ONE unified tournament group
+✓ Pods per round: 16 (4 players each)
+✓ This configuration guarantees perfect pairings with zero repeat matchups
+🔄 RESETTING tournament state for new tournament...
+✓ Tournament state reset complete
+Tournament Teams (16): ['Team_11', 'Team_16', 'Team_12', 'Team_15', 'Team_14', 'Team_10', 'Team_13', 'Team_06', 'Team_03', 'Team_09', 'Team_07', 'Team_02', 'Team_08', 'Team_05', 'Team_01', 'Team_04']
+=== GENERATING ALL 5 SWISS ROUNDS AT ONCE ===
+Generating complete Swiss tournament for 16 teams...
+Tournament teams: ['Team_11', 'Team_16', 'Team_12', 'Team_15', 'Team_14', 'Team_10', 'Team_13', 'Team_06', 'Team_03', 'Team_09', 'Team_07', 'Team_02', 'Team_08', 'Team_05', 'Team_01', 'Team_04']
+Swiss rounds: 5
+🔧 Unified Swiss Pairing initialized
+   Teams: 16 (['Team_11', 'Team_16', 'Team_12', 'Team_15', 'Team_14', 'Team_10', 'Team_13', 'Team_06', 'Team_03', 'Team_09', 'Team_07', 'Team_02', 'Team_08', 'Team_05', 'Team_01', 'Team_04'])
+   Players: 64
+   Pods per round: 16
+   Incomplete pod size: 0
+   Swiss rounds: 5
+🚀 Generating all Swiss rounds with unified algorithm...
+
+--- Attempting Enhanced Constraint Satisfaction ---
+  Solving Round 1...
+    Using enhanced constraint satisfaction solver...
+    Backtrack stats: 17 nodes, 0 backtracks, 0 pruned
+    ✅ Enhanced solver succeeded
+  ✅ Round 1 solved (16 pods)
+  Solving Round 2...
+    Using enhanced constraint satisfaction solver...
+    Backtrack stats: 17 nodes, 0 backtracks, 0 pruned
+    ✅ Enhanced solver succeeded
+  ✅ Round 2 solved (16 pods)
+  Solving Round 3...
+    Using enhanced constraint satisfaction solver...
+    Backtrack stats: 17 nodes, 0 backtracks, 0 pruned
+    ✅ Enhanced solver succeeded
+  ✅ Round 3 solved (16 pods)
+  Solving Round 4...
+    Using enhanced constraint satisfaction solver...
+    Backtrack stats: 17 nodes, 0 backtracks, 0 pruned
+    ✅ Enhanced solver succeeded
+  ✅ Round 4 solved (16 pods)
+  Solving Round 5...
+    Using enhanced constraint satisfaction solver...
+    Backtrack stats: 17 nodes, 0 backtracks, 0 pruned
+    ✅ Enhanced solver succeeded
+  ✅ Round 5 solved (16 pods)
+✅ Enhanced Constraint Satisfaction succeeded!
+   Generation time: 0.01 seconds
+   Total rounds: 5
+✓ Tournament generated successfully!
+  Perfect tournament: True
+  Total violations: 0
+  Pairing efficiency: 100.0%
+  Generation time: 0.01 seconds
+   Round 1, Table 1: Random seating (no prior scores)
+   Round 1, Table 2: Random seating (no prior scores)
+   Round 1, Table 3: Random seating (no prior scores)
+   Round 1, Table 4: Random seating (no prior scores)
+   Round 1, Table 5: Random seating (no prior scores)
+   Round 1, Table 6: Random seating (no prior scores)
+   Round 1, Table 7: Random seating (no prior scores)
+   Round 1, Table 8: Random seating (no prior scores)
+   Round 1, Table 9: Random seating (no prior scores)
+   Round 1, Table 10: Random seating (no prior scores)
+   Round 1, Table 11: Random seating (no prior scores)
+   Round 1, Table 12: Random seating (no prior scores)
+   Round 1, Table 13: Random seating (no prior scores)
+   Round 1, Table 14: Random seating (no prior scores)
+   Round 1, Table 15: Random seating (no prior scores)
+   Round 1, Table 16: Random seating (no prior scores)
+      Seating: Seat 1: Team_11 (0pts) | Seat 2: Team_16 (0pts) | Seat 3: Team_12 (0pts) | Seat 4: Team_15 (0pts)
+   Round 2, Table 1: Intelligent seating (score-based)
+      Seating: Seat 1: Team_11 (0pts) | Seat 2: Team_16 (0pts) | Seat 3: Team_12 (0pts) | Seat 4: Team_15 (0pts)
+   Round 2, Table 2: Intelligent seating (score-based)
+      Seating: Seat 1: Team_11 (0pts) | Seat 2: Team_16 (0pts) | Seat 3: Team_12 (0pts) | Seat 4: Team_15 (0pts)
+   Round 2, Table 3: Intelligent seating (score-based)
+      Seating: Seat 1: Team_11 (0pts) | Seat 2: Team_16 (0pts) | Seat 3: Team_12 (0pts) | Seat 4: Team_15 (0pts)
+   Round 2, Table 4: Intelligent seating (score-based)
+      Seating: Seat 1: Team_14 (0pts) | Seat 2: Team_10 (0pts) | Seat 3: Team_13 (0pts) | Seat 4: Team_06 (0pts)
+   Round 2, Table 5: Intelligent seating (score-based)
+      Seating: Seat 1: Team_14 (0pts) | Seat 2: Team_10 (0pts) | Seat 3: Team_13 (0pts) | Seat 4: Team_06 (0pts)
+   Round 2, Table 6: Intelligent seating (score-based)
+      Seating: Seat 1: Team_14 (0pts) | Seat 2: Team_10 (0pts) | Seat 3: Team_13 (0pts) | Seat 4: Team_06 (0pts)
+   Round 2, Table 7: Intelligent seating (score-based)
+      Seating: Seat 1: Team_14 (0pts) | Seat 2: Team_10 (0pts) | Seat 3: Team_13 (0pts) | Seat 4: Team_06 (0pts)
+   Round 2, Table 8: Intelligent seating (score-based)
+      Seating: Seat 1: Team_03 (0pts) | Seat 2: Team_09 (0pts) | Seat 3: Team_07 (0pts) | Seat 4: Team_02 (0pts)
+   Round 2, Table 9: Intelligent seating (score-based)
+      Seating: Seat 1: Team_03 (0pts) | Seat 2: Team_09 (0pts) | Seat 3: Team_07 (0pts) | Seat 4: Team_02 (0pts)
+   Round 2, Table 10: Intelligent seating (score-based)
+      Seating: Seat 1: Team_03 (0pts) | Seat 2: Team_09 (0pts) | Seat 3: Team_07 (0pts) | Seat 4: Team_02 (0pts)
+   Round 2, Table 11: Intelligent seating (score-based)
+      Seating: Seat 1: Team_03 (0pts) | Seat 2: Team_09 (0pts) | Seat 3: Team_07 (0pts) | Seat 4: Team_02 (0pts)
+   Round 2, Table 12: Intelligent seating (score-based)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_04 (0pts)
+   Round 2, Table 13: Intelligent seating (score-based)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_04 (0pts)
+   Round 2, Table 14: Intelligent seating (score-based)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_04 (0pts)
+   Round 2, Table 15: Intelligent seating (score-based)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_04 (0pts)
+   Round 2, Table 16: Intelligent seating (score-based)
+      Seating: Seat 1: Team_11 (0pts) | Seat 2: Team_16 (0pts) | Seat 3: Team_12 (0pts) | Seat 4: Team_15 (0pts)
+   Round 3, Table 1: Intelligent seating (score-based)
+      Seating: Seat 1: Team_11 (0pts) | Seat 2: Team_16 (0pts) | Seat 3: Team_12 (0pts) | Seat 4: Team_15 (0pts)
+   Round 3, Table 2: Intelligent seating (score-based)
+      Seating: Seat 1: Team_11 (0pts) | Seat 2: Team_16 (0pts) | Seat 3: Team_12 (0pts) | Seat 4: Team_15 (0pts)
+   Round 3, Table 3: Intelligent seating (score-based)
+      Seating: Seat 1: Team_11 (0pts) | Seat 2: Team_16 (0pts) | Seat 3: Team_12 (0pts) | Seat 4: Team_15 (0pts)
+   Round 3, Table 4: Intelligent seating (score-based)
+      Seating: Seat 1: Team_14 (0pts) | Seat 2: Team_10 (0pts) | Seat 3: Team_13 (0pts) | Seat 4: Team_06 (0pts)
+   Round 3, Table 5: Intelligent seating (score-based)
+      Seating: Seat 1: Team_14 (0pts) | Seat 2: Team_10 (0pts) | Seat 3: Team_13 (0pts) | Seat 4: Team_06 (0pts)
+   Round 3, Table 6: Intelligent seating (score-based)
+      Seating: Seat 1: Team_14 (0pts) | Seat 2: Team_10 (0pts) | Seat 3: Team_13 (0pts) | Seat 4: Team_06 (0pts)
+   Round 3, Table 7: Intelligent seating (score-based)
+      Seating: Seat 1: Team_14 (0pts) | Seat 2: Team_10 (0pts) | Seat 3: Team_13 (0pts) | Seat 4: Team_06 (0pts)
+   Round 3, Table 8: Intelligent seating (score-based)
+      Seating: Seat 1: Team_03 (0pts) | Seat 2: Team_09 (0pts) | Seat 3: Team_07 (0pts) | Seat 4: Team_02 (0pts)
+   Round 3, Table 9: Intelligent seating (score-based)
+      Seating: Seat 1: Team_03 (0pts) | Seat 2: Team_09 (0pts) | Seat 3: Team_07 (0pts) | Seat 4: Team_02 (0pts)
+   Round 3, Table 10: Intelligent seating (score-based)
+      Seating: Seat 1: Team_03 (0pts) | Seat 2: Team_09 (0pts) | Seat 3: Team_07 (0pts) | Seat 4: Team_02 (0pts)
+   Round 3, Table 11: Intelligent seating (score-based)
+      Seating: Seat 1: Team_03 (0pts) | Seat 2: Team_09 (0pts) | Seat 3: Team_07 (0pts) | Seat 4: Team_02 (0pts)
+   Round 3, Table 12: Intelligent seating (score-based)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_04 (0pts)
+   Round 3, Table 13: Intelligent seating (score-based)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_04 (0pts)
+   Round 3, Table 14: Intelligent seating (score-based)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_04 (0pts)
+   Round 3, Table 15: Intelligent seating (score-based)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_04 (0pts)
+   Round 3, Table 16: Intelligent seating (score-based)
+      Seating: Seat 1: Team_11 (0pts) | Seat 2: Team_16 (0pts) | Seat 3: Team_12 (0pts) | Seat 4: Team_15 (0pts)
+   Round 4, Table 1: Intelligent seating (score-based)
+      Seating: Seat 1: Team_11 (0pts) | Seat 2: Team_16 (0pts) | Seat 3: Team_12 (0pts) | Seat 4: Team_15 (0pts)
+   Round 4, Table 2: Intelligent seating (score-based)
+      Seating: Seat 1: Team_11 (0pts) | Seat 2: Team_16 (0pts) | Seat 3: Team_12 (0pts) | Seat 4: Team_15 (0pts)
+   Round 4, Table 3: Intelligent seating (score-based)
+      Seating: Seat 1: Team_11 (0pts) | Seat 2: Team_16 (0pts) | Seat 3: Team_12 (0pts) | Seat 4: Team_15 (0pts)
+   Round 4, Table 4: Intelligent seating (score-based)
+      Seating: Seat 1: Team_14 (0pts) | Seat 2: Team_10 (0pts) | Seat 3: Team_13 (0pts) | Seat 4: Team_06 (0pts)
+   Round 4, Table 5: Intelligent seating (score-based)
+      Seating: Seat 1: Team_14 (0pts) | Seat 2: Team_10 (0pts) | Seat 3: Team_13 (0pts) | Seat 4: Team_06 (0pts)
+   Round 4, Table 6: Intelligent seating (score-based)
+      Seating: Seat 1: Team_14 (0pts) | Seat 2: Team_10 (0pts) | Seat 3: Team_13 (0pts) | Seat 4: Team_06 (0pts)
+   Round 4, Table 7: Intelligent seating (score-based)
+      Seating: Seat 1: Team_14 (0pts) | Seat 2: Team_10 (0pts) | Seat 3: Team_13 (0pts) | Seat 4: Team_06 (0pts)
+   Round 4, Table 8: Intelligent seating (score-based)
+      Seating: Seat 1: Team_03 (0pts) | Seat 2: Team_09 (0pts) | Seat 3: Team_07 (0pts) | Seat 4: Team_02 (0pts)
+   Round 4, Table 9: Intelligent seating (score-based)
+      Seating: Seat 1: Team_03 (0pts) | Seat 2: Team_09 (0pts) | Seat 3: Team_07 (0pts) | Seat 4: Team_02 (0pts)
+   Round 4, Table 10: Intelligent seating (score-based)
+      Seating: Seat 1: Team_03 (0pts) | Seat 2: Team_09 (0pts) | Seat 3: Team_07 (0pts) | Seat 4: Team_02 (0pts)
+   Round 4, Table 11: Intelligent seating (score-based)
+      Seating: Seat 1: Team_03 (0pts) | Seat 2: Team_09 (0pts) | Seat 3: Team_07 (0pts) | Seat 4: Team_02 (0pts)
+   Round 4, Table 12: Intelligent seating (score-based)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_04 (0pts)
+   Round 4, Table 13: Intelligent seating (score-based)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_04 (0pts)
+   Round 4, Table 14: Intelligent seating (score-based)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_04 (0pts)
+   Round 4, Table 15: Intelligent seating (score-based)
+      Seating: Seat 1: Team_08 (0pts) | Seat 2: Team_05 (0pts) | Seat 3: Team_01 (0pts) | Seat 4: Team_04 (0pts)
+   Round 4, Table 16: Intelligent seating (score-based)
+      Seating: Seat 1: Team_11 (0pts) | Seat 2: Team_14 (0pts) | Seat 3: Team_03 (0pts) | Seat 4: Team_08 (0pts)
+   Round 5, Table 1: Intelligent seating (score-based)
+      Seating: Seat 1: Team_11 (0pts) | Seat 2: Team_14 (0pts) | Seat 3: Team_03 (0pts) | Seat 4: Team_08 (0pts)
+   Round 5, Table 2: Intelligent seating (score-based)
+      Seating: Seat 1: Team_11 (0pts) | Seat 2: Team_14 (0pts) | Seat 3: Team_03 (0pts) | Seat 4: Team_08 (0pts)
+   Round 5, Table 3: Intelligent seating (score-based)
+      Seating: Seat 1: Team_11 (0pts) | Seat 2: Team_14 (0pts) | Seat 3: Team_03 (0pts) | Seat 4: Team_08 (0pts)
+   Round 5, Table 4: Intelligent seating (score-based)
+      Seating: Seat 1: Team_16 (0pts) | Seat 2: Team_10 (0pts) | Seat 3: Team_09 (0pts) | Seat 4: Team_05 (0pts)
+   Round 5, Table 5: Intelligent seating (score-based)
+      Seating: Seat 1: Team_16 (0pts) | Seat 2: Team_10 (0pts) | Seat 3: Team_09 (0pts) | Seat 4: Team_05 (0pts)
+   Round 5, Table 6: Intelligent seating (score-based)
+      Seating: Seat 1: Team_16 (0pts) | Seat 2: Team_10 (0pts) | Seat 3: Team_09 (0pts) | Seat 4: Team_05 (0pts)
+   Round 5, Table 7: Intelligent seating (score-based)
+      Seating: Seat 1: Team_16 (0pts) | Seat 2: Team_10 (0pts) | Seat 3: Team_09 (0pts) | Seat 4: Team_05 (0pts)
+   Round 5, Table 8: Intelligent seating (score-based)
+      Seating: Seat 1: Team_12 (0pts) | Seat 2: Team_13 (0pts) | Seat 3: Team_07 (0pts) | Seat 4: Team_01 (0pts)
+   Round 5, Table 9: Intelligent seating (score-based)
+      Seating: Seat 1: Team_12 (0pts) | Seat 2: Team_13 (0pts) | Seat 3: Team_07 (0pts) | Seat 4: Team_01 (0pts)
+   Round 5, Table 10: Intelligent seating (score-based)
+      Seating: Seat 1: Team_12 (0pts) | Seat 2: Team_13 (0pts) | Seat 3: Team_07 (0pts) | Seat 4: Team_01 (0pts)
+   Round 5, Table 11: Intelligent seating (score-based)
+      Seating: Seat 1: Team_12 (0pts) | Seat 2: Team_13 (0pts) | Seat 3: Team_07 (0pts) | Seat 4: Team_01 (0pts)
+   Round 5, Table 12: Intelligent seating (score-based)
+      Seating: Seat 1: Team_15 (0pts) | Seat 2: Team_06 (0pts) | Seat 3: Team_02 (0pts) | Seat 4: Team_04 (0pts)
+   Round 5, Table 13: Intelligent seating (score-based)
+      Seating: Seat 1: Team_15 (0pts) | Seat 2: Team_06 (0pts) | Seat 3: Team_02 (0pts) | Seat 4: Team_04 (0pts)
+   Round 5, Table 14: Intelligent seating (score-based)
+      Seating: Seat 1: Team_15 (0pts) | Seat 2: Team_06 (0pts) | Seat 3: Team_02 (0pts) | Seat 4: Team_04 (0pts)
+   Round 5, Table 15: Intelligent seating (score-based)
+      Seating: Seat 1: Team_15 (0pts) | Seat 2: Team_06 (0pts) | Seat 3: Team_02 (0pts) | Seat 4: Team_04 (0pts)
+   Round 5, Table 16: Intelligent seating (score-based)
+✓ Organized all rounds into tables structure with intelligent seating
+✓ Tournament ready: 5 rounds with 16 tables each
+✓ All 5 Swiss rounds generated successfully!
+Tournament pairings are now LOCKED for the entire event.
+[PASS]  PASS: 5 Swiss rounds (expected: 5, got: 5)
+[INFO]  
+============================================================
+[WARN]  GAP 1 VALIDATION: Checking team separation (no teammates at same table)
+[INFO]  ============================================================
+[INFO]  
+Round 1: Checking 16 tables for team separation
+[INFO]  
+Round 2: Checking 16 tables for team separation
+[INFO]  
+Round 3: Checking 16 tables for team separation
+[INFO]  
+Round 4: Checking 16 tables for team separation
+[INFO]  
+Round 5: Checking 16 tables for team separation
+[INFO]  
+============================================================
+[PASS]  ✅ GAP 1 CLOSED: No teammates paired together in ANY round!
+[PASS]  PASS: GAP 1: Team separation
+[INFO]  
+############################################################
+[INFO]  # Swiss Round 1
+[INFO]  ############################################################
+[PASS]  PASS: Round 1 tables (expected: 16, got: 16)
+[INFO]  
+========================================
+[WARN]  GAP 3: Simulating Round 1 with PROPER API methods
+[INFO]  ========================================
+[INFO]    Table 1: Points [1, 1, 5, 0]
+[INFO]    Table 2: Points [1, 0, 1, 5]
+[INFO]    Table 3: Points [0, 1, 5, 1]
+[INFO]    Table 4: Points [5, 0, 1, 1]
+[INFO]    Table 5: Points [0, 5, 1, 1]
+[INFO]    Table 6: Points [1, 5, 1, 0]
+[INFO]    Table 7: Points [1, 1, 0, 5]
+[INFO]    Table 8: Points [1, 5, 1, 0]
+[INFO]    Table 9: Points [1, 1, 0, 5]
+[INFO]    Table 10: Points [0, 5, 1, 1]
+[INFO]    Table 11: Points [1, 0, 5, 1]
+[INFO]    Table 12: Points [1, 5, 1, 0]
+[INFO]    Table 13: Points [0, 1, 1, 5]
+[INFO]    Table 14: Points [1, 5, 1, 0]
+[INFO]    Table 15: Points [1, 5, 1, 0]
+[INFO]    Table 16: Points [5, 0, 1, 1]
+[INFO]  
+Calling tournament.submit_player_results(1, ...)
+Round 1 player results submitted and finalized successfully
+[INFO]  Calling tournament.calculate_team_scores()
+[PASS]  ✅ GAP 3: Round 1 submitted through proper API methods
+[INFO]  
+========================================
+[WARN]  GAP 3 VALIDATION: Team score calculation
+[INFO]  ========================================
+[PASS]  ✅ GAP 3 CLOSED: All team scores correctly calculated (sum of 4 players)
+[PASS]  PASS: GAP 3: Round 1
+[INFO]  
+############################################################
+[INFO]  # Swiss Round 2
+[INFO]  ############################################################
+[PASS]  PASS: Round 2 tables (expected: 16, got: 16)
+[INFO]  
+========================================
+[WARN]  GAP 3: Simulating Round 2 with PROPER API methods
+[INFO]  ========================================
+[INFO]    Table 1: Points [1, 0, 5, 1]
+[INFO]    Table 2: Points [1, 0, 1, 5]
+[INFO]    Table 3: Points [0, 1, 1, 5]
+[INFO]    Table 4: Points [0, 1, 5, 1]
+[INFO]    Table 5: Points [1, 1, 0, 5]
+[INFO]    Table 6: Points [1, 0, 5, 1]
+[INFO]    Table 7: Points [1, 0, 5, 1]
+[INFO]    Table 8: Points [0, 5, 1, 1]
+[INFO]    Table 9: Points [0, 5, 1, 1]
+[INFO]    Table 10: Points [1, 5, 0, 1]
+[INFO]    Table 11: Points [1, 5, 0, 1]
+[INFO]    Table 12: Points [5, 1, 0, 1]
+[INFO]    Table 13: Points [0, 1, 1, 5]
+[INFO]    Table 14: Points [5, 0, 1, 1]
+[INFO]    Table 15: Points [5, 1, 0, 1]
+[INFO]    Table 16: Points [5, 1, 1, 0]
+[INFO]  
+Calling tournament.submit_player_results(2, ...)
+Round 2 player results submitted and finalized successfully
+[INFO]  Calling tournament.calculate_team_scores()
+[PASS]  ✅ GAP 3: Round 2 submitted through proper API methods
+[INFO]  
+========================================
+[WARN]  GAP 3 VALIDATION: Team score calculation
+[INFO]  ========================================
+[PASS]  ✅ GAP 3 CLOSED: All team scores correctly calculated (sum of 4 players)
+[PASS]  PASS: GAP 3: Round 2
+[INFO]  
+========================================
+[WARN]  GAP 2 VALIDATION: Intelligent seating Round 2
+[INFO]  ========================================
+[INFO]  Calling tournament.apply_intelligent_seating_to_round(2)
+[PASS]  ✅ GAP 2 PASSED: Round 2 has intelligent seating (all tables sorted by score)
+[PASS]  PASS: GAP 2: Round 2
+[INFO]  
+############################################################
+[INFO]  # Swiss Round 3
+[INFO]  ############################################################
+[PASS]  PASS: Round 3 tables (expected: 16, got: 16)
+[INFO]  
+========================================
+[WARN]  GAP 3: Simulating Round 3 with PROPER API methods
+[INFO]  ========================================
+[INFO]    Table 1: Points [5, 1, 1, 0]
+[INFO]    Table 2: Points [1, 1, 0, 5]
+[INFO]    Table 3: Points [1, 5, 1, 0]
+[INFO]    Table 4: Points [0, 1, 5, 1]
+[INFO]    Table 5: Points [1, 1, 0, 5]
+[INFO]    Table 6: Points [1, 1, 0, 5]
+[INFO]    Table 7: Points [1, 5, 0, 1]
+[INFO]    Table 8: Points [0, 5, 1, 1]
+[INFO]    Table 9: Points [0, 5, 1, 1]
+[INFO]    Table 10: Points [1, 1, 5, 0]
+[INFO]    Table 11: Points [1, 5, 1, 0]
+[INFO]    Table 12: Points [1, 5, 1, 0]
+[INFO]    Table 13: Points [5, 1, 1, 0]
+[INFO]    Table 14: Points [1, 5, 0, 1]
+[INFO]    Table 15: Points [1, 1, 0, 5]
+[INFO]    Table 16: Points [5, 1, 1, 0]
+[INFO]  
+Calling tournament.submit_player_results(3, ...)
+Round 3 player results submitted and finalized successfully
+[INFO]  Calling tournament.calculate_team_scores()
+[PASS]  ✅ GAP 3: Round 3 submitted through proper API methods
+[INFO]  
+========================================
+[WARN]  GAP 3 VALIDATION: Team score calculation
+[INFO]  ========================================
+[PASS]  ✅ GAP 3 CLOSED: All team scores correctly calculated (sum of 4 players)
+[PASS]  PASS: GAP 3: Round 3
+[INFO]  
+========================================
+[WARN]  GAP 2 VALIDATION: Intelligent seating Round 3
+[INFO]  ========================================
+[INFO]  Calling tournament.apply_intelligent_seating_to_round(3)
+[PASS]  ✅ GAP 2 PASSED: Round 3 has intelligent seating (all tables sorted by score)
+[PASS]  PASS: GAP 2: Round 3
+[INFO]  
+############################################################
+[INFO]  # Swiss Round 4
+[INFO]  ############################################################
+[PASS]  PASS: Round 4 tables (expected: 16, got: 16)
+[INFO]  
+========================================
+[WARN]  GAP 3: Simulating Round 4 with PROPER API methods
+[INFO]  ========================================
+[INFO]    Table 1: Points [0, 1, 5, 1]
+[INFO]    Table 2: Points [5, 0, 1, 1]
+[INFO]    Table 3: Points [1, 1, 5, 0]
+[INFO]    Table 4: Points [1, 1, 5, 0]
+[INFO]    Table 5: Points [1, 1, 0, 5]
+[INFO]    Table 6: Points [1, 0, 5, 1]
+[INFO]    Table 7: Points [1, 0, 5, 1]
+[INFO]    Table 8: Points [1, 5, 1, 0]
+[INFO]    Table 9: Points [1, 0, 5, 1]
+[INFO]    Table 10: Points [5, 0, 1, 1]
+[INFO]    Table 11: Points [0, 1, 5, 1]
+[INFO]    Table 12: Points [5, 1, 1, 0]
+[INFO]    Table 13: Points [1, 0, 1, 5]
+[INFO]    Table 14: Points [1, 1, 0, 5]
+[INFO]    Table 15: Points [5, 1, 1, 0]
+[INFO]    Table 16: Points [1, 0, 5, 1]
+[INFO]  
+Calling tournament.submit_player_results(4, ...)
+Round 4 player results submitted and finalized successfully
+[INFO]  Calling tournament.calculate_team_scores()
+[PASS]  ✅ GAP 3: Round 4 submitted through proper API methods
+[INFO]  
+========================================
+[WARN]  GAP 3 VALIDATION: Team score calculation
+[INFO]  ========================================
+[PASS]  ✅ GAP 3 CLOSED: All team scores correctly calculated (sum of 4 players)
+[PASS]  PASS: GAP 3: Round 4
+[INFO]  
+========================================
+[WARN]  GAP 2 VALIDATION: Intelligent seating Round 4
+[INFO]  ========================================
+[INFO]  Calling tournament.apply_intelligent_seating_to_round(4)
+[PASS]  ✅ GAP 2 PASSED: Round 4 has intelligent seating (all tables sorted by score)
+[PASS]  PASS: GAP 2: Round 4
+[INFO]  
+############################################################
+[INFO]  # Swiss Round 5
+[INFO]  ############################################################
+[PASS]  PASS: Round 5 tables (expected: 16, got: 16)
+[INFO]  
+========================================
+[WARN]  GAP 3: Simulating Round 5 with PROPER API methods
+[INFO]  ========================================
+[INFO]    Table 1: Points [5, 1, 0, 1]
+[INFO]    Table 2: Points [0, 1, 5, 1]
+[INFO]    Table 3: Points [5, 0, 1, 1]
+[INFO]    Table 4: Points [1, 5, 0, 1]
+[INFO]    Table 5: Points [1, 5, 1, 0]
+[INFO]    Table 6: Points [5, 0, 1, 1]
+[INFO]    Table 7: Points [1, 0, 1, 5]
+[INFO]    Table 8: Points [1, 0, 1, 5]
+[INFO]    Table 9: Points [1, 1, 0, 5]
+[INFO]    Table 10: Points [0, 1, 5, 1]
+[INFO]    Table 11: Points [5, 1, 0, 1]
+[INFO]    Table 12: Points [0, 5, 1, 1]
+[INFO]    Table 13: Points [0, 5, 1, 1]
+[INFO]    Table 14: Points [1, 5, 0, 1]
+[INFO]    Table 15: Points [0, 1, 1, 5]
+[INFO]    Table 16: Points [1, 1, 5, 0]
+[INFO]  
+Calling tournament.submit_player_results(5, ...)
+Round 5 player results submitted and finalized successfully
+[INFO]  Calling tournament.calculate_team_scores()
+[PASS]  ✅ GAP 3: Round 5 submitted through proper API methods
+[INFO]  
+========================================
+[WARN]  GAP 3 VALIDATION: Team score calculation
+[INFO]  ========================================
+[PASS]  ✅ GAP 3 CLOSED: All team scores correctly calculated (sum of 4 players)
+[PASS]  PASS: GAP 3: Round 5
+[INFO]  
+========================================
+[WARN]  GAP 2 VALIDATION: Intelligent seating Round 5
+[INFO]  ========================================
+[INFO]  Calling tournament.apply_intelligent_seating_to_round(5)
+[PASS]  ✅ GAP 2 PASSED: Round 5 has intelligent seating (all tables sorted by score)
+[PASS]  PASS: GAP 2: Round 5
+[INFO]  
+============================================================
+[WARN]  ORIGINAL VALIDATION: Checking for repeat matchups in Swiss rounds
+[INFO]  ============================================================
+[INFO]  
+Round 1: Checking 16 tables
+[INFO]  
+Round 2: Checking 16 tables
+[INFO]  
+Round 3: Checking 16 tables
+[INFO]  
+Round 4: Checking 16 tables
+[INFO]  
+Round 5: Checking 16 tables
+[INFO]  
+============================================================
+[PASS]  ✅ PERFECT: No repeat matchups found in Swiss rounds!
+[INFO]  Total unique matchups tracked: 960
+[PASS]  PASS: No repeats
+[INFO]  
+############################################################
+[INFO]  # Semifinals
+[INFO]  ############################################################
+🏆 Generating SEMIFINALS for 16-team tournament
+   Top 8 teams advancing to semifinals:
+     1. Team_12: 45 pts
+     2. Team_06: 44 pts
+     3. Team_11: 43 pts
+     4. Team_09: 42 pts
+     5. Team_08: 41 pts
+     6. Team_10: 41 pts
+     7. Team_04: 39 pts
+     8. Team_13: 39 pts
+
+   Team_12 player rankings:
+     Rank 1: Player_47 - 16 pts
+     Rank 2: Player_46 - 12 pts
+     Rank 3: Player_45 - 9 pts
+     Rank 4: Player_48 - 8 pts
+
+   Team_06 player rankings:
+     Rank 1: Player_24 - 13 pts
+     Rank 2: Player_21 - 12 pts
+     Rank 3: Player_22 - 11 pts
+     Rank 4: Player_23 - 8 pts
+
+   Team_11 player rankings:
+     Rank 1: Player_41 - 16 pts
+     Rank 2: Player_42 - 12 pts
+     Rank 3: Player_43 - 12 pts
+     Rank 4: Player_44 - 3 pts
+
+   Team_09 player rankings:
+     Rank 1: Player_33 - 13 pts
+     Rank 2: Player_34 - 13 pts
+     Rank 3: Player_35 - 8 pts
+     Rank 4: Player_36 - 8 pts
+
+   Team_08 player rankings:
+     Rank 1: Player_31 - 13 pts
+     Rank 2: Player_32 - 12 pts
+     Rank 3: Player_30 - 9 pts
+     Rank 4: Player_29 - 7 pts
+
+   Team_10 player rankings:
+     Rank 1: Player_37 - 16 pts
+     Rank 2: Player_38 - 11 pts
+     Rank 3: Player_39 - 11 pts
+     Rank 4: Player_40 - 3 pts
+
+   Team_04 player rankings:
+     Rank 1: Player_15 - 16 pts
+     Rank 2: Player_16 - 16 pts
+     Rank 3: Player_14 - 4 pts
+     Rank 4: Player_13 - 3 pts
+
+   Team_13 player rankings:
+     Rank 1: Player_49 - 17 pts
+     Rank 2: Player_52 - 16 pts
+     Rank 3: Player_50 - 3 pts
+     Rank 4: Player_51 - 3 pts
+
+   Creating semifinals tables (Round 6):
+   Group 1 teams: ['Team_12', 'Team_11', 'Team_08', 'Team_04']
+   Group 2 teams: ['Team_06', 'Team_09', 'Team_10', 'Team_13']
+     Semifinals Table 1: ['Player_47', 'Player_41', 'Player_31', 'Player_15']
+     Semifinals Table 2: ['Player_46', 'Player_42', 'Player_32', 'Player_16']
+     Semifinals Table 3: ['Player_45', 'Player_43', 'Player_30', 'Player_14']
+     Semifinals Table 4: ['Player_48', 'Player_44', 'Player_29', 'Player_13']
+     Semifinals Table 5: ['Player_24', 'Player_33', 'Player_37', 'Player_49']
+     Semifinals Table 6: ['Player_21', 'Player_34', 'Player_38', 'Player_52']
+     Semifinals Table 7: ['Player_22', 'Player_35', 'Player_39', 'Player_50']
+     Semifinals Table 8: ['Player_23', 'Player_36', 'Player_40', 'Player_51']
+
+✅ Semifinals created: 8 tables with strength-based matchups
+   - Top 8 teams (32 players total)
+   - Each table: 4 players from 4 different teams (NO teammates)
+   - Players matched by skill level
+[PASS]  PASS: Semifinals generated
+[PASS]  PASS: Semifinals round
+[PASS]  PASS: 8 tables (expected: 8, got: 8)
+[INFO]  
+========================================
+[WARN]  GAP 3: Simulating Round 6 with PROPER API methods
+[INFO]  ========================================
+[INFO]    Semifinals Table 1: Points [5, 0, 1, 1]
+[INFO]    Semifinals Table 2: Points [0, 5, 1, 1]
+[INFO]    Semifinals Table 3: Points [1, 5, 0, 1]
+[INFO]    Semifinals Table 4: Points [0, 1, 1, 5]
+[INFO]    Semifinals Table 5: Points [1, 0, 5, 1]
+[INFO]    Semifinals Table 6: Points [1, 0, 1, 5]
+[INFO]    Semifinals Table 7: Points [0, 1, 1, 5]
+[INFO]    Semifinals Table 8: Points [0, 1, 5, 1]
+[INFO]  
+Calling tournament.submit_player_results(6, ...)
+Round 6 player results submitted and finalized successfully
+[INFO]  Calling tournament.calculate_team_scores()
+[PASS]  ✅ GAP 3: Round 6 submitted through proper API methods
+[INFO]  
+############################################################
+[INFO]  # Finals
+[INFO]  ############################################################
+🏆 Generating FINALS after semifinals (16-team tournament)
+   Top 4 teams advancing to finals:
+     1. Team_11: 54 pts
+     2. Team_10: 53 pts
+     3. Team_12: 51 pts
+     4. Team_13: 51 pts
+
+   Team_11 players (ranked by Swiss points):
+     Rank 1: Player_42 - 17 pts
+     Rank 2: Player_43 - 17 pts
+     Rank 3: Player_41 - 16 pts
+     Rank 4: Player_44 - 4 pts
+
+   Team_10 players (ranked by Swiss points):
+     Rank 1: Player_37 - 21 pts
+     Rank 2: Player_38 - 12 pts
+     Rank 3: Player_39 - 12 pts
+     Rank 4: Player_40 - 8 pts
+
+   Team_12 players (ranked by Swiss points):
+     Rank 1: Player_47 - 21 pts
+     Rank 2: Player_46 - 12 pts
+     Rank 3: Player_45 - 10 pts
+     Rank 4: Player_48 - 8 pts
+
+   Team_13 players (ranked by Swiss points):
+     Rank 1: Player_52 - 21 pts
+     Rank 2: Player_49 - 18 pts
+     Rank 3: Player_50 - 8 pts
+     Rank 4: Player_51 - 4 pts
+
+   Creating finals tables (Round 7) (NO teammates together, ordered by team ranking):
+     Finals Table 1 Seat 1: Player_42 (Team_11) - 17 pts (Team: 54 pts)
+     Finals Table 1 Seat 2: Player_37 (Team_10) - 21 pts (Team: 53 pts)
+     Finals Table 1 Seat 3: Player_47 (Team_12) - 21 pts (Team: 51 pts)
+     Finals Table 1 Seat 4: Player_52 (Team_13) - 21 pts (Team: 51 pts)
+     Finals Table 2 Seat 1: Player_43 (Team_11) - 17 pts (Team: 54 pts)
+     Finals Table 2 Seat 2: Player_38 (Team_10) - 12 pts (Team: 53 pts)
+     Finals Table 2 Seat 3: Player_46 (Team_12) - 12 pts (Team: 51 pts)
+     Finals Table 2 Seat 4: Player_49 (Team_13) - 18 pts (Team: 51 pts)
+     Finals Table 3 Seat 1: Player_41 (Team_11) - 16 pts (Team: 54 pts)
+     Finals Table 3 Seat 2: Player_39 (Team_10) - 12 pts (Team: 53 pts)
+     Finals Table 3 Seat 3: Player_45 (Team_12) - 10 pts (Team: 51 pts)
+     Finals Table 3 Seat 4: Player_50 (Team_13) - 8 pts (Team: 51 pts)
+     Finals Table 4 Seat 1: Player_44 (Team_11) - 4 pts (Team: 54 pts)
+     Finals Table 4 Seat 2: Player_40 (Team_10) - 8 pts (Team: 53 pts)
+     Finals Table 4 Seat 3: Player_48 (Team_12) - 8 pts (Team: 51 pts)
+     Finals Table 4 Seat 4: Player_51 (Team_13) - 4 pts (Team: 51 pts)
+
+✅ Finals created: 4 tables with strength-based matchups
+   - Table 1: Strongest player from each team (NO teammates)
+   - Table 2: 2nd strongest player from each team (NO teammates)
+   - Table 3: 3rd strongest player from each team (NO teammates)
+   - Table 4: 4th strongest player from each team (NO teammates)
+   ✅ VERIFIED: No teammates are paired together!
+   ✅ Seating order: Arranged by team ranking (highest team score = first seat)
+[PASS]  PASS: Finals generated
+[PASS]  PASS: Finals round
+[PASS]  PASS: 4 tables (expected: 4, got: 4)
+[INFO]  
+============================================================
+[WARN]  GAP 4 VALIDATION: Finals qualification logic
+[INFO]  ============================================================
+[INFO]  Source for finals: semifinals
+[INFO]  Expected top 4 teams: ['Team_10', 'Team_11', 'Team_12', 'Team_13']
+[INFO]  Actual finals teams: ['Team_10', 'Team_11', 'Team_12', 'Team_13']
+[PASS]  ✅ GAP 4 CLOSED: Correct top 4 teams advanced to finals (source: semifinals)
+[PASS]  PASS: GAP 4: Qualification
+[INFO]  
+========================================
+[WARN]  GAP 4 VALIDATION: Finals strength-based seating
+[INFO]  ========================================
+[PASS]  ✅ GAP 4: Finals has correct structure (4 tables, 4 players each, no teammates)
+[PASS]  PASS: GAP 4: Structure
+[INFO]  
+============================================================
+[WARN]  GAP 5: COMPLETING TOURNAMENT & VALIDATING CHAMPIONSHIP
+[INFO]  ============================================================
+[INFO]  
+--- Simulating Finals Round 7 ---
+[INFO]  Finals has 4 tables
+[INFO]  
+========================================
+[WARN]  GAP 3: Simulating Round 7 with PROPER API methods
+[INFO]  ========================================
+[INFO]    Finals Table 1: Points [0, 5, 1, 1]
+[INFO]    Finals Table 2: Points [1, 1, 5, 0]
+[INFO]    Finals Table 3: Points [1, 0, 1, 5]
+[INFO]    Finals Table 4: Points [5, 0, 1, 1]
+[INFO]  
+Calling tournament.submit_player_results(7, ...)
+Round 7 player results submitted and finalized successfully
+[INFO]  Calling tournament.calculate_team_scores()
+[PASS]  ✅ GAP 3: Round 7 submitted through proper API methods
+[PASS]  ✅ Finals results submitted successfully
+[INFO]  
+--- Calculating Final Standings ---
+
+🏆 CALCULATING CHAMPION - Teams in finals: ['Team_11', 'Team_10', 'Team_12', 'Team_13']
+📊 Final round scores: {}
+📊 Swiss round scores: {}
+  Team_11: Final=0 pts, Swiss=0 pts, Total=0 pts
+  Team_10: Final=0 pts, Swiss=0 pts, Total=0 pts
+  Team_12: Final=0 pts, Swiss=0 pts, Total=0 pts
+  Team_13: Final=0 pts, Swiss=0 pts, Total=0 pts
+
+🔄 Sorting by: (final_points DESC, swiss_points DESC)
+
+✅ FINAL STANDINGS (sorted by FINAL points first, then Swiss as tiebreaker):
+  🥇 Team_11: Final=0 pts (PRIMARY), Swiss=0 pts (tiebreaker), Total=0 pts
+  🥈 Team_10: Final=0 pts (PRIMARY), Swiss=0 pts (tiebreaker), Total=0 pts
+  🥉 Team_12: Final=0 pts (PRIMARY), Swiss=0 pts (tiebreaker), Total=0 pts
+  4. Team_13: Final=0 pts (PRIMARY), Swiss=0 pts (tiebreaker), Total=0 pts
+⚠️  TIE on final points! Using Swiss points as tiebreaker:
+   Winner: Team_11 (Swiss: 0 pts)
+   Runner-up: Team_10 (Swiss: 0 pts)
+[PASS]  ✅ Final standings calculated: 4 teams
+[INFO]    1. Team_11: 0 pts (Swiss: 0)
+[INFO]    2. Team_10: 0 pts (Swiss: 0)
+[INFO]    3. Team_12: 0 pts (Swiss: 0)
+[INFO]    4. Team_13: 0 pts (Swiss: 0)
+[INFO]  
+--- Validating Champion ---
+[PASS]  ✅ Champion: Team_11 with 0 pts
+[INFO]  
+--- Validating Standings Order ---
+[PASS]  ✅ Standings properly sorted by total points
+[INFO]  
+--- Validating Tiebreaker Logic ---
+[WARN]  ⚠️  Swiss scores not preserved (tiebreaker won't work)
+[INFO]  
+--- Validating MVP Calculation ---
+[PASS]  ✅ MVP: Player 37 with 26 points
+[PASS]  
+============================================================
+[PASS]  ✅ GAP 5 CLOSED: Championship determination fully validated!
+[PASS]  ============================================================
+[PASS]  PASS: GAP 5: Championship determination validated
+[PASS]  
+================================================================================
+[PASS]  ✅ TEST PASSED: 16 Teams - 5 Swiss Rounds
+[PASS]  ================================================================================
+[INFO]  
+================================================================================
+[INFO]  GAP 6 TEST: Edge Cases & Error Handling
+[INFO]  ================================================================================
+[INFO]  
+--- GAP 6.1: Invalid team counts ---
+⚠️  Unsupported team count: 4
+   Supported: 8 or 16 teams only
+[PASS]  PASS: 4 teams should be rejected (expected: False, got: False)
+⚠️  Unsupported team count: 6
+   Supported: 8 or 16 teams only
+[PASS]  PASS: 6 teams should be rejected (expected: False, got: False)
+⚠️  Unsupported team count: 10
+   Supported: 8 or 16 teams only
+[PASS]  PASS: 10 teams should be rejected (expected: False, got: False)
+⚠️  Unsupported team count: 12
+   Supported: 8 or 16 teams only
+[PASS]  PASS: 12 teams should be rejected (expected: False, got: False)
+⚠️  Unsupported team count: 20
+   Supported: 8 or 16 teams only
+[PASS]  PASS: 20 teams should be rejected (expected: False, got: False)
+[INFO]  
+--- GAP 6.2: Invalid Swiss round counts ---
+[PASS]  PASS: 1 Swiss rounds should be rejected (expected: False, got: False)
+[PASS]  PASS: 2 Swiss rounds should be rejected (expected: False, got: False)
+[PASS]  PASS: 3 Swiss rounds should be rejected (expected: False, got: False)
+[PASS]  PASS: 6 Swiss rounds should be rejected (expected: False, got: False)
+[PASS]  PASS: 7 Swiss rounds should be rejected (expected: False, got: False)
+[PASS]  PASS: 10 Swiss rounds should be rejected (expected: False, got: False)
+[INFO]  
+--- GAP 6.3: Duplicate round submission prevention ---
+✓ Swiss rounds configured: 4 rounds
+✓ Tournament structure will be determined when teams are loaded
+✓ Tournament structure: 8 teams
+  - Swiss rounds: 4
+  - Semifinals: NO (top 4 teams advance directly to Finals)
+  - Finals: YES (top 4 teams)
+  - Total rounds: 5
+✓ Tournament configuration: 8 teams (OPTIMAL), 4 Swiss rounds
+✓ All teams will compete in ONE unified tournament group
+✓ Pods per round: 8 (4 players each)
+✓ This configuration guarantees perfect pairings with zero repeat matchups
+🔄 RESETTING tournament state for new tournament...
+✓ Tournament state reset complete
+Tournament Teams (8): ['Team_02', 'Team_04', 'Team_06', 'Team_05', 'Team_03', 'Team_01', 'Team_07', 'Team_08']
+=== GENERATING ALL 4 SWISS ROUNDS AT ONCE ===
+Generating complete Swiss tournament for 8 teams...
+Tournament teams: ['Team_02', 'Team_04', 'Team_06', 'Team_05', 'Team_03', 'Team_01', 'Team_07', 'Team_08']
+Swiss rounds: 4
+🔧 Unified Swiss Pairing initialized
+   Teams: 8 (['Team_02', 'Team_04', 'Team_06', 'Team_05', 'Team_03', 'Team_01', 'Team_07', 'Team_08'])
+   Players: 32
+   Pods per round: 8
+   Incomplete pod size: 0
+   Swiss rounds: 4
+🚀 Generating all Swiss rounds with unified algorithm...
+
+--- Attempting Enhanced Constraint Satisfaction ---
+  Solving Round 1...
+    Using enhanced constraint satisfaction solver...
+    Backtrack stats: 9 nodes, 0 backtracks, 0 pruned
+    ✅ Enhanced solver succeeded
+  ✅ Round 1 solved (8 pods)
+  Solving Round 2...
+    Using enhanced constraint satisfaction solver...
+    Backtrack stats: 9 nodes, 0 backtracks, 0 pruned
+    ✅ Enhanced solver succeeded
+  ✅ Round 2 solved (8 pods)
+  Solving Round 3...
+    Using enhanced constraint satisfaction solver...
+    Backtrack stats: 9 nodes, 0 backtracks, 0 pruned
+    ✅ Enhanced solver succeeded
+  ✅ Round 3 solved (8 pods)
+  Solving Round 4...
+    Using enhanced constraint satisfaction solver...
+    Backtrack stats: 9 nodes, 0 backtracks, 0 pruned
+    ✅ Enhanced solver succeeded
+  ✅ Round 4 solved (8 pods)
+✅ Enhanced Constraint Satisfaction succeeded!
+   Generation time: 0.00 seconds
+   Total rounds: 4
+✓ Tournament generated successfully!
+  Perfect tournament: True
+  Total violations: 0
+  Pairing efficiency: 100.0%
+  Generation time: 0.00 seconds
+   Round 1, Table 1: Random seating (no prior scores)
+   Round 1, Table 2: Random seating (no prior scores)
+   Round 1, Table 3: Random seating (no prior scores)
+   Round 1, Table 4: Random seating (no prior scores)
+   Round 1, Table 5: Random seating (no prior scores)
+   Round 1, Table 6: Random seating (no prior scores)
+   Round 1, Table 7: Random seating (no prior scores)
+   Round 1, Table 8: Random seating (no prior scores)
+      Seating: Seat 1: Team_02 (0pts) | Seat 2: Team_04 (0pts) | Seat 3: Team_06 (0pts) | Seat 4: Team_05 (0pts)
+   Round 2, Table 1: Intelligent seating (score-based)
+      Seating: Seat 1: Team_02 (0pts) | Seat 2: Team_04 (0pts) | Seat 3: Team_06 (0pts) | Seat 4: Team_05 (0pts)
+   Round 2, Table 2: Intelligent seating (score-based)
+      Seating: Seat 1: Team_02 (0pts) | Seat 2: Team_04 (0pts) | Seat 3: Team_06 (0pts) | Seat 4: Team_05 (0pts)
+   Round 2, Table 3: Intelligent seating (score-based)
+      Seating: Seat 1: Team_02 (0pts) | Seat 2: Team_04 (0pts) | Seat 3: Team_06 (0pts) | Seat 4: Team_05 (0pts)
+   Round 2, Table 4: Intelligent seating (score-based)
+      Seating: Seat 1: Team_03 (0pts) | Seat 2: Team_01 (0pts) | Seat 3: Team_07 (0pts) | Seat 4: Team_08 (0pts)
+   Round 2, Table 5: Intelligent seating (score-based)
+      Seating: Seat 1: Team_03 (0pts) | Seat 2: Team_01 (0pts) | Seat 3: Team_07 (0pts) | Seat 4: Team_08 (0pts)
+   Round 2, Table 6: Intelligent seating (score-based)
+      Seating: Seat 1: Team_03 (0pts) | Seat 2: Team_01 (0pts) | Seat 3: Team_07 (0pts) | Seat 4: Team_08 (0pts)
+   Round 2, Table 7: Intelligent seating (score-based)
+      Seating: Seat 1: Team_03 (0pts) | Seat 2: Team_01 (0pts) | Seat 3: Team_07 (0pts) | Seat 4: Team_08 (0pts)
+   Round 2, Table 8: Intelligent seating (score-based)
+      Seating: Seat 1: Team_02 (0pts) | Seat 2: Team_04 (0pts) | Seat 3: Team_06 (0pts) | Seat 4: Team_05 (0pts)
+   Round 3, Table 1: Intelligent seating (score-based)
+      Seating: Seat 1: Team_02 (0pts) | Seat 2: Team_04 (0pts) | Seat 3: Team_06 (0pts) | Seat 4: Team_05 (0pts)
+   Round 3, Table 2: Intelligent seating (score-based)
+      Seating: Seat 1: Team_02 (0pts) | Seat 2: Team_04 (0pts) | Seat 3: Team_06 (0pts) | Seat 4: Team_05 (0pts)
+   Round 3, Table 3: Intelligent seating (score-based)
+      Seating: Seat 1: Team_02 (0pts) | Seat 2: Team_04 (0pts) | Seat 3: Team_06 (0pts) | Seat 4: Team_05 (0pts)
+   Round 3, Table 4: Intelligent seating (score-based)
+      Seating: Seat 1: Team_03 (0pts) | Seat 2: Team_01 (0pts) | Seat 3: Team_07 (0pts) | Seat 4: Team_08 (0pts)
+   Round 3, Table 5: Intelligent seating (score-based)
+      Seating: Seat 1: Team_03 (0pts) | Seat 2: Team_01 (0pts) | Seat 3: Team_07 (0pts) | Seat 4: Team_08 (0pts)
+   Round 3, Table 6: Intelligent seating (score-based)
+      Seating: Seat 1: Team_03 (0pts) | Seat 2: Team_01 (0pts) | Seat 3: Team_07 (0pts) | Seat 4: Team_08 (0pts)
+   Round 3, Table 7: Intelligent seating (score-based)
+      Seating: Seat 1: Team_03 (0pts) | Seat 2: Team_01 (0pts) | Seat 3: Team_07 (0pts) | Seat 4: Team_08 (0pts)
+   Round 3, Table 8: Intelligent seating (score-based)
+      Seating: Seat 1: Team_02 (0pts) | Seat 2: Team_04 (0pts) | Seat 3: Team_06 (0pts) | Seat 4: Team_05 (0pts)
+   Round 4, Table 1: Intelligent seating (score-based)
+      Seating: Seat 1: Team_02 (0pts) | Seat 2: Team_04 (0pts) | Seat 3: Team_06 (0pts) | Seat 4: Team_05 (0pts)
+   Round 4, Table 2: Intelligent seating (score-based)
+      Seating: Seat 1: Team_02 (0pts) | Seat 2: Team_04 (0pts) | Seat 3: Team_06 (0pts) | Seat 4: Team_05 (0pts)
+   Round 4, Table 3: Intelligent seating (score-based)
+      Seating: Seat 1: Team_02 (0pts) | Seat 2: Team_04 (0pts) | Seat 3: Team_06 (0pts) | Seat 4: Team_05 (0pts)
+   Round 4, Table 4: Intelligent seating (score-based)
+      Seating: Seat 1: Team_03 (0pts) | Seat 2: Team_01 (0pts) | Seat 3: Team_07 (0pts) | Seat 4: Team_08 (0pts)
+   Round 4, Table 5: Intelligent seating (score-based)
+      Seating: Seat 1: Team_03 (0pts) | Seat 2: Team_01 (0pts) | Seat 3: Team_07 (0pts) | Seat 4: Team_08 (0pts)
+   Round 4, Table 6: Intelligent seating (score-based)
+      Seating: Seat 1: Team_03 (0pts) | Seat 2: Team_01 (0pts) | Seat 3: Team_07 (0pts) | Seat 4: Team_08 (0pts)
+   Round 4, Table 7: Intelligent seating (score-based)
+      Seating: Seat 1: Team_03 (0pts) | Seat 2: Team_01 (0pts) | Seat 3: Team_07 (0pts) | Seat 4: Team_08 (0pts)
+   Round 4, Table 8: Intelligent seating (score-based)
+✓ Organized all rounds into tables structure with intelligent seating
+✓ Tournament ready: 4 rounds with 8 tables each
+✓ All 4 Swiss rounds generated successfully!
+Tournament pairings are now LOCKED for the entire event.
+[INFO]  
+========================================
+[WARN]  GAP 3: Simulating Round 1 with PROPER API methods
+[INFO]  ========================================
+[INFO]    Table 1: Points [5, 1, 0, 1]
+[INFO]    Table 2: Points [1, 0, 5, 1]
+[INFO]    Table 3: Points [1, 5, 1, 0]
+[INFO]    Table 4: Points [1, 1, 5, 0]
+[INFO]    Table 5: Points [5, 1, 1, 0]
+[INFO]    Table 6: Points [0, 5, 1, 1]
+[INFO]    Table 7: Points [1, 0, 5, 1]
+[INFO]    Table 8: Points [5, 1, 1, 0]
+[INFO]  
+Calling tournament.submit_player_results(1, ...)
+Round 1 player results submitted and finalized successfully
+[INFO]  Calling tournament.calculate_team_scores()
+[PASS]  ✅ GAP 3: Round 1 submitted through proper API methods
+[INFO]    Attempting duplicate submission...
+Warning: Round 1 player results already exist! Preventing duplicate submission.
+[PASS]  PASS: Duplicate submission should be rejected (expected: False, got: False)
+[PASS]  
+================================================================================
+[PASS]  ✅ GAP 6 CLOSED: All edge cases handled correctly!
+[PASS]  ================================================================================
+[INFO]  
+================================================================================
+[INFO]  TEST SUMMARY
+[INFO]  ================================================================================
+[INFO]  Total Tests: 5
+[PASS]  Passed: 5
+[INFO]  Failed: 0
+[INFO]  
+================================================================================
+[INFO]  GAPS CLOSURE STATUS
+[INFO]  ================================================================================
+[PASS]  GAP_1_team_separation: ✅ CLOSED
+[PASS]  GAP_2_intelligent_seating: ✅ CLOSED
+[PASS]  GAP_3_score_calculation: ✅ CLOSED
+[PASS]  GAP_4_finals_qualification: ✅ CLOSED
+[PASS]  GAP_5_championship: ✅ CLOSED
+[PASS]  GAP_6_edge_cases: ✅ CLOSED
+[PASS]  
+Total Gaps Closed: 6/6

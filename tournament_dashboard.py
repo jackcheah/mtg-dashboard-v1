@@ -27,11 +27,13 @@ class TournamentManager:
         self.supported_team_counts = [8, 16]  # Only support exactly 8 or 16 teams
         self.max_teams = 16  # Maximum supported teams (optimized for 8 or 16)
         self.has_semifinals = False  # Track if tournament structure includes semifinals
+        self.submitted_rounds = set()  # Track which rounds have been submitted
+        self.finalized_rounds = set()  # Track which rounds have been finalized
 
     def configure_swiss_rounds(self, rounds):
         """
         Configure the number of Swiss rounds before tournament setup.
-        Must be called before setup_tournament().
+        Can be called multiple times before teams are loaded.
 
         Args:
             rounds (int): Number of Swiss rounds (4 or 5)
@@ -39,8 +41,9 @@ class TournamentManager:
         Returns:
             tuple: (success: bool, message: str)
         """
-        if self.swiss_rounds_configured:
-            return False, "Swiss rounds already configured. Cannot change after loading participants."
+        # Allow reconfiguration if teams haven't been loaded yet
+        if self.swiss_rounds_configured and self.teams:
+            return False, "Swiss rounds already configured and teams loaded. Cannot change after loading participants."
 
         if rounds not in [4, 5]:
             return False, "Swiss rounds must be either 4 or 5."
@@ -209,9 +212,13 @@ class TournamentManager:
 
         return True
     
-    def create_sample_data(self):
-        """Create sample data if Excel file can't be loaded - creates exactly 16 teams for testing"""
-        sample_teams = {
+    def create_sample_data(self, num_teams=8):
+        """Create sample data if Excel file can't be loaded
+
+        Args:
+            num_teams: Number of teams to create (8 or 16, default: 8)
+        """
+        all_teams = {
             'Team Alpha': [
                 {'Player ID': 1, 'Player Name': 'Alice', 'Team Name': 'Team Alpha'},
                 {'Player ID': 2, 'Player Name': 'Bob', 'Team Name': 'Team Alpha'},
@@ -309,6 +316,16 @@ class TournamentManager:
                 {'Player ID': 64, 'Player Name': 'Luke', 'Team Name': 'Team Pi'}
             ]
         }
+
+        # Select the appropriate number of teams
+        if num_teams == 8:
+            sample_teams = dict(list(all_teams.items())[:8])
+        elif num_teams == 16:
+            sample_teams = all_teams
+        else:
+            # Default to 8 teams
+            sample_teams = dict(list(all_teams.items())[:8])
+
         self.teams = sample_teams
         self.tournament_teams = list(sample_teams.keys())
         self.scores = {team: 0 for team in self.teams.keys()}
@@ -1209,9 +1226,14 @@ def load_data():
     try:
         # Get Swiss rounds configuration from request (if POST)
         swiss_rounds = 4  # Default
+        use_sample_data = False
+        sample_team_count = 8  # Default for sample data
+
         if request.method == 'POST':
             data = request.get_json() or {}
             swiss_rounds = data.get('swiss_rounds', 4)
+            use_sample_data = data.get('use_sample_data', False)
+            sample_team_count = data.get('sample_team_count', 8)
 
             # Configure Swiss rounds before loading participants
             # Allow reconfiguration if the requested rounds differ from current configuration
@@ -1225,25 +1247,37 @@ def load_data():
 
         # Only reload from Excel if teams aren't already loaded
         if not tournament.teams:
-            excel_path = 'July_CEDH_Event/13th July CEDH Participant List.xlsx'
-
-            # Try to load from Excel, fallback to sample data
-            if os.path.exists(excel_path):
-                try:
-                    success = tournament.load_participants(excel_path)
-                    print(f"Load data result: {success}")
-                    print(f"Teams loaded: {len(tournament.teams)}")
-                    print(f"Team names: {list(tournament.teams.keys())}")
-                except Exception as e:
-                    print(f"Error loading Excel file: {e}")
-                    print("Falling back to sample data...")
-                    tournament.create_sample_data()
-                    success = True
-            else:
-                print(f"Excel file not found: {excel_path}")
-                print("Creating sample data with 16 teams...")
-                tournament.create_sample_data()
+            # Check if we should force sample data
+            if use_sample_data:
+                print(f"Using sample data with {sample_team_count} teams (forced by request)...")
+                tournament.create_sample_data(sample_team_count)
+                # Determine tournament structure after creating sample data
+                tournament.determine_tournament_structure()
                 success = True
+            else:
+                excel_path = 'July_CEDH_Event/13th July CEDH Participant List.xlsx'
+
+                # Try to load from Excel, fallback to sample data
+                if os.path.exists(excel_path):
+                    try:
+                        success = tournament.load_participants(excel_path)
+                        print(f"Load data result: {success}")
+                        print(f"Teams loaded: {len(tournament.teams)}")
+                        print(f"Team names: {list(tournament.teams.keys())}")
+                    except Exception as e:
+                        print(f"Error loading Excel file: {e}")
+                        print("Falling back to sample data...")
+                        tournament.create_sample_data(sample_team_count)
+                        # Determine tournament structure after creating sample data
+                        tournament.determine_tournament_structure()
+                        success = True
+                else:
+                    print(f"Excel file not found: {excel_path}")
+                    print(f"Creating sample data with {sample_team_count} teams...")
+                    tournament.create_sample_data(sample_team_count)
+                    # Determine tournament structure after creating sample data
+                    tournament.determine_tournament_structure()
+                    success = True
         else:
             success = True
             print(f"Returning existing tournament data (scores preserved)")
@@ -1284,6 +1318,39 @@ def set_swiss_rounds():
         'success': success,
         'message': message,
         'swiss_rounds_count': tournament.swiss_rounds_count if success else None
+    })
+
+@app.route('/configure_swiss_rounds', methods=['POST'])
+def configure_swiss_rounds():
+    """Configure the number of Swiss rounds (4 or 5) - API endpoint for tests"""
+    data = request.get_json()
+
+    if not data:
+        return jsonify({
+            'success': False,
+            'error': 'No data provided'
+        })
+
+    rounds = data.get('swiss_rounds')
+
+    if rounds is None:
+        return jsonify({
+            'success': False,
+            'error': 'swiss_rounds parameter is required'
+        })
+
+    if rounds not in [4, 5]:
+        return jsonify({
+            'success': False,
+            'error': 'Swiss rounds must be either 4 or 5'
+        })
+
+    success, message = tournament.configure_swiss_rounds(rounds)
+
+    return jsonify({
+        'success': success,
+        'message': message,
+        'swiss_rounds': tournament.swiss_rounds_count
     })
 
 @app.route('/setup_tournament', methods=['POST'])
@@ -1330,15 +1397,27 @@ def submit_player_results():
     """Finalize round (without adding points again - they're already added via table submissions)"""
     data = request.json
     round_num = data.get('round')
-    
-    # Check if round is already finalized
+
+    # Initialize tracking sets if they don't exist
     if not hasattr(tournament, 'finalized_rounds'):
         tournament.finalized_rounds = set()
-    
+
+    if not hasattr(tournament, 'submitted_rounds'):
+        tournament.submitted_rounds = set()
+
+    # Check if round is already finalized or submitted
     if round_num in tournament.finalized_rounds:
         return jsonify({
             'success': False,
+            'error': f'Round {round_num} has already been finalized!',
             'message': f'Round {round_num} has already been finalized!'
+        })
+
+    if round_num in tournament.submitted_rounds:
+        return jsonify({
+            'success': False,
+            'error': f'Round {round_num} results have already been submitted!',
+            'message': f'Round {round_num} results have already been submitted!'
         })
     
     # Check if this round has table submissions (points already added)
@@ -1348,16 +1427,18 @@ def submit_player_results():
     if has_table_submissions:
         print(f"Round {round_num} has table submissions - points already added via table submissions")
         print("Finalizing round WITHOUT adding points again to prevent double counting")
-        
-        # Just mark the round as finalized without adding points again
+
+        # Mark the round as finalized and submitted
         tournament.finalized_rounds.add(round_num)
-        
+        tournament.submitted_rounds.add(round_num)
+
         # Store finalization timestamp in round results
         if round_num not in tournament.round_results:
             tournament.round_results[round_num] = {}
         tournament.round_results[round_num]['finalized'] = True
-        
-        print(f"Round {round_num} has been FINALIZED - preventing future submissions")
+        tournament.round_results[round_num]['submitted'] = True
+
+        print(f"Round {round_num} has been FINALIZED and SUBMITTED - preventing future submissions")
         
         # Check if this is Round 4 (end of Swiss) - trigger finals
         # OR Round 5 (end of Finals) - trigger winner announcement
@@ -1441,9 +1522,10 @@ def submit_player_results():
         success = tournament.submit_player_results(round_num, player_results)
         
         if success:
-            # Mark round as finalized
+            # Mark round as finalized and submitted
             tournament.finalized_rounds.add(round_num)
-            print(f"Round {round_num} has been FINALIZED - preventing future submissions")
+            tournament.submitted_rounds.add(round_num)
+            print(f"Round {round_num} has been FINALIZED and SUBMITTED - preventing future submissions")
             
             # Determine what happens after this round based on tournament structure
             semifinals_data = None
@@ -1588,29 +1670,33 @@ def get_tournament_state():
         seated_tables[round_num] = tournament.apply_intelligent_seating_to_round(round_num)
 
     response_data = {
+        'success': True,
         'teams': tournament.teams,
         'scores': tournament.scores,
         'player_scores': tournament.player_scores,
         'current_round': tournament.current_round,
         'round_results': tournament.round_results,
-        'tables': seated_tables
+        'tables': seated_tables,
+        'swiss_rounds_count': tournament.swiss_rounds_count,
+        'max_rounds': tournament.max_rounds,
+        'has_semifinals': tournament.has_semifinals
     }
-    
+
     # Add legacy group support for backward compatibility (all teams in single group)
     response_data['group_a'] = getattr(tournament, 'tournament_teams', list(tournament.teams.keys()))
     response_data['group_b'] = []  # Empty for single-group tournaments
-    
+
     # Add final round data if available
     if hasattr(tournament, 'final_round_scores'):
         response_data['final_round_scores'] = tournament.final_round_scores
     if hasattr(tournament, 'swiss_round_scores'):
         response_data['swiss_round_scores'] = tournament.swiss_round_scores
-    
+
     # Add final standings if Round 5 is available
     final_standings = tournament.calculate_final_round_standings()
     if final_standings:
         response_data['final_standings'] = final_standings
-    
+
     return jsonify(response_data)
 
 @app.route('/get_tables/<int:round_num>')
@@ -1990,18 +2076,28 @@ def get_all_swiss_rounds():
 
 @app.route('/get_semifinals')
 def get_semifinals():
-    """Get finals data if generated"""
-    if hasattr(tournament, 'semifinals') and tournament.semifinals:
+    """Get semifinals data if generated"""
+    # Check for semifinals_data (new) or semifinals (legacy)
+    semifinals_data = None
+    if hasattr(tournament, 'semifinals_data') and tournament.semifinals_data:
+        semifinals_data = tournament.semifinals_data
+    elif hasattr(tournament, 'semifinals') and tournament.semifinals:
+        semifinals_data = tournament.semifinals
+
+    if semifinals_data:
+        # Determine the semifinals round number
+        semifinals_round = tournament.swiss_rounds_count + 1 if tournament.has_semifinals else None
+
         return jsonify({
             'success': True,
-            'semifinals': tournament.semifinals,
-            'round_5_tables': tournament.tables.get(5, {}),
-            'message': 'Finals data retrieved successfully'
+            'semifinals': semifinals_data,
+            'round_5_tables': tournament.tables.get(semifinals_round, {}),
+            'message': 'Semifinals data retrieved successfully'
         })
     else:
         return jsonify({
             'success': False,
-            'message': 'Finals not generated yet. Complete Swiss Round 4 first.'
+            'message': 'Semifinals not generated yet. Complete Swiss rounds first.'
         })
 
 @app.route('/get_final_standings')
@@ -2126,6 +2222,253 @@ def tournament_statistics():
             'success': False,
             'error': str(e),
             'message': 'Failed to generate tournament statistics'
+        })
+
+# ==========================================
+# NEW API ENDPOINTS FOR GAP 7 TESTING
+# ==========================================
+
+@app.route('/get_teams')
+def get_teams():
+    """Get all teams and their players"""
+    if not tournament.teams:
+        return jsonify({
+            'success': False,
+            'error': 'No teams loaded yet'
+        })
+
+    return jsonify({
+        'success': True,
+        'teams': tournament.teams,
+        'team_count': len(tournament.teams),
+        'tournament_teams': tournament.tournament_teams
+    })
+
+@app.route('/get_scores')
+def get_scores():
+    """Get current team scores"""
+    return jsonify({
+        'success': True,
+        'scores': tournament.scores,
+        'swiss_round_scores': tournament.swiss_round_scores if hasattr(tournament, 'swiss_round_scores') else {},
+        'final_round_scores': tournament.final_round_scores if hasattr(tournament, 'final_round_scores') else {}
+    })
+
+@app.route('/get_player_scores')
+def get_player_scores():
+    """Get individual player scores"""
+    return jsonify({
+        'success': True,
+        'player_scores': tournament.player_scores
+    })
+
+@app.route('/standings')
+def standings():
+    """Get current standings (sorted by score)"""
+    # Sort teams by score (descending)
+    sorted_standings = sorted(
+        tournament.scores.items(),
+        key=lambda x: x[1],
+        reverse=True
+    )
+
+    standings_list = [
+        {
+            'rank': idx + 1,
+            'team': team_name,
+            'score': score,
+            'players': tournament.teams.get(team_name, [])
+        }
+        for idx, (team_name, score) in enumerate(sorted_standings)
+    ]
+
+    return jsonify({
+        'success': True,
+        'standings': standings_list,
+        'total_teams': len(standings_list)
+    })
+
+@app.route('/final_standings')
+def final_standings():
+    """Get final standings after tournament completion"""
+    # Check if tournament is complete
+    if not hasattr(tournament, 'finals_data') or not tournament.finals_data:
+        return jsonify({
+            'success': False,
+            'error': 'Tournament not complete yet. Finals must be played first.'
+        })
+
+    # Get final standings
+    final_standings_data = tournament.calculate_final_round_standings()
+
+    if not final_standings_data:
+        return jsonify({
+            'success': False,
+            'error': 'Unable to calculate final standings'
+        })
+
+    return jsonify({
+        'success': True,
+        'final_standings': final_standings_data,
+        'champion': final_standings_data[0] if final_standings_data else None,
+        'mvp': tournament.get_mvp() if hasattr(tournament, 'get_mvp') else None
+    })
+
+@app.route('/generate_finals')
+def generate_finals():
+    """Generate finals round (top 4 teams)"""
+    try:
+        # Check if Swiss rounds are complete
+        if len(tournament.submitted_rounds) < tournament.swiss_rounds_count:
+            return jsonify({
+                'success': False,
+                'error': f'Swiss rounds not complete. {tournament.swiss_rounds_count - len(tournament.submitted_rounds)} rounds remaining.'
+            })
+
+        # Generate finals based on tournament structure
+        if tournament.has_semifinals:
+            # 16 teams: Check if semifinals are complete
+            semifinals_round = tournament.swiss_rounds_count + 1
+            if semifinals_round not in tournament.submitted_rounds:
+                return jsonify({
+                    'success': False,
+                    'error': 'Semifinals not complete yet'
+                })
+            finals_data = tournament.generate_unified_finals(after_semifinals=True)
+        else:
+            # 8 teams: Generate finals directly from Swiss
+            finals_data = tournament.generate_unified_finals(after_semifinals=False)
+
+        if finals_data:
+            return jsonify({
+                'success': True,
+                'finals_data': finals_data,
+                'message': 'Finals generated successfully',
+                'finals_round': tournament.max_rounds
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'error': 'Failed to generate finals'
+            })
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'message': 'Error generating finals'
+        })
+
+@app.route('/get_finals')
+def get_finals():
+    """Get finals data if generated"""
+    if hasattr(tournament, 'finals_data') and tournament.finals_data:
+        return jsonify({
+            'success': True,
+            'finals_data': tournament.finals_data,
+            'finals_round': tournament.max_rounds,
+            'message': 'Finals data retrieved successfully'
+        })
+    else:
+        return jsonify({
+            'success': False,
+            'error': 'Finals not generated yet'
+        })
+
+@app.route('/validate_integrity')
+def validate_integrity():
+    """Validate tournament data integrity"""
+    checks_performed = []
+    issues = []
+
+    # Check 1: Teams loaded
+    if not tournament.teams:
+        issues.append('No teams loaded')
+    checks_performed.append('Teams loaded')
+
+    # Check 2: Scores initialized
+    if not tournament.scores:
+        issues.append('Scores not initialized')
+    checks_performed.append('Scores initialized')
+
+    # Check 3: Player scores initialized
+    if not tournament.player_scores:
+        issues.append('Player scores not initialized')
+    checks_performed.append('Player scores initialized')
+
+    # Check 4: Team count validation
+    team_count = len(tournament.teams)
+    if team_count not in [8, 16]:
+        issues.append(f'Invalid team count: {team_count} (must be 8 or 16)')
+    checks_performed.append('Team count validation')
+
+    # Check 5: Player count validation
+    expected_players = team_count * 4
+    actual_players = len(tournament.participants)
+    if actual_players != expected_players:
+        issues.append(f'Player count mismatch: {actual_players} (expected {expected_players})')
+    checks_performed.append('Player count validation')
+
+    # Check 6: Tables generated
+    if tournament.tables:
+        checks_performed.append('Tables generated')
+    else:
+        issues.append('No tables generated')
+
+    # Check 7: Swiss rounds configuration
+    if tournament.swiss_rounds_count not in [4, 5]:
+        issues.append(f'Invalid Swiss rounds: {tournament.swiss_rounds_count}')
+    checks_performed.append('Swiss rounds configuration')
+
+    return jsonify({
+        'valid': len(issues) == 0,
+        'checks_performed': checks_performed,
+        'issues': issues,
+        'total_checks': len(checks_performed),
+        'passed_checks': len(checks_performed) - len(issues)
+    })
+
+@app.route('/reset_tournament', methods=['POST'])
+def reset_tournament():
+    """Reset tournament to initial state"""
+    try:
+        # Reset all tournament state
+        tournament.participants = []
+        tournament.teams = {}
+        tournament.tournament_teams = []
+        tournament.scores = {}
+        tournament.player_scores = {}
+        tournament.current_round = 1
+        tournament.swiss_rounds_count = 4
+        tournament.swiss_rounds_configured = False
+        tournament.max_rounds = 6
+        tournament.round_results = {}
+        tournament.tables = {}
+        tournament.final_round_scores = {}
+        tournament.semifinal_round_scores = {}
+        tournament.swiss_round_scores = {}
+        tournament.has_semifinals = False
+        tournament.finals_data = None
+        tournament.semifinals_data = None
+
+        if hasattr(tournament, 'submitted_rounds'):
+            tournament.submitted_rounds = set()
+
+        if hasattr(tournament, 'finalized_rounds'):
+            tournament.finalized_rounds = set()
+
+        return jsonify({
+            'success': True,
+            'message': 'Tournament reset successfully'
+        })
+
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'message': 'Failed to reset tournament'
         })
 
 if __name__ == '__main__':

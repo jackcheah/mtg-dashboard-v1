@@ -126,18 +126,25 @@ class APIEndpointTester(unittest.TestCase):
             'results': all_results
         }
 
-    def setup_tournament_helper(self, swiss_rounds=4):
+    def setup_tournament_helper(self, swiss_rounds=4, use_sample_data=False, sample_team_count=8):
         """Helper to set up a complete tournament
 
         Args:
             swiss_rounds: 4 or 5
+            use_sample_data: If True, use sample data instead of Excel file
+            sample_team_count: Number of teams for sample data (8 or 16)
 
         Returns:
             bool: Success status
         """
         # Step 1: Load participants (which also configures Swiss rounds)
+        load_params = {'swiss_rounds': swiss_rounds}
+        if use_sample_data:
+            load_params['use_sample_data'] = True
+            load_params['sample_team_count'] = sample_team_count
+
         response = self.client.post('/load_data',
-            json={'swiss_rounds': swiss_rounds},
+            json=load_params,
             content_type='application/json')
         if not json.loads(response.data)['success']:
             return False
@@ -353,7 +360,8 @@ class APIEndpointTester(unittest.TestCase):
 
     def test_13_get_tables_success(self):
         """Test retrieving tables for a specific round"""
-        self.setup_tournament_helper(4)
+        # Use sample data with 8 teams for this test
+        self.setup_tournament_helper(4, use_sample_data=True, sample_team_count=8)
 
         response = self.client.get('/get_tables/1')
 
@@ -386,7 +394,8 @@ class APIEndpointTester(unittest.TestCase):
 
     def test_15_get_teams(self):
         """Test retrieving all teams"""
-        self.setup_tournament_helper(4)
+        # Use sample data with 8 teams for this test
+        self.setup_tournament_helper(4, use_sample_data=True, sample_team_count=8)
 
         response = self.client.get('/get_teams')
 
@@ -471,7 +480,8 @@ class APIEndpointTester(unittest.TestCase):
 
     def test_21_get_semifinals_16_teams(self):
         """Test semifinals generation for 16 teams"""
-        self.setup_tournament_helper(16, 4)
+        # Note: This test requires the Excel file to have 16 teams
+        self.setup_tournament_helper(4)
 
         # Complete 4 Swiss rounds
         for round_num in range(1, 5):
@@ -493,7 +503,8 @@ class APIEndpointTester(unittest.TestCase):
 
     def test_22_generate_finals_8_teams(self):
         """Test finals generation for 8 teams (from Swiss)"""
-        self.setup_tournament_helper(4)
+        # Use sample data with 8 teams for this test
+        self.setup_tournament_helper(4, use_sample_data=True, sample_team_count=8)
 
         # Complete 4 Swiss rounds
         for round_num in range(1, 5):
@@ -513,7 +524,8 @@ class APIEndpointTester(unittest.TestCase):
 
     def test_23_get_finals_data(self):
         """Test retrieving finals information"""
-        self.setup_tournament_helper(4)
+        # Use sample data with 8 teams for this test
+        self.setup_tournament_helper(4, use_sample_data=True, sample_team_count=8)
 
         # Complete Swiss and generate finals
         for round_num in range(1, 5):
@@ -590,8 +602,9 @@ class APIEndpointTester(unittest.TestCase):
     def test_28_complete_tournament_workflow(self):
         """Test complete tournament workflow through API"""
         # Step 1: Load participants (also configures Swiss rounds)
+        # Use sample data with 8 teams for this test
         response = self.client.post('/load_data',
-            json={'swiss_rounds': 4},
+            json={'swiss_rounds': 4, 'use_sample_data': True, 'sample_team_count': 8},
             content_type='application/json')
         self.assertTrue(json.loads(response.data)['success'])
 
