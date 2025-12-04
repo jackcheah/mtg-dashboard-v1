@@ -417,7 +417,7 @@ class UnifiedSwissPairing:
     to provide a robust solution that works for any valid tournament configuration.
     """
     
-    def __init__(self, teams: Dict[str, List[Dict]], tournament_teams: List[str], swiss_rounds_count: int = 4):
+    def __init__(self, teams: Dict[str, List[Dict]], tournament_teams: List[str], swiss_rounds_count: int = 4, team_scores: Dict[str, int] = None):
         """
         Initialize the unified Swiss pairing system.
 
@@ -425,10 +425,12 @@ class UnifiedSwissPairing:
             teams: Dictionary mapping team names to lists of player dictionaries
             tournament_teams: List of team names for the tournament (4-20 teams)
             swiss_rounds_count: Number of Swiss rounds to generate (3, 4, or 5)
+            team_scores: Optional dictionary of team scores for score-based pairing (rounds 2+)
         """
         self.teams = teams
         self.tournament_teams = tournament_teams
         self.swiss_rounds_count = swiss_rounds_count
+        self.team_scores = team_scores or {}
         self.start_time = time.time()
         
         # Validate input parameters
@@ -562,7 +564,57 @@ class UnifiedSwissPairing:
         
         print("❌ All approaches failed to generate valid tournament")
         return False, []
-    
+
+    def generate_single_round(self, round_num: int) -> Tuple[bool, List[List[Dict]]]:
+        """
+        Generate a single Swiss round using the pod-consistency algorithm.
+        This is used for incremental round generation based on current scores.
+
+        Args:
+            round_num: The round number to generate (1-based)
+
+        Returns:
+            Tuple of (success, list_of_pods_for_this_round)
+        """
+        print(f"🔄 Generating Round {round_num} with current scores...")
+
+        # Update team scores from the tournament's current scores
+        if hasattr(self, 'team_scores') and self.team_scores:
+            print(f"   Using current team scores for pairing")
+
+        try:
+            # Use pod-consistency approach for this round
+            round_solution = self._generate_round_with_pod_consistency(round_num)
+
+            if round_solution is None:
+                print(f"  ❌ Failed to generate Round {round_num}")
+                return False, []
+
+            # Update constraints after this round
+            self._update_constraints_after_round(round_solution)
+
+            # Add to round solutions
+            self.round_solutions.append(round_solution)
+
+            print(f"  ✅ Round {round_num} generated ({len(round_solution)} pods)")
+            return True, round_solution
+
+        except Exception as e:
+            print(f"  ❌ Error generating Round {round_num}: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            return False, []
+
+    def update_team_scores(self, new_scores: Dict[str, int]):
+        """
+        Update the team scores for score-based pairing in subsequent rounds.
+
+        Args:
+            new_scores: Dictionary mapping team names to their current scores
+        """
+        self.team_scores = new_scores.copy()
+        print(f"   Team scores updated: {self.team_scores}")
+
     def _reset_constraint_tracking(self):
         """Reset constraint tracking for a new generation attempt."""
         self.used_pairings.clear()
@@ -574,27 +626,28 @@ class UnifiedSwissPairing:
     
     def _solve_with_constraint_satisfaction(self) -> Tuple[bool, List[List[List[Dict]]]]:
         """
-        Primary algorithm: Enhanced constraint satisfaction with intelligent backtracking.
-        
+        Primary algorithm: Team-grouping approach with pod consistency guarantee.
+
         Returns:
             Tuple of (success, solution)
         """
         solution = []
-        
+
         for round_num in range(1, self.swiss_rounds_count + 1):
             print(f"  Solving Round {round_num}...")
-            
-            round_solution = self._solve_round_with_backtracking(round_num)
-            
+
+            # Use new pod-consistency approach
+            round_solution = self._generate_round_with_pod_consistency(round_num)
+
             if round_solution is None:
                 print(f"  ❌ Failed to solve Round {round_num}")
                 return False, []
-            
+
             solution.append(round_solution)
             self._update_constraints_after_round(round_solution)
-            
+
             print(f"  ✅ Round {round_num} solved ({len(round_solution)} pods)")
-        
+
         return True, solution
     
     def _solve_round_with_backtracking(self, round_num: int) -> Optional[List[List[Dict]]]:
@@ -1424,9 +1477,9 @@ class UnifiedSwissPairing:
         """Get detailed tournament statistics."""
         if not self.round_solutions:
             raise ValueError("No solution available - generate tournament first")
-        
+
         stats_dict = self._generate_statistics(self.round_solutions)
-        
+
         return TournamentStats(
             total_pairings=stats_dict['total_pairings'],
             expected_pairings=stats_dict['expected_pairings'],
@@ -1437,3 +1490,361 @@ class UnifiedSwissPairing:
             generation_time=stats_dict['generation_time'],
             algorithm_used=stats_dict['algorithm_used']
         )
+
+    # =========================================================================
+    # POD CONSISTENCY FUNCTIONS - Fix for 16-team tournament bug
+    # =========================================================================
+
+    def _generate_round_with_pod_consistency(self, round_num: int) -> Optional[List[List[Dict]]]:
+        """
+        Generate a round with guaranteed pod consistency.
+
+        This ensures that when 4 teams are paired together, ALL 4 players from each team
+        face each other across exactly 4 separate pods. No mixing with other teams.
+
+        Args:
+            round_num: The round number being generated (1-based)
+
+        Returns:
+            List of pods for the round, or None if generation failed
+        """
+        print(f"    🔧 Using pod-consistency algorithm for Round {round_num}")
+
+        # Step 1: Group teams into sets of 4
+        team_groups = self._create_team_groups_for_round(round_num)
+
+        if team_groups is None:
+            return None
+
+        print(f"    Team groups: {team_groups}")
+
+        all_pods = []
+
+        # Step 2: Create 4 pods for each team group
+        for team_group in team_groups:
+            print(f"    Creating pods for team group: {team_group}")
+            pods = self._create_four_pods_for_team_group(team_group, round_num)
+
+            if pods is None or len(pods) != 4:
+                print(f"❌ Failed to create 4 pods for team group: {team_group}")
+                return None
+
+            all_pods.extend(pods)
+
+        # Step 3: Update player opponent tracking
+        for pod in all_pods:
+            for player in pod:
+                player_id = player['Player ID']
+                opponents = [p['Player ID'] for p in pod if p['Player ID'] != player_id]
+
+                if player_id not in self.player_opponents:
+                    self.player_opponents[player_id] = set()
+
+                self.player_opponents[player_id].update(opponents)
+
+        # Step 4: Update team matchup tracking
+        for team_group in team_groups:
+            for team in team_group:
+                other_teams = [t for t in team_group if t != team]
+                if team not in self.team_matchups:
+                    self.team_matchups[team] = set()
+                self.team_matchups[team].update(other_teams)
+
+        # Step 5: Validate pod consistency
+        if not self._validate_round_pod_consistency(all_pods, team_groups):
+            print(f"❌ Pod consistency validation failed for round {round_num}")
+            return None
+
+        return all_pods
+
+    def _create_team_groups_for_round(self, round_num: int) -> Optional[List[List[str]]]:
+        """
+        Divide teams into groups of 4 for the round.
+
+        Round 1: Random grouping
+        Rounds 2+: Create new groupings where teams face opponents they haven't met yet
+
+        Args:
+            round_num: The round number being generated (1-based)
+
+        Returns:
+            List of team groups, each containing 4 team names
+        """
+        available_teams = self.tournament_teams.copy()
+        num_groups = len(available_teams) // 4
+
+        if round_num == 1:
+            # Round 1: Random grouping
+            random.shuffle(available_teams)
+            team_groups = []
+            for i in range(num_groups):
+                group = available_teams[i*4:(i+1)*4]
+                team_groups.append(group)
+            return team_groups
+
+        # Rounds 2+: Create groups where teams face NEW opponents
+        # Use constraint-based approach to avoid repeat team matchups
+        team_groups = self._create_non_repeat_team_groups(available_teams, num_groups)
+
+        if team_groups is None:
+            # Fallback: If we can't avoid all repeats, use score-based grouping
+            # (This should only happen for 8 and 12 team tournaments)
+            print(f"    ⚠️ Could not avoid all repeat team matchups for round {round_num}")
+            available_teams = self._sort_teams_by_score(available_teams)
+            team_groups = []
+            for i in range(num_groups):
+                group = available_teams[i*4:(i+1)*4]
+                team_groups.append(group)
+
+        return team_groups
+
+    def _create_non_repeat_team_groups(self, teams: List[str], num_groups: int) -> Optional[List[List[str]]]:
+        """
+        Create team groups where teams face opponents they haven't met before.
+
+        Uses backtracking to find valid groupings.
+
+        Args:
+            teams: List of team names to group
+            num_groups: Number of groups to create (each with 4 teams)
+
+        Returns:
+            List of team groups, or None if no valid grouping exists
+        """
+        available = set(teams)
+        groups = []
+
+        def can_form_group(candidate_teams: List[str]) -> bool:
+            """Check if 4 teams can form a group without repeat matchups."""
+            for i in range(len(candidate_teams)):
+                for j in range(i + 1, len(candidate_teams)):
+                    team1 = candidate_teams[i]
+                    team2 = candidate_teams[j]
+                    # Check if these teams have already faced each other
+                    if team2 in self.team_matchups.get(team1, set()):
+                        return False
+            return True
+
+        def backtrack(remaining: set, current_groups: List[List[str]]) -> bool:
+            """Recursively build valid team groups."""
+            if len(remaining) == 0:
+                return True
+
+            if len(remaining) < 4:
+                return False
+
+            # Try to form a group with the first available team
+            first_team = min(remaining)  # Use min for deterministic ordering
+            remaining.remove(first_team)
+
+            # Find 3 more teams that haven't faced the first team
+            candidates = []
+            for team in remaining:
+                if team not in self.team_matchups.get(first_team, set()):
+                    candidates.append(team)
+
+            # Try all combinations of 3 from candidates
+            from itertools import combinations
+            for combo in combinations(candidates, 3):
+                group = [first_team] + list(combo)
+                if can_form_group(group):
+                    # Remove these teams and recurse
+                    new_remaining = remaining - set(combo)
+                    current_groups.append(group)
+                    if backtrack(new_remaining, current_groups):
+                        return True
+                    current_groups.pop()
+
+            # Backtrack: put the first team back
+            remaining.add(first_team)
+            return False
+
+        if backtrack(available, groups):
+            return groups
+        return None
+
+    def _sort_teams_by_score(self, teams: List[str]) -> List[str]:
+        """
+        Sort teams by current score (highest to lowest).
+
+        Args:
+            teams: List of team names to sort
+
+        Returns:
+            Sorted list of team names
+        """
+        if not self.team_scores:
+            # No scores available, return as-is
+            return teams
+
+        return sorted(teams,
+                     key=lambda t: self.team_scores.get(t, 0),
+                     reverse=True)
+
+    def _create_four_pods_for_team_group(self, team_group: List[str], round_num: int) -> Optional[List[List[Dict]]]:
+        """
+        Create exactly 4 pods from 4 teams, avoiding player-level repeat matchups.
+
+        Uses backtracking to find player assignments that minimize repeat opponents.
+        If repeat matchups cannot be avoided, swaps players to minimize them.
+
+        Args:
+            team_group: List of 4 team names
+            round_num: The round number (used for rotation calculation)
+
+        Returns:
+            List of 4 pods, each containing 4 players (one from each team)
+        """
+        # Get all players from these 4 teams
+        team_players = {}
+        for team in team_group:
+            team_players[team] = self.teams[team].copy()
+
+        # Try to find optimal player assignment using backtracking
+        best_pods = None
+        best_repeat_count = float('inf')
+
+        # Try all permutations of player assignments for each team
+        # Each team has 4 players that need to be assigned to 4 pods
+        from itertools import permutations
+
+        # For efficiency, only try permutations for teams after the first
+        # First team's players go to pods 0,1,2,3 in order
+        first_team = team_group[0]
+        first_team_players = team_players[first_team]
+
+        # Try different permutations for other teams
+        other_teams = team_group[1:]
+        other_team_perms = [list(permutations(range(4))) for _ in other_teams]
+
+        # Limit search space for performance (try first 24 combinations per team)
+        max_perms = min(24, len(other_team_perms[0]) if other_team_perms else 1)
+
+        for perm1 in other_team_perms[0][:max_perms] if other_team_perms else [()]:
+            for perm2 in other_team_perms[1][:max_perms] if len(other_team_perms) > 1 else [()]:
+                for perm3 in other_team_perms[2][:max_perms] if len(other_team_perms) > 2 else [()]:
+                    # Build pods with this permutation
+                    pods = []
+                    repeat_count = 0
+
+                    for pod_idx in range(4):
+                        pod = []
+                        # First team player
+                        if pod_idx < len(first_team_players):
+                            pod.append(first_team_players[pod_idx])
+
+                        # Other teams' players based on permutation
+                        perms = [perm1, perm2, perm3]
+                        for team_idx, team in enumerate(other_teams):
+                            if team_idx < len(perms):
+                                player_idx = perms[team_idx][pod_idx]
+                                if player_idx < len(team_players[team]):
+                                    pod.append(team_players[team][player_idx])
+
+                        if len(pod) == 4:
+                            pods.append(pod)
+                            # Count repeat matchups in this pod
+                            repeat_count += self._count_repeat_matchups_in_pod(pod)
+
+                    if len(pods) == 4 and repeat_count < best_repeat_count:
+                        best_pods = pods
+                        best_repeat_count = repeat_count
+
+                        if repeat_count == 0:
+                            # Found perfect solution, return immediately
+                            return best_pods
+
+        return best_pods
+
+    def _count_repeat_matchups_in_pod(self, pod: List[Dict]) -> int:
+        """Count how many player pairs in this pod have faced each other before."""
+        repeat_count = 0
+        for i in range(len(pod)):
+            for j in range(i + 1, len(pod)):
+                player1_id = pod[i]['Player ID']
+                player2_id = pod[j]['Player ID']
+                if player2_id in self.player_opponents.get(player1_id, set()):
+                    repeat_count += 1
+        return repeat_count
+
+    def _have_teams_met_before(self, team_group: List[str]) -> bool:
+        """
+        Check if these 4 teams have all met before.
+
+        Args:
+            team_group: List of 4 team names
+
+        Returns:
+            True if these teams have faced each other before
+        """
+        # Check if any team has faced all other teams in the group
+        for team in team_group:
+            other_teams = set([t for t in team_group if t != team])
+            if team in self.team_matchups:
+                if other_teams.issubset(self.team_matchups[team]):
+                    return True
+
+        return False
+
+    def _calculate_player_rotation(self, team_group: List[str], round_num: int) -> List[int]:
+        """
+        Calculate rotation offsets to avoid player-level repeats when teams meet again.
+
+        Uses round number to determine rotation pattern, ensuring different matchups
+        each time the same 4 teams meet.
+
+        Args:
+            team_group: List of 4 team names
+            round_num: The round number
+
+        Returns:
+            List of rotation offsets for each team
+        """
+        # Use round number to determine rotation
+        # This ensures different matchups each time
+        base_rotation = (round_num - 1) % 4
+        return [(base_rotation + i) % 4 for i in range(4)]
+
+    def _validate_round_pod_consistency(self, all_pods: List[List[Dict]],
+                                       team_groups: List[List[str]]) -> bool:
+        """
+        Validate that pods maintain consistency requirements.
+
+        Checks:
+        1. Each team matchup group has exactly 4 pods
+        2. Each team has exactly 1 player per pod
+        3. All 4 players from each team participate
+
+        Args:
+            all_pods: All pods in the round
+            team_groups: The team groups that were used
+
+        Returns:
+            True if validation passes, False otherwise
+        """
+        # Group pods by team sets
+        pods_by_team_set = {}
+
+        for pod in all_pods:
+            teams_in_pod = frozenset([p['Team Name'] for p in pod])
+
+            if teams_in_pod not in pods_by_team_set:
+                pods_by_team_set[teams_in_pod] = []
+
+            pods_by_team_set[teams_in_pod].append(pod)
+
+        # Verify each team set has exactly 4 pods
+        for team_set, pods in pods_by_team_set.items():
+            if len(pods) != 4:
+                print(f"❌ Validation failed: Team set {team_set} has {len(pods)} pods (expected 4)")
+                return False
+
+            # Verify each team has exactly 1 player per pod
+            for team in team_set:
+                for pod in pods:
+                    team_players_in_pod = [p for p in pod if p['Team Name'] == team]
+                    if len(team_players_in_pod) != 1:
+                        print(f"❌ Validation failed: {team} has {len(team_players_in_pod)} players in a pod")
+                        return False
+
+        return True

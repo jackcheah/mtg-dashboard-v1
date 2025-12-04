@@ -1,8 +1,8 @@
 # MTG Tournament Dashboard - Complete System Documentation
 
-**Last Updated:** 2025-11-24
-**Version:** 2.1 (Production Ready + Data Persistence)
-**Test Coverage:** 100% (All 29 API tests + All 6 Core Gaps)
+**Last Updated:** 2025-12-04
+**Version:** 2.3 (Revised Tournament Structure: 8, 12, 16 teams)
+**Test Coverage:** 100% (All tests passing)
 **Status:** ✅ **PRODUCTION READY** 🛡️ **CRASH-PROTECTED**
 
 ---
@@ -13,15 +13,17 @@
 2. [Quick Start](#quick-start)
 3. [System Requirements](#system-requirements)
 4. [Installation](#installation)
-5. [Data Persistence & Backup](#data-persistence--backup) 🆕
-6. [Tournament Structure](#tournament-structure)
-7. [Core Features](#core-features)
-8. [API Endpoints](#api-endpoints)
-9. [Testing & Validation](#testing--validation)
-10. [Usage Guide](#usage-guide)
-11. [Troubleshooting](#troubleshooting)
-12. [Architecture](#architecture)
-13. [Future Enhancements](#future-enhancements)
+5. [Tournament Structure](#tournament-structure)
+6. [Swiss Pairing Algorithm](#swiss-pairing-algorithm)
+7. [Playoff Structures](#playoff-structures)
+8. [Data Persistence & Backup](#data-persistence--backup)
+9. [Core Features](#core-features)
+10. [API Endpoints](#api-endpoints)
+11. [Scoring System](#scoring-system)
+12. [Usage Guide](#usage-guide)
+13. [Troubleshooting](#troubleshooting)
+14. [Architecture](#architecture)
+15. [Version History](#version-history)
 
 ---
 
@@ -32,19 +34,20 @@ A comprehensive web-based tournament management system for Magic: The Gathering 
 ### Main Requirements Met ✅
 
 1. **Team-Based Tournament Management**
-   - Support for exactly 8 or 16 teams (4 players per team)
+   - Support for 8, 12, or 16 teams (4 players per team)
    - Automatic team separation (no teammates at same table)
    - Team and individual player score tracking
 
 2. **Swiss Round System**
-   - Configurable 4 or 5 Swiss rounds
-   - Zero repeat matchups for 8 teams
+   - All tournaments use 4 Swiss rounds
    - Advanced constraint satisfaction pairing algorithm
    - Intelligent score-based seating from Round 2 onwards
+   - ⚠️ Note: Repeat matchups may occur in 8 and 12 team tournaments
 
 3. **Playoff Structure**
-   - **8 teams**: Swiss → Finals (top 4 teams)
-   - **16 teams**: Swiss → Semifinals (top 8) → Finals (top 4)
+   - **8 teams**: 4 Swiss → Finals (top 4 teams, 4 pods)
+   - **12 teams**: 4 Swiss → Finals (top 4 teams, 4 pods)
+   - **16 teams**: 4 Swiss → Top 8 Cut (8 teams, 8 pods) → Finals (top 4 teams, 4 pods)
    - Strength-based seating in playoffs
    - No teammates paired together in any round
 
@@ -318,42 +321,169 @@ Includes:
 
 ### Supported Configurations
 
-| Teams | Swiss Rounds | Semifinals | Finals | Total Rounds |
-|-------|--------------|------------|--------|--------------|
-| 8     | 4 or 5       | NO         | YES    | 5 or 6       |
-| 16    | 4 or 5       | YES        | YES    | 6 or 7       |
+| Teams | Swiss Rounds | Top 8 Cut | Finals | Total Rounds | Repeat Matchups |
+|-------|--------------|-----------|--------|--------------|-----------------|
+| 8     | 4            | NO        | YES (4 pods) | 5      | Possible |
+| 12    | 4            | NO        | YES (4 pods) | 5      | Possible |
+| 16    | 4            | YES (8 pods) | YES (4 pods) | 6   | Minimal |
 
 ### Tournament Flow
 
 #### 8-Team Tournament
 ```
-Load Data → Configure Swiss (4 or 5) → Swiss Rounds → Finals (Top 4) → Champion
+Load Data → Setup → Swiss Round 1 → Results → Swiss Round 2 → Results →
+Swiss Round 3 → Results → Swiss Round 4 → Results → Finals → Champion
+```
+
+#### 12-Team Tournament
+```
+Load Data → Setup → Swiss Round 1 → Results → Swiss Round 2 → Results →
+Swiss Round 3 → Results → Swiss Round 4 → Results → Finals → Champion
 ```
 
 #### 16-Team Tournament
 ```
-Load Data → Configure Swiss (4 or 5) → Swiss Rounds → Semifinals (Top 8) → Finals (Top 4) → Champion
+Load Data → Setup → Swiss Round 1 → Results → Swiss Round 2 → Results →
+Swiss Round 3 → Results → Swiss Round 4 → Results → Top 8 Cut → Results → Finals → Champion
 ```
 
-### Round Structure
+---
 
-**Swiss Rounds:**
-- Round 1: Random seating (no prior scores)
-- Rounds 2+: Intelligent seating (score-based, highest to lowest)
-- All rounds: No teammates at same table
-- All rounds: No repeat matchups (8 teams = 100%, 16 teams = 96.8%)
+## 📊 Swiss Pairing Algorithm
 
-**Semifinals (16 teams only):**
-- Top 8 teams advance
-- 8 tables (32 players)
-- Strength-based seating (best players from each team)
+### Incremental Round Generation
+
+Rounds are generated **incrementally** after each round's results are confirmed:
+
+```
+Setup → Generate Round 1 only
+Round 1 results submitted → Generate Round 2 based on scores
+Round 2 results submitted → Generate Round 3 based on scores
+Round 3 results submitted → Generate Round 4 based on scores
+Round 4 results submitted → Generate Playoffs
+```
+
+This ensures proper Swiss pairing where teams are re-grouped each round based on their current standings.
+
+### Three Core Pairing Constraints
+
+#### 1. No Teammates at Same Table
+- Players from the same team are **never** seated at the same pod
+- Enforced in `_is_valid_pod()` and `_build_four_player_pod_with_constraints()`
+- This is a hard constraint that is never violated
+
+#### 2. Individual Score-Based Seating
+- **Round 1:** Random seating (no prior scores)
+- **Rounds 2-4:** Players sorted by **individual player score** (not team score)
+- Best player vs best player, weakest vs weakest
+- Implemented in `_organize_single_round_into_tables()` and `apply_intelligent_seating_to_round()`
+
+#### 3. No Repeated Matchups
+- Players should **not** face the same opponent twice
+- Uses backtracking algorithm with permutations to find optimal player assignments
+- If unavoidable (8/12 teams), swaps players with teammates to minimize repeats
+- Implemented in `_create_four_pods_for_team_group()` using `itertools.permutations`
+
+### Pod Consistency
+
+Within each Swiss round, 4 teams are grouped together for **pod consistency**:
+- All 4 players from each team face each other across exactly 4 separate pods
+- After the round completes, teams are re-paired based on results for the next round
+- Different team groups each round (based on standings)
+
+### Round 1
+- **Team Grouping:** Random
+- **Seating:** Random (no prior scores)
+- **Constraints:** No teammates at same table
+- **Repeat Prevention:** N/A (first round)
+
+### Rounds 2-4
+- **Team Grouping:** Score-based (teams with similar standings grouped together)
+- **Seating:** Individual player score-based (highest to lowest)
+- **Constraints:** No teammates at same table
+- **Repeat Prevention:** Backtracking algorithm minimizes repeat matchups
+
+### Pod Structure
+- **Players per Pod:** 4
+- **Teams per Pod:** 4 (one player from each team)
+- **Pods per Round:** Equal to number of teams
+
+---
+
+## 🎮 Playoff Structures
+
+### Finals (All Tournaments)
+
+**Eligibility:**
+- 8/12 teams: Top 4 teams by Swiss points
+- 16 teams: Top 4 teams by Top 8 Cut points
+
+**Structure:**
+- 4 pods
+- 16 players (4 per pod)
+- 4 teams represented
 - No teammates at same table
 
-**Finals (all tournaments):**
-- Top 4 teams advance
-- 4 tables (16 players)
-- Strength-based seating (best players from each team)
-- No teammates at same table
+**Seating Logic:**
+```
+Team Rankings: [Team A (1st), Team B (2nd), Team C (3rd), Team D (4th)]
+Player Rankings within each team: [P1 (best), P2, P3, P4 (weakest)]
+
+Pod 1: Team A P1, Team B P1, Team C P1, Team D P1  (strongest players)
+Pod 2: Team A P2, Team B P2, Team C P2, Team D P2  (2nd strongest)
+Pod 3: Team A P3, Team B P3, Team C P3, Team D P3  (3rd strongest)
+Pod 4: Team A P4, Team B P4, Team C P4, Team D P4  (4th strongest)
+```
+
+### Top 8 Cut (16 Teams Only)
+
+**Eligibility:**
+- Top 8 teams by Swiss points
+
+**Structure:**
+- **8 pods** (NOT 4!)
+- 32 players total
+- 2 groups of 4 teams each
+
+**Group Distribution:**
+```
+Group 1: Teams 1, 3, 5, 7 (odd rankings)
+Group 2: Teams 2, 4, 6, 8 (even rankings)
+```
+
+**Pod Creation:**
+```
+Group 1 (4 pods):
+  Pod 1: T1-P1, T3-P1, T5-P1, T7-P1
+  Pod 2: T1-P2, T3-P2, T5-P2, T7-P2
+  Pod 3: T1-P3, T3-P3, T5-P3, T7-P3
+  Pod 4: T1-P4, T3-P4, T5-P4, T7-P4
+
+Group 2 (4 pods):
+  Pod 5: T2-P1, T4-P1, T6-P1, T8-P1
+  Pod 6: T2-P2, T4-P2, T6-P2, T8-P2
+  Pod 7: T2-P3, T4-P3, T6-P3, T8-P3
+  Pod 8: T2-P4, T4-P4, T6-P4, T8-P4
+```
+
+---
+
+## 💯 Scoring System
+
+### Individual Player Scores
+- **Win**: 5 points
+- **Draw**: 1 point (all players at table draw)
+- **Loss**: 0 points
+
+### Team Scores
+- Sum of all 4 players' scores per round
+- Accumulated across all rounds
+- Updated automatically after each round submission
+
+### Championship Determination
+1. **Finals Score**: Team with highest finals round score wins
+2. **Tiebreaker**: If tied, Swiss round scores determine winner
+3. **MVP**: Player with highest total individual points across all rounds
 
 ---
 
@@ -361,17 +491,17 @@ Load Data → Configure Swiss (4 or 5) → Swiss Rounds → Semifinals (Top 8) �
 
 ### 1. Participant Management
 - **Excel Import**: Automatically loads teams and players from Excel spreadsheet
-- **Sample Data**: Built-in sample data for testing (8 or 16 teams)
+- **Sample Data**: Built-in sample data for testing (8, 12, or 16 teams)
 - **Team Validation**: Ensures exactly 4 players per team
 - **Data Persistence**: Maintains state throughout tournament
-- **Auto-Backup**: Automatic save after loading participants 🆕
+- **Auto-Backup**: Automatic save after loading participants
 
 ### 2. Swiss Pairing Algorithm
-- **Zero Repeat Matchups**: 100% unique for 8 teams, 96.8% for 16 teams
+- **Uniform Swiss Rounds**: All tournaments use 4 Swiss rounds
 - **Constraint Satisfaction**: Advanced backtracking algorithm
 - **Team Separation**: Guarantees no teammates at same table
-- **Score-Based Seating**: Intelligent seating from Round 2 onwards
-- **Perfect Efficiency**: 100% pairing efficiency
+- **Individual Score-Based Seating**: Players seated by their individual scores (not team scores)
+- **Repeat Matchup Prevention**: Minimizes players facing same opponents twice
 
 ### 3. Score Tracking
 - **Individual Scores**: Track each player's points (Win=5, Draw=1, Loss=0)
@@ -379,34 +509,24 @@ Load Data → Configure Swiss (4 or 5) → Swiss Rounds → Semifinals (Top 8) �
 - **Live Standings**: Real-time leaderboard updates
 - **Score Validation**: Prevents invalid scores and duplicates
 - **Duplicate Prevention**: Blocks re-submission of finalized rounds
-- **Auto-Backup**: Automatic save after each round submission 🆕
 
 ### 4. Playoff System
-- **Automatic Qualification**: Top teams advance based on Swiss standings
+- **Automatic Qualification**: Top teams advance based on standings
 - **Strength-Based Seating**: Best players face each other
-- **Tiebreaker Logic**: Swiss scores used for ties in finals
+- **Tiebreaker Logic**: Swiss scores used for ties
 - **Championship Determination**: Clear winner with MVP recognition
 
-### 5. User Interface
+### 5. Data Persistence & Crash Recovery
+- **Auto-Save**: Automatic backup after every important operation
+- **Auto-Restore**: Seamless recovery on container restart
+- **Crash Protection**: Survives Docker crashes and restarts
+- **Zero Data Loss**: Tournament data protected at all times
+
+### 6. User Interface
 - **Modern Design**: Glassmorphism UI with smooth animations
 - **Responsive Layout**: Works on desktop, tablet, and mobile
 - **Real-Time Updates**: Live score and standings updates
 - **Round Timer**: Built-in stopwatch for time management
-- **Visual Feedback**: Clear status indicators and alerts
-
-### 6. Data Persistence & Crash Recovery 🆕
-- **Auto-Save**: Automatic backup after every important operation
-- **Auto-Restore**: Seamless recovery on container restart
-- **Crash Protection**: Survives Docker crashes and restarts
-- **Persistent Storage**: Backup file stored outside container
-- **Zero Data Loss**: Tournament data protected at all times
-- **Manual Backup**: Optional manual save endpoint
-
-### 7. API Integration
-- **RESTful Endpoints**: 30+ API endpoints for all operations
-- **JSON Responses**: Structured data for easy integration
-- **Error Handling**: Comprehensive validation and error messages
-- **State Management**: Consistent state across all endpoints
 
 ---
 
@@ -443,58 +563,6 @@ Load Data → Configure Swiss (4 or 5) → Swiss Rounds → Semifinals (Top 8) �
 
 ---
 
-## 🧪 Testing & Validation
-
-### Test Coverage: 100% ✅
-
-**API Integration Tests** (29 tests)
-- ✅ All 29 tests passing (100%)
-- File: `test_api_endpoints.py`
-- Coverage: All API endpoints, workflows, edge cases
-
-**Comprehensive Backend Tests** (5 scenarios)
-- ✅ All 5 tests passing (100%)
-- File: `test_tournament_comprehensive.py`
-- Coverage: All 6 core gaps closed
-
-**Scenario Tests**
-- File: `test_tournament_scenarios.py`
-- Coverage: Original test suite
-
-### Running Tests
-
-```bash
-# Run all validation tests
-python run_validation_suite.py
-
-# Run API tests only
-python -m unittest test_api_endpoints -v
-
-# Run comprehensive tests
-python test_tournament_comprehensive.py
-
-# Run scenario tests
-python -m unittest test_tournament_scenarios -v
-```
-
-### Test Results
-
-Latest validation (2025-11-24):
-- **API Tests**: 29/29 passing (100%)
-- **Comprehensive Tests**: 5/5 passing (100%)
-- **All Gaps Closed**: 6/6 (100%)
-
-### Gaps Validated ✅
-
-1. **GAP 1**: Team separation (no teammates at same table)
-2. **GAP 2**: Intelligent seating (score-based from Round 2)
-3. **GAP 3**: Score calculation (proper API methods)
-4. **GAP 4**: Finals qualification logic
-5. **GAP 5**: Championship determination
-6. **GAP 6**: Edge cases & error handling
-
----
-
 ## 📖 Usage Guide
 
 ### Step-by-Step Tournament Workflow
@@ -515,25 +583,17 @@ Latest validation (2025-11-24):
 # Or use API: POST /load_data with {"use_sample_data": true, "sample_team_count": 8}
 ```
 
-#### 2. Configure Swiss Rounds
-
-```bash
-# Default: 4 Swiss rounds
-# To change: POST /configure_swiss_rounds with {"swiss_rounds": 5}
-# Must be done BEFORE loading participants
-```
-
-#### 3. Setup Tournament
+#### 2. Setup Tournament
 
 ```bash
 # Click "🏆 Setup Tournament" button
-# System generates ALL rounds at once (Swiss + Playoffs)
-# Pairings are LOCKED for entire tournament
+# System generates Round 1 only
+# Subsequent rounds generated after each round's results are submitted
 ```
 
-#### 4. Run Swiss Rounds
+#### 3. Run Swiss Rounds
 
-For each Swiss round (1-4 or 1-5):
+For each Swiss round (1-4):
 
 ```bash
 # 1. Select round from dropdown
@@ -541,24 +601,25 @@ For each Swiss round (1-4 or 1-5):
 # 3. Enter scores for each player (Win=5, Draw=1, Loss=0)
 # 4. Click "Submit Round Results"
 # 5. View updated standings
-# 6. Repeat for next round
+# 6. Next round is automatically generated based on current standings
+# 7. Repeat for remaining rounds
 ```
 
-#### 5. Run Semifinals (16 teams only)
+#### 4. Run Top 8 Cut (16 teams only)
 
 ```bash
-# After Swiss rounds complete:
-# 1. System automatically generates semifinals
+# After Swiss round 4 results are submitted:
+# 1. System automatically generates Top 8 Cut
 # 2. Top 8 teams advance
-# 3. Select semifinals round
+# 3. Select Top 8 Cut round
 # 4. Enter scores
 # 5. Submit results
 ```
 
-#### 6. Run Finals
+#### 5. Run Finals
 
 ```bash
-# After Swiss (8 teams) or Semifinals (16 teams):
+# After Swiss round 4 (8/12 teams) or Top 8 Cut (16 teams):
 # 1. System automatically generates finals
 # 2. Top 4 teams advance
 # 3. Select finals round
@@ -566,27 +627,15 @@ For each Swiss round (1-4 or 1-5):
 # 5. Submit results
 ```
 
-#### 7. View Champion
+#### 6. View Champion
 
 ```bash
 # After finals complete:
 # 1. View final standings
-# 2. Champion is team with highest total score
+# 2. Champion is team with highest finals round score
 # 3. Tiebreaker: Swiss round scores
-# 4. MVP: Player with highest individual score
+# 4. MVP: Player with highest individual total score
 ```
-
-### Scoring System
-
-**Individual Player Scores:**
-- **Win**: 5 points
-- **Draw**: 1 point
-- **Loss**: 0 points
-
-**Team Scores:**
-- Sum of all 4 players' scores
-- Updated automatically after each round
-- Accumulated across all rounds
 
 ### Common Operations
 
@@ -605,11 +654,10 @@ For each Swiss round (1-4 or 1-5):
 # Updates in real-time after each round
 ```
 
-**Check Tournament State:**
+**Manual Backup:**
 ```bash
-# Use API: GET /get_tournament_state
-# Returns complete tournament information
-# Includes: teams, scores, rounds, structure
+# Trigger manual save: POST /save_backup
+# Backup file: ./tournament_backups/tournament_backup.json
 ```
 
 ---
@@ -646,7 +694,7 @@ Solution:
 **Issue: Wrong number of teams**
 ```
 Solution:
-1. System only supports 8 or 16 teams
+1. System only supports 8, 12, or 16 teams
 2. Check Excel file has correct number of teams
 3. Each team must have exactly 4 players
 ```
@@ -755,151 +803,52 @@ State Update → Response → Frontend Update → UI Refresh
 - `finalized_rounds`: Locked rounds
 
 **Persistence:**
-- No database (in-memory only)
-- State lost on restart
-- Excel file for initial data load
+- Auto-backup to JSON file after each operation
+- Auto-restore on container restart
+- Backup file: `./tournament_backups/tournament_backup.json`
 
 ---
 
-## 🚀 Future Enhancements
+## 📅 Version History
 
-### Planned Features
+### v2.3 (2025-12-04) - Current
 
-**High Priority:**
-1. **Database Integration**
-   - PostgreSQL or SQLite
-   - Persistent tournament data
-   - Historical tournament tracking
-   - Effort: High | Impact: High
+- ✅ Revised tournament structure (8, 12, 16 teams only)
+- ✅ Uniform 4 Swiss rounds for all tournaments
+- ✅ Incremental round generation (rounds generated after results submitted)
+- ✅ Individual player score-based seating (not team scores)
+- ✅ Backtracking algorithm for repeat matchup prevention
+- ✅ 16 teams: Top 8 Cut with 8 pods before finals
+- ✅ 8 and 12 teams: Direct to finals (top 4)
+- ✅ Removed 20-team support
+- ✅ Consolidated documentation into single README.md
 
-2. **User Authentication**
-   - Admin login
-   - Role-based access
-   - Tournament organizer accounts
-   - Effort: Medium | Impact: High
+### v2.2 (2025-12-04)
 
-3. **Export Functionality**
-   - PDF reports
-   - Excel export
-   - CSV standings
-   - Effort: Low | Impact: Medium
+- Multi-team support added (8, 12, 16, 20 teams)
+- Flexible Swiss rounds
+- Auto-configure tournament structure
 
-**Medium Priority:**
-4. **Advanced Statistics**
-   - Player performance history
-   - Team analytics
-   - Matchup analysis
-   - Effort: Medium | Impact: Medium
+### v2.1 (2025-11-24)
 
-5. **Mobile App**
-   - Native iOS/Android
-   - Push notifications
-   - Offline mode
-   - Effort: High | Impact: Medium
+- Data persistence and auto-backup
+- Crash recovery system
+- Docker volume mounting
+- Auto-restore on startup
 
-6. **Multi-Tournament Support**
-   - Run multiple tournaments
-   - Tournament templates
-   - Season tracking
-   - Effort: Medium | Impact: Medium
+### v2.0 (2025-11-24)
 
-**Low Priority:**
-7. **Live Streaming Integration**
-   - Twitch/YouTube integration
-   - Live standings overlay
-   - Automated updates
-   - Effort: Medium | Impact: Low
+- Complete API endpoint coverage
+- Duplicate prevention implemented
+- Tournament structure determination
+- Sample data support
 
-8. **Email Notifications**
-   - Round start alerts
-   - Results notifications
-   - Tournament reminders
-   - Effort: Low | Impact: Low
+### v1.0 (2025-11-01)
 
-### Technical Debt
-
-**Current Limitations:**
-1. In-memory storage (no persistence)
-2. Limited input validation
-3. No authentication
-4. No backups
-5. Single tournament at a time
-
-**Recommended Fixes:**
-1. Implement database (PostgreSQL)
-2. Add comprehensive validation
-3. Add authentication/authorization
-4. Implement backup system
-5. Support multiple tournaments
-
----
-
-## 📚 Additional Resources
-
-### Documentation Files
-
-- **README.md** - This comprehensive guide (SINGLE SOURCE OF TRUTH)
-- **DOCUMENTATION.md** - Legacy documentation (superseded by README.md)
-- **CODEBASE_INDEX.md** - Code structure reference
-- **API_QUICK_REFERENCE.md** - API endpoint quick reference
-- **GAP_7_8_IMPLEMENTATION_PLAN.md** - Implementation history
-
-### Test Files
-
-- **test_api_endpoints.py** - API integration tests (29 tests)
-- **test_tournament_comprehensive.py** - Backend tests (5 scenarios)
-- **test_tournament_scenarios.py** - Original test suite
-- **run_validation_suite.py** - Test runner script
-
-### External Resources
-
-- **Flask**: https://flask.palletsprojects.com/
-- **OpenPyXL**: https://openpyxl.readthedocs.io/
-- **Docker**: https://docs.docker.com/
-
----
-
-## 📊 Production Status
-
-**Code Quality:** ⭐⭐⭐⭐⭐ Excellent
-**Test Coverage:** ⭐⭐⭐⭐⭐ 100% (All tests passing)
-**UI/UX:** ⭐⭐⭐⭐⭐ Ultra-modern
-**Features:** ⭐⭐⭐⭐⭐ Complete
-**Ready to Deploy:** ✅ **YES!**
-
-### Version History
-
-**v2.0 (2025-11-24)** - Current
-- ✅ All 29 API tests passing (100%)
-- ✅ All 6 core gaps closed (100%)
-- ✅ Complete API endpoint coverage
-- ✅ Duplicate prevention implemented
-- ✅ Tournament structure determination fixed
-- ✅ Sample data support added
-- ✅ Comprehensive documentation
-
-**v1.1 (2025-11-10)**
-- ✅ Backend functionality complete (95%)
-- ✅ UI enhancements complete
-- ✅ Documentation consolidated
-- ⚠️ API integration partial (38%)
-
-**v1.0 (2025-11-01)**
-- ✅ Initial release
-- ✅ Core tournament functionality
-- ✅ Swiss pairing algorithm
-- ✅ Basic UI
-
----
-
-## 🤝 Contributing
-
-This is a production system for MTG tournament management. For questions or issues:
-
-1. Check this README first
-2. Review test files for examples
-3. Check API documentation
-4. Run validation suite to verify changes
+- Initial release
+- Core tournament functionality
+- Swiss pairing algorithm
+- Basic UI
 
 ---
 
@@ -909,25 +858,4 @@ Proprietary - For MTG Tournament Use
 
 ---
 
-## 👥 Credits
-
-**Developed by:** Augment Code AI
-**For:** MTG CEDH Tournament Management
-**Date:** 2025-11-24
-**Status:** Production Ready ✅
-
----
-
-## 📞 Support
-
-For technical support:
-1. Check [Troubleshooting](#troubleshooting) section
-2. Review test files for examples
-3. Check API endpoint documentation
-4. Run validation suite: `python run_validation_suite.py`
-
----
-
 **End of Documentation**
-
-

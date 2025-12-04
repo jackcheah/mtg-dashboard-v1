@@ -1774,6 +1774,11 @@
             margin: 0 auto;
         }
 
+        .bracket-grid.top8cut {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        /* Legacy support */
         .bracket-grid.semifinals {
             grid-template-columns: repeat(2, 1fr);
         }
@@ -1881,6 +1886,7 @@
         }
 
         @media (max-width: 768px) {
+            .bracket-grid.top8cut,
             .bracket-grid.semifinals {
                 grid-template-columns: 1fr;
             }
@@ -2843,9 +2849,12 @@
             const selectedOption = roundSelect.options[roundSelect.selectedIndex];
             const roundText = selectedOption ? selectedOption.textContent : '';
 
-            // Check if it's labeled as Semifinals or Finals
-            if (roundText.includes('Semifinals')) {
-                return 'semifinals';
+            // Check if it's labeled as Top 8 Cut or Finals
+            if (roundText.includes('Top 8 Cut')) {
+                return 'top8cut';
+            } else if (roundText.includes('Semifinals')) {
+                // Legacy support
+                return 'top8cut';
             } else if (roundText.includes('Finals')) {
                 return 'finals';
             } else if (roundNum <= swissRounds) {
@@ -2875,12 +2884,12 @@
                 roundSelect.appendChild(option);
             }
 
-            // Add Semifinals if applicable (16 teams)
+            // Add Top 8 Cut if applicable (16 teams only)
             if (hasSemifinals) {
-                const semifinalsOption = document.createElement('option');
-                semifinalsOption.value = swissRounds + 1;
-                semifinalsOption.textContent = 'Semifinals';
-                roundSelect.appendChild(semifinalsOption);
+                const top8Option = document.createElement('option');
+                top8Option.value = swissRounds + 1;
+                top8Option.textContent = 'Top 8 Cut';
+                roundSelect.appendChild(top8Option);
 
                 // Add Finals
                 const finalsOption = document.createElement('option');
@@ -2888,7 +2897,7 @@
                 finalsOption.textContent = 'Finals';
                 roundSelect.appendChild(finalsOption);
             } else {
-                // No semifinals (8 teams) - Finals directly after Swiss
+                // No Top 8 Cut (8 or 12 teams) - Finals directly after Swiss
                 const finalsOption = document.createElement('option');
                 finalsOption.value = swissRounds + 1;
                 finalsOption.textContent = 'Finals';
@@ -2901,7 +2910,7 @@
                 roundSelect.value = currentValue;
             }
 
-            console.log(`Round selector updated: ${swissRounds} Swiss rounds, Semifinals: ${hasSemifinals}, Team count: ${teamCount}`);
+            console.log(`Round selector updated: ${swissRounds} Swiss rounds, Has Top 8 Cut: ${hasSemifinals}, Team count: ${teamCount}`);
         }
 
         // Load Participants
@@ -2935,7 +2944,7 @@
                     updateStats(data);
 
                     const structureMsg = hasSemifinals ?
-                        `${teamCount} teams - ${data.swiss_rounds} Swiss rounds → Semifinals → Finals` :
+                        `${teamCount} teams - ${data.swiss_rounds} Swiss rounds → Top 8 Cut → Finals` :
                         `${teamCount} teams - ${data.swiss_rounds} Swiss rounds → Finals`;
                     showToast('Success!', `Loaded ${data.team_count} teams (${data.player_count} players) | ${structureMsg}`, 'success');
                     document.getElementById('empty-state').style.display = 'none';
@@ -2954,7 +2963,7 @@
                         updateStats(data);
 
                         const structureMsg = hasSemifinals ?
-                            `${teamCount} teams - ${data.swiss_rounds} Swiss rounds → Semifinals → Finals` :
+                            `${teamCount} teams - ${data.swiss_rounds} Swiss rounds → Top 8 Cut → Finals` :
                             `${teamCount} teams - ${data.swiss_rounds} Swiss rounds → Finals`;
                         showToast('Sample Data Loaded', `Loaded ${teamCount} sample teams | ${structureMsg}`, 'warning');
                         document.getElementById('empty-state').style.display = 'none';
@@ -3179,8 +3188,8 @@
                     // Determine round type
                     const roundType = getRoundType(parseInt(round));
                     let roundLabel = round;
-                    if (roundType === 'semifinals') {
-                        roundLabel = 'Semifinals';
+                    if (roundType === 'top8cut') {
+                        roundLabel = 'Top 8 Cut';
                     } else if (roundType === 'finals') {
                         roundLabel = 'Finals';
                     }
