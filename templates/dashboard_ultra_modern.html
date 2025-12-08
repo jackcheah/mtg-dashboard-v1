@@ -1,23 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MTG Tournament Dashboard - Ultra Modern</title>
-    
+
     <!-- Google Fonts: Modern Typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+
     <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <style>
         /* ============================================
            ULTRA MODERN UI - 2025 Design System
            ============================================ */
-        
+
         :root {
             /* Modern Color Palette - Deep Purple & Cyan Theme */
             --color-primary: #8b5cf6;
@@ -29,24 +32,24 @@
             --color-success: #10b981;
             --color-danger: #ef4444;
             --color-warning: #f59e0b;
-            
+
             /* Background Gradients */
             --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             --gradient-mesh: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #1e40af 100%);
-            --gradient-card: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
-            
+            --gradient-card: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+
             /* Glassmorphism */
             --glass-bg: rgba(255, 255, 255, 0.1);
             --glass-border: rgba(255, 255, 255, 0.2);
             --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-            
+
             /* Shadows */
             --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
             --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
             --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
             --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
             --shadow-glow: 0 0 20px rgba(139, 92, 246, 0.5);
-            
+
             /* Spacing */
             --spacing-xs: 0.5rem;
             --spacing-sm: 0.75rem;
@@ -54,27 +57,27 @@
             --spacing-lg: 1.5rem;
             --spacing-xl: 2rem;
             --spacing-2xl: 3rem;
-            
+
             /* Border Radius */
             --radius-sm: 0.5rem;
             --radius-md: 0.75rem;
             --radius-lg: 1rem;
             --radius-xl: 1.5rem;
             --radius-full: 9999px;
-            
+
             /* Transitions */
             --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
             --transition-base: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             --transition-slow: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        
+
         /* Reset and Base Styles */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: var(--gradient-mesh);
@@ -84,7 +87,7 @@
             overflow-x: hidden;
             position: relative;
         }
-        
+
         /* Animated Background Particles */
         body::before {
             content: '';
@@ -93,7 +96,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: 
+            background-image:
                 radial-gradient(circle at 20% 50%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
                 radial-gradient(circle at 80% 80%, rgba(6, 182, 212, 0.15) 0%, transparent 50%),
                 radial-gradient(circle at 50% 20%, rgba(245, 158, 11, 0.1) 0%, transparent 50%);
@@ -101,12 +104,19 @@
             pointer-events: none;
             z-index: 0;
         }
-        
+
         @keyframes float {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(2deg); }
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-20px) rotate(2deg);
+            }
         }
-        
+
         /* Container */
         .container {
             max-width: 1400px;
@@ -115,7 +125,7 @@
             position: relative;
             z-index: 1;
         }
-        
+
         /* Expand container width on large screens */
         @media (min-width: 1024px) {
             .container {
@@ -123,14 +133,14 @@
                 padding: var(--spacing-lg) !important;
             }
         }
-        
+
         @media (min-width: 1600px) {
             .container {
                 max-width: 98% !important;
                 padding: var(--spacing-md) !important;
             }
         }
-        
+
         /* Header with Glassmorphism */
         .header {
             background: var(--glass-bg);
@@ -145,7 +155,7 @@
             position: relative;
             overflow: hidden;
         }
-        
+
         /* Animated gradient overlay for header */
         .header::before {
             content: '';
@@ -154,18 +164,24 @@
             left: -100%;
             width: 200%;
             height: 100%;
-            background: linear-gradient(90deg, 
-                transparent 0%, 
-                rgba(255,255,255,0.1) 50%, 
-                transparent 100%);
+            background: linear-gradient(90deg,
+                    transparent 0%,
+                    rgba(255, 255, 255, 0.1) 50%,
+                    transparent 100%);
             animation: shine 3s ease-in-out infinite;
         }
-        
+
         @keyframes shine {
-            0% { left: -100%; }
-            50%, 100% { left: 100%; }
+            0% {
+                left: -100%;
+            }
+
+            50%,
+            100% {
+                left: 100%;
+            }
         }
-        
+
         .header h1 {
             font-size: clamp(1.75rem, 4vw, 3rem);
             font-weight: 800;
@@ -177,15 +193,15 @@
             position: relative;
             z-index: 1;
         }
-        
+
         .header p {
             font-size: var(--text-lg);
-            color: rgba(255,255,255,0.8);
+            color: rgba(255, 255, 255, 0.8);
             font-weight: 500;
             position: relative;
             z-index: 1;
         }
-        
+
         /* Timer Display - Compact Horizontal Layout */
         .timer-section {
             background: var(--glass-bg);
@@ -263,7 +279,7 @@
         .timer-section .active-round-controls.visible {
             display: grid;
         }
-        
+
         /* Modern Button System */
         .btn {
             font-family: 'Inter', sans-serif;
@@ -281,7 +297,7 @@
             overflow: hidden;
             box-shadow: var(--shadow-md);
         }
-        
+
         .btn::before {
             content: '';
             position: absolute;
@@ -290,76 +306,76 @@
             width: 0;
             height: 0;
             border-radius: 50%;
-            background: rgba(255,255,255,0.3);
+            background: rgba(255, 255, 255, 0.3);
             transform: translate(-50%, -50%);
             transition: width 0.6s, height 0.6s;
         }
-        
+
         .btn:hover::before {
             width: 300px;
             height: 300px;
         }
-        
+
         .btn:active {
             transform: scale(0.98);
         }
-        
+
         .btn i {
             font-size: var(--text-lg);
             position: relative;
             z-index: 1;
         }
-        
+
         .btn span {
             position: relative;
             z-index: 1;
         }
-        
+
         .btn-primary {
             background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
             color: white;
         }
-        
+
         .btn-primary:hover {
             box-shadow: 0 0 30px rgba(139, 92, 246, 0.6);
             transform: translateY(-2px);
         }
-        
+
         .btn-success {
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: white;
         }
-        
+
         .btn-success:hover {
             box-shadow: 0 0 30px rgba(16, 185, 129, 0.6);
             transform: translateY(-2px);
         }
-        
+
         .btn-danger {
             background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
             color: white;
         }
-        
+
         .btn-danger:hover {
             box-shadow: 0 0 30px rgba(239, 68, 68, 0.6);
             transform: translateY(-2px);
         }
-        
+
         .btn-warning {
             background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
             color: white;
         }
-        
+
         .btn-warning:hover {
             box-shadow: 0 0 30px rgba(245, 158, 11, 0.6);
             transform: translateY(-2px);
         }
-        
+
         .btn-secondary {
             background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
             color: white;
         }
-        
+
         .btn-secondary:hover {
             box-shadow: 0 0 20px rgba(107, 114, 128, 0.6);
             transform: translateY(-2px);
@@ -448,7 +464,7 @@
             transform: translateY(-2px);
         }
 
-        .radio-option input[type="radio"]:checked ~ .radio-content {
+        .radio-option input[type="radio"]:checked~.radio-content {
             background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(6, 182, 212, 0.2));
             border-color: var(--color-primary);
             box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
@@ -465,7 +481,7 @@
             transition: var(--transition-base);
         }
 
-        .radio-option input[type="radio"]:checked ~ .radio-content .radio-check {
+        .radio-option input[type="radio"]:checked~.radio-content .radio-check {
             background: var(--color-primary);
             border-color: var(--color-primary);
         }
@@ -477,7 +493,7 @@
             transition: var(--transition-fast);
         }
 
-        .radio-option input[type="radio"]:checked ~ .radio-content .radio-check i {
+        .radio-option input[type="radio"]:checked~.radio-content .radio-check i {
             opacity: 1;
         }
 
@@ -564,7 +580,8 @@
 
         /* Active Round Controls - Compact inline layout */
         .active-round-controls {
-            display: none; /* Hidden until tournament starts */
+            display: none;
+            /* Hidden until tournament starts */
             grid-template-columns: 1fr auto;
             gap: var(--spacing-md);
             align-items: center;
@@ -598,20 +615,20 @@
             gap: var(--spacing-md);
             margin-bottom: var(--spacing-lg);
         }
-        
+
         /* Round Selector - Modern Dropdown */
         .round-selector {
             position: relative;
         }
-        
+
         .round-selector select {
             width: 100%;
             padding: var(--spacing-md) var(--spacing-lg);
             font-family: 'Inter', sans-serif;
             font-size: var(--text-base);
             font-weight: 600;
-            background: rgba(255,255,255,0.1);
-            border: 2px solid rgba(255,255,255,0.2);
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
             border-radius: var(--radius-lg);
             color: white;
             cursor: pointer;
@@ -623,24 +640,24 @@
             background-size: 20px;
             padding-right: var(--spacing-2xl);
         }
-        
+
         .round-selector select:hover {
             border-color: var(--color-primary-light);
-            background: rgba(255,255,255,0.15);
+            background: rgba(255, 255, 255, 0.15);
         }
-        
+
         .round-selector select:focus {
             outline: none;
             border-color: var(--color-primary);
             box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.3);
         }
-        
+
         .round-selector option {
             background: #1e1b4b;
             color: white;
             padding: var(--spacing-md);
         }
-        
+
         /* Stats Cards Grid */
         .stats-grid {
             display: grid;
@@ -648,7 +665,7 @@
             gap: var(--spacing-lg);
             margin-bottom: var(--spacing-xl);
         }
-        
+
         .stat-card {
             background: var(--glass-bg);
             backdrop-filter: blur(20px) saturate(180%);
@@ -660,7 +677,7 @@
             position: relative;
             overflow: hidden;
         }
-        
+
         .stat-card::before {
             content: '';
             position: absolute;
@@ -670,21 +687,21 @@
             height: 3px;
             background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
         }
-        
+
         .stat-card:hover {
             transform: translateY(-4px);
             box-shadow: var(--shadow-xl), var(--shadow-glow);
         }
-        
+
         .stat-label {
             font-size: var(--text-sm);
-            color: rgba(255,255,255,0.7);
+            color: rgba(255, 255, 255, 0.7);
             font-weight: 500;
             margin-bottom: var(--spacing-sm);
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
-        
+
         .stat-value {
             font-size: var(--text-3xl);
             font-weight: 800;
@@ -693,12 +710,12 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
-        
+
         /* Teams Display - Card Grid */
         .teams-section {
             margin-bottom: var(--spacing-xl);
         }
-        
+
         .section-title {
             font-size: var(--text-2xl);
             font-weight: 700;
@@ -707,55 +724,56 @@
             align-items: center;
             gap: var(--spacing-md);
         }
-        
+
         .section-title i {
             color: var(--color-primary-light);
             font-size: var(--text-3xl);
         }
-        
+
         .teams-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: var(--spacing-lg);
         }
-        
+
         /* Landscape Optimization: Horizontal Layout - Enhanced */
         @media (min-width: 1024px) and (orientation: landscape) {
+
             /* Compact header for landscape */
             .header {
                 padding: var(--spacing-md) var(--spacing-lg);
             }
-            
+
             .header h1 {
                 font-size: var(--text-2xl);
                 margin-bottom: var(--spacing-sm);
             }
-            
+
             .header .subtitle {
                 font-size: var(--text-sm);
             }
-            
+
             /* Compact timer section */
             .timer-section {
                 padding: var(--spacing-md) var(--spacing-lg);
                 margin-bottom: var(--spacing-md);
             }
-            
+
             .timer {
                 font-size: 3rem;
             }
-            
+
             /* Compact controls */
             .controls {
                 padding: var(--spacing-md) var(--spacing-lg);
                 margin-bottom: var(--spacing-md);
             }
-            
+
             .stats-grid {
                 padding: var(--spacing-md) var(--spacing-lg);
                 margin-bottom: var(--spacing-md);
             }
-            
+
             /* Two-column main layout */
             .main-content {
                 display: grid;
@@ -763,7 +781,7 @@
                 gap: var(--spacing-lg);
                 padding: 0 var(--spacing-lg);
             }
-            
+
             .teams-section {
                 grid-column: 1;
                 position: sticky;
@@ -772,36 +790,36 @@
                 overflow-y: auto;
                 padding-right: var(--spacing-sm);
             }
-            
+
             .teams-section::-webkit-scrollbar {
                 width: 6px;
             }
-            
+
             .teams-section::-webkit-scrollbar-thumb {
                 background: var(--color-primary);
                 border-radius: 3px;
             }
-            
+
             .teams-grid {
                 grid-template-columns: 1fr !important;
                 gap: var(--spacing-sm) !important;
             }
-            
+
             .team-card {
                 padding: var(--spacing-md);
             }
-            
+
             .tables-section {
                 grid-column: 2;
             }
-            
+
             /* Tables in 4 columns for better space usage */
             .tables-grid {
                 display: grid !important;
                 grid-template-columns: repeat(4, 1fr) !important;
                 gap: var(--spacing-sm) !important;
             }
-            
+
             /* For Swiss rounds with more tables, keep 4 columns on wide screens */
             @media (min-width: 1600px) {
                 .tables-grid {
@@ -809,31 +827,31 @@
                     gap: var(--spacing-sm) !important;
                 }
             }
-            
+
             @media (min-width: 1800px) {
                 .tables-grid {
                     grid-template-columns: repeat(5, 1fr) !important;
                 }
             }
-            
+
             .table-card {
                 margin-bottom: 0;
             }
-            
+
             /* Compact table cards */
             .table-header {
                 padding: var(--spacing-sm) var(--spacing-md);
                 font-size: var(--text-lg);
             }
-            
+
             .table-players {
                 padding: var(--spacing-sm) var(--spacing-md);
             }
-            
+
             .score-input-container {
                 padding: var(--spacing-md);
             }
-            
+
             .player-score-row {
                 padding: var(--spacing-xs) 0;
             }
@@ -845,6 +863,7 @@
            Reduces whitespace and maximizes content
            ============================================ */
         @media (min-width: 1024px) {
+
             /* Ultra-compact spacing variables for laptops */
             :root {
                 --spacing-xs: 0.25rem;
@@ -1328,7 +1347,7 @@
             position: relative;
             overflow: hidden;
         }
-        
+
         .team-card::before {
             content: '';
             position: absolute;
@@ -1338,28 +1357,28 @@
             height: 100%;
             background: linear-gradient(180deg, var(--color-primary), var(--color-secondary));
         }
-        
+
         .team-card:hover {
             transform: translateY(-4px) scale(1.02);
             box-shadow: var(--shadow-xl), var(--shadow-glow);
             border-color: var(--color-primary-light);
         }
-        
+
         .team-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: var(--spacing-md);
             padding-bottom: var(--spacing-md);
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
-        
+
         .team-name {
             font-size: var(--text-xl);
             font-weight: 700;
             color: white;
         }
-        
+
         .team-score {
             background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
             padding: var(--spacing-sm) var(--spacing-md);
@@ -1368,28 +1387,28 @@
             font-size: var(--text-lg);
             box-shadow: var(--shadow-md);
         }
-        
+
         .player-list {
             display: flex;
             flex-direction: column;
             gap: var(--spacing-sm);
         }
-        
+
         .player-item {
             display: flex;
             align-items: center;
             gap: var(--spacing-sm);
             padding: var(--spacing-sm);
-            background: rgba(255,255,255,0.05);
+            background: rgba(255, 255, 255, 0.05);
             border-radius: var(--radius-sm);
             transition: var(--transition-fast);
         }
-        
+
         .player-item:hover {
-            background: rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.1);
             transform: translateX(4px);
         }
-        
+
         .player-id {
             display: flex;
             align-items: center;
@@ -1402,30 +1421,30 @@
             font-size: var(--text-sm);
             flex-shrink: 0;
         }
-        
+
         .player-name {
-            color: rgba(255,255,255,0.9);
+            color: rgba(255, 255, 255, 0.9);
             font-weight: 500;
         }
-        
+
         .player-score {
             margin-left: auto;
             font-weight: 700;
             color: var(--color-accent);
             font-size: var(--text-lg);
         }
-        
+
         /* Tables Display - Modern Cards */
         .tables-section {
             margin-bottom: var(--spacing-xl);
         }
-        
+
         .tables-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
             gap: var(--spacing-lg);
         }
-        
+
         .table-card {
             background: var(--glass-bg);
             backdrop-filter: blur(20px) saturate(180%);
@@ -1435,12 +1454,12 @@
             box-shadow: var(--shadow-lg);
             transition: var(--transition-base);
         }
-        
+
         .table-card:hover {
             transform: translateY(-4px);
             box-shadow: var(--shadow-xl), 0 0 30px rgba(139, 92, 246, 0.3);
         }
-        
+
         .table-header {
             font-size: var(--text-xl);
             font-weight: 700;
@@ -1450,19 +1469,19 @@
             gap: var(--spacing-sm);
             color: var(--color-primary-light);
         }
-        
+
         .table-header i {
             font-size: var(--text-2xl);
         }
-        
+
         .table-players {
             display: flex;
             flex-direction: column;
             gap: var(--spacing-sm);
         }
-        
+
         .table-player {
-            background: rgba(255,255,255,0.05);
+            background: rgba(255, 255, 255, 0.05);
             padding: var(--spacing-md);
             border-radius: var(--radius-sm);
             border-left: 3px solid var(--color-primary);
@@ -1474,7 +1493,7 @@
         }
 
         .table-player:hover {
-            background: rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.1);
             border-left-color: var(--color-secondary);
             transform: translateX(4px);
         }
@@ -1503,7 +1522,7 @@
 
         .table-player-team {
             font-size: var(--text-sm);
-            color: rgba(255,255,255,0.6);
+            color: rgba(255, 255, 255, 0.6);
         }
 
         .table-player-score {
@@ -1521,7 +1540,7 @@
         /* Table Score Legend */
         .table-score-legend {
             font-size: var(--text-sm);
-            color: rgba(255,255,255,0.7);
+            color: rgba(255, 255, 255, 0.7);
             text-align: center;
             padding: var(--spacing-sm) var(--spacing-md);
             background: rgba(139, 92, 246, 0.1);
@@ -1547,8 +1566,8 @@
         .score-buttons-inline .score-btn {
             width: 36px;
             height: 36px;
-            border: 2px solid rgba(255,255,255,0.2);
-            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
             color: white;
             border-radius: var(--radius-sm);
             font-weight: 700;
@@ -1561,7 +1580,7 @@
         }
 
         .score-buttons-inline .score-btn:hover {
-            background: rgba(255,255,255,0.15);
+            background: rgba(255, 255, 255, 0.15);
             border-color: var(--color-primary-light);
             transform: scale(1.05);
         }
@@ -1618,7 +1637,7 @@
         .table-submit-container {
             margin-top: var(--spacing-md);
             padding-top: var(--spacing-md);
-            border-top: 1px solid rgba(255,255,255,0.1);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .table-submit-container .submit-table-btn {
@@ -1690,13 +1709,13 @@
             width: 60px;
             height: 60px;
             border-radius: 50%;
-            background: rgba(255,255,255,0.05);
-            border: 2px solid rgba(255,255,255,0.2);
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.2);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: var(--text-xl);
-            color: rgba(255,255,255,0.4);
+            color: rgba(255, 255, 255, 0.4);
             transition: all 0.3s ease;
         }
 
@@ -1716,7 +1735,7 @@
 
         .progression-label {
             font-size: var(--text-sm);
-            color: rgba(255,255,255,0.6);
+            color: rgba(255, 255, 255, 0.6);
             text-align: center;
             font-weight: 500;
         }
@@ -1731,16 +1750,16 @@
         }
 
         .progression-arrow {
-            color: rgba(255,255,255,0.3);
+            color: rgba(255, 255, 255, 0.3);
             font-size: var(--text-xl);
             margin: 0 var(--spacing-sm);
         }
 
-        .progression-step.active ~ .progression-arrow {
-            color: rgba(255,255,255,0.2);
+        .progression-step.active~.progression-arrow {
+            color: rgba(255, 255, 255, 0.2);
         }
 
-        .progression-step.completed ~ .progression-arrow {
+        .progression-step.completed~.progression-arrow {
             color: #22c55e;
         }
 
@@ -1789,22 +1808,22 @@
         }
 
         .bracket-matchup {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: var(--radius-md);
             padding: var(--spacing-md);
             transition: all 0.3s ease;
         }
 
         .bracket-matchup:hover {
-            background: rgba(255,255,255,0.08);
+            background: rgba(255, 255, 255, 0.08);
             border-color: var(--color-accent);
             transform: translateY(-2px);
         }
 
         .matchup-header {
             font-size: var(--text-sm);
-            color: rgba(255,255,255,0.6);
+            color: rgba(255, 255, 255, 0.6);
             margin-bottom: var(--spacing-sm);
             text-align: center;
             font-weight: 600;
@@ -1817,8 +1836,8 @@
         }
 
         .matchup-team {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: var(--radius-sm);
             padding: var(--spacing-md);
             display: flex;
@@ -1828,7 +1847,7 @@
         }
 
         .matchup-team:hover {
-            background: rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.1);
         }
 
         .matchup-team.winner {
@@ -1879,13 +1898,14 @@
 
         .bracket-vs {
             text-align: center;
-            color: rgba(255,255,255,0.4);
+            color: rgba(255, 255, 255, 0.4);
             font-weight: 700;
             font-size: var(--text-sm);
             margin: var(--spacing-xs) 0;
         }
 
         @media (max-width: 768px) {
+
             .bracket-grid.top8cut,
             .bracket-grid.semifinals {
                 grid-template-columns: 1fr;
@@ -1941,34 +1961,37 @@
                 width: 100%;
             }
 
-            .teams-grid, .tables-grid {
+            .teams-grid,
+            .tables-grid {
                 grid-template-columns: 1fr;
             }
-            
+
             .control-grid {
                 grid-template-columns: 1fr;
             }
-            
+
             .timer-display {
                 font-size: 3rem;
             }
         }
-        
+
         /* Loading Animation */
         .loading {
             display: inline-block;
             width: 20px;
             height: 20px;
-            border: 3px solid rgba(255,255,255,0.3);
+            border: 3px solid rgba(255, 255, 255, 0.3);
             border-radius: 50%;
             border-top-color: white;
             animation: spin 1s linear infinite;
         }
-        
+
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
-        
+
         /* Toast Notification */
         .toast {
             position: fixed;
@@ -1987,119 +2010,120 @@
             animation: slideIn 0.3s ease-out;
             z-index: 1000;
         }
-        
+
         .toast.show {
             display: flex;
         }
-        
+
         @keyframes slideIn {
             from {
                 transform: translateX(400px);
                 opacity: 0;
             }
+
             to {
                 transform: translateX(0);
                 opacity: 1;
             }
         }
-        
+
         .toast-success {
             border-left: 4px solid var(--color-success);
         }
-        
+
         .toast-error {
             border-left: 4px solid var(--color-danger);
         }
-        
+
         .toast-warning {
             border-left: 4px solid var(--color-warning);
         }
-        
+
         .toast-info {
             border-left: 4px solid var(--color-secondary);
         }
-        
+
         .toast-icon {
             font-size: var(--text-2xl);
         }
-        
+
         .toast-success .toast-icon {
             color: var(--color-success);
         }
-        
+
         .toast-error .toast-icon {
             color: var(--color-danger);
         }
-        
+
         .toast-warning .toast-icon {
             color: var(--color-warning);
         }
-        
+
         .toast-info .toast-icon {
             color: var(--color-secondary);
         }
-        
+
         .toast-content {
             flex: 1;
         }
-        
+
         .toast-title {
             font-weight: 700;
             margin-bottom: var(--spacing-xs);
         }
-        
+
         .toast-message {
             font-size: var(--text-sm);
-            color: rgba(255,255,255,0.8);
+            color: rgba(255, 255, 255, 0.8);
         }
-        
+
         /* Empty State */
         .empty-state {
             text-align: center;
             padding: var(--spacing-2xl);
             background: var(--glass-bg);
             backdrop-filter: blur(20px);
-            border: 2px dashed rgba(255,255,255,0.2);
+            border: 2px dashed rgba(255, 255, 255, 0.2);
             border-radius: var(--radius-xl);
             margin: var(--spacing-xl) 0;
         }
-        
+
         .empty-state i {
             font-size: 4rem;
-            color: rgba(255,255,255,0.3);
+            color: rgba(255, 255, 255, 0.3);
             margin-bottom: var(--spacing-lg);
         }
-        
+
         .empty-state h3 {
             font-size: var(--text-xl);
             margin-bottom: var(--spacing-sm);
-            color: rgba(255,255,255,0.7);
+            color: rgba(255, 255, 255, 0.7);
         }
-        
+
         .empty-state p {
-            color: rgba(255,255,255,0.5);
+            color: rgba(255, 255, 255, 0.5);
         }
-        
+
         /* Scrollbar Styling */
         ::-webkit-scrollbar {
             width: 8px;
             height: 8px;
         }
-        
+
         ::-webkit-scrollbar-track {
-            background: rgba(255,255,255,0.05);
+            background: rgba(255, 255, 255, 0.05);
             border-radius: var(--radius-full);
         }
-        
+
         ::-webkit-scrollbar-thumb {
             background: linear-gradient(180deg, var(--color-primary), var(--color-secondary));
             border-radius: var(--radius-full);
         }
-        
+
         ::-webkit-scrollbar-thumb:hover {
             background: linear-gradient(180deg, var(--color-primary-light), var(--color-secondary-light));
         }
-        
+
         /* Badge Component */
         .badge {
             display: inline-flex;
@@ -2112,94 +2136,97 @@
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
-        
+
         .badge-primary {
             background: rgba(139, 92, 246, 0.2);
             color: var(--color-primary-light);
             border: 1px solid rgba(139, 92, 246, 0.3);
         }
-        
+
         .badge-success {
             background: rgba(16, 185, 129, 0.2);
             color: var(--color-success);
             border: 1px solid rgba(16, 185, 129, 0.3);
         }
-        
+
         /* Divider */
         .divider {
             height: 1px;
-            background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.2) 50%, transparent 100%);
+            background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.2) 50%, transparent 100%);
             margin: var(--spacing-xl) 0;
         }
-        
+
         /* Pulse Animation for Active States */
         @keyframes pulse {
-            0%, 100% {
+
+            0%,
+            100% {
                 opacity: 1;
             }
+
             50% {
                 opacity: 0.8;
             }
         }
-        
+
         .pulse {
             animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
-        
+
         /* Score Input System */
         .score-input-container {
             margin-top: var(--spacing-md);
             padding-top: var(--spacing-md);
-            border-top: 1px solid rgba(255,255,255,0.1);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
-        
+
         .score-input-label {
             font-size: var(--text-sm);
-            color: rgba(255,255,255,0.7);
+            color: rgba(255, 255, 255, 0.7);
             margin-bottom: var(--spacing-sm);
             font-weight: 600;
         }
-        
+
         .score-input-grid {
             display: grid;
             gap: var(--spacing-sm);
         }
-        
+
         .player-score-row {
             display: grid;
             grid-template-columns: 1fr auto;
             gap: var(--spacing-md);
             align-items: center;
-            background: rgba(255,255,255,0.05);
+            background: rgba(255, 255, 255, 0.05);
             padding: var(--spacing-sm) var(--spacing-md);
             border-radius: var(--radius-sm);
         }
-        
+
         .player-score-info {
             display: flex;
             flex-direction: column;
         }
-        
+
         .player-score-name {
             font-weight: 600;
             color: white;
         }
-        
+
         .player-score-team {
             font-size: var(--text-xs);
-            color: rgba(255,255,255,0.6);
+            color: rgba(255, 255, 255, 0.6);
         }
-        
+
         .score-buttons {
             display: flex;
             gap: var(--spacing-xs);
         }
-        
+
         .score-btn {
             width: 50px;
             height: 40px;
-            border: 2px solid rgba(255,255,255,0.2);
-            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
             color: white;
             border-radius: var(--radius-sm);
             font-weight: 700;
@@ -2207,45 +2234,45 @@
             transition: var(--transition-fast);
             font-size: var(--text-base);
         }
-        
+
         .score-btn:hover {
-            background: rgba(255,255,255,0.15);
+            background: rgba(255, 255, 255, 0.15);
             border-color: var(--color-primary-light);
         }
-        
+
         .score-btn.active {
             background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
             border-color: var(--color-primary-light);
             box-shadow: var(--shadow-glow);
         }
-        
+
         .score-btn-win {
             border-color: var(--color-success);
         }
-        
+
         .score-btn-win.active {
             background: linear-gradient(135deg, var(--color-success), #059669);
             box-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
         }
-        
+
         .score-btn-draw {
             border-color: var(--color-warning);
         }
-        
+
         .score-btn-draw.active {
             background: linear-gradient(135deg, var(--color-warning), #d97706);
             box-shadow: 0 0 20px rgba(245, 158, 11, 0.5);
         }
-        
+
         .score-btn-loss {
             border-color: var(--color-danger);
         }
-        
+
         .score-btn-loss.active {
             background: linear-gradient(135deg, var(--color-danger), #dc2626);
             box-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
         }
-        
+
         .submit-table-btn {
             width: 100%;
             margin-top: var(--spacing-md);
@@ -2258,21 +2285,21 @@
             cursor: pointer;
             transition: var(--transition-base);
         }
-        
+
         .submit-table-btn:hover {
             box-shadow: 0 0 25px rgba(16, 185, 129, 0.6);
             transform: translateY(-2px);
         }
-        
+
         .submit-table-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
         }
-        
+
         .submit-table-btn.submitted {
             background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
         }
-        
+
         /* Championship Modal */
         .modal-overlay {
             display: none;
@@ -2287,17 +2314,22 @@
             align-items: center;
             justify-content: center;
         }
-        
+
         .modal-overlay.show {
             display: flex;
             animation: fadeIn 0.3s ease-out;
         }
-        
+
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
-        
+
         .championship-modal {
             background: var(--glass-bg);
             backdrop-filter: blur(30px) saturate(200%);
@@ -2312,23 +2344,24 @@
             animation: slideUp 0.5s ease-out;
             position: relative;
         }
-        
+
         @keyframes slideUp {
             from {
                 transform: translateY(100px);
                 opacity: 0;
             }
+
             to {
                 transform: translateY(0);
                 opacity: 1;
             }
         }
-        
+
         .modal-close {
             position: absolute;
             top: var(--spacing-lg);
             right: var(--spacing-lg);
-            background: rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.1);
             border: none;
             width: 40px;
             height: 40px;
@@ -2338,24 +2371,31 @@
             cursor: pointer;
             transition: var(--transition-fast);
         }
-        
+
         .modal-close:hover {
-            background: rgba(255,255,255,0.2);
+            background: rgba(255, 255, 255, 0.2);
             transform: rotate(90deg);
         }
-        
+
         .trophy-icon {
             font-size: 6rem;
             text-align: center;
             margin-bottom: var(--spacing-lg);
             animation: bounce 1s ease-in-out infinite;
         }
-        
+
         @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
         }
-        
+
         .champion-title {
             font-size: var(--text-4xl);
             font-weight: 900;
@@ -2366,7 +2406,7 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
-        
+
         .champion-team {
             font-size: var(--text-3xl);
             font-weight: 700;
@@ -2374,71 +2414,71 @@
             margin-bottom: var(--spacing-xl);
             color: white;
         }
-        
+
         .final-standings {
-            background: rgba(255,255,255,0.05);
+            background: rgba(255, 255, 255, 0.05);
             border-radius: var(--radius-lg);
             padding: var(--spacing-lg);
             margin-bottom: var(--spacing-lg);
         }
-        
+
         .standings-title {
             font-size: var(--text-xl);
             font-weight: 700;
             margin-bottom: var(--spacing-md);
             color: var(--color-primary-light);
         }
-        
+
         .standing-row {
             display: grid;
             grid-template-columns: 50px 1fr auto auto;
             gap: var(--spacing-md);
             padding: var(--spacing-md);
-            background: rgba(255,255,255,0.05);
+            background: rgba(255, 255, 255, 0.05);
             border-radius: var(--radius-sm);
             margin-bottom: var(--spacing-sm);
             align-items: center;
         }
-        
+
         .standing-row.champion {
             background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(245, 158, 11, 0.2));
             border: 2px solid #fbbf24;
             box-shadow: 0 0 30px rgba(251, 191, 36, 0.3);
         }
-        
+
         .standing-rank {
             font-size: var(--text-2xl);
             font-weight: 900;
             color: var(--color-accent);
         }
-        
+
         .standing-rank.first {
             background: linear-gradient(135deg, #fbbf24, #f59e0b);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
-        
+
         .standing-team {
             font-weight: 600;
         }
-        
+
         .standing-finals {
             font-size: var(--text-sm);
-            color: rgba(255,255,255,0.7);
+            color: rgba(255, 255, 255, 0.7);
         }
-        
+
         .standing-swiss {
             font-size: var(--text-sm);
-            color: rgba(255,255,255,0.5);
+            color: rgba(255, 255, 255, 0.5);
         }
-        
+
         .standing-total {
             font-size: var(--text-2xl);
             font-weight: 700;
             color: var(--color-accent);
         }
-        
+
         .mvp-section {
             background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(6, 182, 212, 0.2));
             border: 2px solid var(--color-primary-light);
@@ -2447,20 +2487,20 @@
             margin-top: var(--spacing-lg);
             text-align: center;
         }
-        
+
         .mvp-title {
             font-size: var(--text-xl);
             font-weight: 700;
             margin-bottom: var(--spacing-md);
             color: var(--color-primary-light);
         }
-        
+
         .mvp-name {
             font-size: var(--text-2xl);
             font-weight: 700;
             color: white;
         }
-        
+
         .mvp-score {
             font-size: var(--text-lg);
             color: var(--color-accent);
@@ -2468,6 +2508,7 @@
         }
     </style>
 </head>
+
 <body>
     <!-- Championship Modal -->
     <div id="championship-modal" class="modal-overlay">
@@ -2475,21 +2516,21 @@
             <button class="modal-close" onclick="closeChampionshipModal()">
                 <i class="fas fa-times"></i>
             </button>
-            
+
             <div class="trophy-icon">
                 <i class="fas fa-trophy" style="color: #fbbf24;"></i>
             </div>
-            
+
             <h1 class="champion-title">TOURNAMENT CHAMPION!</h1>
             <div class="champion-team" id="champion-team-name"></div>
-            
+
             <div class="final-standings">
                 <h3 class="standings-title">
                     <i class="fas fa-medal"></i> Final Standings
                 </h3>
                 <div id="final-standings-list"></div>
             </div>
-            
+
             <div class="mvp-section">
                 <div class="mvp-title">
                     <i class="fas fa-star"></i> Tournament MVP
@@ -2576,51 +2617,7 @@
             </div>
         </section>
 
-        <!-- Swiss Rounds Configuration Panel -->
-        <section class="config-panel glass-card" id="swiss-config-panel">
-            <div class="config-header">
-                <i class="fas fa-cog config-icon"></i>
-                <h3>Tournament Configuration</h3>
-            </div>
 
-            <div class="config-section">
-                <label class="config-label">Swiss Rounds</label>
-                <p class="config-description">Select the number of Swiss rounds before finals</p>
-
-                <div class="radio-group" id="swiss-rounds-selector">
-                    <label class="radio-option" data-rounds="4">
-                        <input type="radio" name="swiss-rounds" value="4" checked>
-                        <div class="radio-content">
-                            <div class="radio-check">
-                                <i class="fas fa-check"></i>
-                            </div>
-                            <div class="radio-details">
-                                <span class="radio-title">4 Rounds</span>
-                                <span class="radio-subtitle">Standard (2-3 hours)</span>
-                            </div>
-                        </div>
-                    </label>
-
-                    <label class="radio-option" data-rounds="5">
-                        <input type="radio" name="swiss-rounds" value="5">
-                        <div class="radio-content">
-                            <div class="radio-check">
-                                <i class="fas fa-check"></i>
-                            </div>
-                            <div class="radio-details">
-                                <span class="radio-title">5 Rounds</span>
-                                <span class="radio-subtitle">Extended (3-4 hours)</span>
-                            </div>
-                        </div>
-                    </label>
-                </div>
-
-                <div class="config-info">
-                    <i class="fas fa-info-circle"></i>
-                    <span>Configuration will be locked after loading participants</span>
-                </div>
-            </div>
-        </section>
 
         <!-- Stats Overview -->
         <div class="stats-grid" id="stats-container" style="display: none;">
@@ -2700,12 +2697,12 @@
 
         function startTimer() {
             if (timerInterval) return;
-            
+
             timerInterval = setInterval(() => {
                 seconds++;
                 updateTimerDisplay();
             }, 1000);
-            
+
             showToast('Timer Started', 'Round timer is now running', 'success');
         }
 
@@ -2728,11 +2725,11 @@
             const hrs = Math.floor(seconds / 3600);
             const mins = Math.floor((seconds % 3600) / 60);
             const secs = seconds % 60;
-            
+
             const display = [hrs, mins, secs]
                 .map(num => String(num).padStart(2, '0'))
                 .join(':');
-            
+
             document.getElementById('timer').textContent = display;
         }
 
@@ -2742,74 +2739,30 @@
             const toastIcon = toast.querySelector('.toast-icon');
             const toastTitle = document.getElementById('toast-title');
             const toastMessage = document.getElementById('toast-message');
-            
+
             // Set content
             toastTitle.textContent = title;
             toastMessage.textContent = message;
-            
+
             // Set icon and style
             toast.className = 'toast show toast-' + type;
-            
+
             const icons = {
                 success: 'fas fa-check-circle',
                 error: 'fas fa-exclamation-circle',
                 warning: 'fas fa-exclamation-triangle',
                 info: 'fas fa-info-circle'
             };
-            
+
             toastIcon.className = 'toast-icon ' + icons[type];
-            
+
             // Auto hide after 3 seconds
             setTimeout(() => {
                 toast.classList.remove('show');
             }, 3000);
         }
 
-        // Swiss Rounds Configuration State
-        let swissRoundsConfig = {
-            selected: 4,
-            locked: false
-        };
 
-        // Initialize Swiss Rounds Selector
-        function initializeSwissRoundsSelector() {
-            const radioOptions = document.querySelectorAll('.radio-option');
-            const radioInputs = document.querySelectorAll('input[name="swiss-rounds"]');
-
-            // Handle radio option clicks
-            radioOptions.forEach(option => {
-                option.addEventListener('click', function() {
-                    if (!swissRoundsConfig.locked) {
-                        const rounds = parseInt(this.dataset.rounds);
-                        swissRoundsConfig.selected = rounds;
-
-                        // Update radio inputs
-                        radioInputs.forEach(input => {
-                            input.checked = parseInt(input.value) === rounds;
-                        });
-
-                        // Show toast
-                        showToast('Configuration Updated', `${rounds} Swiss rounds selected`, 'info');
-                    }
-                });
-            });
-        }
-
-        // Lock Swiss Rounds Configuration
-        function lockSwissRoundsConfig() {
-            swissRoundsConfig.locked = true;
-            const configPanel = document.getElementById('swiss-config-panel');
-            configPanel.classList.add('locked');
-
-            // Update info text
-            const configInfo = configPanel.querySelector('.config-info span');
-            configInfo.textContent = `Configuration locked: ${swissRoundsConfig.selected} Swiss rounds`;
-        }
-
-        // Get Selected Swiss Rounds
-        function getSelectedSwissRounds() {
-            return swissRoundsConfig.selected;
-        }
 
         // Show/Hide Control Sections
         function showActiveRoundControls() {
@@ -2844,7 +2797,7 @@
 
         // Determine round type based on round number
         function getRoundType(roundNum) {
-            const swissRounds = getSelectedSwissRounds();
+            const swissRounds = window.tournamentSwissRounds || 4;
             const roundSelect = document.getElementById('round-select');
             const selectedOption = roundSelect.options[roundSelect.selectedIndex];
             const roundText = selectedOption ? selectedOption.textContent : '';
@@ -2923,17 +2876,13 @@
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({
-                        swiss_rounds: getSelectedSwissRounds()
-                    })
+                    body: JSON.stringify({})
                 });
                 const data = await response.json();
-                
+
                 console.log('Load data response:', data);
 
                 if (data.success && data.teams) {
-                    // Lock the Swiss rounds configuration
-                    lockSwissRoundsConfig();
 
                     // Update round selector with configured Swiss rounds and tournament structure
                     const hasSemifinals = data.has_semifinals || false;
@@ -2951,8 +2900,6 @@
                 } else {
                     // If no Excel file, sample data might be loaded
                     if (data.teams && Object.keys(data.teams).length > 0) {
-                        // Lock the Swiss rounds configuration
-                        lockSwissRoundsConfig();
 
                         // Update round selector with configured Swiss rounds and tournament structure
                         const hasSemifinals = data.has_semifinals || false;
@@ -2981,9 +2928,9 @@
         function displayTeams(teams, playerScores = null, finalsTeamsOnly = false) {
             const teamsGrid = document.getElementById('teams-grid');
             const teamsContainer = document.getElementById('teams-container');
-            
+
             teamsGrid.innerHTML = '';
-            
+
             // FORCE 1 column layout
             const isLandscape = window.innerWidth >= 1024;
             if (isLandscape) {
@@ -3001,14 +2948,14 @@
                         gap: 12px !important;
                     }
                 `;
-                
+
                 // Also set inline style
                 teamsGrid.style.display = 'grid';
                 teamsGrid.style.gridTemplateColumns = '1fr';
                 teamsGrid.style.gap = '12px';
                 console.log('✅ FORCE Set teams-grid to 1 column, width:', window.innerWidth);
             }
-            
+
             // Get list of teams in finals if applicable
             let finalsTeams = null;
             if (finalsTeamsOnly && window.finalsAdvancingTeams) {
@@ -3019,7 +2966,7 @@
             } else {
                 console.log('=== DISPLAY TEAMS - ALL TEAMS MODE ===');
             }
-            
+
             // Calculate team scores and create array for sorting
             const teamsArray = [];
             Object.entries(teams).forEach(([teamName, players]) => {
@@ -3030,7 +2977,7 @@
                         return;
                     }
                 }
-                
+
                 // Calculate team score from player scores
                 let teamScore = 0;
                 players.forEach(player => {
@@ -3043,14 +2990,14 @@
                         teamScore += (player.score || 0);
                     }
                 });
-                
+
                 teamsArray.push({
                     teamName: teamName,
                     players: players,
                     teamScore: teamScore
                 });
             });
-            
+
             // Sort teams by score (highest to lowest)
             teamsArray.sort((a, b) => {
                 // Primary sort: by score (descending)
@@ -3060,16 +3007,16 @@
                 // Secondary sort: by team name (alphabetical) if scores are equal
                 return a.teamName.localeCompare(b.teamName);
             });
-            
+
             let displayedCount = 0;
             let hiddenCount = 0;
-            
+
             // Display teams in sorted order
             teamsArray.forEach(({ teamName, players, teamScore }) => {
                 displayedCount++;
                 const card = document.createElement('div');
                 card.className = 'team-card';
-                
+
                 card.innerHTML = `
                     <div class="team-header">
                         <div class="team-name">${teamName}</div>
@@ -3077,28 +3024,28 @@
                     </div>
                     <div class="player-list">
                         ${players.map(player => {
-                            const playerId = player['Player ID'] || player.id;
-                            // Try both integer and string keys for player scores
-                            let playerScore = 0;
-                            if (playerScores) {
-                                playerScore = playerScores[playerId] || playerScores[String(playerId)] || 0;
-                            } else {
-                                playerScore = player.score || 0;
-                            }
-                            return `
+                    const playerId = player['Player ID'] || player.id;
+                    // Try both integer and string keys for player scores
+                    let playerScore = 0;
+                    if (playerScores) {
+                        playerScore = playerScores[playerId] || playerScores[String(playerId)] || 0;
+                    } else {
+                        playerScore = player.score || 0;
+                    }
+                    return `
                                 <div class="player-item">
                                     <div class="player-id">${playerId}</div>
                                     <div class="player-name">${player['Player Name'] || player.name}</div>
                                     <div class="player-score">${playerScore} pts</div>
                                 </div>
                             `;
-                        }).join('')}
+                }).join('')}
                     </div>
                 `;
-                
+
                 teamsGrid.appendChild(card);
             });
-            
+
             // Force 1 column FINALLY after all cards are added
             if (isLandscape) {
                 teamsGrid.style.display = 'grid';
@@ -3106,14 +3053,14 @@
                 teamsGrid.style.gap = '12px';
                 console.log(`✅ FINAL: Applied 1-column layout to teams-grid (sorted by score), ${displayedCount} teams rendered`);
             }
-            
+
             console.log(`=== DISPLAY TEAMS COMPLETE ===`);
             console.log(`Displayed: ${displayedCount} teams (sorted by score: highest to lowest)`);
             if (finalsTeamsOnly) {
                 console.log(`Hidden: ${hiddenCount} eliminated teams`);
             }
             console.log(`Finals mode: ${finalsTeamsOnly}`);
-            
+
             teamsContainer.style.display = 'block';
         }
 
@@ -3124,8 +3071,8 @@
 
                 const response = await fetch('/setup_tournament', {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ swiss_rounds: getSelectedSwissRounds() })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({})
                 });
 
                 const data = await response.json();
@@ -3138,7 +3085,7 @@
                     // Update round selector with configured Swiss rounds and tournament structure
                     const hasSemifinals = data.has_semifinals || false;
                     const teamCount = data.tournament_teams ? data.tournament_teams.length : 0;
-                    const swissRounds = data.swiss_rounds_count || getSelectedSwissRounds();
+                    const swissRounds = data.swiss_rounds_count || 4;
 
                     // Store tournament configuration globally
                     window.tournamentSwissRounds = swissRounds;
@@ -3170,18 +3117,19 @@
         async function loadRound() {
             const roundSelect = document.getElementById('round-select');
             const round = roundSelect.value;
-            
+
             if (!round) return;
-            
+
             try {
                 const response = await fetch(`/get_tables/${round}`);
                 const data = await response.json();
-                
+
                 console.log('Load round response:', data);
-                
+
                 if (data.tables) {
-                    // Store tables globally
+                    // Store tables and player scores globally
                     window.currentTables = data.tables;
+                    window.playerScores = data.player_scores || {};
 
                     displayTables(data.tables, round);
 
@@ -3261,7 +3209,7 @@
                 id: 'swiss',
                 icon: 'fas fa-chess-board',
                 label: `Swiss Rounds (${swissRounds})`,
-                rounds: Array.from({length: swissRounds}, (_, i) => i + 1),
+                rounds: Array.from({ length: swissRounds }, (_, i) => i + 1),
                 completed: currentRound > swissRounds,
                 active: currentRound >= 1 && currentRound <= swissRounds
             });
@@ -3432,16 +3380,16 @@
         function displayTables(tables, round) {
             const tablesGrid = document.getElementById('tables-grid');
             const tablesContainer = document.getElementById('tables-container');
-            
-            console.log('displayTables called with:', {round, tableCount: Object.keys(tables).length});
-            
+
+            console.log('displayTables called with:', { round, tableCount: Object.keys(tables).length });
+
             tablesGrid.innerHTML = '';
-            
+
             if (!tables || Object.keys(tables).length === 0) {
                 tablesGrid.innerHTML = '<div class="empty-state"><h3>No tables available</h3></div>';
                 return;
             }
-            
+
             // FORCE 4 columns immediately
             const isLandscape = window.innerWidth >= 1024;
             if (isLandscape) {
@@ -3459,14 +3407,14 @@
                         gap: 12px !important;
                     }
                 `;
-                
+
                 // Also set inline style
                 tablesGrid.style.display = 'grid';
                 tablesGrid.style.gridTemplateColumns = 'repeat(4, 1fr)';
                 tablesGrid.style.gap = '12px';
                 console.log('✅ FORCE Set tables-grid to 4 columns, width:', window.innerWidth);
             }
-            
+
             // Sort tables by number (Table 1, Table 2, ..., Table 16)
             const sortedTables = Object.entries(tables).sort(([tableA], [tableB]) => {
                 // Extract number from table name (e.g., "Table 1" -> 1, "Table 10" -> 10)
@@ -3474,16 +3422,16 @@
                 const numB = parseInt(tableB.replace(/[^0-9]/g, '')) || 0;
                 return numA - numB;
             });
-            
+
             console.log('📊 Tables sorted in numerical order:', sortedTables.map(([name]) => name));
-            
+
             sortedTables.forEach(([tableName, players]) => {
                 console.log(`Creating card for ${tableName} with ${players.length} players`);
-                
+
                 const card = document.createElement('div');
                 card.className = 'table-card';
                 card.id = `table-${tableName.replace(/\s+/g, '-')}`;
-                
+
                 // Create card with inline score buttons
                 card.innerHTML = `
                     <div class="table-header">
@@ -3495,9 +3443,13 @@
                     </div>
                     <div class="table-players">
                         ${players.map(player => {
-                            const playerId = player['Player ID'] || player.id;
-                            const playerScore = window.currentRoundScores?.[tableName]?.[playerId] ?? '-';
-                            return `
+                    const playerId = player['Player ID'] || player.id;
+                    // Show cumulative score from previous rounds, or '-' if no score yet
+                    const cumulativeScore = window.playerScores?.[playerId] || window.playerScores?.[String(playerId)] || 0;
+                    // Show current round score being entered, or cumulative if not entered yet
+                    const currentRoundScore = window.currentRoundScores?.[tableName]?.[playerId];
+                    const playerScore = currentRoundScore !== undefined ? currentRoundScore : cumulativeScore;
+                    return `
                                 <div class="table-player">
                                     <div class="table-player-info">
                                         <i class="fas fa-user"></i>
@@ -3532,7 +3484,7 @@
                                     </div>
                                 </div>
                             `;
-                        }).join('')}
+                }).join('')}
                     </div>
                     <div class="table-submit-container">
                         <button class="submit-table-btn" onclick="submitTableResults('${tableName}')">
@@ -3540,16 +3492,16 @@
                         </button>
                     </div>
                 `;
-                
+
                 tablesGrid.appendChild(card);
-                
+
                 // Force 4 columns after EACH card is added
                 if (isLandscape) {
                     tablesGrid.style.gridTemplateColumns = 'repeat(4, 1fr)';
                     tablesGrid.style.gap = '12px';
                 }
             });
-            
+
             // Force 4 columns FINALLY after all cards are added
             if (isLandscape) {
                 tablesGrid.style.display = 'grid';
@@ -3557,7 +3509,7 @@
                 tablesGrid.style.gap = '12px';
                 console.log(`✅ FINAL: Applied 4-column layout to tables-grid, ${Object.keys(tables).length} tables rendered`);
             }
-            
+
             tablesContainer.style.display = 'block';
             console.log(`displayTables complete: ${Object.keys(tables).length} tables rendered`);
         }
@@ -3565,19 +3517,19 @@
         // Update Stats
         function updateStats(data) {
             const statsContainer = document.getElementById('stats-container');
-            
+
             if (data.teams) {
                 document.getElementById('stat-teams').textContent = Object.keys(data.teams).length;
                 const totalPlayers = Object.values(data.teams).reduce((sum, players) => sum + players.length, 0);
                 document.getElementById('stat-players').textContent = totalPlayers;
             }
-            
+
             statsContainer.style.display = 'grid';
         }
 
         // Track table scores
         const tableScores = {};
-        
+
         // Refresh team scores without reloading entire page
         async function refreshTeamScores(finalsMode = null) {
             try {
@@ -3601,10 +3553,10 @@
                         }
                     }
                 }
-                
+
                 const response = await fetch('/load_data');
                 const data = await response.json();
-                
+
                 if (data.success && data.teams) {
                     // Update team display with fresh scores
                     displayTeams(data.teams, data.player_scores, finalsMode);
@@ -3614,7 +3566,7 @@
                 console.error('Error refreshing scores:', error);
             }
         }
-        
+
         // Set player score
         function setPlayerScore(tableName, playerId, points, button) {
             // Initialize table scores if needed
@@ -3669,31 +3621,31 @@
 
             console.log(`Set score: Table ${tableName}, Player ${playerId} = ${points} pts`);
         }
-        
+
         // Submit table results
         async function submitTableResults(tableName) {
             const currentRound = document.getElementById('round-select').value;
-            
+
             if (!currentRound) {
                 showToast('Error', 'Please select a round first', 'error');
                 return;
             }
-            
+
             if (!tableScores[tableName]) {
                 showToast('Error', 'Please enter scores for all players first', 'warning');
                 return;
             }
-            
+
             // Check if all players have scores
-            const table = Object.values(window.currentTables).find(t => 
+            const table = Object.values(window.currentTables).find(t =>
                 Object.keys(window.currentTables).find(k => k === tableName)
             );
-            
+
             if (!table) {
                 showToast('Error', 'Table not found', 'error');
                 return;
             }
-            
+
             // Build results array
             const results = [];
             for (const playerId in tableScores[tableName]) {
@@ -3702,36 +3654,36 @@
                     points: tableScores[tableName][playerId]
                 });
             }
-            
+
             try {
                 const response = await fetch('/submit_table_results', {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         round: parseInt(currentRound),
                         table: tableName,
                         results: results
                     })
                 });
-                
+
                 const data = await response.json();
-                
+
                 console.log('Submit table response:', data);
-                
+
                 if (data.success) {
                     showToast('Table Submitted!', `Results recorded for ${tableName}`, 'success');
-                    
+
                     // Mark button as submitted
                     const tableCard = document.getElementById(`table-${tableName.replace(/\s+/g, '-')}`);
                     const submitBtn = tableCard.querySelector('.submit-table-btn');
                     submitBtn.classList.add('submitted');
                     submitBtn.innerHTML = '<i class="fas fa-check-double"></i> Submitted';
                     submitBtn.disabled = true;
-                    
+
                     // Update team display with new scores
                     console.log('Updated scores:', data.scores);
                     console.log('Updated player scores:', data.player_scores);
-                    
+
                     // Fetch fresh data to update display
                     refreshTeamScores();
                 } else {
@@ -3742,44 +3694,45 @@
                 console.error(error);
             }
         }
-        
+
         // Submit all round results and finalize
         async function submitRoundResults() {
             const currentRound = document.getElementById('round-select').value;
-            
+
             if (!currentRound) {
                 showToast('Error', 'Please select a round first', 'error');
                 return;
             }
-            
-            // Check if any tables have been submitted
-            const hasSubmissions = Object.keys(tableScores).length > 0;
-            
-            if (!hasSubmissions) {
+
+            // Check if any tables have been submitted (local or already submitted)
+            const hasLocalSubmissions = Object.keys(tableScores).length > 0;
+            const hasConfirmedSubmissions = document.querySelectorAll('.submit-table-btn.submitted').length > 0;
+
+            if (!hasLocalSubmissions && !hasConfirmedSubmissions) {
                 showToast('Warning', 'No table results have been submitted yet', 'warning');
                 return;
             }
-            
+
             try {
                 showToast('Finalizing...', 'Finalizing round results', 'info');
-                
+
                 const response = await fetch('/submit_player_results', {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         round: parseInt(currentRound),
                         results: []  // Empty as scores already added via table submissions
                     })
                 });
-                
+
                 const data = await response.json();
-                
+
                 if (data.success) {
                     showToast('Round Complete!', data.message, 'success');
-                    
+
                     // Clear table scores for next round
                     Object.keys(tableScores).forEach(key => delete tableScores[key]);
-                    
+
                     // Check if semifinals or finals were generated
                     if (data.semifinals) {
                         const roundType = getRoundType(parseInt(currentRound));
@@ -3826,8 +3779,8 @@
                     if (data.tournament_winner) {
                         console.log('Tournament complete!', data.tournament_winner);
                         showToast('Tournament Complete!',
-                                `Champion: ${data.tournament_winner.winning_team}!`,
-                                'success');
+                            `Champion: ${data.tournament_winner.winning_team}!`,
+                            'success');
 
                         // Show championship modal
                         setTimeout(() => {
@@ -3838,7 +3791,7 @@
                         const roundType = getRoundType(parseInt(currentRound));
                         if (roundType === 'swiss') {
                             const nextRound = parseInt(currentRound) + 1;
-                            const swissRounds = getSelectedSwissRounds();
+                            const swissRounds = window.tournamentSwissRounds || 4;
 
                             if (nextRound <= swissRounds) {
                                 showToast('Loading Next Round...', `Moving to Swiss Round ${nextRound}`, 'info');
@@ -3850,7 +3803,7 @@
                             }
                         }
                     }
-                    
+
                     // Refresh team scores to show updated standings
                     console.log('Round finalized, refreshing team scores...');
                     refreshTeamScores();
@@ -3862,10 +3815,10 @@
                 console.error(error);
             }
         }
-        
+
         // Store tables globally for reference
         window.currentTables = {};
-        
+
         // Championship Modal Functions
         function showChampionshipModal(winnerData) {
             const modal = document.getElementById('championship-modal');
@@ -3873,24 +3826,24 @@
             const standingsList = document.getElementById('final-standings-list');
             const mvpName = document.getElementById('mvp-name');
             const mvpScore = document.getElementById('mvp-score');
-            
+
             // Set champion name
             championName.textContent = winnerData.winning_team;
-            
+
             // Set MVP
             mvpName.textContent = `${winnerData.mvp_player.name} (${winnerData.mvp_player.team})`;
             mvpScore.textContent = `${winnerData.mvp_player.total_points} Total Points`;
-            
+
             // Build standings list
             standingsList.innerHTML = '';
-            
+
             winnerData.final_standings.forEach((team, index) => {
                 const row = document.createElement('div');
                 row.className = 'standing-row' + (index === 0 ? ' champion' : '');
-                
+
                 const rank = index + 1;
                 const rankClass = index === 0 ? 'standing-rank first' : 'standing-rank';
-                
+
                 row.innerHTML = `
                     <div class="${rankClass}">${rank}</div>
                     <div>
@@ -3901,19 +3854,19 @@
                     <div class="standing-total">${team.total_points}</div>
                     <div style="font-size: var(--text-xs); color: rgba(255,255,255,0.5);">pts</div>
                 `;
-                
+
                 standingsList.appendChild(row);
             });
-            
+
             // Show modal with animation
             modal.classList.add('show');
         }
-        
+
         function closeChampionshipModal() {
             const modal = document.getElementById('championship-modal');
             modal.classList.remove('show');
         }
-        
+
         // Close modal when clicking outside
         document.addEventListener('DOMContentLoaded', () => {
             const modal = document.getElementById('championship-modal');
@@ -3926,13 +3879,12 @@
 
         // Auto-load on page load
         window.addEventListener('DOMContentLoaded', () => {
-            // Initialize Swiss Rounds Selector
-            initializeSwissRoundsSelector();
+            // Swiss rounds selector will be initialized when participants are loaded
 
             // Optional: Auto-load participants
             // loadParticipants();
         });
     </script>
 </body>
-</html>
 
+</html>

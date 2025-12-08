@@ -34,7 +34,7 @@ if not exist "templates\dashboard.html" (
     exit /b 1
 )
 
-if not exist "July_CEDH_Event\13th July CEDH Participant List.xlsx" (
+if not exist "participants\participant_team.xlsx" (
     echo ❌ Excel participant file not found
     pause
     exit /b 1

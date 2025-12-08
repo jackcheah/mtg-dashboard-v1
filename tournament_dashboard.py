@@ -30,88 +30,10 @@ class TournamentManager:
         self.submitted_rounds = set()  # Track which rounds have been submitted
         self.finalized_rounds = set()  # Track which rounds have been finalized
 
-        # Setup backup directory and file
-        self.backup_dir = 'tournament_backups'
-        os.makedirs(self.backup_dir, exist_ok=True)
-        self.backup_file = os.path.join(self.backup_dir, 'tournament_backup.json')
-
-        # Try to restore from backup on startup
-        self.restore_from_backup()
 
     def save_backup(self):
-        """
-        Auto-save tournament state to JSON file.
-        Called automatically after important operations.
-        """
-        try:
-            backup_data = {
-                'timestamp': datetime.now().isoformat(),
-                'participants': self.participants,
-                'teams': self.teams,
-                'tournament_teams': self.tournament_teams,
-                'scores': self.scores,
-                'player_scores': self.player_scores,
-                'current_round': self.current_round,
-                'swiss_rounds_count': self.swiss_rounds_count,
-                'swiss_rounds_configured': self.swiss_rounds_configured,
-                'max_rounds': self.max_rounds,
-                'round_results': self.round_results,
-                'tables': self.tables,
-                'final_round_scores': self.final_round_scores,
-                'semifinal_round_scores': self.semifinal_round_scores,
-                'swiss_round_scores': self.swiss_round_scores,
-                'has_semifinals': self.has_semifinals,
-                'submitted_rounds': list(self.submitted_rounds),
-                'finalized_rounds': list(self.finalized_rounds)
-            }
-
-            with open(self.backup_file, 'w') as f:
-                json.dump(backup_data, f, indent=2)
-
-            print(f"✅ Auto-saved tournament state at {datetime.now().strftime('%H:%M:%S')}")
-            return True
-        except Exception as e:
-            print(f"⚠️ Warning: Could not save backup: {e}")
-            return False
-
-    def restore_from_backup(self):
-        """
-        Restore tournament state from JSON backup file.
-        Called automatically on startup.
-        """
-        try:
-            if not os.path.exists(self.backup_file):
-                print("ℹ️ No backup file found - starting fresh")
-                return False
-
-            with open(self.backup_file, 'r') as f:
-                backup_data = json.load(f)
-
-            # Restore all state
-            self.participants = backup_data.get('participants', [])
-            self.teams = backup_data.get('teams', {})
-            self.tournament_teams = backup_data.get('tournament_teams', [])
-            self.scores = backup_data.get('scores', {})
-            self.player_scores = backup_data.get('player_scores', {})
-            self.current_round = backup_data.get('current_round', 1)
-            self.swiss_rounds_count = backup_data.get('swiss_rounds_count', 4)
-            self.swiss_rounds_configured = backup_data.get('swiss_rounds_configured', False)
-            self.max_rounds = backup_data.get('max_rounds', 6)
-            self.round_results = backup_data.get('round_results', {})
-            self.tables = backup_data.get('tables', {})
-            self.final_round_scores = backup_data.get('final_round_scores', {})
-            self.semifinal_round_scores = backup_data.get('semifinal_round_scores', {})
-            self.swiss_round_scores = backup_data.get('swiss_round_scores', {})
-            self.has_semifinals = backup_data.get('has_semifinals', False)
-            self.submitted_rounds = set(backup_data.get('submitted_rounds', []))
-            self.finalized_rounds = set(backup_data.get('finalized_rounds', []))
-
-            timestamp = backup_data.get('timestamp', 'unknown')
-            print(f"✅ Restored tournament state from backup (saved: {timestamp})")
-            return True
-        except Exception as e:
-            print(f"⚠️ Warning: Could not restore backup: {e}")
-            return False
+        """Backup feature disabled - no-op for compatibility"""
+        return True
 
     def configure_swiss_rounds(self, rounds):
         """
@@ -139,8 +61,8 @@ class TournamentManager:
         # For now, just configure Swiss rounds
         self.max_rounds = self.swiss_rounds_count + 2  # Placeholder: Swiss + Semifinals + Finals
 
-        print(f"✓ Swiss rounds configured: {self.swiss_rounds_count} rounds")
-        print(f"✓ Tournament structure will be determined when teams are loaded")
+        print(f"[OK] Swiss rounds configured: {self.swiss_rounds_count} rounds")
+        print(f"[OK] Tournament structure will be determined when teams are loaded")
 
         return True, f"Configured for {self.swiss_rounds_count} Swiss rounds"
 
@@ -148,44 +70,44 @@ class TournamentManager:
         """Determine tournament structure based on team count
 
         Rules:
-        - 8 teams: 4 Swiss rounds → Finals (top 4)
-        - 12 teams: 4 Swiss rounds → Finals (top 4)
-        - 16 teams: 4 Swiss rounds → Top 8 Cut (8 pods) → Finals (top 4)
+        - 8 teams: 4 Swiss rounds -> Finals (top 4)
+        - 12 teams: 4 Swiss rounds -> Finals (top 4)
+        - 16 teams: 4 Swiss rounds -> Top 8 Cut (8 pods) -> Finals (top 4)
 
         Note: Repeat matchups may occur in 8 and 12 team tournaments
         """
         team_count = len(self.teams)
 
         if team_count in [8, 12]:
-            # 8 or 12 teams: 4 Swiss rounds → Direct to Finals (top 4)
+            # 8 or 12 teams: 4 Swiss rounds -> Direct to Finals (top 4)
             if not self.swiss_rounds_configured:
                 self.swiss_rounds_count = 4  # Default: 4 Swiss rounds
             self.has_semifinals = False
             self.max_rounds = self.swiss_rounds_count + 1  # Swiss + Finals
 
-            print(f"✓ Tournament structure: {team_count} teams")
+            print(f"[OK] Tournament structure: {team_count} teams")
             print(f"  - Swiss rounds: {self.swiss_rounds_count}")
             print(f"  - Top 8 Cut: NO (top 4 teams advance directly to Finals)")
             print(f"  - Finals: YES (top 4 teams, 4 pods)")
             print(f"  - Total rounds: {self.max_rounds}")
             if team_count in [8, 12]:
-                print(f"  ⚠️  Note: Some repeat matchups may occur during Swiss rounds")
+                print(f"  [WARNING]  Note: Some repeat matchups may occur during Swiss rounds")
 
         elif team_count == 16:
-            # 16 teams: 4 Swiss rounds → Top 8 Cut → Finals
+            # 16 teams: 4 Swiss rounds -> Top 8 Cut -> Finals
             if not self.swiss_rounds_configured:
                 self.swiss_rounds_count = 4  # Default: 4 Swiss rounds
             self.has_semifinals = True  # "Top 8 Cut" uses the semifinals logic
             self.max_rounds = self.swiss_rounds_count + 2  # Swiss + Top8Cut + Finals
 
-            print(f"✓ Tournament structure: {team_count} teams")
+            print(f"[OK] Tournament structure: {team_count} teams")
             print(f"  - Swiss rounds: {self.swiss_rounds_count}")
             print(f"  - Top 8 Cut: YES (top 8 teams, 8 pods)")
             print(f"  - Finals: YES (top 4 teams, 4 pods)")
             print(f"  - Total rounds: {self.max_rounds}")
 
         else:
-            print(f"⚠️  Unsupported team count: {team_count}")
+            print(f"[WARNING]  Unsupported team count: {team_count}")
             print(f"   Supported: 8, 12, or 16 teams")
             return False
 
@@ -455,7 +377,7 @@ class TournamentManager:
                 f"8 teams (32 players), 12 teams (48 players), or "
                 f"16 teams (64 players)."
             )
-            print(f"✗ VALIDATION FAILED: {error_msg}")
+            print(f"[X] VALIDATION FAILED: {error_msg}")
             return False, error_msg
 
         # Auto-configure tournament structure based on team count
@@ -464,13 +386,13 @@ class TournamentManager:
             return False, f"Failed to determine tournament structure for {len(self.teams)} teams"
 
         # Log tournament configuration (optimal configuration confirmed)
-        print(f"✓ Tournament configuration: {len(self.teams)} teams (OPTIMAL), {self.swiss_rounds_count} Swiss rounds")
-        print(f"✓ All teams will compete in ONE unified tournament group")
-        print(f"✓ Pods per round: {len(self.teams)} (4 players each)")
-        print(f"✓ This configuration guarantees perfect pairings with zero repeat matchups")
+        print(f"[OK] Tournament configuration: {len(self.teams)} teams (OPTIMAL), {self.swiss_rounds_count} Swiss rounds")
+        print(f"[OK] All teams will compete in ONE unified tournament group")
+        print(f"[OK] Pods per round: {len(self.teams)} (4 players each)")
+        print(f"[OK] This configuration guarantees perfect pairings with zero repeat matchups")
         
         # RESET ALL TOURNAMENT STATE for fresh start
-        print("🔄 RESETTING tournament state for new tournament...")
+        print("[ROTATING] RESETTING tournament state for new tournament...")
         self.scores = {team: 0 for team in self.teams}
         self.player_scores = {}
         for participant in self.participants:
@@ -479,12 +401,14 @@ class TournamentManager:
         
         self.round_results = {}
         self.tables = {}
-        
-        # Clear finalized rounds tracking
+
+        # Clear finalized and submitted rounds tracking
         if hasattr(self, 'finalized_rounds'):
             self.finalized_rounds = set()
-        
-        print("✓ Tournament state reset complete")
+        if hasattr(self, 'submitted_rounds'):
+            self.submitted_rounds = set()
+
+        print("[OK] Tournament state reset complete")
         
         # Get all team names and randomize them
         team_names = list(self.teams.keys())
@@ -502,15 +426,15 @@ class TournamentManager:
             success = self.generate_swiss_round(1)
 
             if success:
-                print(f"✓ Round 1 generated successfully!")
+                print(f"[OK] Round 1 generated successfully!")
                 print(f"   Remaining rounds will be generated after each round's results are submitted.")
                 print(f"   This ensures proper Swiss pairing based on current standings.")
                 return True, f"Tournament setup complete with {len(self.tournament_teams)} teams. Round 1 is ready!"
             else:
-                print("✗ Failed to generate Round 1")
+                print("[X] Failed to generate Round 1")
                 return False, "Failed to generate Round 1. Please try setup again."
         except Exception as e:
-            print(f"✗ Error during tournament generation: {e}")
+            print(f"[X] Error during tournament generation: {e}")
             import traceback
             traceback.print_exc()
             return False, f"Error generating tournament: {str(e)}"
@@ -532,7 +456,7 @@ class TournamentManager:
             success, solution = unified_pairing.generate_all_rounds()
             
             if not success:
-                print("✗ Failed to generate Swiss tournament")
+                print("[X] Failed to generate Swiss tournament")
                 return False
             
             # Validate the solution
@@ -541,7 +465,7 @@ class TournamentManager:
             # Get statistics
             stats = unified_pairing.get_detailed_statistics()
             
-            print(f"✓ Tournament generated successfully!")
+            print(f"[OK] Tournament generated successfully!")
             print(f"  Perfect tournament: {validation_report.is_perfect}")
             print(f"  Total violations: {validation_report.total_violations}")
             print(f"  Pairing efficiency: {stats.pairing_efficiency:.1f}%")
@@ -556,7 +480,7 @@ class TournamentManager:
             return True
             
         except Exception as e:
-            print(f"✗ Error during tournament generation: {str(e)}")
+            print(f"[X] Error during tournament generation: {str(e)}")
             import traceback
             traceback.print_exc()
             return False
@@ -595,7 +519,7 @@ class TournamentManager:
             success, round_solution = self._unified_pairing.generate_single_round(round_num)
 
             if not success:
-                print(f"✗ Failed to generate Round {round_num}")
+                print(f"[X] Failed to generate Round {round_num}")
                 return False
 
             # Add to tournament rounds
@@ -604,11 +528,11 @@ class TournamentManager:
             # Organize this round into tables structure
             self._organize_single_round_into_tables(round_num, round_solution)
 
-            print(f"✓ Round {round_num} generated successfully!")
+            print(f"[OK] Round {round_num} generated successfully!")
             return True
 
         except Exception as e:
-            print(f"✗ Error generating Round {round_num}: {str(e)}")
+            print(f"[X] Error generating Round {round_num}: {str(e)}")
             import traceback
             traceback.print_exc()
             return False
@@ -639,7 +563,7 @@ class TournamentManager:
 
             self.tables[round_num][table_idx] = pod
 
-        print(f"✓ Round {round_num}: {len(round_solution)} tables organized")
+        print(f"[OK] Round {round_num}: {len(round_solution)} tables organized")
 
 
     def _validate_group_rounds(self, round_pairings, group_name):
@@ -656,14 +580,14 @@ class TournamentManager:
                 teams_in_pod = {player['Team Name'] for player in pod}
                 if len(teams_in_pod) < 4:
                     teammate_violations += 1
-                    print(f"    ⚠️  Round {rnd} Pod {pod_idx}: Teammate violation - Teams: {list(teams_in_pod)}")
+                    print(f"    [WARNING]  Round {rnd} Pod {pod_idx}: Teammate violation - Teams: {list(teams_in_pod)}")
                 
                 # Check duplicate matchups
                 for a, b in combinations(pod, 2):
                     pair = tuple(sorted([a['Player ID'], b['Player ID']]))
                     if pair in seen_pairs:
                         duplicate_violations += 1
-                        print(f"    ⚠️  Round {rnd} Pod {pod_idx}: Duplicate pairing - {a['Player Name']} vs {b['Player Name']}")
+                        print(f"    [WARNING]  Round {rnd} Pod {pod_idx}: Duplicate pairing - {a['Player Name']} vs {b['Player Name']}")
                     seen_pairs.add(pair)
         
         print(f"  Validation results for {group_name}:")
@@ -673,15 +597,15 @@ class TournamentManager:
         print(f"    Expected pairings: {4 * 4 * 6} (4 rounds × 4 pods × 6 pairs per pod)")
         
         if duplicate_violations == 0 and teammate_violations == 0:
-            print(f"    ✅ {group_name}: PERFECT - No violations found!")
+            print(f"    [OK] {group_name}: PERFECT - No violations found!")
         else:
-            print(f"    ❌ {group_name}: {teammate_violations + duplicate_violations} total violations")
+            print(f"    [ERROR] {group_name}: {teammate_violations + duplicate_violations} total violations")
     
     def organize_rounds_into_tables(self):
         """Organize the generated rounds into the tables structure with intelligent seating
 
         Round 1: Random seating (no prior scores)
-        Rounds 2+: Score-based seating (higher team score → Seat 1)
+        Rounds 2+: Score-based seating (higher team score -> Seat 1)
         """
         for round_num in range(1, self.swiss_rounds_count + 1):
             self.tables[round_num] = {}
@@ -705,11 +629,11 @@ class TournamentManager:
                         self.tables[round_num][table_name] = sorted_pod
                         print(f"   Round {round_num}, {table_name}: Intelligent seating (score-based)")
 
-        print(f"✓ Organized all rounds into tables structure with intelligent seating")
-        print(f"✓ Tournament ready: {len(self.tables)} rounds with {len(self.tables[1]) if self.tables else 0} tables each")
+        print(f"[OK] Organized all rounds into tables structure with intelligent seating")
+        print(f"[OK] Tournament ready: {len(self.tables)} rounds with {len(self.tables[1]) if self.tables else 0} tables each")
 
     def _apply_intelligent_seating(self, pod, round_num):
-        """Apply intelligent seating: higher individual player score → Seat 1
+        """Apply intelligent seating: higher individual player score -> Seat 1
 
         Args:
             pod: List of player dictionaries
@@ -737,7 +661,7 @@ class TournamentManager:
         """Apply intelligent seating to a round based on current scores
 
         Round 1: Random seating (no prior scores)
-        Rounds 2+: Score-based seating (higher individual player score → Seat 1)
+        Rounds 2+: Score-based seating (higher individual player score -> Seat 1)
 
         Args:
             round_num: Round number to apply seating to
@@ -868,16 +792,16 @@ class TournamentManager:
         elif hasattr(self, 'semifinals') and self.semifinals:
             advancing_teams = self.semifinals.get('advancing_teams', [])
         else:
-            print("❌ No finals data available")
+            print("[ERROR] No finals data available")
             return None
         
         if not advancing_teams:
-            print("❌ No advancing teams found")
+            print("[ERROR] No advancing teams found")
             return None
         
-        print(f"\n🏆 CALCULATING CHAMPION - Teams in finals: {advancing_teams}")
-        print(f"📊 Final round scores: {self.final_round_scores}")
-        print(f"📊 Swiss round scores: {self.swiss_round_scores}")
+        print(f"\n[TROPHY] CALCULATING CHAMPION - Teams in finals: {advancing_teams}")
+        print(f"[CHART] Final round scores: {self.final_round_scores}")
+        print(f"[CHART] Swiss round scores: {self.swiss_round_scores}")
         
         # Calculate final round team scores (Round 5 only)
         final_standings = []
@@ -898,23 +822,23 @@ class TournamentManager:
         # CRITICAL FIX: Sort by FINAL ROUND POINTS first (primary), then Swiss round points as tiebreaker
         # This ensures the team with highest final round score wins, regardless of Swiss performance
         # Only if teams are tied on final points do we use Swiss points as tiebreaker
-        print(f"\n🔄 Sorting by: (final_points DESC, swiss_points DESC)")
+        print(f"\n[ROTATING] Sorting by: (final_points DESC, swiss_points DESC)")
         final_standings.sort(key=lambda x: (x['final_points'], x['swiss_points']), reverse=True)
         
-        print(f"\n✅ FINAL STANDINGS (sorted by FINAL points first, then Swiss as tiebreaker):")
+        print(f"\n[OK] FINAL STANDINGS (sorted by FINAL points first, then Swiss as tiebreaker):")
         for rank, s in enumerate(final_standings, 1):
-            medal = "🥇" if rank == 1 else "🥈" if rank == 2 else "🥉" if rank == 3 else f"{rank}."
+            medal = "[1st]" if rank == 1 else "[2nd]" if rank == 2 else "[3rd]" if rank == 3 else f"{rank}."
             print(f"  {medal} {s['team']}: Final={s['final_points']} pts (PRIMARY), Swiss={s['swiss_points']} pts (tiebreaker), Total={s['total_points']} pts")
         
         if len(final_standings) > 1:
             winner = final_standings[0]
             runner_up = final_standings[1]
             if winner['final_points'] == runner_up['final_points']:
-                print(f"⚠️  TIE on final points! Using Swiss points as tiebreaker:")
+                print(f"[WARNING]  TIE on final points! Using Swiss points as tiebreaker:")
                 print(f"   Winner: {winner['team']} (Swiss: {winner['swiss_points']} pts)")
                 print(f"   Runner-up: {runner_up['team']} (Swiss: {runner_up['swiss_points']} pts)")
             else:
-                print(f"✅ Winner determined by final round points: {winner['team']} ({winner['final_points']} pts)")
+                print(f"[OK] Winner determined by final round points: {winner['team']} ({winner['final_points']} pts)")
         
         return final_standings
     
@@ -960,7 +884,7 @@ class TournamentManager:
             }
             
         except Exception as e:
-            print(f"❌ Error determining tournament winner: {str(e)}")
+            print(f"[ERROR] Error determining tournament winner: {str(e)}")
             return None
     
     def update_final_round_scores(self, round_num, player_results):
@@ -1008,11 +932,11 @@ class TournamentManager:
         """
         try:
             if after_semifinals:
-                print("🏆 Generating FINALS after semifinals (16-team tournament)")
+                print("[TROPHY] Generating FINALS after semifinals (16-team tournament)")
                 # Use semifinal scores to determine top 4 teams
                 # Semifinal scores are already in self.scores (accumulated)
             else:
-                print("🏆 Generating FINALS after Swiss rounds (8-team tournament)")
+                print("[TROPHY] Generating FINALS after Swiss rounds (8-team tournament)")
 
             # Get top 4 teams by total score
             sorted_teams = sorted(self.scores.items(), key=lambda x: x[1], reverse=True)
@@ -1093,20 +1017,20 @@ class TournamentManager:
                     
                     if player_team:
                         if player_team in teams_at_table:
-                            print(f"     ⚠️  WARNING: Multiple players from {player_team} detected at {table_name}!")
+                            print(f"     [WARNING]  WARNING: Multiple players from {player_team} detected at {table_name}!")
                         teams_at_table.add(player_team)
                 
                 # Seating order is now arranged by team ranking (highest team score = first seat)
                 # No randomization - fixed order based on team performance
                 self.tables[finals_round_num][table_name] = table_players
 
-            print(f"\n✅ Finals created: 4 tables with strength-based matchups")
+            print(f"\n[OK] Finals created: 4 tables with strength-based matchups")
             print(f"   - Table 1: Strongest player from each team (NO teammates)")
             print(f"   - Table 2: 2nd strongest player from each team (NO teammates)")
             print(f"   - Table 3: 3rd strongest player from each team (NO teammates)")
             print(f"   - Table 4: 4th strongest player from each team (NO teammates)")
-            print(f"   ✅ VERIFIED: No teammates are paired together!")
-            print(f"   ✅ Seating order: Arranged by team ranking (highest team score = first seat)")
+            print(f"   [OK] VERIFIED: No teammates are paired together!")
+            print(f"   [OK] Seating order: Arranged by team ranking (highest team score = first seat)")
             
             # Store finals data for winner calculation
             finals_data = {
@@ -1121,7 +1045,7 @@ class TournamentManager:
             return finals_data
 
         except Exception as e:
-            print(f"❌ Error generating finals: {e}")
+            print(f"[ERROR] Error generating finals: {e}")
             import traceback
             traceback.print_exc()
             return None
@@ -1138,11 +1062,11 @@ class TournamentManager:
         try:
             # Validate we have enough teams for semifinals
             if len(self.scores) < 8:
-                print(f"❌ Cannot generate semifinals: Only {len(self.scores)} teams (need at least 8)")
+                print(f"[ERROR] Cannot generate semifinals: Only {len(self.scores)} teams (need at least 8)")
                 return None
 
             team_count = len(self.teams)
-            print(f"🏆 Generating TOP 8 CUT for {team_count}-team tournament")
+            print(f"[TROPHY] Generating TOP 8 CUT for {team_count}-team tournament")
 
             # Get top 8 teams by total score
             sorted_teams = sorted(self.scores.items(), key=lambda x: x[1], reverse=True)
@@ -1209,7 +1133,7 @@ class TournamentManager:
                         print(f"     {table_name}: {player_names}")
                         table_num += 1
 
-            print(f"\n✅ Semifinals created: 8 tables with strength-based matchups")
+            print(f"\n[OK] Semifinals created: 8 tables with strength-based matchups")
             print(f"   - Top 8 teams (32 players total)")
             print(f"   - Each table: 4 players from 4 different teams (NO teammates)")
             print(f"   - Players matched by skill level")
@@ -1226,7 +1150,7 @@ class TournamentManager:
             return semifinals_data
 
         except Exception as e:
-            print(f"❌ Error generating semifinals: {e}")
+            print(f"[ERROR] Error generating semifinals: {e}")
             import traceback
             traceback.print_exc()
             return None
@@ -1236,7 +1160,7 @@ class TournamentManager:
         try:
             # Check if we have the necessary data
             if not hasattr(self, 'group_a') or not hasattr(self, 'group_b') or not self.scores:
-                print("❌ Using unified tournament - calling generate_unified_finals instead")
+                print("[ERROR] Using unified tournament - calling generate_unified_finals instead")
                 return self.generate_unified_finals()
             
             # Calculate team standings for each group
@@ -1254,7 +1178,7 @@ class TournamentManager:
             advancing_teams.append(group_b_standings[0][0])  # Group B 1st
             advancing_teams.append(group_b_standings[1][0])  # Group B 2nd
             
-            print(f"🏆 Advancing teams:")
+            print(f"[TROPHY] Advancing teams:")
             print(f"   Group A: {group_a_standings[0][0]} ({group_a_standings[0][1]} pts), {group_a_standings[1][0]} ({group_a_standings[1][1]} pts)")
             print(f"   Group B: {group_b_standings[0][0]} ({group_b_standings[0][1]} pts), {group_b_standings[1][0]} ({group_b_standings[1][1]} pts)")
             
@@ -1293,7 +1217,7 @@ class TournamentManager:
                 if len(pod_players) == 4:  # Should have exactly 4 players (one from each team)
                     semifinals_pods[f'Table {pod_rank}'] = pod_players
             
-            print(f"🎯 Finals pods created:")
+            print(f"[TARGET] Finals pods created:")
             for pod_name, players in semifinals_pods.items():
                 print(f"   {pod_name}: {[p['Player Name'] for p in players]}")
             
@@ -1318,7 +1242,7 @@ class TournamentManager:
             return self.semifinals
             
         except Exception as e:
-            print(f"❌ Error generating semifinals: {str(e)}")
+            print(f"[ERROR] Error generating semifinals: {str(e)}")
             return None
 
     def validate_group_separation(self, round_num):
@@ -1431,7 +1355,7 @@ def load_data():
                 tournament.determine_tournament_structure()
                 success = True
             else:
-                excel_path = 'July_CEDH_Event/13th July CEDH Participant List.xlsx'
+                excel_path = 'participants/participant_team.xlsx'
 
                 # Try to load from Excel, fallback to sample data
                 if os.path.exists(excel_path):
@@ -1577,180 +1501,77 @@ def setup_tournament():
 @app.route('/submit_player_results', methods=['POST'])
 def submit_player_results():
     """Finalize round (without adding points again - they're already added via table submissions)"""
-    data = request.json
-    round_num = data.get('round')
+    try:
+        data = request.json
+        round_num = data.get('round')
 
-    # Initialize tracking sets if they don't exist
-    if not hasattr(tournament, 'finalized_rounds'):
-        tournament.finalized_rounds = set()
+        # Initialize tracking sets if they don't exist
+        if not hasattr(tournament, 'finalized_rounds'):
+            tournament.finalized_rounds = set()
 
-    if not hasattr(tournament, 'submitted_rounds'):
-        tournament.submitted_rounds = set()
+        if not hasattr(tournament, 'submitted_rounds'):
+            tournament.submitted_rounds = set()
 
-    # Check if round is already finalized or submitted
-    if round_num in tournament.finalized_rounds:
-        return jsonify({
-            'success': False,
-            'error': f'Round {round_num} has already been finalized!',
-            'message': f'Round {round_num} has already been finalized!'
-        })
+        # Check if round is already finalized or submitted
+        if round_num in tournament.finalized_rounds:
+            return jsonify({
+                'success': False,
+                'error': f'Round {round_num} has already been finalized!',
+                'message': f'Round {round_num} has already been finalized!'
+            })
 
-    if round_num in tournament.submitted_rounds:
-        return jsonify({
-            'success': False,
-            'error': f'Round {round_num} results have already been submitted!',
-            'message': f'Round {round_num} results have already been submitted!'
-        })
+        if round_num in tournament.submitted_rounds:
+            return jsonify({
+                'success': False,
+                'error': f'Round {round_num} results have already been submitted!',
+                'message': f'Round {round_num} results have already been submitted!'
+            })
     
-    # Check if this round has table submissions (points already added)
-    has_table_submissions = (round_num in tournament.round_results and 
-                           'table_submissions' in tournament.round_results[round_num])
+        # Check if this round has table submissions (points already added)
+        has_table_submissions = (round_num in tournament.round_results and 
+                               'table_submissions' in tournament.round_results[round_num])
     
-    if has_table_submissions:
-        print(f"Round {round_num} has table submissions - points already added via table submissions")
-        print("Finalizing round WITHOUT adding points again to prevent double counting")
+        if has_table_submissions:
+            print(f"Round {round_num} has table submissions - points already added via table submissions")
+            print("Finalizing round WITHOUT adding points again to prevent double counting")
 
-        # Mark the round as finalized and submitted
-        tournament.finalized_rounds.add(round_num)
-        tournament.submitted_rounds.add(round_num)
-
-        # Store finalization timestamp in round results
-        if round_num not in tournament.round_results:
-            tournament.round_results[round_num] = {}
-        tournament.round_results[round_num]['finalized'] = True
-        tournament.round_results[round_num]['submitted'] = True
-
-        print(f"Round {round_num} has been FINALIZED and SUBMITTED - preventing future submissions")
-        
-        # Check if this is Round 4 (end of Swiss) - trigger finals
-        # OR Round 5 (end of Finals) - trigger winner announcement
-        semifinals_data = None
-        tournament_winner_data = None
-
-        # Determine what happens after this round based on tournament structure
-        last_swiss_round = tournament.swiss_rounds_count
-        semifinals_round = last_swiss_round + 1 if tournament.has_semifinals else None
-        finals_round = tournament.max_rounds
-        next_round_generated = None
-
-        # Generate next Swiss round if not the last one
-        if round_num < last_swiss_round:
-            next_round = round_num + 1
-            print(f"🔄 Generating Swiss Round {next_round} based on current standings...")
-            success = tournament.generate_swiss_round(next_round)
-            if success:
-                print(f"✅ Swiss Round {next_round} generated successfully!")
-                next_round_generated = next_round
-            else:
-                print(f"❌ Failed to generate Swiss Round {next_round}")
-
-        if round_num == last_swiss_round:
-            # End of Swiss rounds
-            print(f"🏆 Swiss Round {last_swiss_round} completed!")
-
-            # Store Swiss round scores
-            tournament.swiss_round_scores = tournament.scores.copy()
-
-            if tournament.has_semifinals:
-                # 16 teams: Generate top 8 cut (8 pods)
-                print("   Generating Top 8 Cut (8 teams, 8 pods)...")
-                semifinals_data = tournament.generate_semifinals_round()
-                if semifinals_data:
-                    print("✅ Semifinals generated successfully!")
-                else:
-                    print("❌ Failed to generate semifinals")
-            else:
-                # 8 or 12 teams: Generate finals directly
-                print("   Generating Finals (top 4 teams, 4 pods)...")
-                semifinals_data = tournament.generate_unified_finals(after_semifinals=False)
-                if semifinals_data:
-                    print("✅ Finals generated successfully!")
-                else:
-                    print("❌ Failed to generate finals")
-
-        elif tournament.has_semifinals and round_num == semifinals_round:
-            # End of top 8 cut (16-team tournament)
-            print(f"🏆 Top 8 Cut completed! Generating Finals...")
-
-            # Store semifinal scores
-            tournament.semifinal_round_scores = tournament.scores.copy()
-
-            # Generate finals after semifinals
-            semifinals_data = tournament.generate_unified_finals(after_semifinals=True)
-            if semifinals_data:
-                print("✅ Finals generated successfully!")
-            else:
-                print("❌ Failed to generate finals")
-
-        elif round_num == finals_round:
-            # End of finals
-            print("🏆 Finals completed! Determining tournament winner...")
-            tournament_winner_data = tournament.get_tournament_winner()
-            if tournament_winner_data:
-                print("✅ Tournament winner determined!")
-                print(f"🥇 Champion: {tournament_winner_data['winning_team']}")
-                print(f"🌟 MVP: {tournament_winner_data['mvp_player']['name']} ({tournament_winner_data['mvp_player']['total_points']} pts)")
-            else:
-                print("❌ Failed to determine tournament winner")
-        
-        response_data = {
-            'success': True,
-            'scores': tournament.scores,
-            'player_scores': tournament.player_scores,
-            'message': f'Round {round_num} finalized successfully (points were already added via table submissions)'
-        }
-
-        if next_round_generated:
-            response_data['next_round'] = next_round_generated
-            response_data['message'] += f' | 🔄 Swiss Round {next_round_generated} generated based on current standings!'
-
-        if semifinals_data:
-            response_data['semifinals'] = semifinals_data
-            response_data['message'] += ' | 🎯 Finals have been generated! Top 2 teams from each group advance.'
-
-        if tournament_winner_data:
-            response_data['tournament_winner'] = tournament_winner_data
-            response_data['message'] += f" | 🏆 Tournament Complete! Champion: {tournament_winner_data['winning_team']}"
-
-        # Auto-save tournament state after successful submission
-        tournament.save_backup()
-
-        return jsonify(response_data)
-    else:
-        print(f"Round {round_num} has NO table submissions - using legacy point addition method")
-        # Legacy method: add points from form inputs (for backward compatibility)
-        player_results = data.get('results', [])
-        success = tournament.submit_player_results(round_num, player_results)
-        
-        if success:
-            # Mark round as finalized and submitted
+            # Mark the round as finalized and submitted
             tournament.finalized_rounds.add(round_num)
             tournament.submitted_rounds.add(round_num)
+
+            # Store finalization timestamp in round results
+            if round_num not in tournament.round_results:
+                tournament.round_results[round_num] = {}
+            tournament.round_results[round_num]['finalized'] = True
+            tournament.round_results[round_num]['submitted'] = True
+
             print(f"Round {round_num} has been FINALIZED and SUBMITTED - preventing future submissions")
-            
-            # Determine what happens after this round based on tournament structure
+        
+            # Check if this is Round 4 (end of Swiss) - trigger finals
+            # OR Round 5 (end of Finals) - trigger winner announcement
             semifinals_data = None
             tournament_winner_data = None
-            next_round_generated = None
 
+            # Determine what happens after this round based on tournament structure
             last_swiss_round = tournament.swiss_rounds_count
             semifinals_round = last_swiss_round + 1 if tournament.has_semifinals else None
             finals_round = tournament.max_rounds
+            next_round_generated = None
 
             # Generate next Swiss round if not the last one
             if round_num < last_swiss_round:
                 next_round = round_num + 1
-                print(f"🔄 Generating Swiss Round {next_round} based on current standings...")
+                print(f"[ROTATING] Generating Swiss Round {next_round} based on current standings...")
                 success = tournament.generate_swiss_round(next_round)
                 if success:
-                    print(f"✅ Swiss Round {next_round} generated successfully!")
+                    print(f"[OK] Swiss Round {next_round} generated successfully!")
                     next_round_generated = next_round
                 else:
-                    print(f"❌ Failed to generate Swiss Round {next_round}")
+                    print(f"[ERROR] Failed to generate Swiss Round {next_round}")
 
             if round_num == last_swiss_round:
                 # End of Swiss rounds
-                print(f"🏆 Swiss Round {last_swiss_round} completed!")
+                print(f"[TROPHY] Swiss Round {last_swiss_round} completed!")
 
                 # Store Swiss round scores
                 tournament.swiss_round_scores = tournament.scores.copy()
@@ -1760,21 +1581,21 @@ def submit_player_results():
                     print("   Generating Top 8 Cut (8 teams, 8 pods)...")
                     semifinals_data = tournament.generate_semifinals_round()
                     if semifinals_data:
-                        print("✅ Semifinals generated successfully!")
+                        print("[OK] Semifinals generated successfully!")
                     else:
-                        print("❌ Failed to generate semifinals")
+                        print("[ERROR] Failed to generate semifinals")
                 else:
                     # 8 or 12 teams: Generate finals directly
                     print("   Generating Finals (top 4 teams, 4 pods)...")
-                    semifinals_data = tournament.generate_semifinals()  # Legacy method calls generate_unified_finals
+                    semifinals_data = tournament.generate_unified_finals(after_semifinals=False)
                     if semifinals_data:
-                        print("✅ Finals generated successfully!")
+                        print("[OK] Finals generated successfully!")
                     else:
-                        print("❌ Failed to generate finals")
+                        print("[ERROR] Failed to generate finals")
 
             elif tournament.has_semifinals and round_num == semifinals_round:
                 # End of top 8 cut (16-team tournament)
-                print(f"🏆 Top 8 Cut completed! Generating Finals...")
+                print(f"[TROPHY] Top 8 Cut completed! Generating Finals...")
 
                 # Store semifinal scores
                 tournament.semifinal_round_scores = tournament.scores.copy()
@@ -1782,46 +1603,161 @@ def submit_player_results():
                 # Generate finals after semifinals
                 semifinals_data = tournament.generate_unified_finals(after_semifinals=True)
                 if semifinals_data:
-                    print("✅ Finals generated successfully!")
+                    print("[OK] Finals generated successfully!")
                 else:
-                    print("❌ Failed to generate finals")
+                    print("[ERROR] Failed to generate finals")
 
             elif round_num == finals_round:
                 # End of finals
-                print("🏆 Finals completed! Determining tournament winner...")
+                print("[TROPHY] Finals completed! Determining tournament winner...")
                 tournament_winner_data = tournament.get_tournament_winner()
                 if tournament_winner_data:
-                    print("✅ Tournament winner determined!")
-                    print(f"🥇 Champion: {tournament_winner_data['winning_team']}")
-                    print(f"🌟 MVP: {tournament_winner_data['mvp_player']['name']} ({tournament_winner_data['mvp_player']['total_points']} pts)")
+                    print("[OK] Tournament winner determined!")
+                    print(f"[1st] Champion: {tournament_winner_data['winning_team']}")
+                    print(f"[STAR] MVP: {tournament_winner_data['mvp_player']['name']} ({tournament_winner_data['mvp_player']['total_points']} pts)")
                 else:
-                    print("❌ Failed to determine tournament winner")
-            
+                    print("[ERROR] Failed to determine tournament winner")
+        
             response_data = {
                 'success': True,
                 'scores': tournament.scores,
                 'player_scores': tournament.player_scores,
-                'message': f'Round {round_num} finalized successfully'
+                'message': f'Round {round_num} finalized successfully (points were already added via table submissions)'
             }
 
             if next_round_generated:
                 response_data['next_round'] = next_round_generated
-                response_data['message'] += f' | 🔄 Swiss Round {next_round_generated} generated based on current standings!'
+                response_data['message'] += f' | [ROTATING] Swiss Round {next_round_generated} generated based on current standings!'
 
             if semifinals_data:
                 response_data['semifinals'] = semifinals_data
-                response_data['message'] += ' | 🎯 Finals have been generated! Top 2 teams from each group advance.'
+                response_data['message'] += ' | [TARGET] Finals have been generated! Top 2 teams from each group advance.'
 
             if tournament_winner_data:
                 response_data['tournament_winner'] = tournament_winner_data
-                response_data['message'] += f" | 🏆 Tournament Complete! Champion: {tournament_winner_data['winning_team']}"
+                response_data['message'] += f" | [TROPHY] Tournament Complete! Champion: {tournament_winner_data['winning_team']}"
+
+            # Auto-save tournament state after successful submission
+            tournament.save_backup()
 
             return jsonify(response_data)
         else:
-            return jsonify({
-                'success': False,
-                'message': 'Failed to finalize round results'
-            })
+            print(f"Round {round_num} has NO table submissions - using legacy point addition method")
+            # Legacy method: add points from form inputs (for backward compatibility)
+            player_results = data.get('results', [])
+            success = tournament.submit_player_results(round_num, player_results)
+        
+            if success:
+                # Mark round as finalized and submitted
+                tournament.finalized_rounds.add(round_num)
+                tournament.submitted_rounds.add(round_num)
+                print(f"Round {round_num} has been FINALIZED and SUBMITTED - preventing future submissions")
+            
+                # Determine what happens after this round based on tournament structure
+                semifinals_data = None
+                tournament_winner_data = None
+                next_round_generated = None
+
+                last_swiss_round = tournament.swiss_rounds_count
+                semifinals_round = last_swiss_round + 1 if tournament.has_semifinals else None
+                finals_round = tournament.max_rounds
+
+                # Generate next Swiss round if not the last one
+                if round_num < last_swiss_round:
+                    next_round = round_num + 1
+                    print(f"[ROTATING] Generating Swiss Round {next_round} based on current standings...")
+                    success = tournament.generate_swiss_round(next_round)
+                    if success:
+                        print(f"[OK] Swiss Round {next_round} generated successfully!")
+                        next_round_generated = next_round
+                    else:
+                        print(f"[ERROR] Failed to generate Swiss Round {next_round}")
+
+                if round_num == last_swiss_round:
+                    # End of Swiss rounds
+                    print(f"[TROPHY] Swiss Round {last_swiss_round} completed!")
+
+                    # Store Swiss round scores
+                    tournament.swiss_round_scores = tournament.scores.copy()
+
+                    if tournament.has_semifinals:
+                        # 16 teams: Generate top 8 cut (8 pods)
+                        print("   Generating Top 8 Cut (8 teams, 8 pods)...")
+                        semifinals_data = tournament.generate_semifinals_round()
+                        if semifinals_data:
+                            print("[OK] Semifinals generated successfully!")
+                        else:
+                            print("[ERROR] Failed to generate semifinals")
+                    else:
+                        # 8 or 12 teams: Generate finals directly
+                        print("   Generating Finals (top 4 teams, 4 pods)...")
+                        semifinals_data = tournament.generate_semifinals()  # Legacy method calls generate_unified_finals
+                        if semifinals_data:
+                            print("[OK] Finals generated successfully!")
+                        else:
+                            print("[ERROR] Failed to generate finals")
+
+                elif tournament.has_semifinals and round_num == semifinals_round:
+                    # End of top 8 cut (16-team tournament)
+                    print(f"[TROPHY] Top 8 Cut completed! Generating Finals...")
+
+                    # Store semifinal scores
+                    tournament.semifinal_round_scores = tournament.scores.copy()
+
+                    # Generate finals after semifinals
+                    semifinals_data = tournament.generate_unified_finals(after_semifinals=True)
+                    if semifinals_data:
+                        print("[OK] Finals generated successfully!")
+                    else:
+                        print("[ERROR] Failed to generate finals")
+
+                elif round_num == finals_round:
+                    # End of finals
+                    print("[TROPHY] Finals completed! Determining tournament winner...")
+                    tournament_winner_data = tournament.get_tournament_winner()
+                    if tournament_winner_data:
+                        print("[OK] Tournament winner determined!")
+                        print(f"[1st] Champion: {tournament_winner_data['winning_team']}")
+                        print(f"[STAR] MVP: {tournament_winner_data['mvp_player']['name']} ({tournament_winner_data['mvp_player']['total_points']} pts)")
+                    else:
+                        print("[ERROR] Failed to determine tournament winner")
+            
+                response_data = {
+                    'success': True,
+                    'scores': tournament.scores,
+                    'player_scores': tournament.player_scores,
+                    'message': f'Round {round_num} finalized successfully'
+                }
+
+                if next_round_generated:
+                    response_data['next_round'] = next_round_generated
+                    response_data['message'] += f' | [ROTATING] Swiss Round {next_round_generated} generated based on current standings!'
+
+                if semifinals_data:
+                    response_data['semifinals'] = semifinals_data
+                    response_data['message'] += ' | [TARGET] Finals have been generated! Top 2 teams from each group advance.'
+
+                if tournament_winner_data:
+                    response_data['tournament_winner'] = tournament_winner_data
+                    response_data['message'] += f" | [TROPHY] Tournament Complete! Champion: {tournament_winner_data['winning_team']}"
+
+                return jsonify(response_data)
+            else:
+                return jsonify({
+                    'success': False,
+                    'message': 'Failed to finalize round results'
+                })
+
+    except Exception as e:
+        import traceback
+        error_trace = traceback.format_exc()
+        print(f"[ERROR] Error in submit_player_results: {str(e)}")
+        print(f"Traceback: {error_trace}")
+        return jsonify({
+            'success': False,
+            'message': f'Error finalizing round: {str(e)}',
+            'error': str(e)
+        }), 500
 
 @app.route('/submit_table_results', methods=['POST'])
 def submit_table_results():
@@ -1927,6 +1863,7 @@ def get_tables(round_num):
             'success': True,
             'tables': tables_with_seating,
             'round': round_num,
+            'player_scores': tournament.player_scores,  # Include cumulative player scores
             'message': f'Round {round_num} pairings with intelligent seating'
         })
     else:

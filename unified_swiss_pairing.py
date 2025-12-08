@@ -215,6 +215,10 @@ class HybridConstraintSolver:
         """
         self.backtrack_stats['nodes_explored'] += 1
         
+        # Safety limit to prevent infinite loops/timeouts
+        if self.backtrack_stats['nodes_explored'] > 500000:
+            raise Exception(f"Solver timeout - search space too large ({self.backtrack_stats['nodes_explored']} nodes)")
+        
         # Base case: all pods filled
         expected_pods = self.pairing_system.pods_per_round + (1 if self.pairing_system.incomplete_pod_size > 0 else 0)
         
@@ -450,7 +454,7 @@ class UnifiedSwissPairing:
         if len(self.tournament_teams) % 4 != 0:
             # We can't have proper 4-team pods, so we'll use the best available configuration
             # This is a limitation that should be documented
-            print(f"⚠️  Note: {len(self.tournament_teams)} teams cannot form perfect 4-team pods")
+            print(f"[WARNING]  Note: {len(self.tournament_teams)} teams cannot form perfect 4-team pods")
             print(f"   Tournament will use mixed pod sizes for optimal pairing")
         
         # Initialize constraint tracking
@@ -476,7 +480,7 @@ class UnifiedSwissPairing:
         # Strict constraint only if: R × 3 <= N - 1
         self.enforce_strict_team_matchups = (self.swiss_rounds_count * 3) <= (len(self.tournament_teams) - 1)
 
-        print(f"🔧 Unified Swiss Pairing initialized")
+        print(f"[WRENCH] Unified Swiss Pairing initialized")
         print(f"   Teams: {len(tournament_teams)} ({tournament_teams})")
         print(f"   Players: {self.total_players}")
         print(f"   Pods per round: {self.pods_per_round}")
@@ -484,9 +488,9 @@ class UnifiedSwissPairing:
         print(f"   Swiss rounds: {swiss_rounds_count}")
 
         if self.enforce_strict_team_matchups:
-            print(f"   ✓ Team matchup policy: STRICT (each team faces unique opponents)")
+            print(f"   [OK] Team matchup policy: STRICT (each team faces unique opponents)")
         else:
-            print(f"   ⚠️  Team matchup policy: RELAXED (repeat matchups allowed when necessary)")
+            print(f"   [WARNING]  Team matchup policy: RELAXED (repeat matchups allowed when necessary)")
     
     def _validate_tournament_configuration(self):
         """Validate that the tournament configuration is valid."""
@@ -511,7 +515,7 @@ class UnifiedSwissPairing:
         
         # Special validation for team counts that don't divide evenly by 4
         if team_count % 4 != 0:
-            print(f"⚠️  Warning: {team_count} teams will result in incomplete pods")
+            print(f"[WARNING]  Warning: {team_count} teams will result in incomplete pods")
             print(f"   Each round will have {team_count // 4} full pods and 1 pod with {team_count % 4} players")
     
     def _build_player_list(self):
@@ -528,7 +532,7 @@ class UnifiedSwissPairing:
         Returns:
             Tuple of (success, list_of_round_pairings)
         """
-        print("🚀 Generating all Swiss rounds with unified algorithm...")
+        print("[ROCKET] Generating all Swiss rounds with unified algorithm...")
         
         # Try multiple approaches in order of preference
         approaches = [
@@ -550,19 +554,19 @@ class UnifiedSwissPairing:
                     self.round_solutions = solution
                     generation_time = time.time() - self.start_time
                     
-                    print(f"✅ {approach_name} succeeded!")
+                    print(f"[OK] {approach_name} succeeded!")
                     print(f"   Generation time: {generation_time:.2f} seconds")
                     print(f"   Total rounds: {len(solution)}")
                     
                     return True, solution
                 else:
-                    print(f"❌ {approach_name} failed")
+                    print(f"[ERROR] {approach_name} failed")
                     
             except Exception as e:
-                print(f"❌ {approach_name} error: {str(e)}")
+                print(f"[ERROR] {approach_name} error: {str(e)}")
                 continue
         
-        print("❌ All approaches failed to generate valid tournament")
+        print("[ERROR] All approaches failed to generate valid tournament")
         return False, []
 
     def generate_single_round(self, round_num: int) -> Tuple[bool, List[List[Dict]]]:
@@ -576,7 +580,7 @@ class UnifiedSwissPairing:
         Returns:
             Tuple of (success, list_of_pods_for_this_round)
         """
-        print(f"🔄 Generating Round {round_num} with current scores...")
+        print(f"[ROTATING] Generating Round {round_num} with current scores...")
 
         # Update team scores from the tournament's current scores
         if hasattr(self, 'team_scores') and self.team_scores:
@@ -587,7 +591,7 @@ class UnifiedSwissPairing:
             round_solution = self._generate_round_with_pod_consistency(round_num)
 
             if round_solution is None:
-                print(f"  ❌ Failed to generate Round {round_num}")
+                print(f"  [ERROR] Failed to generate Round {round_num}")
                 return False, []
 
             # Update constraints after this round
@@ -596,11 +600,11 @@ class UnifiedSwissPairing:
             # Add to round solutions
             self.round_solutions.append(round_solution)
 
-            print(f"  ✅ Round {round_num} generated ({len(round_solution)} pods)")
+            print(f"  [OK] Round {round_num} generated ({len(round_solution)} pods)")
             return True, round_solution
 
         except Exception as e:
-            print(f"  ❌ Error generating Round {round_num}: {str(e)}")
+            print(f"  [ERROR] Error generating Round {round_num}: {str(e)}")
             import traceback
             traceback.print_exc()
             return False, []
@@ -640,13 +644,13 @@ class UnifiedSwissPairing:
             round_solution = self._generate_round_with_pod_consistency(round_num)
 
             if round_solution is None:
-                print(f"  ❌ Failed to solve Round {round_num}")
+                print(f"  [ERROR] Failed to solve Round {round_num}")
                 return False, []
 
             solution.append(round_solution)
             self._update_constraints_after_round(round_solution)
 
-            print(f"  ✅ Round {round_num} solved ({len(round_solution)} pods)")
+            print(f"  [OK] Round {round_num} solved ({len(round_solution)} pods)")
 
         return True, solution
     
@@ -668,10 +672,10 @@ class UnifiedSwissPairing:
         result = self.constraint_solver.solve_with_enhanced_backtracking(available_players)
         
         if result is not None:
-            print(f"    ✅ Enhanced solver succeeded")
+            print(f"    [OK] Enhanced solver succeeded")
             return result
         
-        print(f"    ❌ Enhanced solver failed, trying fallback...")
+        print(f"    [ERROR] Enhanced solver failed, trying fallback...")
         
         # Fallback to original backtracking if enhanced solver fails
         available_players.sort(key=lambda p: self._count_valid_opponents(p), reverse=False)
@@ -910,13 +914,13 @@ class UnifiedSwissPairing:
                 success, solution = strategy_method()
                 
                 if success:
-                    print(f"    ✅ {strategy_name} succeeded on attempt {attempt + 1}")
+                    print(f"    [OK] {strategy_name} succeeded on attempt {attempt + 1}")
                     return True, solution
                 
                 if (attempt + 1) % 100 == 0:
                     print(f"      Attempt {attempt + 1}/{max_attempts}...")
             
-            print(f"    ❌ {strategy_name} failed after {max_attempts} attempts")
+            print(f"    [ERROR] {strategy_name} failed after {max_attempts} attempts")
         
         return False, []
     
@@ -1198,10 +1202,10 @@ class UnifiedSwissPairing:
                 print(f"    Optimization attempt {attempt + 1}/{optimization_attempts}...")
         
         if best_solution is not None:
-            print(f"  ✅ Relaxed constraint optimization succeeded with {best_violation_count} violations")
+            print(f"  [OK] Relaxed constraint optimization succeeded with {best_violation_count} violations")
             return True, best_solution
         
-        print("  ❌ Relaxed constraint optimization failed")
+        print("  [ERROR] Relaxed constraint optimization failed")
         return False, []
     
     def _generate_round_with_minimal_violations(self, round_num: int) -> Tuple[Optional[List[List[Dict]]], int]:
@@ -1508,7 +1512,7 @@ class UnifiedSwissPairing:
         Returns:
             List of pods for the round, or None if generation failed
         """
-        print(f"    🔧 Using pod-consistency algorithm for Round {round_num}")
+        print(f"    [WRENCH] Using pod-consistency algorithm for Round {round_num}")
 
         # Step 1: Group teams into sets of 4
         team_groups = self._create_team_groups_for_round(round_num)
@@ -1526,7 +1530,7 @@ class UnifiedSwissPairing:
             pods = self._create_four_pods_for_team_group(team_group, round_num)
 
             if pods is None or len(pods) != 4:
-                print(f"❌ Failed to create 4 pods for team group: {team_group}")
+                print(f"[ERROR] Failed to create 4 pods for team group: {team_group}")
                 return None
 
             all_pods.extend(pods)
@@ -1552,7 +1556,7 @@ class UnifiedSwissPairing:
 
         # Step 5: Validate pod consistency
         if not self._validate_round_pod_consistency(all_pods, team_groups):
-            print(f"❌ Pod consistency validation failed for round {round_num}")
+            print(f"[ERROR] Pod consistency validation failed for round {round_num}")
             return None
 
         return all_pods
@@ -1589,7 +1593,7 @@ class UnifiedSwissPairing:
         if team_groups is None:
             # Fallback: If we can't avoid all repeats, use score-based grouping
             # (This should only happen for 8 and 12 team tournaments)
-            print(f"    ⚠️ Could not avoid all repeat team matchups for round {round_num}")
+            print(f"    [WARNING] Could not avoid all repeat team matchups for round {round_num}")
             available_teams = self._sort_teams_by_score(available_teams)
             team_groups = []
             for i in range(num_groups):
@@ -1836,7 +1840,7 @@ class UnifiedSwissPairing:
         # Verify each team set has exactly 4 pods
         for team_set, pods in pods_by_team_set.items():
             if len(pods) != 4:
-                print(f"❌ Validation failed: Team set {team_set} has {len(pods)} pods (expected 4)")
+                print(f"[ERROR] Validation failed: Team set {team_set} has {len(pods)} pods (expected 4)")
                 return False
 
             # Verify each team has exactly 1 player per pod
@@ -1844,7 +1848,7 @@ class UnifiedSwissPairing:
                 for pod in pods:
                     team_players_in_pod = [p for p in pod if p['Team Name'] == team]
                     if len(team_players_in_pod) != 1:
-                        print(f"❌ Validation failed: {team} has {len(team_players_in_pod)} players in a pod")
+                        print(f"[ERROR] Validation failed: {team} has {len(team_players_in_pod)} players in a pod")
                         return False
 
         return True

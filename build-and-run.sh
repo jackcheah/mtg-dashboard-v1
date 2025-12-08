@@ -28,7 +28,7 @@ if [ ! -f "templates/dashboard.html" ]; then
     exit 1
 fi
 
-if [ ! -f "July_CEDH_Event/13th July CEDH Participant List.xlsx" ]; then
+if [ ! -f "participants/participant_team.xlsx" ]; then
     echo "❌ Excel participant file not found"
     exit 1
 fi

@@ -10,12 +10,12 @@ services:
       - PYTHONUNBUFFERED=1
     volumes:
       # Mount Excel file so it can be easily updated
-      - ./July_CEDH_Event:/app/July_CEDH_Event
+      - ./participants:/app/participants
       # Mount backup directory to persist tournament state across container restarts
       - ./tournament_backups:/app/tournament_backups
     restart: unless-stopped
     container_name: mtg-tournament-dashboard
-    
+
     # Optional: Add resource limits
     deploy:
       resources:
@@ -24,4 +24,4 @@ services:
           memory: 512M
         reservations:
           cpus: '0.5'
-          memory: 256M 
+          memory: 256M

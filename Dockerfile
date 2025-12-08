@@ -25,7 +25,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY tournament_dashboard.py .
 COPY unified_swiss_pairing.py .
 COPY templates/ ./templates/
-COPY July_CEDH_Event/ ./July_CEDH_Event/
+COPY participants/ ./participants/
 
 # Create a non-root user for security
 RUN groupadd -r appuser && useradd -r -g appuser appuser
