@@ -2591,6 +2591,10 @@
                             <i class="fas fa-trophy"></i>
                             <span>Setup Tournament</span>
                         </button>
+                        <button class="btn btn-warning" onclick="restoreBackup()">
+                            <i class="fas fa-history"></i>
+                            <span>Restore Backup</span>
+                        </button>
                     </div>
 
                     <!-- Active Round Controls (shown when tournament is active) -->
@@ -3110,6 +3114,44 @@
             } catch (error) {
                 showToast('Error', 'Failed to setup tournament: ' + error.message, 'error');
                 console.error('Setup error:', error);
+            }
+        }
+
+        // Restore Backup
+        async function restoreBackup() {
+            if (!confirm('Are you sure? This will overwrite the current tournament state.')) {
+                return;
+            }
+
+            try {
+                showToast('Restoring...', 'Restoring tournament from backup...', 'info');
+
+                const response = await fetch('/restore_backup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({})
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showToast('Success', data.message, 'success');
+                    
+                    // Reload data to refresh UI
+                    await loadParticipants(); // Refresh teams/scores
+                    
+                    // Check if tournament is active and switch controls
+                    if (data.current_round) {
+                        showActiveRoundControls();
+                        document.getElementById('round-select').value = data.current_round;
+                        loadRound(); // Load tables for current round
+                    }
+                } else {
+                    showToast('Restore Failed', data.message, 'error');
+                }
+            } catch (error) {
+                showToast('Error', 'Failed to restore backup: ' + error.message, 'error');
+                console.error('Restore error:', error);
             }
         }
 

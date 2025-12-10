@@ -31,9 +31,154 @@ class TournamentManager:
         self.finalized_rounds = set()  # Track which rounds have been finalized
 
 
+    def save_state(self, filepath='tournament_state.json.bak'):
+        """
+        Save tournament state to a JSON file.
+        Uses a temporary file and atomic rename to prevent corruption.
+        """
+        try:
+            # Convert sets to lists for JSON serialization
+            submitted_rounds_list = list(self.submitted_rounds)
+            finalized_rounds_list = list(self.finalized_rounds)
+            
+            state = {
+                "version": "2.0",
+                "timestamp": datetime.now().isoformat(),
+                "config": {
+                    "swiss_rounds_count": self.swiss_rounds_count,
+                    "max_rounds": self.max_rounds,
+                    "has_semifinals": self.has_semifinals,
+                    "swiss_rounds_configured": self.swiss_rounds_configured,
+                    "supported_team_counts": self.supported_team_counts
+                },
+                "state": {
+                    "current_round": self.current_round,
+                    "submitted_rounds": submitted_rounds_list,
+                    "finalized_rounds": finalized_rounds_list
+                },
+                "data": {
+                    "teams": self.teams,
+                    "participants": self.participants,
+                    "tournament_teams": self.tournament_teams,
+                    "scores": self.scores,
+                    "player_scores": self.player_scores,
+                    "tables": self.tables,
+                    "round_results": self.round_results,
+                    "_tournament_rounds": getattr(self, '_tournament_rounds', []),
+                    "finals_data": getattr(self, 'finals_data', {}),
+                    "semifinals": getattr(self, 'semifinals', {})
+                }
+            }
+            
+            # Save to temporary file first
+            temp_path = filepath + '.tmp'
+            with open(temp_path, 'w') as f:
+                json.dump(state, f, indent=2)
+            
+            # Atomic rename (or replace)
+            if os.path.exists(filepath):
+                os.replace(temp_path, filepath)
+            else:
+                os.rename(temp_path, filepath)
+                
+            print(f"[BACKUP] Tournament state saved successfully to {filepath}")
+            return True
+            
+        except Exception as e:
+            print(f"[ERROR] Failed to save backup: {e}")
+            import traceback
+            traceback.print_exc()
+            return False
+
+    def load_state(self, filepath='tournament_state.json.bak'):
+        """
+        Load tournament state from JSON file and restore pairing engine.
+        Replays round history to rebuild internal constraint state.
+        """
+        if not os.path.exists(filepath):
+            print(f"[BACKUP] No backup file found at {filepath}")
+            return False
+
+        try:
+            print(f"[BACKUP] Loading state from {filepath}...")
+            with open(filepath, 'r') as f:
+                state_data = json.load(f)
+            
+            # Restore Configuration
+            config = state_data.get('config', {})
+            self.swiss_rounds_count = config.get('swiss_rounds_count', 4)
+            self.max_rounds = config.get('max_rounds', 6)
+            self.has_semifinals = config.get('has_semifinals', False)
+            self.swiss_rounds_configured = config.get('swiss_rounds_configured', False)
+            
+            # Restore State
+            state = state_data.get('state', {})
+            self.current_round = state.get('current_round', 1)
+            self.submitted_rounds = set(state.get('submitted_rounds', []))
+            self.finalized_rounds = set(state.get('finalized_rounds', []))
+            
+            # Restore Data
+            data = state_data.get('data', {})
+            self.teams = data.get('teams', {})
+            self.participants = data.get('participants', [])
+            self.tournament_teams = data.get('tournament_teams', [])
+            self.scores = data.get('scores', {})
+            
+            # Fix integer keys for player_scores and tables (JSON converts keys to strings)
+            raw_player_scores = data.get('player_scores', {})
+            self.player_scores = {int(k) if k.isdigit() else k: v for k, v in raw_player_scores.items()}
+            
+            raw_tables = data.get('tables', {})
+            self.tables = {int(k) if k.isdigit() else k: v for k, v in raw_tables.items()}
+            
+            raw_round_results = data.get('round_results', {})
+            self.round_results = {int(k) if k.isdigit() else k: v for k, v in raw_round_results.items()}
+            
+            self._tournament_rounds = data.get('_tournament_rounds', [])
+            self.finals_data = data.get('finals_data', {})
+            self.semifinals = data.get('semifinals', {})
+            
+            # === CRITICAL: REHYDRATE PAIRING ENGINE ===
+            # We must recreate the UnifiedSwissPairing instance and replay the history
+            # so it knows which players/teams have already faced each other.
+            
+            if self.tournament_teams:
+                print("[BACKUP] Rehydrating Swiss Pairing Engine...")
+                from unified_swiss_pairing import UnifiedSwissPairing
+                
+                # Initialize fresh engine
+                self._unified_pairing = UnifiedSwissPairing(
+                    self.teams, 
+                    self.tournament_teams,
+                    self.swiss_rounds_count, 
+                    self.scores
+                )
+                
+                # Replay history
+                if self._tournament_rounds:
+                    print(f"[BACKUP] Replaying {len(self._tournament_rounds)} rounds of history...")
+                    for round_idx, round_solution in enumerate(self._tournament_rounds):
+                        # The engine updates its internal sets (constraints) based on this solution
+                        self._unified_pairing._update_constraints_after_round(round_solution)
+                        # Also add it to the engine's internal memory of solutions if needed
+                        self._unified_pairing.round_solutions.append(round_solution)
+                    
+                    print("[BACKUP] Engine rehydration complete.")
+                else:
+                    print("[BACKUP] No round history to replay.")
+            
+            print(f"[BACKUP] Tournament state restored successfully!")
+            return True
+            
+        except Exception as e:
+            print(f"[ERROR] Failed to restore backup: {e}")
+            import traceback
+            traceback.print_exc()
+            return False
+
     def save_backup(self):
-        """Backup feature disabled - no-op for compatibility"""
-        return True
+        """Legacy method wrapper"""
+        return self.save_state()
 
     def configure_swiss_rounds(self, rounds):
         """
@@ -561,7 +706,10 @@ class TournamentManager:
                                         for i, p in enumerate(pod)])
                 print(f"      Seating: {seating_str}")
 
-            self.tables[round_num][table_idx] = pod
+                print(f"      Seating: {seating_str}")
+
+            table_name = f"Table {table_idx}"
+            self.tables[round_num][table_name] = pod
 
         print(f"[OK] Round {round_num}: {len(round_solution)} tables organized")
 
@@ -1408,6 +1556,35 @@ def load_data():
             'message': str(e)
         })
 
+@app.route('/restore_backup', methods=['POST'])
+def restore_backup():
+    """Restore tournament state from backup"""
+    try:
+        success = tournament.load_state()
+        
+        if success:
+            return jsonify({
+                'success': True,
+                'message': 'Tournament restored from backup successfully',
+                'current_round': tournament.current_round,
+                'swiss_rounds': tournament.swiss_rounds_count,
+                'teams': len(tournament.teams)
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'message': 'Failed to restore backup or no backup found'
+            })
+            
+    except Exception as e:
+        print(f"Error in restore_backup: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'success': False,
+            'message': str(e)
+        })
+
 @app.route('/set_swiss_rounds', methods=['POST'])
 def set_swiss_rounds():
     """Set the number of Swiss rounds (4 or 5)"""
@@ -1804,6 +1981,9 @@ def submit_table_results():
     
     # Recalculate team scores from individual player scores
     tournament.calculate_team_scores()
+    
+    # Auto-save after table submission
+    tournament.save_backup()
     
     return jsonify({
         'success': True, 
@@ -2649,4 +2829,4 @@ def reset_tournament():
 if __name__ == '__main__':
     import os
     debug_mode = os.getenv('FLASK_ENV') != 'production'
-    app.run(debug=debug_mode, host='0.0.0.0', port=5000)
+    app.run(debug=debug_mode, host='0.0.0.0', port=5001)
