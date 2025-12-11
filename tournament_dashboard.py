@@ -1976,7 +1976,7 @@ def submit_table_results():
             print(f"  WARNING: Player ID {player_id} not found in player_scores!")
     
     # Handle final round scoring separately
-    if round_num == 5:
+    if round_num == tournament.max_rounds:
         tournament.update_final_round_scores(round_num, player_results)
     
     # Recalculate team scores from individual player scores

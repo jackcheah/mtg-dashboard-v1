@@ -47,151 +47,134 @@ After a thorough analysis of the tournament flow logic, frontend structure, and 
 
 > **Priority: P0 - Must Fix Before Any 16-Team Tournament**
 
-### 1.1 Hardcoded Round Number Bug
+This phase addresses the fundamental structural bugs preventing 16-team tournaments from completing.
+
+### 1.1 Hardcoded Round Number Logic (Backend & Frontend)
 
 **Severity:** CRITICAL
-**Impact:** Champion determination fails for 16-team tournaments
+**Impact:** Champion determination fails, finals detection fails for 16-team (6 round) tournaments.
 
-#### Affected Locations
+#### Backend Fix
+**File:** `tournament_dashboard.py`
+**Line:** 1979 in `submit_table_results`
 
-| File | Line | Current Code | Problem |
-|------|------|--------------|---------|
-| `tournament_dashboard.py` | 1979 | `if round_num == 5:` | Finals are round 6 for 16 teams |
-| `dashboard_ultra_modern.html` | 3581 | `currentRound === '5'` | Same issue in frontend |
-
-#### Background
-
-Tournament structure varies by team count:
-- **8 teams:** 4 Swiss + 1 Finals = Round 5 is finals ✓
-- **12 teams:** 4 Swiss + 1 Finals = Round 5 is finals ✓
-- **16 teams:** 4 Swiss + 1 Top 8 Cut + 1 Finals = Round **6** is finals ✗
-
-#### Required Changes
-
-**Backend (`tournament_dashboard.py:1979`):**
+Change the hardcoded round 5 check to dynamic `max_rounds`:
 ```python
-# BEFORE (broken):
-if round_num == 5:
-    tournament.update_final_round_scores(round_num, player_results)
-
-# AFTER (fixed):
-if round_num == tournament.max_rounds:
+# Handle final round scoring separately
+if round_num == tournament.max_rounds:  # Was: if round_num == 5:
     tournament.update_final_round_scores(round_num, player_results)
 ```
 
-**Frontend (`dashboard_ultra_modern.html:3581`):**
+#### Frontend Fix 1: State Initialization
+**File:** `dashboard_ultra_modern.html`
+**Lines:** ~2889 (`loadParticipants`) and ~3093 (`setupTournament`)
+
+**IMPORTANT:** The frontend currently does NOT capture `max_rounds` from any API response. This variable must be added to the global state before the dynamic finals detection will work.
+
+We need to ensure `window.tournamentMaxRounds` is initialized from the API response so other functions can use it.
+
+**In `loadParticipants` (Line ~2889):**
 ```javascript
-// BEFORE (broken):
-finalsMode = (currentRound === '5' || currentRound === 5);
-
-// AFTER (fixed):
-finalsMode = (currentRound === maxRounds || currentRound === String(maxRounds));
+if (data.success && data.teams) {
+    // NEW: Store max rounds
+    if (data.max_rounds) {
+        window.tournamentMaxRounds = data.max_rounds;
+    }
+    // ... rest of function
 ```
 
-#### Testing Required
-- [ ] Unit test: Finals scoring triggers for round 6 in 16-team tournament
-- [ ] Unit test: Finals scoring still works for round 5 in 8/12-team tournaments
-- [ ] Integration test: Champion determined correctly for all team counts
+**In `setupTournament` (Line ~3093):**
+```javascript
+// Store tournament configuration globally
+window.tournamentSwissRounds = swissRounds;
+window.totalTeams = teamCount;
+// NEW: Store max rounds
+if (data.max_rounds) {
+     window.tournamentMaxRounds = data.max_rounds;
+}
+```
+
+#### Frontend Fix 2: Dynamic Finals Mode
+**File:** `dashboard_ultra_modern.html`
+**Line:** 3581 in `refreshTeamScores`
+
+Update finals detection to use the dynamic variable:
+```javascript
+if (finalsMode === null) {
+    const currentRound = document.getElementById('round-select').value;
+    // was: finalsMode = (currentRound === '5' || currentRound === 5);
+    const maxRounds = window.tournamentMaxRounds || 5;
+    finalsMode = (parseInt(currentRound) === maxRounds);
+}
+```
 
 ---
 
 ### 1.2 Missing API Endpoint
 
 **Severity:** CRITICAL
-**Impact:** Bracket visualization fails silently
+**Impact:** Bracket visualization fails silently.
 
-#### Affected Location
+**File:** `dashboard_ultra_modern.html`
+**Line:** 3329 in `updateBracketVisualization`
 
-| File | Line | Code | Problem |
-|------|------|------|---------|
-| `dashboard_ultra_modern.html` | 3329 | `fetch('/get_standings')` | Endpoint doesn't exist |
-
-#### Available Endpoints
-
-The backend has these standings-related endpoints:
-- `/standings` (line 2600) - Returns team standings
-- `/get_final_standings` (line 2437) - Returns final standings with winner
-- `/final_standings` (line 2626) - Alias for final standings
-
-#### Required Changes
-
-**Option A:** Change frontend to use existing endpoint
+Change the call to the non-existent `/get_standings` to the existing `/standings` endpoint:
 ```javascript
-// BEFORE:
-const standingsResponse = await fetch('/get_standings');
-
-// AFTER:
-const standingsResponse = await fetch('/standings');
+try {
+    // Fetch current standings to get team scores
+    const standingsResponse = await fetch('/standings'); // Was: fetch('/get_standings');
+    const standingsData = await standingsResponse.json();
 ```
-
-**Option B:** Create the missing endpoint (if different data needed)
-```python
-@app.route('/get_standings')
-def get_standings():
-    return jsonify({
-        'success': True,
-        'standings': sorted(tournament.scores.items(), key=lambda x: x[1], reverse=True)
-    })
-```
-
-#### Testing Required
-- [ ] Verify bracket visualization displays after fix
-- [ ] Test standings display for all tournament phases
 
 ---
 
 ### 1.3 Incorrect Round Type Detection
 
 **Severity:** CRITICAL
-**Impact:** Bracket visualization doesn't display for Top 8 Cut
+**Impact:** Bracket visualization fails for "Top 8 Cut" round.
 
-#### Affected Location
+**File:** `dashboard_ultra_modern.html`
+**Function:** `updateBracketVisualization`
 
-| File | Line | Issue |
-|------|------|-------|
-| `dashboard_ultra_modern.html` | 3322 | Checks for `'semifinals'` but function returns `'top8cut'` |
+**Issue:** The code checks for `'semifinals'` but `getRoundType()` returns `'top8cut'`. Two locations need fixing (both use the wrong string 'semifinals').
 
-#### Analysis
+Matches internal logic to `getRoundType` return value ('top8cut').
 
+**Line 3322:**
 ```javascript
-// Line 2803-2828: getRoundType() returns 'top8cut'
-function getRoundType(roundNum) {
-    if (roundText.includes('Top 8 Cut')) {
-        return 'top8cut';  // <-- Returns this
-    }
-}
-
-// Line 3322: updateBracketVisualization() expects 'semifinals'
-if (roundType !== 'semifinals' && roundType !== 'finals') {  // <-- Mismatch!
+// Only show bracket for top8cut and finals
+if (roundType !== 'top8cut' && roundType !== 'finals') { // Was: !== 'semifinals'
+    bracketContainer.style.display = 'none';
     return;
 }
 ```
 
-#### Required Changes
-
-**Option A:** Update the check to match the return value
+**Line 3339:**
 ```javascript
-// BEFORE:
-if (roundType !== 'semifinals' && roundType !== 'finals') {
-
-// AFTER:
-if (roundType !== 'top8cut' && roundType !== 'finals') {
+if (roundType === 'top8cut') { // Was: === 'semifinals'
+    // Show top 8 teams in semifinals bracket
+    bracketTitleText.textContent = 'Semifinals Bracket - Top 8 Teams';
 ```
 
-**Option B:** Update getRoundType() to return 'semifinals'
-```javascript
-// In getRoundType():
-if (roundText.includes('Top 8 Cut')) {
-    return 'semifinals';  // Standardize on 'semifinals'
-}
-```
+**Note:** Both line 3322 and 3339 must be updated. The `getRoundType()` function (line 2803) correctly returns `'top8cut'`, but the bracket visualization logic checks for the old string `'semifinals'`.
 
-#### Recommendation
-Choose Option A - update the check. The term "Top 8 Cut" is more descriptive for users than "Semifinals".
+---
 
-#### Testing Required
-- [ ] Bracket visualization displays for Top 8 Cut round
-- [ ] Bracket visualization displays for Finals round
+### 1.4 Verification Plan for Phase 1
+
+1.  **Automated Tests:**
+    ```bash
+    python test_tournament_comprehensive.py --teams 16
+    ```
+    Ensure `test_finals` passes on 16 teams.
+
+2.  **Manual Browser Verification:**
+    -   Start server: `python tournament_dashboard.py`
+    -   Load a 16-team participant list.
+    -   **Console Check:** Type `window.tournamentMaxRounds` -> Must be `6`.
+    -   Simulate rounds up to Round 5.
+    -   **Round 5 (Top 8 Cut):** Verify "Tournament Bracket" title appears and shows 8 teams (checking `roundType === 'top8cut'`).
+    -   **Round 6 (Finals):** Verify "Finals Mode" activates (checking `max_rounds`).
 
 ---
 
@@ -747,9 +730,11 @@ def get_current_scores():
 ## Recommended Implementation Order
 
 ### Immediate (Before Next 16-Team Tournament)
-1. [ ] Fix hardcoded round 5 → `max_rounds` (1.1)
-2. [ ] Fix missing `/get_standings` endpoint (1.2)
-3. [ ] Fix round type detection mismatch (1.3)
+1. [ ] Fix hardcoded round 5 → `max_rounds` (1.1 - Backend: 1 location)
+2. [ ] Capture `max_rounds` in frontend state (1.1 - Frontend: 2 locations)
+3. [ ] Update finals detection to use dynamic max_rounds (1.1 - Frontend: 1 location)
+4. [ ] Fix missing `/get_standings` endpoint (1.2 - Frontend: 1 location)
+5. [ ] Fix round type detection mismatch (1.3 - Frontend: 2 locations)
 
 ### Short Term (Next Sprint)
 4. [ ] Add input validation to submit_table_results (2.2)

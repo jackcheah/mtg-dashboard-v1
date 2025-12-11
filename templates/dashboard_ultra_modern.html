@@ -2888,6 +2888,11 @@
 
                 if (data.success && data.teams) {
 
+                    // Store max rounds globally
+                    if (data.max_rounds) {
+                        window.tournamentMaxRounds = data.max_rounds;
+                    }
+
                     // Update round selector with configured Swiss rounds and tournament structure
                     const hasSemifinals = data.has_semifinals || false;
                     const teamCount = data.team_count || Object.keys(data.teams).length;
@@ -3094,6 +3099,11 @@
                     // Store tournament configuration globally
                     window.tournamentSwissRounds = swissRounds;
                     window.totalTeams = teamCount;
+
+                    // Store max rounds globally
+                    if (data.max_rounds) {
+                        window.tournamentMaxRounds = data.max_rounds;
+                    }
 
                     updateRoundSelector(swissRounds, hasSemifinals, teamCount);
 
@@ -3318,15 +3328,15 @@
 
             const roundType = getRoundType(currentRound);
 
-            // Only show bracket for semifinals and finals
-            if (roundType !== 'semifinals' && roundType !== 'finals') {
+            // Only show bracket for top8cut and finals
+            if (roundType !== 'top8cut' && roundType !== 'finals') {
                 bracketContainer.style.display = 'none';
                 return;
             }
 
             try {
                 // Fetch current standings to get team scores
-                const standingsResponse = await fetch('/get_standings');
+                const standingsResponse = await fetch('/standings');
                 const standingsData = await standingsResponse.json();
 
                 if (!standingsData.standings) {
@@ -3336,7 +3346,7 @@
 
                 const standings = standingsData.standings;
 
-                if (roundType === 'semifinals') {
+                if (roundType === 'top8cut') {
                     // Show top 8 teams in semifinals bracket
                     bracketTitleText.textContent = 'Semifinals Bracket - Top 8 Teams';
                     bracketGrid.className = 'bracket-grid semifinals';
@@ -3578,7 +3588,8 @@
                 // Auto-detect finals mode if not explicitly provided
                 if (finalsMode === null) {
                     const currentRound = document.getElementById('round-select').value;
-                    finalsMode = (currentRound === '5' || currentRound === 5);
+                    const maxRounds = window.tournamentMaxRounds || 5;
+                    finalsMode = (parseInt(currentRound) === maxRounds);
                     if (finalsMode && !window.finalsAdvancingTeams) {
                         // Try to get teams from current tables
                         const tablesGrid = document.getElementById('tables-grid');
