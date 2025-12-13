@@ -5,8 +5,23 @@ import random
 from datetime import datetime
 import os
 from itertools import combinations
+from enum import Enum
+from functools import wraps
 
 app = Flask(__name__)
+
+# Tournament State Machine (Phase 3.4)
+class TournamentState(Enum):
+    """Enum representing the tournament lifecycle states."""
+    INITIAL = "initial"                           # Server started, no data loaded
+    PARTICIPANTS_LOADED = "participants_loaded"   # Participants loaded, not set up
+    TOURNAMENT_SETUP = "tournament_setup"         # Tournament initialized, Round 1 ready
+    SWISS_IN_PROGRESS = "swiss_in_progress"       # Swiss rounds being played
+    SWISS_COMPLETE = "swiss_complete"             # All Swiss rounds completed
+    TOP8_IN_PROGRESS = "top8_in_progress"         # Top 8 Cut in progress (16-team only)
+    TOP8_COMPLETE = "top8_complete"               # Top 8 Cut completed (16-team only)
+    FINALS_IN_PROGRESS = "finals_in_progress"     # Finals round in progress
+    FINALS_COMPLETE = "finals_complete"           # Finals completed, champion determined
 
 class TournamentManager:
     def __init__(self):
@@ -29,6 +44,23 @@ class TournamentManager:
         self.has_semifinals = False  # Track if tournament structure includes semifinals
         self.submitted_rounds = set()  # Track which rounds have been submitted
         self.finalized_rounds = set()  # Track which rounds have been finalized
+
+        # State machine tracking (Phase 3.4)
+        self.state = TournamentState.INITIAL
+        self.state_history = []  # Track state transitions for debugging
+
+    def transition_to(self, new_state: TournamentState, reason: str = ""):
+        """Transition to a new state with logging (Phase 3.4)."""
+        old_state = self.state
+        self.state = new_state
+        transition = {
+            'from': old_state.value,
+            'to': new_state.value,
+            'reason': reason,
+            'timestamp': datetime.now().isoformat()
+        }
+        self.state_history.append(transition)
+        print(f"[STATE] {old_state.value} → {new_state.value} ({reason})")
 
 
     def save_state(self, filepath='tournament_state.json.bak'):
@@ -1464,6 +1496,35 @@ class TournamentManager:
 # Initialize tournament manager
 tournament = TournamentManager()
 
+# State validation decorator (Phase 3.4)
+def require_state(*allowed_states):
+    """
+    Decorator to ensure endpoint is called in a valid tournament state.
+
+    Usage:
+        @require_state(TournamentState.SWISS_IN_PROGRESS, TournamentState.FINALS_IN_PROGRESS)
+        def my_endpoint():
+            ...
+
+    Returns 400 error if current state is not in allowed_states.
+    """
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            if tournament.state not in allowed_states:
+                allowed_names = [s.value for s in allowed_states]
+                return jsonify({
+                    'success': False,
+                    'error': f'Invalid operation in current state: {tournament.state.value}',
+                    'user_message': f'Cannot perform this action right now.',
+                    'suggestion': f'Current state: {tournament.state.value}. This action requires one of: {", ".join(allowed_names)}',
+                    'current_state': tournament.state.value,
+                    'allowed_states': allowed_names
+                }), 400
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator
+
 @app.route('/')
 def index():
     return render_template('dashboard_ultra_modern.html')
@@ -1534,6 +1595,13 @@ def load_data():
 
         # Auto-save after loading data
         tournament.save_backup()
+
+        # State transition: Participants loaded (Phase 3.4)
+        if success and len(tournament.teams) > 0:
+            tournament.transition_to(
+                TournamentState.PARTICIPANTS_LOADED,
+                f"Loaded {len(tournament.teams)} teams"
+            )
 
         return jsonify({
             'success': success,
@@ -1654,6 +1722,7 @@ def configure_swiss_rounds():
     })
 
 @app.route('/setup_tournament', methods=['POST'])
+@require_state(TournamentState.PARTICIPANTS_LOADED, TournamentState.TOURNAMENT_SETUP)
 def setup_tournament():
     """Setup tournament with all teams in a single group"""
     try:
@@ -1671,6 +1740,12 @@ def setup_tournament():
 
         # Auto-save after tournament setup
         tournament.save_backup()
+
+        # State transition: Tournament setup complete (Phase 3.4)
+        tournament.transition_to(
+            TournamentState.TOURNAMENT_SETUP,
+            "Tournament setup complete, Round 1 ready"
+        )
 
         return jsonify({
             'success': success,
@@ -1957,6 +2032,12 @@ def submit_player_results():
         }), 500
 
 @app.route('/submit_table_results', methods=['POST'])
+@require_state(
+    TournamentState.TOURNAMENT_SETUP,
+    TournamentState.SWISS_IN_PROGRESS,
+    TournamentState.TOP8_IN_PROGRESS,
+    TournamentState.FINALS_IN_PROGRESS
+)
 def submit_table_results():
     """Submit results for a specific table with comprehensive validation."""
     try:
@@ -2081,6 +2162,39 @@ def submit_table_results():
         # Mark table as submitted (prevent double-submission)
         tournament.round_results[round_num]['submitted_tables'].add(table_name)
         print(f"[OK] Table {table_name} marked as submitted for round {round_num}")
+
+        # State transition logic (Phase 3.4)
+        total_tables = len(tournament.tables.get(round_num, {}))
+        submitted_count = len(tournament.round_results[round_num]['submitted_tables'])
+        all_tables_submitted = (submitted_count == total_tables)
+
+        # Transition from TOURNAMENT_SETUP to SWISS_IN_PROGRESS on first table submission
+        if tournament.state == TournamentState.TOURNAMENT_SETUP and round_num == 1:
+            tournament.transition_to(
+                TournamentState.SWISS_IN_PROGRESS,
+                f"First table submitted in Round {round_num}"
+            )
+
+        # Transition to SWISS_COMPLETE when all Swiss rounds are done
+        if round_num == tournament.swiss_rounds_count and all_tables_submitted:
+            tournament.transition_to(
+                TournamentState.SWISS_COMPLETE,
+                f"All {tournament.swiss_rounds_count} Swiss rounds completed"
+            )
+
+        # Transition for Top 8 Cut (16-team tournaments)
+        if tournament.has_semifinals and round_num == (tournament.swiss_rounds_count + 1) and all_tables_submitted:
+            tournament.transition_to(
+                TournamentState.TOP8_COMPLETE,
+                "Top 8 Cut completed"
+            )
+
+        # Transition to FINALS_COMPLETE when finals are done
+        if round_num == tournament.max_rounds and all_tables_submitted:
+            tournament.transition_to(
+                TournamentState.FINALS_COMPLETE,
+                "Finals completed, tournament finished"
+            )
 
         # Auto-save after table submission
         tournament.save_backup()
@@ -2826,6 +2940,7 @@ def final_standings():
     })
 
 @app.route('/generate_finals')
+@require_state(TournamentState.SWISS_COMPLETE, TournamentState.TOP8_COMPLETE)
 def generate_finals():
     """Generate finals round (top 4 teams)"""
     try:
@@ -2851,6 +2966,12 @@ def generate_finals():
             finals_data = tournament.generate_unified_finals(after_semifinals=False)
 
         if finals_data:
+            # State transition: Finals started (Phase 3.4)
+            tournament.transition_to(
+                TournamentState.FINALS_IN_PROGRESS,
+                "Finals round started"
+            )
+
             return jsonify({
                 'success': True,
                 'finals_data': finals_data,
@@ -2887,6 +3008,56 @@ def get_finals():
             'success': False,
             'error': 'Finals not generated yet'
         })
+
+@app.route('/get_state_info')
+def get_state_info():
+    """Get current tournament state and valid next actions (Phase 3.4)."""
+    try:
+        # Determine valid actions based on current state
+        valid_actions = []
+
+        if tournament.state == TournamentState.INITIAL:
+            valid_actions = ['load_data']
+        elif tournament.state == TournamentState.PARTICIPANTS_LOADED:
+            valid_actions = ['setup_tournament', 'load_data']  # Can reload
+        elif tournament.state == TournamentState.TOURNAMENT_SETUP:
+            valid_actions = ['submit_table_results']
+        elif tournament.state == TournamentState.SWISS_IN_PROGRESS:
+            valid_actions = ['submit_table_results']
+        elif tournament.state == TournamentState.SWISS_COMPLETE:
+            if tournament.has_semifinals:
+                valid_actions = ['setup_round']  # Auto-generated, but allow manual trigger
+            else:
+                valid_actions = ['generate_finals']
+        elif tournament.state == TournamentState.TOP8_IN_PROGRESS:
+            valid_actions = ['submit_table_results']
+        elif tournament.state == TournamentState.TOP8_COMPLETE:
+            valid_actions = ['generate_finals']
+        elif tournament.state == TournamentState.FINALS_IN_PROGRESS:
+            valid_actions = ['submit_table_results']
+        elif tournament.state == TournamentState.FINALS_COMPLETE:
+            valid_actions = []  # Tournament is over
+
+        return jsonify({
+            'success': True,
+            'current_state': tournament.state.value,
+            'valid_actions': valid_actions,
+            'state_history': tournament.state_history[-10:],  # Last 10 transitions
+            'tournament_info': {
+                'swiss_rounds_count': tournament.swiss_rounds_count,
+                'current_round': tournament.current_round,
+                'max_rounds': tournament.max_rounds,
+                'has_semifinals': tournament.has_semifinals,
+                'team_count': len(tournament.teams)
+            }
+        })
+
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'user_message': 'Failed to retrieve state information'
+        }), 500
 
 @app.route('/validate_integrity')
 def validate_integrity():

@@ -129,15 +129,32 @@ The solver tries three strategies in order. Teammates constraint is NEVER relaxe
 - Validation: exactly 4 players per team, total teams must be 8/12/16
 - Fallback: `create_sample_data()` generates 8 teams if Excel missing ([tournament_dashboard.py:380](tournament_dashboard.py#L380))
 
+### Tournament State Machine (Phase 3.4)
+
+**State Lifecycle:**
+```
+INITIAL → load_data → PARTICIPANTS_LOADED → setup_tournament → TOURNAMENT_SETUP
+  → submit_table (Round 1) → SWISS_IN_PROGRESS → submit_table (all Swiss) → SWISS_COMPLETE
+  → generate_top8 (16-team) → TOP8_IN_PROGRESS → TOP8_COMPLETE
+  → generate_finals → FINALS_IN_PROGRESS → submit_table (finals) → FINALS_COMPLETE
+```
+
+**State Validation:**
+- Endpoints are protected with `@require_state` decorator
+- Prevents out-of-sequence operations (e.g., submitting scores before setup)
+- State transitions happen automatically based on actions
+- Use `GET /get_state_info` to check current state and valid next actions
+
 ### Key Flask Endpoints
 - `POST /load_data` - Load participants from Excel or sample data
-- `POST /setup_tournament` - Initialize tournament, reset state, generate Round 1
+- `POST /setup_tournament` - Initialize tournament, reset state, generate Round 1 (requires: PARTICIPANTS_LOADED)
 - `POST /setup_round/<N>` - Generate round N if not already exists
-- `POST /submit_table_results` - Submit results for a specific table (Phase 2: with validation)
+- `POST /submit_table_results` - Submit results for a specific table (Phase 2: with validation, Phase 3.4: state-protected)
 - `POST /submit_player_results` - Record scores, trigger next round generation
 - `GET /get_tournament_state` - Full snapshot (standings, scores, current round, submission status)
-- `GET /get_submission_status/<round_num>` - Get submission progress for a round (Phase 3)
-- `POST /generate_finals` - Create finals from top 4 teams
+- `GET /get_submission_status/<round_num>` - Get submission progress for a round (Phase 3.1)
+- `GET /get_state_info` - Get current tournament state and valid next actions (Phase 3.4)
+- `POST /generate_finals` - Create finals from top 4 teams (requires: SWISS_COMPLETE or TOP8_COMPLETE)
 
 ## Common Pitfalls
 

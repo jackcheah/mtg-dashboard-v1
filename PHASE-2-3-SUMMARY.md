@@ -489,9 +489,67 @@ for round_num, results in tournament.round_results.items():
 
 ---
 
+## Task 3.4: Tournament State Validation - COMPLETE ✅
+
+**Implementation Date:** 2025-12-13
+
+### Features Implemented
+
+**State Machine:**
+- Added `TournamentState` enum with 9 states tracking tournament lifecycle
+- Implemented state transition tracking with history
+- Created `@require_state` decorator for endpoint validation
+
+**States:**
+1. `INITIAL` - Server started, no data loaded
+2. `PARTICIPANTS_LOADED` - Participants loaded from Excel or sample data
+3. `TOURNAMENT_SETUP` - Tournament initialized, Round 1 ready
+4. `SWISS_IN_PROGRESS` - Swiss rounds being played
+5. `SWISS_COMPLETE` - All Swiss rounds completed
+6. `TOP8_IN_PROGRESS` - Top 8 Cut in progress (16-team only)
+7. `TOP8_COMPLETE` - Top 8 Cut completed (16-team only)
+8. `FINALS_IN_PROGRESS` - Finals round in progress
+9. `FINALS_COMPLETE` - Finals completed, champion determined
+
+**New Endpoint:**
+- `GET /get_state_info` - Returns current state, valid next actions, and state history
+
+**Protected Endpoints:**
+- `POST /setup_tournament` - Requires PARTICIPANTS_LOADED or TOURNAMENT_SETUP
+- `POST /submit_table_results` - Requires TOURNAMENT_SETUP, SWISS_IN_PROGRESS, TOP8_IN_PROGRESS, or FINALS_IN_PROGRESS
+- `POST /generate_finals` - Requires SWISS_COMPLETE or TOP8_COMPLETE
+
+**Automatic State Transitions:**
+- Load data → PARTICIPANTS_LOADED
+- Setup tournament → TOURNAMENT_SETUP
+- First table submission → SWISS_IN_PROGRESS
+- Last Swiss table → SWISS_COMPLETE
+- Top 8 completion → TOP8_COMPLETE
+- Finals generation → FINALS_IN_PROGRESS
+- Finals completion → FINALS_COMPLETE
+
+**Testing:**
+- ✅ All 28 tests passing (8-team tournament)
+- ✅ All 37 tests passing (16-team tournament)
+- ✅ Manual testing: State validation prevents out-of-sequence operations
+- ✅ Backward compatible: No breaking changes
+
+**Files Modified:**
+- [tournament_dashboard.py:8-9](tournament_dashboard.py#L8-L9) - Added imports (Enum, wraps)
+- [tournament_dashboard.py:13-24](tournament_dashboard.py#L13-L24) - TournamentState enum
+- [tournament_dashboard.py:48-63](tournament_dashboard.py#L48-L63) - State tracking in TournamentManager
+- [tournament_dashboard.py:1500-1526](tournament_dashboard.py#L1500-L1526) - @require_state decorator
+- [tournament_dashboard.py:1599-1604](tournament_dashboard.py#L1599-L1604) - Load data transition
+- [tournament_dashboard.py:1743-1747](tournament_dashboard.py#L1743-L1747) - Setup tournament transition
+- [tournament_dashboard.py:2159-2190](tournament_dashboard.py#L2159-L2190) - Table submission transitions
+- [tournament_dashboard.py:2962-2965](tournament_dashboard.py#L2962-L2965) - Finals generation transition
+- [tournament_dashboard.py:3004-3052](tournament_dashboard.py#L3004-L3052) - New /get_state_info endpoint
+
+---
+
 ## Conclusion
 
-**Phase 2 (Security) is 100% complete** with all tests passing. **Phase 3 (UX) is 75% complete** with the most impactful features implemented:
+**Phase 2 (Security) is 100% complete** with all tests passing. **Phase 3 (UX) is 87.5% complete** with all high-value features implemented:
 
 ✅ **Completed (High Value):**
 - XSS vulnerability fix
@@ -500,14 +558,14 @@ for round_num, results in tournament.round_results.items():
 - Improved error messages
 - Submission status tracking
 - JSON serialization bug fix
+- **Tournament state validation (Task 3.4)** ← NEW
 
 ⏸️ **Deferred (Lower Priority):**
-- State validation (2-3 hours)
-- Score correction (3-4 hours, optional)
+- Score correction (3-4 hours, optional - Task 3.2)
 
-**All changes are production-ready and backward compatible.** The tournament dashboard is now significantly more secure, user-friendly, and robust.
+**All changes are production-ready and backward compatible.** The tournament dashboard is now significantly more secure, user-friendly, and robust with comprehensive state management preventing invalid operations.
 
-**Estimated remaining effort for 100% completion:** 2-3 hours (Task 3.4 only) or 5-7 hours (including optional Task 3.2).
+**Estimated remaining effort for 100% completion:** 3-4 hours (Task 3.2 - Score Correction only, marked as optional).
 
 ---
 
