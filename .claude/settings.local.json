@@ -6,14 +6,18 @@
       "Bash(pip3 install:*)",
       "Bash(pip install:*)",
       "Bash(python test_tournament_comprehensive.py:*)",
-      "Bash(python -X utf8:*)"
+      "Bash(python -X utf8:*)",
+      "Bash(curl:*)",
+      "Bash(python:*)"
     ],
     "deny": []
   },
   "mcpServers": {
     "TestSprite": {
       "command": "npx",
-      "args": ["@testsprite/testsprite-mcp@latest"],
+      "args": [
+        "@testsprite/testsprite-mcp@latest"
+      ],
       "env": {
         "API_KEY": "sk-user-VvPqfMBx-6rP9oJchM3zFOoOXupjiKN6I1GJcnZxqAruKJgMg83RzE4EyGhHGyQsO4gOiRsYPr0zjxvymfTYwjhDUF_LB-_2wE9SiSOrA3Q9CakR4XfWdr7xNWDM5pmDPWQ"
       }

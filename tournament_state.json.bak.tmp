@@ -1,0 +1,1177 @@
+{
+  "version": "2.0",
+  "timestamp": "2025-12-13T16:36:56.452450",
+  "config": {
+    "swiss_rounds_count": 4,
+    "max_rounds": 6,
+    "has_semifinals": true,
+    "swiss_rounds_configured": true,
+    "supported_team_counts": [
+      8,
+      12,
+      16
+    ]
+  },
+  "state": {
+    "current_round": 1,
+    "submitted_rounds": [],
+    "finalized_rounds": []
+  },
+  "data": {
+    "teams": {
+      "Team A": [
+        {
+          "Player ID": 1,
+          "Player Name": "Player 1 (Team A)",
+          "Team Name": "Team A"
+        },
+        {
+          "Player ID": 2,
+          "Player Name": "Player 2 (Team A)",
+          "Team Name": "Team A"
+        },
+        {
+          "Player ID": 3,
+          "Player Name": "Player 3 (Team A)",
+          "Team Name": "Team A"
+        },
+        {
+          "Player ID": 4,
+          "Player Name": "Player 4 (Team A)",
+          "Team Name": "Team A"
+        }
+      ],
+      "Team B": [
+        {
+          "Player ID": 5,
+          "Player Name": "Player 5 (Team B)",
+          "Team Name": "Team B"
+        },
+        {
+          "Player ID": 6,
+          "Player Name": "Player 6 (Team B)",
+          "Team Name": "Team B"
+        },
+        {
+          "Player ID": 7,
+          "Player Name": "Player 7 (Team B)",
+          "Team Name": "Team B"
+        },
+        {
+          "Player ID": 8,
+          "Player Name": "Player 8 (Team B)",
+          "Team Name": "Team B"
+        }
+      ],
+      "Team C": [
+        {
+          "Player ID": 9,
+          "Player Name": "Player 9 (Team C)",
+          "Team Name": "Team C"
+        },
+        {
+          "Player ID": 10,
+          "Player Name": "Player 10 (Team C)",
+          "Team Name": "Team C"
+        },
+        {
+          "Player ID": 11,
+          "Player Name": "Player 11 (Team C)",
+          "Team Name": "Team C"
+        },
+        {
+          "Player ID": 12,
+          "Player Name": "Player 12 (Team C)",
+          "Team Name": "Team C"
+        }
+      ],
+      "Team D": [
+        {
+          "Player ID": 13,
+          "Player Name": "Player 13 (Team D)",
+          "Team Name": "Team D"
+        },
+        {
+          "Player ID": 14,
+          "Player Name": "Player 14 (Team D)",
+          "Team Name": "Team D"
+        },
+        {
+          "Player ID": 15,
+          "Player Name": "Player 15 (Team D)",
+          "Team Name": "Team D"
+        },
+        {
+          "Player ID": 16,
+          "Player Name": "Player 16 (Team D)",
+          "Team Name": "Team D"
+        }
+      ],
+      "Team E": [
+        {
+          "Player ID": 17,
+          "Player Name": "Player 17 (Team E)",
+          "Team Name": "Team E"
+        },
+        {
+          "Player ID": 18,
+          "Player Name": "Player 18 (Team E)",
+          "Team Name": "Team E"
+        },
+        {
+          "Player ID": 19,
+          "Player Name": "Player 19 (Team E)",
+          "Team Name": "Team E"
+        },
+        {
+          "Player ID": 20,
+          "Player Name": "Player 20 (Team E)",
+          "Team Name": "Team E"
+        }
+      ],
+      "Team F": [
+        {
+          "Player ID": 21,
+          "Player Name": "Player 21 (Team F)",
+          "Team Name": "Team F"
+        },
+        {
+          "Player ID": 22,
+          "Player Name": "Player 22 (Team F)",
+          "Team Name": "Team F"
+        },
+        {
+          "Player ID": 23,
+          "Player Name": "Player 23 (Team F)",
+          "Team Name": "Team F"
+        },
+        {
+          "Player ID": 24,
+          "Player Name": "Player 24 (Team F)",
+          "Team Name": "Team F"
+        }
+      ],
+      "Team G": [
+        {
+          "Player ID": 25,
+          "Player Name": "Player 25 (Team G)",
+          "Team Name": "Team G"
+        },
+        {
+          "Player ID": 26,
+          "Player Name": "Player 26 (Team G)",
+          "Team Name": "Team G"
+        },
+        {
+          "Player ID": 27,
+          "Player Name": "Player 27 (Team G)",
+          "Team Name": "Team G"
+        },
+        {
+          "Player ID": 28,
+          "Player Name": "Player 28 (Team G)",
+          "Team Name": "Team G"
+        }
+      ],
+      "Team H": [
+        {
+          "Player ID": 29,
+          "Player Name": "Player 29 (Team H)",
+          "Team Name": "Team H"
+        },
+        {
+          "Player ID": 30,
+          "Player Name": "Player 30 (Team H)",
+          "Team Name": "Team H"
+        },
+        {
+          "Player ID": 31,
+          "Player Name": "Player 31 (Team H)",
+          "Team Name": "Team H"
+        },
+        {
+          "Player ID": 32,
+          "Player Name": "Player 32 (Team H)",
+          "Team Name": "Team H"
+        }
+      ],
+      "Team I": [
+        {
+          "Player ID": 33,
+          "Player Name": "Player 33 (Team I)",
+          "Team Name": "Team I"
+        },
+        {
+          "Player ID": 34,
+          "Player Name": "Player 34 (Team I)",
+          "Team Name": "Team I"
+        },
+        {
+          "Player ID": 35,
+          "Player Name": "Player 35 (Team I)",
+          "Team Name": "Team I"
+        },
+        {
+          "Player ID": 36,
+          "Player Name": "Player 36 (Team I)",
+          "Team Name": "Team I"
+        }
+      ],
+      "Team J": [
+        {
+          "Player ID": 37,
+          "Player Name": "Player 37 (Team J)",
+          "Team Name": "Team J"
+        },
+        {
+          "Player ID": 38,
+          "Player Name": "Player 38 (Team J)",
+          "Team Name": "Team J"
+        },
+        {
+          "Player ID": 39,
+          "Player Name": "Player 39 (Team J)",
+          "Team Name": "Team J"
+        },
+        {
+          "Player ID": 40,
+          "Player Name": "Player 40 (Team J)",
+          "Team Name": "Team J"
+        }
+      ],
+      "Team K": [
+        {
+          "Player ID": 41,
+          "Player Name": "Player 41 (Team K)",
+          "Team Name": "Team K"
+        },
+        {
+          "Player ID": 42,
+          "Player Name": "Player 42 (Team K)",
+          "Team Name": "Team K"
+        },
+        {
+          "Player ID": 43,
+          "Player Name": "Player 43 (Team K)",
+          "Team Name": "Team K"
+        },
+        {
+          "Player ID": 44,
+          "Player Name": "Player 44 (Team K)",
+          "Team Name": "Team K"
+        }
+      ],
+      "Team L": [
+        {
+          "Player ID": 45,
+          "Player Name": "Player 45 (Team L)",
+          "Team Name": "Team L"
+        },
+        {
+          "Player ID": 46,
+          "Player Name": "Player 46 (Team L)",
+          "Team Name": "Team L"
+        },
+        {
+          "Player ID": 47,
+          "Player Name": "Player 47 (Team L)",
+          "Team Name": "Team L"
+        },
+        {
+          "Player ID": 48,
+          "Player Name": "Player 48 (Team L)",
+          "Team Name": "Team L"
+        }
+      ],
+      "Team M": [
+        {
+          "Player ID": 49,
+          "Player Name": "Player 49 (Team M)",
+          "Team Name": "Team M"
+        },
+        {
+          "Player ID": 50,
+          "Player Name": "Player 50 (Team M)",
+          "Team Name": "Team M"
+        },
+        {
+          "Player ID": 51,
+          "Player Name": "Player 51 (Team M)",
+          "Team Name": "Team M"
+        },
+        {
+          "Player ID": 52,
+          "Player Name": "Player 52 (Team M)",
+          "Team Name": "Team M"
+        }
+      ],
+      "Team N": [
+        {
+          "Player ID": 53,
+          "Player Name": "Player 53 (Team N)",
+          "Team Name": "Team N"
+        },
+        {
+          "Player ID": 54,
+          "Player Name": "Player 54 (Team N)",
+          "Team Name": "Team N"
+        },
+        {
+          "Player ID": 55,
+          "Player Name": "Player 55 (Team N)",
+          "Team Name": "Team N"
+        },
+        {
+          "Player ID": 56,
+          "Player Name": "Player 56 (Team N)",
+          "Team Name": "Team N"
+        }
+      ],
+      "Team O": [
+        {
+          "Player ID": 57,
+          "Player Name": "Player 57 (Team O)",
+          "Team Name": "Team O"
+        },
+        {
+          "Player ID": 58,
+          "Player Name": "Player 58 (Team O)",
+          "Team Name": "Team O"
+        },
+        {
+          "Player ID": 59,
+          "Player Name": "Player 59 (Team O)",
+          "Team Name": "Team O"
+        },
+        {
+          "Player ID": 60,
+          "Player Name": "Player 60 (Team O)",
+          "Team Name": "Team O"
+        }
+      ],
+      "Team P": [
+        {
+          "Player ID": 61,
+          "Player Name": "Player 61 (Team P)",
+          "Team Name": "Team P"
+        },
+        {
+          "Player ID": 62,
+          "Player Name": "Player 62 (Team P)",
+          "Team Name": "Team P"
+        },
+        {
+          "Player ID": 63,
+          "Player Name": "Player 63 (Team P)",
+          "Team Name": "Team P"
+        },
+        {
+          "Player ID": 64,
+          "Player Name": "Player 64 (Team P)",
+          "Team Name": "Team P"
+        }
+      ]
+    },
+    "participants": [
+      {
+        "Player ID": 1,
+        "Player Name": "Player 1 (Team A)",
+        "Team Name": "Team A"
+      },
+      {
+        "Player ID": 2,
+        "Player Name": "Player 2 (Team A)",
+        "Team Name": "Team A"
+      },
+      {
+        "Player ID": 3,
+        "Player Name": "Player 3 (Team A)",
+        "Team Name": "Team A"
+      },
+      {
+        "Player ID": 4,
+        "Player Name": "Player 4 (Team A)",
+        "Team Name": "Team A"
+      },
+      {
+        "Player ID": 5,
+        "Player Name": "Player 5 (Team B)",
+        "Team Name": "Team B"
+      },
+      {
+        "Player ID": 6,
+        "Player Name": "Player 6 (Team B)",
+        "Team Name": "Team B"
+      },
+      {
+        "Player ID": 7,
+        "Player Name": "Player 7 (Team B)",
+        "Team Name": "Team B"
+      },
+      {
+        "Player ID": 8,
+        "Player Name": "Player 8 (Team B)",
+        "Team Name": "Team B"
+      },
+      {
+        "Player ID": 9,
+        "Player Name": "Player 9 (Team C)",
+        "Team Name": "Team C"
+      },
+      {
+        "Player ID": 10,
+        "Player Name": "Player 10 (Team C)",
+        "Team Name": "Team C"
+      },
+      {
+        "Player ID": 11,
+        "Player Name": "Player 11 (Team C)",
+        "Team Name": "Team C"
+      },
+      {
+        "Player ID": 12,
+        "Player Name": "Player 12 (Team C)",
+        "Team Name": "Team C"
+      },
+      {
+        "Player ID": 13,
+        "Player Name": "Player 13 (Team D)",
+        "Team Name": "Team D"
+      },
+      {
+        "Player ID": 14,
+        "Player Name": "Player 14 (Team D)",
+        "Team Name": "Team D"
+      },
+      {
+        "Player ID": 15,
+        "Player Name": "Player 15 (Team D)",
+        "Team Name": "Team D"
+      },
+      {
+        "Player ID": 16,
+        "Player Name": "Player 16 (Team D)",
+        "Team Name": "Team D"
+      },
+      {
+        "Player ID": 17,
+        "Player Name": "Player 17 (Team E)",
+        "Team Name": "Team E"
+      },
+      {
+        "Player ID": 18,
+        "Player Name": "Player 18 (Team E)",
+        "Team Name": "Team E"
+      },
+      {
+        "Player ID": 19,
+        "Player Name": "Player 19 (Team E)",
+        "Team Name": "Team E"
+      },
+      {
+        "Player ID": 20,
+        "Player Name": "Player 20 (Team E)",
+        "Team Name": "Team E"
+      },
+      {
+        "Player ID": 21,
+        "Player Name": "Player 21 (Team F)",
+        "Team Name": "Team F"
+      },
+      {
+        "Player ID": 22,
+        "Player Name": "Player 22 (Team F)",
+        "Team Name": "Team F"
+      },
+      {
+        "Player ID": 23,
+        "Player Name": "Player 23 (Team F)",
+        "Team Name": "Team F"
+      },
+      {
+        "Player ID": 24,
+        "Player Name": "Player 24 (Team F)",
+        "Team Name": "Team F"
+      },
+      {
+        "Player ID": 25,
+        "Player Name": "Player 25 (Team G)",
+        "Team Name": "Team G"
+      },
+      {
+        "Player ID": 26,
+        "Player Name": "Player 26 (Team G)",
+        "Team Name": "Team G"
+      },
+      {
+        "Player ID": 27,
+        "Player Name": "Player 27 (Team G)",
+        "Team Name": "Team G"
+      },
+      {
+        "Player ID": 28,
+        "Player Name": "Player 28 (Team G)",
+        "Team Name": "Team G"
+      },
+      {
+        "Player ID": 29,
+        "Player Name": "Player 29 (Team H)",
+        "Team Name": "Team H"
+      },
+      {
+        "Player ID": 30,
+        "Player Name": "Player 30 (Team H)",
+        "Team Name": "Team H"
+      },
+      {
+        "Player ID": 31,
+        "Player Name": "Player 31 (Team H)",
+        "Team Name": "Team H"
+      },
+      {
+        "Player ID": 32,
+        "Player Name": "Player 32 (Team H)",
+        "Team Name": "Team H"
+      },
+      {
+        "Player ID": 33,
+        "Player Name": "Player 33 (Team I)",
+        "Team Name": "Team I"
+      },
+      {
+        "Player ID": 34,
+        "Player Name": "Player 34 (Team I)",
+        "Team Name": "Team I"
+      },
+      {
+        "Player ID": 35,
+        "Player Name": "Player 35 (Team I)",
+        "Team Name": "Team I"
+      },
+      {
+        "Player ID": 36,
+        "Player Name": "Player 36 (Team I)",
+        "Team Name": "Team I"
+      },
+      {
+        "Player ID": 37,
+        "Player Name": "Player 37 (Team J)",
+        "Team Name": "Team J"
+      },
+      {
+        "Player ID": 38,
+        "Player Name": "Player 38 (Team J)",
+        "Team Name": "Team J"
+      },
+      {
+        "Player ID": 39,
+        "Player Name": "Player 39 (Team J)",
+        "Team Name": "Team J"
+      },
+      {
+        "Player ID": 40,
+        "Player Name": "Player 40 (Team J)",
+        "Team Name": "Team J"
+      },
+      {
+        "Player ID": 41,
+        "Player Name": "Player 41 (Team K)",
+        "Team Name": "Team K"
+      },
+      {
+        "Player ID": 42,
+        "Player Name": "Player 42 (Team K)",
+        "Team Name": "Team K"
+      },
+      {
+        "Player ID": 43,
+        "Player Name": "Player 43 (Team K)",
+        "Team Name": "Team K"
+      },
+      {
+        "Player ID": 44,
+        "Player Name": "Player 44 (Team K)",
+        "Team Name": "Team K"
+      },
+      {
+        "Player ID": 45,
+        "Player Name": "Player 45 (Team L)",
+        "Team Name": "Team L"
+      },
+      {
+        "Player ID": 46,
+        "Player Name": "Player 46 (Team L)",
+        "Team Name": "Team L"
+      },
+      {
+        "Player ID": 47,
+        "Player Name": "Player 47 (Team L)",
+        "Team Name": "Team L"
+      },
+      {
+        "Player ID": 48,
+        "Player Name": "Player 48 (Team L)",
+        "Team Name": "Team L"
+      },
+      {
+        "Player ID": 49,
+        "Player Name": "Player 49 (Team M)",
+        "Team Name": "Team M"
+      },
+      {
+        "Player ID": 50,
+        "Player Name": "Player 50 (Team M)",
+        "Team Name": "Team M"
+      },
+      {
+        "Player ID": 51,
+        "Player Name": "Player 51 (Team M)",
+        "Team Name": "Team M"
+      },
+      {
+        "Player ID": 52,
+        "Player Name": "Player 52 (Team M)",
+        "Team Name": "Team M"
+      },
+      {
+        "Player ID": 53,
+        "Player Name": "Player 53 (Team N)",
+        "Team Name": "Team N"
+      },
+      {
+        "Player ID": 54,
+        "Player Name": "Player 54 (Team N)",
+        "Team Name": "Team N"
+      },
+      {
+        "Player ID": 55,
+        "Player Name": "Player 55 (Team N)",
+        "Team Name": "Team N"
+      },
+      {
+        "Player ID": 56,
+        "Player Name": "Player 56 (Team N)",
+        "Team Name": "Team N"
+      },
+      {
+        "Player ID": 57,
+        "Player Name": "Player 57 (Team O)",
+        "Team Name": "Team O"
+      },
+      {
+        "Player ID": 58,
+        "Player Name": "Player 58 (Team O)",
+        "Team Name": "Team O"
+      },
+      {
+        "Player ID": 59,
+        "Player Name": "Player 59 (Team O)",
+        "Team Name": "Team O"
+      },
+      {
+        "Player ID": 60,
+        "Player Name": "Player 60 (Team O)",
+        "Team Name": "Team O"
+      },
+      {
+        "Player ID": 61,
+        "Player Name": "Player 61 (Team P)",
+        "Team Name": "Team P"
+      },
+      {
+        "Player ID": 62,
+        "Player Name": "Player 62 (Team P)",
+        "Team Name": "Team P"
+      },
+      {
+        "Player ID": 63,
+        "Player Name": "Player 63 (Team P)",
+        "Team Name": "Team P"
+      },
+      {
+        "Player ID": 64,
+        "Player Name": "Player 64 (Team P)",
+        "Team Name": "Team P"
+      }
+    ],
+    "tournament_teams": [
+      "Team K",
+      "Team I",
+      "Team O",
+      "Team L",
+      "Team M",
+      "Team A",
+      "Team P",
+      "Team J",
+      "Team N",
+      "Team D",
+      "Team C",
+      "Team F",
+      "Team E",
+      "Team H",
+      "Team G",
+      "Team B"
+    ],
+    "scores": {
+      "Team A": 1,
+      "Team B": 5,
+      "Team C": 0,
+      "Team D": 0,
+      "Team E": 0,
+      "Team F": 0,
+      "Team G": 0,
+      "Team H": 0,
+      "Team I": 0,
+      "Team J": 0,
+      "Team K": 0,
+      "Team L": 0,
+      "Team M": 0,
+      "Team N": 0,
+      "Team O": 0,
+      "Team P": 1
+    },
+    "player_scores": {
+      "1": 1,
+      "2": 0,
+      "3": 0,
+      "4": 0,
+      "5": 5,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0,
+      "12": 0,
+      "13": 0,
+      "14": 0,
+      "15": 0,
+      "16": 0,
+      "17": 0,
+      "18": 0,
+      "19": 0,
+      "20": 0,
+      "21": 0,
+      "22": 0,
+      "23": 0,
+      "24": 0,
+      "25": 0,
+      "26": 0,
+      "27": 0,
+      "28": 0,
+      "29": 0,
+      "30": 0,
+      "31": 0,
+      "32": 0,
+      "33": 0,
+      "34": 0,
+      "35": 0,
+      "36": 0,
+      "37": 0,
+      "38": 0,
+      "39": 0,
+      "40": 0,
+      "41": 0,
+      "42": 0,
+      "43": 0,
+      "44": 0,
+      "45": 0,
+      "46": 0,
+      "47": 0,
+      "48": 0,
+      "49": 0,
+      "50": 0,
+      "51": 0,
+      "52": 0,
+      "53": 0,
+      "54": 0,
+      "55": 0,
+      "56": 0,
+      "57": 0,
+      "58": 0,
+      "59": 0,
+      "60": 0,
+      "61": 1,
+      "62": 0,
+      "63": 0,
+      "64": 0
+    },
+    "tables": {
+      "1": {
+        "Table 1": [
+          {
+            "Player ID": 53,
+            "Player Name": "Player 53 (Team N)",
+            "Team Name": "Team N"
+          },
+          {
+            "Player ID": 17,
+            "Player Name": "Player 17 (Team E)",
+            "Team Name": "Team E"
+          },
+          {
+            "Player ID": 9,
+            "Player Name": "Player 9 (Team C)",
+            "Team Name": "Team C"
+          },
+          {
+            "Player ID": 5,
+            "Player Name": "Player 5 (Team B)",
+            "Team Name": "Team B"
+          }
+        ],
+        "Table 2": [
+          {
+            "Player ID": 6,
+            "Player Name": "Player 6 (Team B)",
+            "Team Name": "Team B"
+          },
+          {
+            "Player ID": 18,
+            "Player Name": "Player 18 (Team E)",
+            "Team Name": "Team E"
+          },
+          {
+            "Player ID": 54,
+            "Player Name": "Player 54 (Team N)",
+            "Team Name": "Team N"
+          },
+          {
+            "Player ID": 10,
+            "Player Name": "Player 10 (Team C)",
+            "Team Name": "Team C"
+          }
+        ],
+        "Table 3": [
+          {
+            "Player ID": 7,
+            "Player Name": "Player 7 (Team B)",
+            "Team Name": "Team B"
+          },
+          {
+            "Player ID": 19,
+            "Player Name": "Player 19 (Team E)",
+            "Team Name": "Team E"
+          },
+          {
+            "Player ID": 11,
+            "Player Name": "Player 11 (Team C)",
+            "Team Name": "Team C"
+          },
+          {
+            "Player ID": 55,
+            "Player Name": "Player 55 (Team N)",
+            "Team Name": "Team N"
+          }
+        ],
+        "Table 4": [
+          {
+            "Player ID": 20,
+            "Player Name": "Player 20 (Team E)",
+            "Team Name": "Team E"
+          },
+          {
+            "Player ID": 12,
+            "Player Name": "Player 12 (Team C)",
+            "Team Name": "Team C"
+          },
+          {
+            "Player ID": 8,
+            "Player Name": "Player 8 (Team B)",
+            "Team Name": "Team B"
+          },
+          {
+            "Player ID": 56,
+            "Player Name": "Player 56 (Team N)",
+            "Team Name": "Team N"
+          }
+        ],
+        "Table 5": [
+          {
+            "Player ID": 25,
+            "Player Name": "Player 25 (Team G)",
+            "Team Name": "Team G"
+          },
+          {
+            "Player ID": 29,
+            "Player Name": "Player 29 (Team H)",
+            "Team Name": "Team H"
+          },
+          {
+            "Player ID": 21,
+            "Player Name": "Player 21 (Team F)",
+            "Team Name": "Team F"
+          },
+          {
+            "Player ID": 49,
+            "Player Name": "Player 49 (Team M)",
+            "Team Name": "Team M"
+          }
+        ],
+        "Table 6": [
+          {
+            "Player ID": 22,
+            "Player Name": "Player 22 (Team F)",
+            "Team Name": "Team F"
+          },
+          {
+            "Player ID": 30,
+            "Player Name": "Player 30 (Team H)",
+            "Team Name": "Team H"
+          },
+          {
+            "Player ID": 50,
+            "Player Name": "Player 50 (Team M)",
+            "Team Name": "Team M"
+          },
+          {
+            "Player ID": 26,
+            "Player Name": "Player 26 (Team G)",
+            "Team Name": "Team G"
+          }
+        ],
+        "Table 7": [
+          {
+            "Player ID": 23,
+            "Player Name": "Player 23 (Team F)",
+            "Team Name": "Team F"
+          },
+          {
+            "Player ID": 31,
+            "Player Name": "Player 31 (Team H)",
+            "Team Name": "Team H"
+          },
+          {
+            "Player ID": 27,
+            "Player Name": "Player 27 (Team G)",
+            "Team Name": "Team G"
+          },
+          {
+            "Player ID": 51,
+            "Player Name": "Player 51 (Team M)",
+            "Team Name": "Team M"
+          }
+        ],
+        "Table 8": [
+          {
+            "Player ID": 32,
+            "Player Name": "Player 32 (Team H)",
+            "Team Name": "Team H"
+          },
+          {
+            "Player ID": 28,
+            "Player Name": "Player 28 (Team G)",
+            "Team Name": "Team G"
+          },
+          {
+            "Player ID": 24,
+            "Player Name": "Player 24 (Team F)",
+            "Team Name": "Team F"
+          },
+          {
+            "Player ID": 52,
+            "Player Name": "Player 52 (Team M)",
+            "Team Name": "Team M"
+          }
+        ],
+        "Table 9": [
+          {
+            "Player ID": 57,
+            "Player Name": "Player 57 (Team O)",
+            "Team Name": "Team O"
+          },
+          {
+            "Player ID": 61,
+            "Player Name": "Player 61 (Team P)",
+            "Team Name": "Team P"
+          },
+          {
+            "Player ID": 41,
+            "Player Name": "Player 41 (Team K)",
+            "Team Name": "Team K"
+          },
+          {
+            "Player ID": 13,
+            "Player Name": "Player 13 (Team D)",
+            "Team Name": "Team D"
+          }
+        ],
+        "Table 10": [
+          {
+            "Player ID": 58,
+            "Player Name": "Player 58 (Team O)",
+            "Team Name": "Team O"
+          },
+          {
+            "Player ID": 42,
+            "Player Name": "Player 42 (Team K)",
+            "Team Name": "Team K"
+          },
+          {
+            "Player ID": 62,
+            "Player Name": "Player 62 (Team P)",
+            "Team Name": "Team P"
+          },
+          {
+            "Player ID": 14,
+            "Player Name": "Player 14 (Team D)",
+            "Team Name": "Team D"
+          }
+        ],
+        "Table 11": [
+          {
+            "Player ID": 63,
+            "Player Name": "Player 63 (Team P)",
+            "Team Name": "Team P"
+          },
+          {
+            "Player ID": 43,
+            "Player Name": "Player 43 (Team K)",
+            "Team Name": "Team K"
+          },
+          {
+            "Player ID": 59,
+            "Player Name": "Player 59 (Team O)",
+            "Team Name": "Team O"
+          },
+          {
+            "Player ID": 15,
+            "Player Name": "Player 15 (Team D)",
+            "Team Name": "Team D"
+          }
+        ],
+        "Table 12": [
+          {
+            "Player ID": 44,
+            "Player Name": "Player 44 (Team K)",
+            "Team Name": "Team K"
+          },
+          {
+            "Player ID": 64,
+            "Player Name": "Player 64 (Team P)",
+            "Team Name": "Team P"
+          },
+          {
+            "Player ID": 16,
+            "Player Name": "Player 16 (Team D)",
+            "Team Name": "Team D"
+          },
+          {
+            "Player ID": 60,
+            "Player Name": "Player 60 (Team O)",
+            "Team Name": "Team O"
+          }
+        ],
+        "Table 13": [
+          {
+            "Player ID": 1,
+            "Player Name": "Player 1 (Team A)",
+            "Team Name": "Team A"
+          },
+          {
+            "Player ID": 45,
+            "Player Name": "Player 45 (Team L)",
+            "Team Name": "Team L"
+          },
+          {
+            "Player ID": 37,
+            "Player Name": "Player 37 (Team J)",
+            "Team Name": "Team J"
+          },
+          {
+            "Player ID": 33,
+            "Player Name": "Player 33 (Team I)",
+            "Team Name": "Team I"
+          }
+        ],
+        "Table 14": [
+          {
+            "Player ID": 38,
+            "Player Name": "Player 38 (Team J)",
+            "Team Name": "Team J"
+          },
+          {
+            "Player ID": 46,
+            "Player Name": "Player 46 (Team L)",
+            "Team Name": "Team L"
+          },
+          {
+            "Player ID": 34,
+            "Player Name": "Player 34 (Team I)",
+            "Team Name": "Team I"
+          },
+          {
+            "Player ID": 2,
+            "Player Name": "Player 2 (Team A)",
+            "Team Name": "Team A"
+          }
+        ],
+        "Table 15": [
+          {
+            "Player ID": 3,
+            "Player Name": "Player 3 (Team A)",
+            "Team Name": "Team A"
+          },
+          {
+            "Player ID": 47,
+            "Player Name": "Player 47 (Team L)",
+            "Team Name": "Team L"
+          },
+          {
+            "Player ID": 39,
+            "Player Name": "Player 39 (Team J)",
+            "Team Name": "Team J"
+          },
+          {
+            "Player ID": 35,
+            "Player Name": "Player 35 (Team I)",
+            "Team Name": "Team I"
+          }
+        ],
+        "Table 16": [
+          {
+            "Player ID": 48,
+            "Player Name": "Player 48 (Team L)",
+            "Team Name": "Team L"
+          },
+          {
+            "Player ID": 4,
+            "Player Name": "Player 4 (Team A)",
+            "Team Name": "Team A"
+          },
+          {
+            "Player ID": 40,
+            "Player Name": "Player 40 (Team J)",
+            "Team Name": "Team J"
+          },
+          {
+            "Player ID": 36,
+            "Player Name": "Player 36 (Team I)",
+            "Team Name": "Team I"
+          }
+        ]
+      }
+    },
+    "round_results": {
+      "1": {
+        "table_submissions": {
+          "Table 1": [
+            {
+              "player_id": 5,
+              "points": 5
+            },
+            {
+              "player_id": 1,
+              "points": 1
+            },
+            {
+              "player_id": 61,
+              "points": 1
+            },
+            {
+              "player_id": 21,
+              "points": 0
+            }
+          ]
+        },
+        "submitted_tables": 

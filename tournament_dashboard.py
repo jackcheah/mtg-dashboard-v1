@@ -2167,13 +2167,23 @@ def get_tournament_state():
             'is_complete': len(submitted) == total
         }
 
+    # Convert round_results for JSON serialization (Phase 3.1 - convert sets to lists)
+    serializable_round_results = {}
+    for round_num, results in tournament.round_results.items():
+        serializable_round_results[round_num] = {}
+        for key, value in results.items():
+            if isinstance(value, set):
+                serializable_round_results[round_num][key] = list(value)
+            else:
+                serializable_round_results[round_num][key] = value
+
     response_data = {
         'success': True,
         'teams': tournament.teams,
         'scores': tournament.scores,
         'player_scores': tournament.player_scores,
         'current_round': tournament.current_round,
-        'round_results': tournament.round_results,
+        'round_results': serializable_round_results,
         'tables': seated_tables,
         'swiss_rounds_count': tournament.swiss_rounds_count,
         'max_rounds': tournament.max_rounds,

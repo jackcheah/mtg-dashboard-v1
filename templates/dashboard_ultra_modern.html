@@ -2081,6 +2081,85 @@
             overflow-y: auto;
         }
 
+        /* Submission Progress (Phase 3.1) */
+        .submission-progress-container {
+            margin: 20px 0;
+            padding: 20px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            backdrop-filter: blur(20px) saturate(180%);
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .progress-label {
+            font-weight: 600;
+            color: #fff;
+            font-size: 16px;
+        }
+
+        .progress-stats {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+        }
+
+        .progress-stats span {
+            font-weight: 600;
+            color: var(--color-secondary);
+        }
+
+        .progress-bar-bg {
+            height: 32px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 16px;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .progress-percent {
+            color: #fff;
+            font-weight: 700;
+            font-size: 14px;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .submitted-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+        }
+
+        .submitted-badge i {
+            font-size: 12px;
+        }
+
         /* Empty State */
         .empty-state {
             text-align: center;
@@ -3278,6 +3357,9 @@
 
             // Update bracket visualization
             updateBracketVisualization(parseInt(round));
+
+            // Update submission progress (Phase 3.1)
+            await updateSubmissionProgress(parseInt(round));
         }
 
         // Update Tournament Progression Tracker
@@ -3465,6 +3547,92 @@
                     </div>
                 </div>
             `;
+        }
+
+        // Submission Progress Tracking (Phase 3.1)
+        async function updateSubmissionProgress(roundNum) {
+            try {
+                const response = await fetch(`/get_submission_status/${roundNum}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    // Update or create progress bar
+                    let progressContainer = document.getElementById(`submission-progress-${roundNum}`);
+
+                    if (!progressContainer) {
+                        // Create progress bar if it doesn't exist
+                        const tablesContainer = document.getElementById('tables-container');
+                        if (tablesContainer) {
+                            progressContainer = document.createElement('div');
+                            progressContainer.id = `submission-progress-${roundNum}`;
+                            progressContainer.className = 'submission-progress-container';
+                            progressContainer.innerHTML = `
+                                <div class="progress-header">
+                                    <span class="progress-label">Round ${roundNum} Progress</span>
+                                    <span class="progress-stats">
+                                        <span id="submitted-count-${roundNum}">${data.submitted_count}</span> /
+                                        <span id="total-count-${roundNum}">${data.total_tables}</span> tables submitted
+                                    </span>
+                                </div>
+                                <div class="progress-bar-bg">
+                                    <div class="progress-bar-fill" id="progress-bar-${roundNum}" style="width: ${data.progress_percent}%">
+                                        <span class="progress-percent">${Math.round(data.progress_percent)}%</span>
+                                    </div>
+                                </div>
+                            `;
+                            tablesContainer.insertBefore(progressContainer, tablesContainer.firstChild);
+                        }
+                    } else {
+                        // Update existing progress bar
+                        document.getElementById(`submitted-count-${roundNum}`).textContent = data.submitted_count;
+                        document.getElementById(`total-count-${roundNum}`).textContent = data.total_tables;
+                        document.getElementById(`progress-bar-${roundNum}`).style.width = `${data.progress_percent}%`;
+                        document.getElementById(`progress-bar-${roundNum}`).querySelector('.progress-percent').textContent = `${Math.round(data.progress_percent)}%`;
+                    }
+
+                    // Mark submitted tables visually
+                    data.submitted_tables.forEach(tableName => {
+                        markTableAsSubmitted(tableName, roundNum);
+                    });
+
+                    console.log(`Submission progress: ${data.submitted_count}/${data.total_tables} (${data.progress_percent}%)`);
+                } else {
+                    console.warn('Failed to get submission status:', data.error);
+                }
+            } catch (error) {
+                console.error('Error updating submission progress:', error);
+            }
+        }
+
+        function markTableAsSubmitted(tableName, roundNum) {
+            const tableCard = document.getElementById(`table-${tableName.replace(/\s+/g, '-')}`);
+            if (!tableCard) return;
+
+            // Add submitted badge to header
+            const header = tableCard.querySelector('.table-card-header');
+            if (header && !header.querySelector('.submitted-badge')) {
+                const badge = document.createElement('span');
+                badge.className = 'submitted-badge';
+                badge.innerHTML = '<i class="fas fa-check-circle"></i> SUBMITTED';
+                badge.style.marginLeft = '10px';
+                header.appendChild(badge);
+            }
+
+            // Disable all score buttons
+            const scoreButtons = tableCard.querySelectorAll('.score-btn');
+            scoreButtons.forEach(btn => {
+                btn.disabled = true;
+                btn.style.opacity = '0.5';
+                btn.style.cursor = 'not-allowed';
+            });
+
+            // Update submit button
+            const submitBtn = tableCard.querySelector('.submit-table-btn');
+            if (submitBtn && !submitBtn.classList.contains('submitted')) {
+                submitBtn.classList.add('submitted');
+                submitBtn.innerHTML = '<i class="fas fa-check-double"></i> Submitted';
+                submitBtn.disabled = true;
+            }
         }
 
         // Display Tables with Score Input
@@ -3800,6 +3968,10 @@
 
                     // Fetch fresh data to update display
                     refreshTeamScores();
+
+                    // Update submission progress (Phase 3.1)
+                    const roundNum = parseInt(document.getElementById('round-select').value);
+                    await updateSubmissionProgress(roundNum);
                 } else if (data.already_submitted) {
                     // Backend says already submitted
                     showToast('Already Submitted', data.error || `${tableName} has already been submitted`, 'info');

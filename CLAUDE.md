@@ -133,8 +133,10 @@ The solver tries three strategies in order. Teammates constraint is NEVER relaxe
 - `POST /load_data` - Load participants from Excel or sample data
 - `POST /setup_tournament` - Initialize tournament, reset state, generate Round 1
 - `POST /setup_round/<N>` - Generate round N if not already exists
+- `POST /submit_table_results` - Submit results for a specific table (Phase 2: with validation)
 - `POST /submit_player_results` - Record scores, trigger next round generation
-- `GET /get_tournament_state` - Full snapshot (standings, scores, current round)
+- `GET /get_tournament_state` - Full snapshot (standings, scores, current round, submission status)
+- `GET /get_submission_status/<round_num>` - Get submission progress for a round (Phase 3)
 - `POST /generate_finals` - Create finals from top 4 teams
 
 ## Common Pitfalls
