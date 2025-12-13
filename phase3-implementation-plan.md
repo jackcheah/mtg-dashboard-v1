@@ -324,9 +324,10 @@ async function submitRoundResults() {
 
 > **STATUS: DEFERRED - Ready for future implementation**
 >
-> **Estimated Effort:** 3-4 hours
+> **Estimated Effort:** 4-6 hours (increased from 3-4 due to complexity)
 > **Priority:** Optional (nice-to-have)
 > **When to implement:** When score editing capability becomes necessary
+> **Risk Level:** HIGH (data integrity concerns)
 >
 > This task has a complete implementation plan below. All other Phase 3 tasks are complete.
 
@@ -337,12 +338,21 @@ There is currently no way to correct scores after submission, requiring tourname
 - **As a tournament organizer**, I want to edit scores for unfinalized rounds so I can fix data entry mistakes
 - **As a tournament organizer**, I want to see a warning when editing submitted scores
 - **As a tournament organizer**, I want an audit trail of score changes
+- **As a tournament organizer**, I want to prevent editing finalized rounds to maintain data integrity
 
 ### Workaround (Current)
 If scores need to be corrected, tournament organizers can:
 1. Restart the affected round from the beginning
 2. Or manually restart the server and reload from a backup point
 3. The state machine (Task 3.4) helps prevent some common errors that would require correction
+
+### Prerequisites (Already Implemented ✅)
+- ✅ `finalized_rounds` tracking exists (line 46 in tournament_dashboard.py)
+- ✅ `submitted_tables` tracking exists (Phase 2.3)
+- ✅ `round_results` structure with `table_submissions` (Phase 2.2)
+- ✅ `player_scores` and `scores` tracking (core functionality)
+- ✅ `calculate_team_scores()` method (line 948)
+- ✅ `update_final_round_scores()` method (line 1070)
 
 ### Implementation Details
 
@@ -647,6 +657,121 @@ async function viewScoreHistory(tableName, roundNum) {
 - [ ] Edit count is displayed correctly
 - [ ] Cancel button restores original state
 - [ ] Audit trail can be viewed
+
+### ⚠️ Critical Implementation Notes
+
+**1. Input Validation (MUST IMPLEMENT)**
+The current plan lacks comprehensive input validation. Add these checks:
+- Validate `new_results` array length (must be 4 players)
+- Validate each result has `player_id` and `points` fields
+- Validate `points` values are 0, 1, or 5 only
+- Validate all `player_id` values exist in `tournament.player_scores`
+- Validate all players belong to the correct table
+
+**2. State Machine Integration (MUST IMPLEMENT)**
+Add `@require_state` decorator to enforce valid tournament states:
+```python
+@require_state(TournamentState.SWISS_IN_PROGRESS,
+               TournamentState.TOP8_IN_PROGRESS,
+               TournamentState.FINALS_IN_PROGRESS)
+```
+
+**3. Enhanced Error Messages (MUST IMPLEMENT)**
+All error responses should include `user_message` and `suggestion` fields (Phase 3.3 standard):
+```python
+return jsonify({
+    'success': False,
+    'error': 'Technical error message',
+    'user_message': 'User-friendly explanation',
+    'suggestion': 'What to do next'
+}), status_code
+```
+
+**4. Data Integrity Safeguards (RECOMMENDED)**
+Add validation to prevent score corruption:
+```python
+# Before editing: Calculate total points
+old_total = sum(r['points'] for r in old_results)
+new_total = sum(r['points'] for r in new_results)
+
+# After editing: Verify player_scores integrity
+expected_change = new_total - old_total
+actual_change = sum(tournament.player_scores.values()) - old_player_total
+
+if abs(expected_change - actual_change) > 0.01:  # Allow floating point tolerance
+    # ROLLBACK and return error
+    raise ValueError("Score integrity check failed")
+```
+
+**5. Backup Removal (CRITICAL)**
+Remove this line from the implementation:
+```python
+tournament.save_backup()  # ❌ REMOVE - Backup feature is disabled
+```
+The backup feature is known to cause state corruption (see CLAUDE.md line 106).
+
+**6. Finals Round Handling (CRITICAL)**
+The current plan uses hardcoded Round 5:
+```python
+if round_num == 5:  # ❌ WRONG
+    tournament.update_final_round_scores(round_num, new_results)
+```
+Must use dynamic check:
+```python
+if round_num == tournament.max_rounds:  # ✅ CORRECT
+    tournament.update_final_round_scores(round_num, new_results)
+```
+
+**7. Score History Structure (IMPROVEMENT)**
+Enhance history tracking to include editor information:
+```python
+tournament.round_results[round_num]['score_history'][table_name].append({
+    'timestamp': datetime.now().isoformat(),
+    'old_results': old_results,
+    'new_results': new_results,
+    'editor_ip': request.remote_addr,  # Track who made the change
+    'reason': data.get('reason', 'No reason provided')  # Optional edit reason
+})
+```
+
+**8. Atomic Operations (RECOMMENDED)**
+Wrap score updates in try-except to enable rollback on failure:
+```python
+# Store original state
+original_player_scores = tournament.player_scores.copy()
+original_team_scores = tournament.scores.copy()
+
+try:
+    # Perform all updates
+    # ...
+except Exception as e:
+    # Rollback on any error
+    tournament.player_scores = original_player_scores
+    tournament.scores = original_team_scores
+    raise
+```
+
+### Implementation Checklist
+
+Before implementing Task 3.2, ensure:
+- [ ] All Phase 3.1, 3.3, 3.4 tasks are complete (they are ✅)
+- [ ] Comprehensive testing environment is set up
+- [ ] Backup/restore feature remains disabled
+- [ ] Input validation matches Phase 2.2 standards
+- [ ] Error messages match Phase 3.3 standards
+- [ ] State machine integration matches Phase 3.4 standards
+- [ ] Code review by another developer (high-risk feature)
+
+### Estimated Effort Breakdown
+
+| Subtask | Effort | Risk |
+|---------|--------|------|
+| Backend endpoint with validation | 2 hours | High |
+| Score history tracking | 1 hour | Medium |
+| Frontend edit UI | 1.5 hours | Low |
+| Audit trail viewer | 1 hour | Low |
+| Testing & debugging | 2 hours | High |
+| **Total** | **7.5 hours** | **High** |
 
 ---
 
