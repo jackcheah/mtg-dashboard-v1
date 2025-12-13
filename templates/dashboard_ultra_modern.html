@@ -3519,17 +3519,23 @@
                                     </div>
                                     <div class="score-buttons-inline">
                                         <button class="score-btn score-btn-win"
-                                                onclick="setPlayerScore('${tableName}', ${playerId}, 5, this)"
+                                                data-table="${tableName.replace(/'/g, '&#39;').replace(/"/g, '&quot;')}"
+                                                data-player="${playerId}"
+                                                data-points="5"
                                                 title="Win (5 points)">
                                             W
                                         </button>
                                         <button class="score-btn score-btn-draw"
-                                                onclick="setPlayerScore('${tableName}', ${playerId}, 1, this)"
+                                                data-table="${tableName.replace(/'/g, '&#39;').replace(/"/g, '&quot;')}"
+                                                data-player="${playerId}"
+                                                data-points="1"
                                                 title="Draw (1 point)">
                                             D
                                         </button>
                                         <button class="score-btn score-btn-loss"
-                                                onclick="setPlayerScore('${tableName}', ${playerId}, 0, this)"
+                                                data-table="${tableName.replace(/'/g, '&#39;').replace(/"/g, '&quot;')}"
+                                                data-player="${playerId}"
+                                                data-points="0"
                                                 title="Loss (0 points)">
                                             L
                                         </button>
@@ -3684,6 +3690,16 @@
                 return;
             }
 
+            // Get submit button to prevent double-click
+            const tableCard = document.getElementById(`table-${tableName.replace(/\s+/g, '-')}`);
+            const submitBtn = tableCard ? tableCard.querySelector('.submit-table-btn') : null;
+
+            // Prevent double-submission (check if already disabled/submitted)
+            if (submitBtn && submitBtn.disabled) {
+                showToast('Already Submitted', `${tableName} results have already been submitted`, 'info');
+                return;
+            }
+
             if (!tableScores[tableName]) {
                 showToast('Error', 'Please enter scores for all players first', 'warning');
                 return;
@@ -3708,6 +3724,12 @@
                 });
             }
 
+            // Disable button immediately to prevent double-click
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+            }
+
             try {
                 const response = await fetch('/submit_table_results', {
                     method: 'POST',
@@ -3727,11 +3749,11 @@
                     showToast('Table Submitted!', `Results recorded for ${tableName}`, 'success');
 
                     // Mark button as submitted
-                    const tableCard = document.getElementById(`table-${tableName.replace(/\s+/g, '-')}`);
-                    const submitBtn = tableCard.querySelector('.submit-table-btn');
-                    submitBtn.classList.add('submitted');
-                    submitBtn.innerHTML = '<i class="fas fa-check-double"></i> Submitted';
-                    submitBtn.disabled = true;
+                    if (submitBtn) {
+                        submitBtn.classList.add('submitted');
+                        submitBtn.innerHTML = '<i class="fas fa-check-double"></i> Submitted';
+                        // Keep button disabled
+                    }
 
                     // Update team display with new scores
                     console.log('Updated scores:', data.scores);
@@ -3739,12 +3761,30 @@
 
                     // Fetch fresh data to update display
                     refreshTeamScores();
+                } else if (data.already_submitted) {
+                    // Backend says already submitted
+                    showToast('Already Submitted', data.error || `${tableName} has already been submitted`, 'info');
+                    if (submitBtn) {
+                        submitBtn.classList.add('submitted');
+                        submitBtn.innerHTML = '<i class="fas fa-check-double"></i> Already Submitted';
+                        // Keep button disabled
+                    }
                 } else {
-                    showToast('Error', data.message || 'Failed to submit results', 'error');
+                    // Other error - re-enable button
+                    showToast('Error', data.error || data.message || 'Failed to submit results', 'error');
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Table Results';
+                    }
                 }
             } catch (error) {
-                showToast('Error', 'Network error submitting results', 'error');
+                showToast('Error', 'Network error submitting results. Please try again.', 'error');
                 console.error(error);
+                // Re-enable button on network error so user can retry
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Table Results';
+                }
             }
         }
 
@@ -3928,6 +3968,16 @@
                     closeChampionshipModal();
                 }
             });
+        });
+
+        // Event delegation for score buttons (XSS-safe)
+        document.addEventListener('click', function(e) {
+            if (e.target.matches('.score-btn')) {
+                const tableName = e.target.dataset.table;
+                const playerId = parseInt(e.target.dataset.player);
+                const points = parseInt(e.target.dataset.points);
+                setPlayerScore(tableName, playerId, points, e.target);
+            }
         });
 
         // Auto-load on page load

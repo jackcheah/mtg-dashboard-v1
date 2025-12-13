@@ -1938,61 +1938,150 @@ def submit_player_results():
 
 @app.route('/submit_table_results', methods=['POST'])
 def submit_table_results():
-    """Submit results for a specific table"""
-    data = request.json
-    round_num = data.get('round')
-    table_name = data.get('table')
-    player_results = data.get('results', [])
-    
-    print(f"Submitting table results for Round {round_num}, {table_name}")
-    print(f"Player results: {player_results}")
-    
-    # Initialize round results if not exists
-    if round_num not in tournament.round_results:
-        tournament.round_results[round_num] = {}
-    
-    if 'table_submissions' not in tournament.round_results[round_num]:
-        tournament.round_results[round_num]['table_submissions'] = {}
-    
-    # Store table-specific results
-    tournament.round_results[round_num]['table_submissions'][table_name] = player_results
-    
-    # Update individual player scores
-    for result in player_results:
-        player_id = result['player_id']
-        points = result['points']
-        
-        print(f"  Processing player_id={player_id}, points={points}")
-        print(f"  player_id in player_scores? {player_id in tournament.player_scores}")
-        print(f"  Current player_scores keys (first 5): {list(tournament.player_scores.keys())[:5]}")
-        
-        if player_id in tournament.player_scores:
-            # Add points to player's total
-            old_score = tournament.player_scores[player_id]
-            tournament.player_scores[player_id] += points
-            new_score = tournament.player_scores[player_id]
-            print(f"  Updated player {player_id}: {old_score} -> {new_score}")
+    """Submit results for a specific table with comprehensive validation."""
+    try:
+        data = request.json
+
+        # Validate request body exists
+        if not data:
+            return jsonify({'success': False, 'error': 'No data provided'}), 400
+
+        # Validate round number
+        round_num = data.get('round')
+        if round_num is None:
+            return jsonify({'success': False, 'error': 'Round number is required'}), 400
+        if not isinstance(round_num, int):
+            return jsonify({'success': False, 'error': f'Round number must be an integer, got {type(round_num).__name__}'}), 400
+        if round_num < 1:
+            return jsonify({'success': False, 'error': f'Round number must be at least 1, got {round_num}'}), 400
+        if round_num > tournament.max_rounds:
+            return jsonify({'success': False, 'error': f'Round number {round_num} exceeds maximum rounds ({tournament.max_rounds})'}), 400
+
+        # Validate table name
+        table_name = data.get('table')
+        if not table_name:
+            return jsonify({'success': False, 'error': 'Table name is required'}), 400
+        if not isinstance(table_name, str):
+            return jsonify({'success': False, 'error': f'Table name must be a string, got {type(table_name).__name__}'}), 400
+
+        # Validate table exists in round
+        if round_num in tournament.tables:
+            if table_name not in tournament.tables[round_num]:
+                available_tables = list(tournament.tables[round_num].keys())
+                return jsonify({
+                    'success': False,
+                    'error': f'Table "{table_name}" not found in round {round_num}. Available tables: {available_tables}'
+                }), 400
         else:
-            print(f"  WARNING: Player ID {player_id} not found in player_scores!")
-    
-    # Handle final round scoring separately
-    if round_num == tournament.max_rounds:
-        tournament.update_final_round_scores(round_num, player_results)
-    
-    # Recalculate team scores from individual player scores
-    tournament.calculate_team_scores()
-    
-    # Auto-save after table submission
-    tournament.save_backup()
-    
-    return jsonify({
-        'success': True, 
-        'message': f'Results submitted for {table_name}',
-        'table': table_name,
-        'round': round_num,
-        'scores': tournament.scores,
-        'player_scores': tournament.player_scores
-    })
+            return jsonify({'success': False, 'error': f'Round {round_num} has not been set up yet'}), 400
+
+        # Validate player results
+        player_results = data.get('results', [])
+        if not isinstance(player_results, list):
+            return jsonify({'success': False, 'error': f'Results must be a list, got {type(player_results).__name__}'}), 400
+        if len(player_results) == 0:
+            return jsonify({'success': False, 'error': 'No player results provided'}), 400
+
+        # Validate each player result
+        for idx, result in enumerate(player_results):
+            # Check result is a dict
+            if not isinstance(result, dict):
+                return jsonify({'success': False, 'error': f'Result {idx} must be an object, got {type(result).__name__}'}), 400
+
+            # Check required fields exist
+            if 'player_id' not in result:
+                return jsonify({'success': False, 'error': f'Result {idx} missing required field: player_id'}), 400
+            if 'points' not in result:
+                return jsonify({'success': False, 'error': f'Result {idx} missing required field: points'}), 400
+
+            # Validate player_id
+            player_id = result['player_id']
+            if not isinstance(player_id, int):
+                return jsonify({'success': False, 'error': f'Result {idx}: player_id must be an integer, got {type(player_id).__name__}'}), 400
+            if player_id not in tournament.player_scores:
+                return jsonify({'success': False, 'error': f'Result {idx}: Invalid player_id {player_id}. Player not found in tournament.'}), 400
+
+            # Validate points (must be 0, 1, or 5)
+            points = result['points']
+            if not isinstance(points, int):
+                return jsonify({'success': False, 'error': f'Result {idx}: points must be an integer, got {type(points).__name__}'}), 400
+            if points not in [0, 1, 5]:
+                return jsonify({'success': False, 'error': f'Result {idx}: Invalid points value {points}. Must be 0 (Loss), 1 (Draw), or 5 (Win)'}), 400
+
+        print(f"[OK] Validation passed for Round {round_num}, {table_name}")
+        print(f"Player results: {player_results}")
+
+        # Initialize round results if not exists
+        if round_num not in tournament.round_results:
+            tournament.round_results[round_num] = {}
+
+        if 'table_submissions' not in tournament.round_results[round_num]:
+            tournament.round_results[round_num]['table_submissions'] = {}
+
+        # Initialize submitted_tables tracking set
+        if 'submitted_tables' not in tournament.round_results[round_num]:
+            tournament.round_results[round_num]['submitted_tables'] = set()
+
+        # Check if table already submitted (prevent double-submission)
+        if table_name in tournament.round_results[round_num]['submitted_tables']:
+            print(f"[WARNING] Table {table_name} already submitted for round {round_num}")
+            return jsonify({
+                'success': False,
+                'error': f'{table_name} has already been submitted for round {round_num}. Scores are locked.',
+                'already_submitted': True
+            }), 400
+
+        # Store table-specific results
+        tournament.round_results[round_num]['table_submissions'][table_name] = player_results
+
+        # Update individual player scores
+        for result in player_results:
+            player_id = result['player_id']
+            points = result['points']
+
+            print(f"  Processing player_id={player_id}, points={points}")
+
+            if player_id in tournament.player_scores:
+                # Add points to player's total
+                old_score = tournament.player_scores[player_id]
+                tournament.player_scores[player_id] += points
+                new_score = tournament.player_scores[player_id]
+                print(f"  Updated player {player_id}: {old_score} -> {new_score}")
+            else:
+                # This should never happen due to validation above, but kept for safety
+                print(f"  WARNING: Player ID {player_id} not found in player_scores!")
+
+        # Handle final round scoring separately
+        if round_num == tournament.max_rounds:
+            tournament.update_final_round_scores(round_num, player_results)
+
+        # Recalculate team scores from individual player scores
+        tournament.calculate_team_scores()
+
+        # Mark table as submitted (prevent double-submission)
+        tournament.round_results[round_num]['submitted_tables'].add(table_name)
+        print(f"[OK] Table {table_name} marked as submitted for round {round_num}")
+
+        # Auto-save after table submission
+        tournament.save_backup()
+
+        return jsonify({
+            'success': True,
+            'message': f'Results submitted for {table_name}',
+            'table': table_name,
+            'round': round_num,
+            'scores': tournament.scores,
+            'player_scores': tournament.player_scores
+        })
+
+    except Exception as e:
+        print(f"[ERROR] submit_table_results failed: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'success': False,
+            'error': f'Server error: {str(e)}'
+        }), 500
 
 @app.route('/get_tournament_state')
 def get_tournament_state():
