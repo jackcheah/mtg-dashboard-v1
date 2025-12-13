@@ -13,36 +13,42 @@ MTG Tournament Dashboard is a web-based tournament management system for Magic: 
 ### Development
 ```bash
 # Install dependencies
-pip install -r MTG-Tournament-Dashboard-AugmentCode/requirements.txt
+pip install -r requirements.txt
 
 # Run the application
-cd MTG-Tournament-Dashboard-AugmentCode
 python tournament_dashboard.py
 
 # Access dashboard at http://127.0.0.1:5000
 ```
 
-### Testing Workflow
+### Testing
 ```bash
-# No automated tests currently
-# Manual testing: Load Participants → Setup Tournament → Submit rounds → Verify finals
+# Run comprehensive test suite (8, 12, or 16 teams)
+python test_tournament_comprehensive.py --teams 16 --verbose
+
+# Test specific team count
+python test_tournament_comprehensive.py --teams 8
+python test_tournament_comprehensive.py --teams 12
+
+# Manual testing workflow:
+# 1. Load Participants → 2. Setup Tournament → 3. Submit rounds → 4. Verify finals
 ```
 
 ## Architecture
 
 ### Core Components
 
-**1. TournamentManager** ([tournament_dashboard.py:11-1465](MTG-Tournament-Dashboard-AugmentCode/tournament_dashboard.py))
+**1. TournamentManager** ([tournament_dashboard.py:11-2831](tournament_dashboard.py))
 - Central state management class handling tournament lifecycle
 - Key state: `participants`, `teams`, `scores`, `player_scores`, `tables`, `submitted_rounds`
 - Manages incremental round generation (Round 1 on setup, subsequent rounds after prior submission)
 
-**2. UnifiedSwissPairing** ([unified_swiss_pairing.py:415+](MTG-Tournament-Dashboard-AugmentCode/unified_swiss_pairing.py))
+**2. UnifiedSwissPairing** ([unified_swiss_pairing.py:415+](unified_swiss_pairing.py))
 - Constraint satisfaction solver for pod generation
 - Enforces: teammates never together (hard), zero repeat matchups (soft)
 - Uses HybridConstraintSolver with backtracking (500K node limit)
 
-**3. Frontend SPA** ([templates/dashboard_ultra_modern.html](MTG-Tournament-Dashboard-AugmentCode/templates/dashboard_ultra_modern.html))
+**3. Frontend SPA** ([templates/dashboard_ultra_modern.html](templates/dashboard_ultra_modern.html))
 - Single HTML file with embedded CSS/JS (~3,900 lines)
 - Glassmorphism design with purple/cyan color scheme
 - Direct fetch() calls to Flask REST endpoints
@@ -80,7 +86,7 @@ Excel/Sample Data → load_participants() → TournamentManager state
 - Round 1: random pairing and seating
 - Rounds 2+: Swiss pairing by team scores, seating by individual player scores
 
-**Intelligent Seating** ([tournament_dashboard.py:778-835](MTG-Tournament-Dashboard-AugmentCode/tournament_dashboard.py))
+**Intelligent Seating** ([tournament_dashboard.py:783-836](tournament_dashboard.py#L783-L836))
 - Round 1: Randomized
 - Rounds 2+: Players sorted by `player_scores[]` within each pod
 - Highest scorer → Seat 1 (players of similar strength face each other)
@@ -118,10 +124,10 @@ The solver tries three strategies in order. Teammates constraint is NEVER relaxe
 - Always check `round_num == tournament.max_rounds`, never hardcode round 5
 
 ### Excel Import
-- Default path: `participants/participant_team.xlsx` ([tournament_dashboard.py:1506](MTG-Tournament-Dashboard-AugmentCode/tournament_dashboard.py))
+- Default path: `participants/participant_team.xlsx` (configured in Flask route)
 - Supports column-based (team names as headers) or row-based format
 - Validation: exactly 4 players per team, total teams must be 8/12/16
-- Fallback: `create_sample_data()` generates 8 teams if Excel missing
+- Fallback: `create_sample_data()` generates 8 teams if Excel missing ([tournament_dashboard.py:380](tournament_dashboard.py#L380))
 
 ### Key Flask Endpoints
 - `POST /load_data` - Load participants from Excel or sample data
@@ -141,7 +147,7 @@ The solver tries three strategies in order. Teammates constraint is NEVER relaxe
 
 4. **Max Rounds is Dynamic**: Don't hardcode `if round_num == 5` for finals detection. Use `if round_num == self.max_rounds`.
 
-5. **Excel Path is Hardcoded**: To change participant file location, edit line 1506 in [tournament_dashboard.py](MTG-Tournament-Dashboard-AugmentCode/tournament_dashboard.py).
+5. **Excel Path is Hardcoded**: To change participant file location, search for `participants/participant_team.xlsx` in Flask routes in [tournament_dashboard.py](tournament_dashboard.py).
 
 6. **Backup Feature is Disabled**: The `save_state()` and `load_state()` methods exist but should not be used. They cause state corruption.
 
@@ -149,12 +155,13 @@ The solver tries three strategies in order. Teammates constraint is NEVER relaxe
 
 | Component | File | Key Functions/Classes |
 |-----------|------|----------------------|
-| Main application | [tournament_dashboard.py](MTG-Tournament-Dashboard-AugmentCode/tournament_dashboard.py) | TournamentManager (line 11), Flask routes |
-| Pairing algorithm | [unified_swiss_pairing.py](MTG-Tournament-Dashboard-AugmentCode/unified_swiss_pairing.py) | UnifiedSwissPairing (line 415), HybridConstraintSolver (line 46) |
-| Frontend | [templates/dashboard_ultra_modern.html](MTG-Tournament-Dashboard-AugmentCode/templates/dashboard_ultra_modern.html) | CSS (lines 19-1466), JavaScript (lines 1467+) |
-| Sample data generation | [tournament_dashboard.py:380-505](MTG-Tournament-Dashboard-AugmentCode/tournament_dashboard.py#L380-L505) | create_sample_data() |
-| Excel loading | [tournament_dashboard.py:261-378](MTG-Tournament-Dashboard-AugmentCode/tournament_dashboard.py#L261-L378) | load_participants() |
-| Intelligent seating | [tournament_dashboard.py:778-835](MTG-Tournament-Dashboard-AugmentCode/tournament_dashboard.py#L778-L835) | apply_intelligent_seating() |
+| Main application | [tournament_dashboard.py](tournament_dashboard.py) | TournamentManager (line 11), Flask routes (line 1400+) |
+| Pairing algorithm | [unified_swiss_pairing.py](unified_swiss_pairing.py) | UnifiedSwissPairing (line 415), HybridConstraintSolver (line 46) |
+| Frontend | [templates/dashboard_ultra_modern.html](templates/dashboard_ultra_modern.html) | CSS (lines 19-1466), JavaScript (lines 1467+) |
+| Test suite | [test_tournament_comprehensive.py](test_tournament_comprehensive.py) | TournamentTester, comprehensive validation tests |
+| Sample data generation | [tournament_dashboard.py:380](tournament_dashboard.py#L380) | create_sample_data() |
+| Excel loading | [tournament_dashboard.py:261](tournament_dashboard.py#L261) | load_participants() |
+| Intelligent seating | [tournament_dashboard.py:783-836](tournament_dashboard.py#L783-L836) | apply_intelligent_seating() |
 
 ## Known Limitations
 
