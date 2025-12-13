@@ -1549,12 +1549,32 @@ def load_data():
             'message': f'Loaded {len(tournament.teams)} teams - {tournament.swiss_rounds_count} Swiss rounds configured'
         })
 
-    except Exception as e:
-        print(f"Error in load_data: {e}")
+    except FileNotFoundError as e:
+        print(f"Error in load_data (File not found): {e}")
         return jsonify({
             'success': False,
-            'message': str(e)
-        })
+            'error': str(e),
+            'user_message': 'Participant file not found. Using sample data instead.',
+            'suggestion': 'To load custom participants, place an Excel file at: participants/participant_team.xlsx'
+        }), 404
+    except ValueError as e:
+        print(f"Error in load_data (Invalid data): {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'user_message': 'Invalid participant data format.',
+            'suggestion': 'Please ensure each team has exactly 4 players and total teams is 8, 12, or 16.'
+        }), 400
+    except Exception as e:
+        print(f"Error in load_data: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'user_message': 'Failed to load participants. Please try again or use sample data.',
+            'suggestion': 'Click "Load Sample Data" to test the system with dummy participants.'
+        }), 500
 
 @app.route('/restore_backup', methods=['POST'])
 def restore_backup():
@@ -2083,6 +2103,49 @@ def submit_table_results():
             'error': f'Server error: {str(e)}'
         }), 500
 
+@app.route('/get_submission_status/<int:round_num>')
+def get_submission_status(round_num):
+    """Get submission status for a specific round (Phase 3.1)."""
+    try:
+        if round_num not in tournament.tables:
+            return jsonify({
+                'success': False,
+                'error': f'Round {round_num} not found',
+                'user_message': f'Round {round_num} has not been set up yet.',
+                'suggestion': 'Please wait for the previous round to complete.'
+            }), 404
+
+        total_tables = len(tournament.tables[round_num])
+        submitted_tables = set()
+
+        if round_num in tournament.round_results:
+            submitted_tables = tournament.round_results[round_num].get('submitted_tables', set())
+
+        # Convert set to list for JSON serialization
+        submitted_list = list(submitted_tables)
+
+        progress_percent = (len(submitted_tables) / total_tables * 100) if total_tables > 0 else 0
+
+        return jsonify({
+            'success': True,
+            'round': round_num,
+            'total_tables': total_tables,
+            'submitted_count': len(submitted_tables),
+            'submitted_tables': submitted_list,
+            'progress_percent': round(progress_percent, 1),
+            'is_complete': len(submitted_tables) == total_tables
+        })
+    except Exception as e:
+        print(f"[ERROR] get_submission_status failed: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'user_message': 'Failed to get submission status',
+            'suggestion': 'Please refresh the page and try again.'
+        }), 500
+
 @app.route('/get_tournament_state')
 def get_tournament_state():
     """Get current tournament state with intelligent seating"""
@@ -2090,6 +2153,19 @@ def get_tournament_state():
     seated_tables = {}
     for round_num in tournament.tables.keys():
         seated_tables[round_num] = tournament.apply_intelligent_seating_to_round(round_num)
+
+    # Build submission status for all rounds (Phase 3.1)
+    submission_status = {}
+    for round_num in tournament.tables.keys():
+        total = len(tournament.tables.get(round_num, {}))
+        submitted = list(tournament.round_results.get(round_num, {}).get('submitted_tables', set()))
+        submission_status[round_num] = {
+            'total': total,
+            'submitted_count': len(submitted),
+            'submitted_tables': submitted,
+            'progress_percent': round((len(submitted) / total * 100) if total > 0 else 0, 1),
+            'is_complete': len(submitted) == total
+        }
 
     response_data = {
         'success': True,
@@ -2101,7 +2177,8 @@ def get_tournament_state():
         'tables': seated_tables,
         'swiss_rounds_count': tournament.swiss_rounds_count,
         'max_rounds': tournament.max_rounds,
-        'has_semifinals': tournament.has_semifinals
+        'has_semifinals': tournament.has_semifinals,
+        'submission_status': submission_status  # Phase 3.1
     }
 
     # Add legacy group support for backward compatibility (all teams in single group)

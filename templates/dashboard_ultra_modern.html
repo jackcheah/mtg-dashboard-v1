@@ -2075,6 +2075,10 @@
         .toast-message {
             font-size: var(--text-sm);
             color: rgba(255, 255, 255, 0.8);
+            white-space: pre-line;
+            line-height: 1.5;
+            max-height: 200px;
+            overflow-y: auto;
         }
 
         /* Empty State */
@@ -2737,8 +2741,8 @@
             document.getElementById('timer').textContent = display;
         }
 
-        // Toast Notification System
-        function showToast(title, message, type = 'success') {
+        // Toast Notification System (Enhanced for Phase 3)
+        function showToast(title, message, type = 'success', duration = null) {
             const toast = document.getElementById('toast');
             const toastIcon = toast.querySelector('.toast-icon');
             const toastTitle = document.getElementById('toast-title');
@@ -2760,10 +2764,43 @@
 
             toastIcon.className = 'toast-icon ' + icons[type];
 
-            // Auto hide after 3 seconds
-            setTimeout(() => {
+            // Auto hide based on message length and type
+            // Error messages get more time to read
+            if (duration === null) {
+                const baseTime = type === 'error' ? 6000 : 3000;
+                const messageLength = message.length;
+                duration = Math.max(baseTime, Math.min(messageLength * 50, 10000));
+            }
+
+            // Clear any existing timeout
+            if (toast.hideTimeout) {
+                clearTimeout(toast.hideTimeout);
+            }
+
+            toast.hideTimeout = setTimeout(() => {
                 toast.classList.remove('show');
-            }, 3000);
+            }, duration);
+        }
+
+        // Enhanced error handler with user-friendly messages
+        function handleApiError(response, defaultMessage = 'An error occurred') {
+            let message = response.error || defaultMessage;
+
+            // Use user_message if available (from Phase 2 validation)
+            if (response.user_message) {
+                message = response.user_message;
+                if (response.suggestion) {
+                    message += '\n\nSuggestion: ' + response.suggestion;
+                }
+            }
+
+            // Show error with longer duration
+            showToast('Error', message, 'error', 8000);
+
+            // Log technical details to console
+            if (response.error) {
+                console.error('API Error:', response);
+            }
         }
 
 
@@ -2924,11 +2961,13 @@
                         showToast('Sample Data Loaded', `Loaded ${teamCount} sample teams | ${structureMsg}`, 'warning');
                         document.getElementById('empty-state').style.display = 'none';
                     } else {
-                        showToast('Error', data.message || 'Failed to load participants', 'error');
+                        handleApiError(data, 'Failed to load participants');
                     }
                 }
             } catch (error) {
-                showToast('Error', 'Network error: ' + error.message, 'error');
+                showToast('Network Error',
+                    'Could not connect to the server. Please check your connection and try again.\n\nError: ' + error.message,
+                    'error', 8000);
                 console.error('Load participants error:', error);
             }
         }
