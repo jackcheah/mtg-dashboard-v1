@@ -2160,6 +2160,146 @@
             font-size: 12px;
         }
 
+        /* ============================================
+           SCORE EDITING STYLES (Task 3.2)
+           ============================================ */
+        .edit-scores-btn {
+            background: linear-gradient(135deg, #f6ad55 0%, #ed8936 100%);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            margin-left: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .edit-scores-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(237, 137, 54, 0.4);
+        }
+
+        .cancel-edit-btn {
+            background: linear-gradient(135deg, #718096 0%, #4a5568 100%);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            margin-left: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .cancel-edit-btn:hover {
+            background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+        }
+
+        .table-card.editing {
+            border: 2px solid #f6ad55;
+            box-shadow: 0 0 20px rgba(246, 173, 85, 0.3);
+        }
+
+        .edit-history-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            background: rgba(246, 173, 85, 0.2);
+            color: #f6ad55;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .edit-history-badge:hover {
+            background: rgba(246, 173, 85, 0.4);
+        }
+
+        /* Score History Modal */
+        .history-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .history-modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .history-modal-content {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border-radius: 16px;
+            padding: 24px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .history-entry {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border-left: 3px solid #f6ad55;
+        }
+
+        .history-entry-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 13px;
+            color: #a0aec0;
+        }
+
+        .history-entry-reason {
+            font-style: italic;
+            color: #cbd5e0;
+            margin-bottom: 12px;
+        }
+
+        .history-scores {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .history-scores-before,
+        .history-scores-after {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 6px;
+            padding: 10px;
+        }
+
+        .history-scores-before h5 {
+            color: #fc8181;
+            margin-bottom: 8px;
+        }
+
+        .history-scores-after h5 {
+            color: #68d391;
+            margin-bottom: 8px;
+        }
+
         /* Empty State */
         .empty-state {
             text-align: center;
@@ -3264,10 +3404,10 @@
 
                 if (data.success) {
                     showToast('Success', data.message, 'success');
-                    
+
                     // Reload data to refresh UI
                     await loadParticipants(); // Refresh teams/scores
-                    
+
                     // Check if tournament is active and switch controls
                     if (data.current_round) {
                         showActiveRoundControls();
@@ -3633,6 +3773,337 @@
                 submitBtn.innerHTML = '<i class="fas fa-check-double"></i> Submitted';
                 submitBtn.disabled = true;
             }
+
+            // Add edit button to submitted table (Task 3.2)
+            addEditButton(tableCard, tableName, roundNum);
+        }
+
+        // ============================================
+        // SCORE EDITING FUNCTIONS (Task 3.2)
+        // ============================================
+
+        // Add edit button to all submitted tables in a round
+        function addEditButtonToSubmittedTables(roundNum) {
+            const tableCards = document.querySelectorAll('.table-card');
+            tableCards.forEach(card => {
+                const submitBtn = card.querySelector('.submit-table-btn');
+                if (submitBtn && submitBtn.classList.contains('submitted')) {
+                    const tableName = card.id.replace('table-', '').replace(/-/g, ' ');
+                    addEditButton(card, tableName, roundNum);
+                }
+            });
+        }
+
+        // Add edit button to a specific table card
+        function addEditButton(tableCard, tableName, roundNum) {
+            // Check if edit button already exists
+            if (tableCard.querySelector('.edit-scores-btn')) {
+                return;
+            }
+
+            const submitBtn = tableCard.querySelector('.submit-table-btn');
+            if (!submitBtn) return;
+
+            const editBtn = document.createElement('button');
+            editBtn.className = 'edit-scores-btn';
+            editBtn.innerHTML = '<i class="fas fa-edit"></i> Edit Scores';
+            editBtn.onclick = (e) => {
+                e.stopPropagation();
+                enableScoreEditing(tableName, roundNum);
+            };
+
+            submitBtn.parentElement.appendChild(editBtn);
+
+            // Check for edit history and add badge
+            checkAndShowEditHistory(tableName, roundNum, tableCard);
+        }
+
+        // Check if table has edit history and show badge
+        async function checkAndShowEditHistory(tableName, roundNum, tableCard) {
+            try {
+                const response = await fetch(`/get_score_history/${roundNum}/${encodeURIComponent(tableName)}`);
+                const data = await response.json();
+
+                if (data.success && data.edit_count > 0) {
+                    const header = tableCard.querySelector('.table-header');
+                    if (header && !header.querySelector('.edit-history-badge')) {
+                        const badge = document.createElement('span');
+                        badge.className = 'edit-history-badge';
+                        badge.innerHTML = `<i class="fas fa-history"></i> ${data.edit_count} edit(s)`;
+                        badge.onclick = (e) => {
+                            e.stopPropagation();
+                            viewScoreHistory(tableName, roundNum);
+                        };
+                        header.appendChild(badge);
+                    }
+                }
+            } catch (error) {
+                console.error('Failed to check edit history:', error);
+            }
+        }
+
+        // Enable score editing mode for a table
+        function enableScoreEditing(tableName, roundNum) {
+            const confirmMsg = `You are about to edit scores for ${tableName}.\n\n` +
+                `• The previous scores will be saved in the audit trail\n` +
+                `• Team standings will be recalculated\n` +
+                `• This action can be repeated if needed\n\n` +
+                `Do you want to continue?`;
+
+            if (!confirm(confirmMsg)) {
+                return;
+            }
+
+            const tableCard = document.getElementById(`table-${tableName.replace(/\s+/g, '-')}`);
+            if (!tableCard) {
+                showToast('Error', 'Table not found', 'error');
+                return;
+            }
+
+            // Add editing visual indicator
+            tableCard.classList.add('editing');
+
+            // Re-enable score buttons
+            const scoreButtons = tableCard.querySelectorAll('.score-btn');
+            scoreButtons.forEach(btn => {
+                btn.disabled = false;
+                btn.style.opacity = '1';
+                btn.style.cursor = 'pointer';
+            });
+
+            // Change submit button to "Update Scores"
+            const submitBtn = tableCard.querySelector('.submit-table-btn');
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('submitted');
+            submitBtn.innerHTML = '<i class="fas fa-save"></i> Update Scores';
+            submitBtn.onclick = () => updateTableScores(tableName, roundNum);
+
+            // Hide edit button during editing
+            const editBtn = tableCard.querySelector('.edit-scores-btn');
+            if (editBtn) editBtn.style.display = 'none';
+
+            // Add cancel button
+            const cancelBtn = document.createElement('button');
+            cancelBtn.className = 'cancel-edit-btn';
+            cancelBtn.innerHTML = '<i class="fas fa-times"></i> Cancel';
+            cancelBtn.onclick = () => cancelScoreEditing(tableName, roundNum);
+            submitBtn.parentElement.appendChild(cancelBtn);
+
+            // Clear any previous score selections for this table
+            if (tableScores[tableName]) {
+                delete tableScores[tableName];
+            }
+
+            showToast('Edit Mode', `You can now edit scores for ${tableName}. Select new scores and click Update.`, 'info');
+        }
+
+        // Submit edited scores to backend
+        async function updateTableScores(tableName, roundNum) {
+            const tableCard = document.getElementById(`table-${tableName.replace(/\s+/g, '-')}`);
+            const playerElements = tableCard.querySelectorAll('.table-player');
+
+            // Validate all players have scores
+            if (!tableScores[tableName] || Object.keys(tableScores[tableName]).length !== playerElements.length) {
+                showToast('Incomplete', 'Please select scores for all players before updating.', 'warning');
+                return;
+            }
+
+            // Build results array
+            const results = [];
+            for (const playerId in tableScores[tableName]) {
+                results.push({
+                    player_id: parseInt(playerId),
+                    points: tableScores[tableName][playerId]
+                });
+            }
+
+            // Ask for edit reason
+            const reason = prompt('(Optional) Please provide a reason for this edit:', '');
+
+            const updateBtn = tableCard.querySelector('.submit-table-btn');
+            updateBtn.disabled = true;
+            updateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+
+            try {
+                const response = await fetch('/edit_table_results', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        round: roundNum,
+                        table: tableName,
+                        results: results,
+                        reason: reason || 'Score correction'
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showToast('Scores Updated!', `${tableName} scores have been updated successfully.`, 'success');
+
+                    // Remove editing state
+                    tableCard.classList.remove('editing');
+
+                    // Remove cancel button
+                    const cancelBtn = tableCard.querySelector('.cancel-edit-btn');
+                    if (cancelBtn) cancelBtn.remove();
+
+                    // Restore submitted state
+                    updateBtn.classList.add('submitted');
+                    updateBtn.innerHTML = '<i class="fas fa-check-double"></i> Submitted';
+                    updateBtn.disabled = true;
+                    updateBtn.onclick = () => submitTableResults(tableName);
+
+                    // Show edit button again
+                    const editBtn = tableCard.querySelector('.edit-scores-btn');
+                    if (editBtn) editBtn.style.display = '';
+
+                    // Disable score buttons
+                    const scoreButtons = tableCard.querySelectorAll('.score-btn');
+                    scoreButtons.forEach(btn => {
+                        btn.disabled = true;
+                        btn.style.opacity = '0.5';
+                        btn.style.cursor = 'not-allowed';
+                    });
+
+                    // Add/update edit history badge
+                    checkAndShowEditHistory(tableName, roundNum, tableCard);
+
+                    // Refresh team scores display
+                    refreshTeamScores();
+
+                    if (data.edit_count > 0) {
+                        showToast('Edit History', `This table has been edited ${data.edit_count} time(s). Click the badge to view history.`, 'info');
+                    }
+                } else {
+                    showToast('Error', data.user_message || data.error || 'Failed to update scores', 'error');
+                    updateBtn.disabled = false;
+                    updateBtn.innerHTML = '<i class="fas fa-save"></i> Update Scores';
+                }
+            } catch (error) {
+                showToast('Network Error', 'Failed to connect to server. Please try again.', 'error');
+                console.error('Update scores error:', error);
+                updateBtn.disabled = false;
+                updateBtn.innerHTML = '<i class="fas fa-save"></i> Update Scores';
+            }
+        }
+
+        // Cancel score editing and restore original state
+        function cancelScoreEditing(tableName, roundNum) {
+            const tableCard = document.getElementById(`table-${tableName.replace(/\s+/g, '-')}`);
+
+            // Remove editing state
+            tableCard.classList.remove('editing');
+
+            // Clear score selections
+            if (tableScores[tableName]) {
+                delete tableScores[tableName];
+            }
+
+            // Remove cancel button
+            const cancelBtn = tableCard.querySelector('.cancel-edit-btn');
+            if (cancelBtn) cancelBtn.remove();
+
+            // Show edit button again
+            const editBtn = tableCard.querySelector('.edit-scores-btn');
+            if (editBtn) editBtn.style.display = '';
+
+            // Restore submitted state - reload the round to get correct data
+            loadRound();
+
+            showToast('Cancelled', 'Score editing cancelled. Original scores restored.', 'info');
+        }
+
+        // View score history for a table
+        async function viewScoreHistory(tableName, roundNum) {
+            try {
+                const response = await fetch(`/get_score_history/${roundNum}/${encodeURIComponent(tableName)}`);
+                const data = await response.json();
+
+                if (data.success && data.edit_count > 0) {
+                    showHistoryModal(tableName, roundNum, data.history);
+                } else {
+                    showToast('No History', 'This table has not been edited.', 'info');
+                }
+            } catch (error) {
+                showToast('Error', 'Failed to load score history.', 'error');
+                console.error('Score history error:', error);
+            }
+        }
+
+        // Show modal with score history
+        function showHistoryModal(tableName, roundNum, history) {
+            // Create modal if it doesn't exist
+            let modal = document.getElementById('history-modal');
+            if (!modal) {
+                modal = document.createElement('div');
+                modal.id = 'history-modal';
+                modal.className = 'history-modal';
+                modal.innerHTML = `
+                    <div class="history-modal-content">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <h3 id="history-modal-title" style="margin: 0; color: #fff;"></h3>
+                            <button onclick="closeHistoryModal()" style="background: none; border: none; color: #fff; font-size: 24px; cursor: pointer;">&times;</button>
+                        </div>
+                        <div id="history-modal-body"></div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+
+                // Close on background click
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) closeHistoryModal();
+                });
+            }
+
+            // Populate modal content
+            document.getElementById('history-modal-title').textContent = `Score History: ${tableName} (Round ${roundNum})`;
+
+            let bodyHTML = `<p style="color: #a0aec0; margin-bottom: 16px;">Total edits: ${history.length}</p>`;
+
+            history.forEach((entry, index) => {
+                const timestamp = new Date(entry.timestamp).toLocaleString();
+                bodyHTML += `
+                    <div class="history-entry">
+                        <div class="history-entry-header">
+                            <span><strong>Edit #${index + 1}</strong></span>
+                            <span>${timestamp}</span>
+                        </div>
+                        ${entry.reason ? `<div class="history-entry-reason">"${entry.reason}"</div>` : ''}
+                        <div class="history-scores">
+                            <div class="history-scores-before">
+                                <h5>Before</h5>
+                                ${formatScoresForHistory(entry.old_results)}
+                            </div>
+                            <div class="history-scores-after">
+                                <h5>After</h5>
+                                ${formatScoresForHistory(entry.new_results)}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            document.getElementById('history-modal-body').innerHTML = bodyHTML;
+
+            // Show modal
+            modal.classList.add('show');
+        }
+
+        // Format scores for history display
+        function formatScoresForHistory(results) {
+            if (!results || results.length === 0) return '<p>No data</p>';
+
+            return results.map(r => {
+                const pointsLabel = r.points === 5 ? 'Win' : (r.points === 1 ? 'Draw' : 'Loss');
+                return `<div style="font-size: 12px; margin: 4px 0;">Player ${r.player_id}: ${r.points} pts (${pointsLabel})</div>`;
+            }).join('');
+        }
+
+        // Close history modal
+        function closeHistoryModal() {
+            const modal = document.getElementById('history-modal');
+            if (modal) modal.classList.remove('show');
         }
 
         // Display Tables with Score Input
@@ -4182,7 +4653,7 @@
         });
 
         // Event delegation for score buttons (XSS-safe)
-        document.addEventListener('click', function(e) {
+        document.addEventListener('click', function (e) {
             if (e.target.matches('.score-btn')) {
                 const tableName = e.target.dataset.table;
                 const playerId = parseInt(e.target.dataset.player);

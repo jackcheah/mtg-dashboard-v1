@@ -68,10 +68,23 @@ class TournamentManager:
         Save tournament state to a JSON file.
         Uses a temporary file and atomic rename to prevent corruption.
         """
+        def convert_sets_to_lists(obj):
+            """Recursively convert sets to lists for JSON serialization."""
+            if isinstance(obj, set):
+                return list(obj)
+            elif isinstance(obj, dict):
+                return {k: convert_sets_to_lists(v) for k, v in obj.items()}
+            elif isinstance(obj, list):
+                return [convert_sets_to_lists(item) for item in obj]
+            else:
+                return obj
+
         try:
             # Convert sets to lists for JSON serialization
             submitted_rounds_list = list(self.submitted_rounds)
             finalized_rounds_list = list(self.finalized_rounds)
+            # Convert nested sets in round_results (e.g., submitted_tables)
+            round_results_serializable = convert_sets_to_lists(self.round_results)
             
             state = {
                 "version": "2.0",
@@ -95,7 +108,7 @@ class TournamentManager:
                     "scores": self.scores,
                     "player_scores": self.player_scores,
                     "tables": self.tables,
-                    "round_results": self.round_results,
+                    "round_results": round_results_serializable,
                     "_tournament_rounds": getattr(self, '_tournament_rounds', []),
                     "finals_data": getattr(self, 'finals_data', {}),
                     "semifinals": getattr(self, 'semifinals', {})
@@ -2258,6 +2271,288 @@ def get_submission_status(round_num):
             'error': str(e),
             'user_message': 'Failed to get submission status',
             'suggestion': 'Please refresh the page and try again.'
+        }), 500
+
+# ============================================
+# SCORE EDITING ENDPOINTS (Task 3.2)
+# ============================================
+
+@app.route('/edit_table_results', methods=['POST'])
+@require_state(
+    TournamentState.SWISS_IN_PROGRESS,
+    TournamentState.TOP8_IN_PROGRESS,
+    TournamentState.FINALS_IN_PROGRESS
+)
+def edit_table_results():
+    """Edit previously submitted table results (before round finalization)."""
+    try:
+        data = request.json
+
+        # ========================================
+        # VALIDATION BLOCK (match Phase 2.2 standards)
+        # ========================================
+
+        # 1. Validate request body exists
+        if not data:
+            return jsonify({
+                'success': False,
+                'error': 'No data provided',
+                'user_message': 'The request was empty.',
+                'suggestion': 'Please provide round, table, and results data.'
+            }), 400
+
+        # 2. Validate round number
+        round_num = data.get('round')
+        if not isinstance(round_num, int):
+            return jsonify({
+                'success': False,
+                'error': f'Round must be an integer, got {type(round_num).__name__}',
+                'user_message': 'Invalid round number format.',
+                'suggestion': 'Please select a valid round.'
+            }), 400
+
+        if round_num < 1 or round_num > tournament.max_rounds:
+            return jsonify({
+                'success': False,
+                'error': f'Round {round_num} is out of range (1-{tournament.max_rounds})',
+                'user_message': f'Round {round_num} does not exist.',
+                'suggestion': f'Valid rounds are 1 to {tournament.max_rounds}.'
+            }), 400
+
+        # 3. Validate round is not finalized
+        if hasattr(tournament, 'finalized_rounds') and round_num in tournament.finalized_rounds:
+            return jsonify({
+                'success': False,
+                'error': f'Round {round_num} is finalized',
+                'user_message': f'Round {round_num} has been finalized and cannot be edited.',
+                'suggestion': 'Finalized rounds are locked to preserve tournament integrity.'
+            }), 400
+
+        # 4. Validate table name
+        table_name = data.get('table')
+        if not table_name or not isinstance(table_name, str):
+            return jsonify({
+                'success': False,
+                'error': 'Invalid table name',
+                'user_message': 'Table name is required.',
+                'suggestion': 'Please specify which table to edit.'
+            }), 400
+
+        # 5. Validate table was previously submitted
+        if round_num not in tournament.round_results:
+            return jsonify({
+                'success': False,
+                'error': f'Round {round_num} has no submissions',
+                'user_message': f'Round {round_num} has no submitted tables yet.',
+                'suggestion': 'Use Submit Table Results for new submissions.'
+            }), 400
+
+        submitted_tables = tournament.round_results[round_num].get('submitted_tables', set())
+        if table_name not in submitted_tables:
+            return jsonify({
+                'success': False,
+                'error': f'{table_name} not in submitted tables',
+                'user_message': f'{table_name} has not been submitted yet.',
+                'suggestion': 'Use Submit Table Results for new submissions, not Edit.'
+            }), 400
+
+        # 6. Validate results array
+        new_results = data.get('results', [])
+        if not isinstance(new_results, list):
+            return jsonify({
+                'success': False,
+                'error': f'Results must be a list, got {type(new_results).__name__}',
+                'user_message': 'Invalid results format.',
+                'suggestion': 'Results must be an array of player scores.'
+            }), 400
+
+        if len(new_results) != 4:
+            return jsonify({
+                'success': False,
+                'error': f'Expected 4 player results, got {len(new_results)}',
+                'user_message': 'Each table must have exactly 4 player scores.',
+                'suggestion': 'Please provide scores for all 4 players at the table.'
+            }), 400
+
+        # 7. Validate each player result
+        for idx, result in enumerate(new_results):
+            if not isinstance(result, dict):
+                return jsonify({
+                    'success': False,
+                    'error': f'Result {idx} must be an object',
+                    'user_message': f'Invalid format for player {idx + 1}.',
+                    'suggestion': 'Each result must have player_id and points fields.'
+                }), 400
+
+            if 'player_id' not in result:
+                return jsonify({
+                    'success': False,
+                    'error': f'Result {idx} missing player_id',
+                    'user_message': f'Player {idx + 1} is missing player ID.',
+                    'suggestion': 'Each result must include player_id.'
+                }), 400
+
+            if 'points' not in result:
+                return jsonify({
+                    'success': False,
+                    'error': f'Result {idx} missing points',
+                    'user_message': f'Player {idx + 1} is missing points.',
+                    'suggestion': 'Each result must include points (0, 1, or 5).'
+                }), 400
+
+            player_id = result['player_id']
+            if not isinstance(player_id, int):
+                return jsonify({
+                    'success': False,
+                    'error': f'player_id must be int, got {type(player_id).__name__}',
+                    'user_message': 'Invalid player ID format.',
+                    'suggestion': 'Player ID must be a number.'
+                }), 400
+
+            if player_id not in tournament.player_scores:
+                return jsonify({
+                    'success': False,
+                    'error': f'Player ID {player_id} not found',
+                    'user_message': f'Player ID {player_id} does not exist.',
+                    'suggestion': 'Please check the player ID is correct.'
+                }), 400
+
+            points = result['points']
+            if points not in [0, 1, 5]:
+                return jsonify({
+                    'success': False,
+                    'error': f'Invalid points value: {points}',
+                    'user_message': f'Invalid points: {points}. Must be 0 (Loss), 1 (Draw), or 5 (Win).',
+                    'suggestion': 'Use W=5, D=1, L=0 for scoring.'
+                }), 400
+
+        # ========================================
+        # PROCESSING BLOCK
+        # ========================================
+
+        # Store original state for potential rollback
+        original_player_scores = tournament.player_scores.copy()
+        original_team_scores = tournament.scores.copy()
+
+        try:
+            # Get old results
+            old_results = tournament.round_results[round_num]['table_submissions'].get(table_name, [])
+
+            # Initialize score history if needed
+            if 'score_history' not in tournament.round_results[round_num]:
+                tournament.round_results[round_num]['score_history'] = {}
+
+            if table_name not in tournament.round_results[round_num]['score_history']:
+                tournament.round_results[round_num]['score_history'][table_name] = []
+
+            # Store edit in history
+            edit_entry = {
+                'timestamp': datetime.now().isoformat(),
+                'old_results': old_results,
+                'new_results': new_results,
+                'reason': data.get('reason', 'No reason provided'),
+                'editor_ip': request.remote_addr
+            }
+            tournament.round_results[round_num]['score_history'][table_name].append(edit_entry)
+
+            # Subtract old scores from player totals
+            for result in old_results:
+                player_id = result['player_id']
+                points = result['points']
+                if player_id in tournament.player_scores:
+                    tournament.player_scores[player_id] -= points
+                    print(f"  [EDIT] Subtracting old score: Player {player_id} -= {points}")
+
+            # Add new scores to player totals
+            for result in new_results:
+                player_id = result['player_id']
+                points = result['points']
+                if player_id in tournament.player_scores:
+                    tournament.player_scores[player_id] += points
+                    print(f"  [EDIT] Adding new score: Player {player_id} += {points}")
+
+            # Update stored results
+            tournament.round_results[round_num]['table_submissions'][table_name] = new_results
+
+            # Recalculate team scores
+            tournament.calculate_team_scores()
+
+            # Handle final round scoring if applicable
+            if round_num == tournament.max_rounds:
+                tournament.update_final_round_scores(round_num, new_results)
+
+            print(f"[OK] Table {table_name} results edited for round {round_num}")
+
+            edit_count = len(tournament.round_results[round_num]['score_history'][table_name])
+
+            # Auto-save after edit
+            tournament.save_backup()
+
+            return jsonify({
+                'success': True,
+                'message': f'Results updated for {table_name}',
+                'table': table_name,
+                'round': round_num,
+                'scores': tournament.scores,
+                'player_scores': tournament.player_scores,
+                'edit_count': edit_count,
+                'previous_results': old_results
+            })
+
+        except Exception as inner_error:
+            # Rollback on error
+            tournament.player_scores = original_player_scores
+            tournament.scores = original_team_scores
+            print(f"[ROLLBACK] Restored original scores due to error: {inner_error}")
+            raise
+
+    except Exception as e:
+        print(f"[ERROR] edit_table_results failed: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'success': False,
+            'error': f'Server error: {str(e)}',
+            'user_message': 'An unexpected error occurred while editing scores.',
+            'suggestion': 'Please try again. If the problem persists, contact support.'
+        }), 500
+
+
+@app.route('/get_score_history/<int:round_num>/<path:table_name>')
+def get_score_history(round_num, table_name):
+    """Get edit history for a specific table (Task 3.2)."""
+    try:
+        # Decode table name (handles URL encoding)
+        from urllib.parse import unquote
+        table_name = unquote(table_name)
+
+        if round_num not in tournament.round_results:
+            return jsonify({
+                'success': False,
+                'error': 'Round not found',
+                'user_message': f'Round {round_num} does not exist.',
+                'suggestion': 'Please check the round number.'
+            }), 404
+
+        history = tournament.round_results[round_num].get('score_history', {}).get(table_name, [])
+
+        return jsonify({
+            'success': True,
+            'table': table_name,
+            'round': round_num,
+            'edit_count': len(history),
+            'history': history,
+            'has_edits': len(history) > 0
+        })
+    except Exception as e:
+        print(f"[ERROR] get_score_history failed: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'user_message': 'Failed to retrieve score history.',
+            'suggestion': 'Please try again.'
         }), 500
 
 @app.route('/get_tournament_state')
