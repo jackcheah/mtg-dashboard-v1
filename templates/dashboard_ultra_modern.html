@@ -1992,75 +1992,71 @@
             }
         }
 
-        /* Toast Notification */
-        .toast {
+        /* Updated Toast Notification System */
+        #toast-container {
             position: fixed;
-            bottom: var(--spacing-xl);
-            right: var(--spacing-xl);
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px) saturate(180%);
-            border: 1px solid var(--glass-border);
-            border-radius: var(--radius-lg);
-            padding: var(--spacing-lg);
-            box-shadow: var(--shadow-2xl);
-            display: none;
-            align-items: center;
-            gap: var(--spacing-md);
+            bottom: 24px;
+            right: 24px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column-reverse;
+            /* Newest at bottom */
+            gap: 12px;
+            pointer-events: none;
+        }
+
+        .toast {
+            pointer-events: auto;
+            min-width: 300px;
             max-width: 400px;
-            animation: slideIn 0.3s ease-out;
-            z-index: 1000;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-left: 4px solid var(--color-primary);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-md);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: flex-start;
+            gap: var(--spacing-md);
+            color: white;
+
+            /* Animation States */
+            transform: translateX(120%);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
 
         .toast.show {
-            display: flex;
+            transform: translateX(0);
+            opacity: 1;
         }
 
-        @keyframes slideIn {
-            from {
-                transform: translateX(400px);
-                opacity: 0;
-            }
-
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
+        .toast.hiding {
+            transform: translateX(120%);
+            opacity: 0;
         }
 
         .toast-success {
-            border-left: 4px solid var(--color-success);
+            border-left-color: var(--color-success);
         }
 
         .toast-error {
-            border-left: 4px solid var(--color-danger);
+            border-left-color: var(--color-danger);
         }
 
         .toast-warning {
-            border-left: 4px solid var(--color-warning);
+            border-left-color: var(--color-warning);
         }
 
         .toast-info {
-            border-left: 4px solid var(--color-secondary);
+            border-left-color: var(--color-secondary);
         }
 
         .toast-icon {
-            font-size: var(--text-2xl);
-        }
-
-        .toast-success .toast-icon {
-            color: var(--color-success);
-        }
-
-        .toast-error .toast-icon {
-            color: var(--color-danger);
-        }
-
-        .toast-warning .toast-icon {
-            color: var(--color-warning);
-        }
-
-        .toast-info .toast-icon {
-            color: var(--color-secondary);
+            font-size: 1.25rem;
+            flex-shrink: 0;
+            margin-top: 2px;
         }
 
         .toast-content {
@@ -2069,14 +2065,15 @@
 
         .toast-title {
             font-weight: 700;
-            margin-bottom: var(--spacing-xs);
+            margin-bottom: 4px;
+            font-size: 0.95rem;
         }
 
         .toast-message {
-            font-size: var(--text-sm);
+            font-size: 0.85rem;
             color: rgba(255, 255, 255, 0.8);
+            line-height: 1.4;
             white-space: pre-line;
-            line-height: 1.5;
             max-height: 200px;
             overflow-y: auto;
         }
@@ -2729,6 +2726,202 @@
             color: var(--color-accent);
             margin-top: var(--spacing-sm);
         }
+
+        /* ============================================
+           UX IMPROVEMENTS (Phase 4)
+           ============================================ */
+
+        /* Sticky Header */
+        .timer-section.sticky {
+            position: sticky;
+            top: 10px;
+            z-index: 1000;
+            margin-bottom: var(--spacing-lg);
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px) saturate(200%);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Compact Mode */
+        body.compact-mode {
+            --spacing-lg: 0.75rem;
+            --spacing-xl: 1rem;
+        }
+
+        body.compact-mode .table-card {
+            padding: var(--spacing-md);
+        }
+
+        body.compact-mode .table-player {
+            padding: 0.25rem 0.5rem;
+            min-height: auto;
+        }
+
+        body.compact-mode .score-btn {
+            height: 32px;
+            font-size: 0.8rem;
+        }
+
+        body.compact-mode .player-score-row {
+            padding: 0.25rem;
+        }
+
+        /* Custom Modal System */
+        .custom-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s ease;
+        }
+
+        .custom-modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .custom-modal {
+            background: #1e1b4b;
+            /* Deep blue background */
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-xl);
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            transform: scale(0.95);
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .custom-modal-overlay.show .custom-modal {
+            transform: scale(1);
+        }
+
+        .custom-modal-header {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: var(--spacing-md);
+            color: white;
+        }
+
+        .custom-modal-body {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: var(--spacing-lg);
+            line-height: 1.6;
+        }
+
+        .custom-modal-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-md);
+            color: white;
+            font-size: 1rem;
+            margin-top: var(--spacing-sm);
+        }
+
+        .custom-modal-input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+        }
+
+        .custom-modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: var(--spacing-md);
+        }
+
+        /* Batch Submit Button in Header */
+        .batch-submit-btn {
+            background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+            margin-left: auto;
+        }
+
+        /* Segmented Control Style for Score Buttons */
+        .score-buttons-inline {
+            display: flex;
+            gap: 0;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 2px;
+            border-radius: var(--radius-full);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .score-btn {
+            border-radius: var(--radius-full);
+            margin: 0;
+            border: none;
+            flex: 1;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+        .score-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: none;
+        }
+
+        .score-btn.active {
+            transform: scale(1.05);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+        }
+
+        /* Status Visuals */
+        @keyframes pulse-red {
+            0% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+                border-color: rgba(239, 68, 68, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 6px rgba(239, 68, 68, 0);
+                border-color: rgba(239, 68, 68, 1);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+                border-color: rgba(239, 68, 68, 0.4);
+            }
+        }
+
+        .table-card.urgent:not(.submitted) {
+            animation: pulse-red 2s infinite;
+        }
+
+        /* Timer Visuals */
+        .timer-display.timer-warning {
+            color: var(--color-warning);
+            text-shadow: 0 0 20px rgba(245, 158, 11, 0.5);
+        }
+
+        .timer-display.timer-danger {
+            color: var(--color-danger);
+            text-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
+            animation: pulse-text 1s infinite alternate;
+        }
+
+        @keyframes pulse-text {
+            from {
+                opacity: 1;
+            }
+
+            to {
+                opacity: 0.7;
+            }
+        }
     </style>
 </head>
 
@@ -2765,13 +2958,8 @@
     </div>
 
     <!-- Toast Notification -->
-    <div id="toast" class="toast">
-        <i class="toast-icon"></i>
-        <div class="toast-content">
-            <div class="toast-title" id="toast-title"></div>
-            <div class="toast-message" id="toast-message"></div>
-        </div>
-    </div>
+    <!-- Toast Container (Dynamic) -->
+    <div id="toast-container"></div>
 
     <div class="container">
         <!-- Header -->
@@ -2798,6 +2986,10 @@
                         <button class="btn btn-warning" onclick="resetTimer()" title="Reset Timer">
                             <i class="fas fa-redo"></i>
                             <span>Reset</span>
+                        </button>
+                        <button class="btn btn-secondary" onclick="toggleCompactMode()" title="Toggle Compact Mode">
+                            <i class="fas fa-compress-alt"></i>
+                            <span>Compact</span>
                         </button>
                     </div>
                 </div>
@@ -2835,6 +3027,11 @@
                                 </select>
                             </div>
                         </div>
+                        <button class="btn btn-primary batch-submit-btn" onclick="batchSubmitTables()"
+                            title="Submit all completed tables">
+                            <i class="fas fa-check-double"></i>
+                            <span>Batch Submit</span>
+                        </button>
                         <button class="btn btn-success" onclick="submitRoundResults()">
                             <i class="fas fa-check-circle"></i>
                             <span>Submit Round Results</span>
@@ -2918,6 +3115,241 @@
     </div>
 
     <script>
+        // ==========================================
+        // UI ENHANCEMENTS & UTILITIES
+        // ==========================================
+
+        class ModalManager {
+            constructor() {
+                this.overlay = null;
+                this.init();
+            }
+
+            init() {
+                // Remove existing if any
+                const existing = document.querySelector('.custom-modal-overlay');
+                if (existing) existing.remove();
+
+                // Create container
+                this.overlay = document.createElement('div');
+                this.overlay.className = 'custom-modal-overlay';
+                document.body.appendChild(this.overlay);
+            }
+
+            _show(html) {
+                return new Promise((resolve) => {
+                    this.overlay.innerHTML = html;
+
+                    // Bind buttons
+                    const confirmBtn = this.overlay.querySelector('.js-modal-confirm');
+                    const cancelBtn = this.overlay.querySelector('.js-modal-cancel');
+                    const input = this.overlay.querySelector('.custom-modal-input');
+
+                    if (input) input.focus();
+
+                    const close = (result) => {
+                        this.overlay.classList.remove('show');
+                        setTimeout(() => this.overlay.innerHTML = '', 200); // clear after transition
+                        resolve(result);
+                    };
+
+                    if (confirmBtn) {
+                        confirmBtn.onclick = () => {
+                            const value = input ? input.value : true;
+                            close(value);
+                        };
+                    }
+
+                    if (cancelBtn) {
+                        cancelBtn.onclick = () => close(false);
+                    }
+
+                    // Allow Enter key to confirm
+                    if (input) {
+                        input.addEventListener('keypress', (e) => {
+                            if (e.key === 'Enter') confirmBtn.click();
+                        });
+                    }
+
+                    // Show modal
+                    requestAnimationFrame(() => this.overlay.classList.add('show'));
+                });
+            }
+
+            async confirm(title, message, confirmText = 'Confirm', cancelText = 'Cancel') {
+                const html = `
+                    <div class="custom-modal">
+                        <div class="custom-modal-header">${title}</div>
+                        <div class="custom-modal-body">${message.replace(/\n/g, '<br>')}</div>
+                        <div class="custom-modal-actions">
+                            <button class="btn btn-secondary js-modal-cancel">${cancelText}</button>
+                            <button class="btn btn-primary js-modal-confirm">${confirmText}</button>
+                        </div>
+                    </div>
+                `;
+                return this._show(html);
+            }
+
+            async prompt(title, message, defaultValue = '', placeholder = '') {
+                const html = `
+                    <div class="custom-modal">
+                        <div class="custom-modal-header">${title}</div>
+                        <div class="custom-modal-body">
+                            ${message}
+                            <input type="text" class="custom-modal-input" value="${defaultValue}" placeholder="${placeholder}">
+                        </div>
+                        <div class="custom-modal-actions">
+                            <button class="btn btn-secondary js-modal-cancel">Cancel</button>
+                            <button class="btn btn-primary js-modal-confirm">Submit</button>
+                        </div>
+                    </div>
+                `;
+                return this._show(html);
+            }
+        }
+
+        const modalManager = new ModalManager();
+
+        // Keyboard Navigation Class
+        class KeyboardNavigator {
+            constructor() {
+                this.init();
+            }
+
+            init() {
+                document.addEventListener('keydown', (e) => this.handleKeydown(e));
+
+                // Add keyboard help to UI
+                this.addKeyboardHelp();
+            }
+
+            addKeyboardHelp() {
+                // Could actally be added to DOM here or handled in HTML
+            }
+
+            handleKeydown(e) {
+                // If in input/textarea, ignore
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+                // Global Shortcuts
+
+                // Ctrl+Enter: Submit active table (if focus is within a table)
+                if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                    const activeTableCard = e.target.closest('.table-card');
+                    if (activeTableCard) {
+                        e.preventDefault();
+                        const submitBtn = activeTableCard.querySelector('.submit-table-btn');
+                        if (submitBtn && !submitBtn.disabled) submitBtn.click();
+                        return;
+                    }
+                }
+
+                // Esc: Close any open modal
+                if (e.key === 'Escape') {
+                    const modal = document.querySelector('.custom-modal-overlay.show');
+                    if (modal) {
+                        const cancelBtn = modal.querySelector('.js-modal-cancel');
+                        if (cancelBtn) cancelBtn.click();
+                    }
+                }
+
+                // Scoring Shortcuts (W/D/L or 1/2/3)
+                // Only works if focus is on a score button or within a player row
+                const activeEl = document.activeElement;
+                if (activeEl && (activeEl.classList.contains('score-btn') || activeEl.closest('.table-player'))) {
+                    const playerRow = activeEl.closest('.table-player');
+
+                    if (playerRow) {
+                        let btnToClick = null;
+
+                        // Map keys to actions
+                        if (e.key.toLowerCase() === 'w' || e.key === '5') {
+                            btnToClick = playerRow.querySelector('.score-btn-win');
+                        } else if (e.key.toLowerCase() === 'd' || e.key === '1') {
+                            btnToClick = playerRow.querySelector('.score-btn-draw');
+                        } else if (e.key.toLowerCase() === 'l' || e.key === '0') {
+                            btnToClick = playerRow.querySelector('.score-btn-loss');
+                        }
+
+                        if (btnToClick) {
+                            e.preventDefault();
+                            btnToClick.click();
+
+                            // Optional: Move focus to next player after selection? 
+                            // This can be disruptive if user wants to change mind. 
+                            // Let's keep manual navigation for now but ensure focus stays valid.
+                        }
+                    }
+                }
+            }
+        }
+
+        const keyboardNav = new KeyboardNavigator();
+
+        // Sticky Header Init
+        document.addEventListener('DOMContentLoaded', () => {
+            const timerSection = document.querySelector('.timer-section');
+            if (timerSection) timerSection.classList.add('sticky');
+
+            // Compact mode toggle could be added here
+        });
+
+        // Batch Submit Logic
+        async function batchSubmitTables() {
+            // Find all tables that have full scores but are not submitted
+            const filledTables = [];
+            const allTableCards = document.querySelectorAll('.table-card');
+
+            allTableCards.forEach(card => {
+                const submitBtn = card.querySelector('.submit-table-btn');
+                if (submitBtn && !submitBtn.disabled && !submitBtn.classList.contains('submitted')) {
+                    const tableName = card.id.replace('table-', '').replace(/-/g, ' ');
+
+                    // Check if scores are filled (by checking JS state)
+                    const hasScores = tableScores[tableName] &&
+                        Object.keys(tableScores[tableName]).length === card.querySelectorAll('.table-player').length;
+
+                    if (hasScores) {
+                        filledTables.push(tableName);
+                    }
+                }
+            });
+
+            if (filledTables.length === 0) {
+                showToast('Batch Submit', 'No unsubmitted tables found with full scores.', 'info');
+                return;
+            }
+
+            const confirmed = await modalManager.confirm(
+                'Batch Submit',
+                `Found ${filledTables.length} tables ready to submit.\n\nTables: ${filledTables.join(', ')}\n\nSubmit all?`,
+                `Submit ${filledTables.length} Tables`
+            );
+
+            if (confirmed) {
+                showToast('Batch Submit', `Submitting ${filledTables.length} tables...`, 'info');
+                for (const tableName of filledTables) {
+                    await submitTableResults(tableName);
+                    // Small delay to prevent race conditions/UI jank
+                    await new Promise(r => setTimeout(r, 300));
+                }
+                showToast('Batch Complete', 'All selected tables submitted.', 'success');
+            }
+        }
+
+        // Compact Mode Toggle
+        function toggleCompactMode() {
+            document.body.classList.toggle('compact-mode');
+            const btn = document.querySelector('button[onclick="toggleCompactMode()"] i');
+            if (document.body.classList.contains('compact-mode')) {
+                btn.className = 'fas fa-expand-alt';
+                showToast('View Mode', 'Compact mode enabled', 'info');
+            } else {
+                btn.className = 'fas fa-compress-alt';
+                showToast('View Mode', 'Standard mode enabled', 'info');
+            }
+        }
+
         // Timer functionality
         let timerInterval = null;
         let seconds = 0;
@@ -2957,23 +3389,34 @@
                 .map(num => String(num).padStart(2, '0'))
                 .join(':');
 
-            document.getElementById('timer').textContent = display;
+            const timerEl = document.getElementById('timer');
+            timerEl.textContent = display;
+
+            // Dynamic Timer Visuals
+            // Warning at 45 mins (2700s), Danger at 50 mins (3000s) - Example thresholds
+            // Assuming standard 50min round
+            timerEl.classList.remove('timer-warning', 'timer-danger');
+
+            if (seconds >= 3000) { // 50 mins
+                timerEl.classList.add('timer-danger');
+                // Make unsubmitted cards pulse
+                document.querySelectorAll('.table-card:not(.submitted)').forEach(c => c.classList.add('urgent'));
+            } else if (seconds >= 2700) { // 45 mins
+                timerEl.classList.add('timer-warning');
+            }
         }
 
-        // Toast Notification System (Enhanced for Phase 3)
+        // Toast Notification System (Stacked)
         function showToast(title, message, type = 'success', duration = null) {
-            const toast = document.getElementById('toast');
-            const toastIcon = toast.querySelector('.toast-icon');
-            const toastTitle = document.getElementById('toast-title');
-            const toastMessage = document.getElementById('toast-message');
+            // Get or create container
+            let container = document.getElementById('toast-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'toast-container';
+                document.body.appendChild(container); // Add to body, not removed if exists
+            }
 
-            // Set content
-            toastTitle.textContent = title;
-            toastMessage.textContent = message;
-
-            // Set icon and style
-            toast.className = 'toast show toast-' + type;
-
+            // Icon helper
             const icons = {
                 success: 'fas fa-check-circle',
                 error: 'fas fa-exclamation-circle',
@@ -2981,24 +3424,57 @@
                 info: 'fas fa-info-circle'
             };
 
-            toastIcon.className = 'toast-icon ' + icons[type];
+            const iconClass = icons[type] || icons.info;
+            const colorClass = type === 'success' ? 'var(--color-success)' :
+                type === 'error' ? 'var(--color-danger)' :
+                    type === 'warning' ? 'var(--color-warning)' :
+                        'var(--color-secondary)';
 
-            // Auto hide based on message length and type
-            // Error messages get more time to read
+            // Create toast element
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.innerHTML = `
+                <i class="toast-icon ${iconClass}" style="color: ${colorClass}"></i>
+                <div class="toast-content">
+                    <div class="toast-title">${title}</div>
+                    <div class="toast-message">${message}</div>
+                </div>
+            `;
+
+            // Add to container
+            container.appendChild(toast);
+
+            // Trigger animation
+            requestAnimationFrame(() => {
+                toast.classList.add('show');
+            });
+
+            // Auto hide duration
             if (duration === null) {
                 const baseTime = type === 'error' ? 6000 : 3000;
                 const messageLength = message.length;
                 duration = Math.max(baseTime, Math.min(messageLength * 50, 10000));
             }
 
-            // Clear any existing timeout
-            if (toast.hideTimeout) {
-                clearTimeout(toast.hideTimeout);
-            }
-
-            toast.hideTimeout = setTimeout(() => {
+            // Remove function
+            const removeToast = () => {
                 toast.classList.remove('show');
-            }, duration);
+                toast.classList.add('hiding');
+
+                // Wait for transition end
+                setTimeout(() => {
+                    if (toast.parentElement) {
+                        toast.parentElement.removeChild(toast);
+                    }
+                    // Remove container if empty? Maybe not necessary
+                }, 400);
+            };
+
+            // Set timeout
+            setTimeout(removeToast, duration);
+
+            // Allow manual dismiss on click
+            toast.onclick = removeToast;
         }
 
         // Enhanced error handler with user-friendly messages
@@ -3843,14 +4319,17 @@
         }
 
         // Enable score editing mode for a table
-        function enableScoreEditing(tableName, roundNum) {
+        async function enableScoreEditing(tableName, roundNum) {
             const confirmMsg = `You are about to edit scores for ${tableName}.\n\n` +
                 `• The previous scores will be saved in the audit trail\n` +
                 `• Team standings will be recalculated\n` +
                 `• This action can be repeated if needed\n\n` +
                 `Do you want to continue?`;
 
-            if (!confirm(confirmMsg)) {
+            // UX Improvement: Use Custom Modal
+            const confirmed = await modalManager.confirm('Edit Scores', confirmMsg, 'Continue Editing', 'Cancel');
+
+            if (!confirmed) {
                 return;
             }
 
@@ -3918,7 +4397,18 @@
             }
 
             // Ask for edit reason
-            const reason = prompt('(Optional) Please provide a reason for this edit:', '');
+            // UX Improvement: Use Custom Modal
+            const reason = await modalManager.prompt(
+                'Reason for Edit',
+                'Please provide a brief reason for this change:',
+                '', // Default
+                'e.g. Data entry error' // Placeholder
+            );
+
+            // If user cancels prompt (returns false/null), abort update
+            if (reason === false || reason === null) {
+                return;
+            }
 
             const updateBtn = tableCard.querySelector('.submit-table-btn');
             updateBtn.disabled = true;
@@ -4357,6 +4847,40 @@
             button.classList.add('active');
 
             console.log(`Set score: Table ${tableName}, Player ${playerId} = ${points} pts`);
+
+            // Auto-Fill Losers Logic (UX Improvement)
+            // If Win (5 points) is selected, set all OTHER players in this table to Loss (0)
+            // UNLESS they already have a score set
+            if (points === 5) {
+                const tableCard = button.closest('.table-card');
+                if (tableCard) {
+                    const allScoreBtns = tableCard.querySelectorAll('.score-btn-loss');
+                    let autoFilledCount = 0;
+
+                    allScoreBtns.forEach(lossBtn => {
+                        const otherPlayerId = parseInt(lossBtn.dataset.player);
+                        const otherPlayerRow = lossBtn.closest('.table-player');
+
+                        // Skip the winner (obviously)
+                        if (otherPlayerId === playerId) return;
+
+                        // Check if this player already has a score selected
+                        // Look for active class on any button in this row
+                        const hasSelection = otherPlayerRow.querySelector('.score-btn.active');
+
+                        if (!hasSelection) {
+                            // Synthetically click the loss button to set the score
+                            // This triggers this same function recursively but for 0 points
+                            lossBtn.click();
+                            autoFilledCount++;
+                        }
+                    });
+
+                    if (autoFilledCount > 0) {
+                        showToast('Auto-Fill', `Marked ${autoFilledCount} other players as Loss`, 'info');
+                    }
+                }
+            }
         }
 
         // Submit table results
