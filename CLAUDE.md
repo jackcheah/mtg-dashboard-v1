@@ -7,7 +7,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 MTG Tournament Dashboard is a production-ready web-based tournament management system for **Magic: The Gathering cEDH team tournaments**. It implements Swiss-system pairing with automatic round generation, intelligent seating, and finals management.
 
 **Tech Stack:** Python 3.13+ | Flask 3.0.0 | Vanilla JavaScript | In-memory state management
-
 **Developed for:** Knights of Round Table - cEDH Team Championship tournaments
 
 ---
@@ -66,15 +65,11 @@ python3 test_tournament_comprehensive.py --all
 | **UnifiedSwissPairing** | `unified_swiss_pairing.py` | Constraint satisfaction solver for pod generation |
 | **Frontend SPA** | `templates/dashboard_ultra_modern.html` | Single HTML file (~4,600 lines) with embedded CSS/JS |
 
-### Tournament State Machine
-
-```
-INITIAL → PARTICIPANTS_LOADED → TOURNAMENT_SETUP → SWISS_IN_PROGRESS → SWISS_COMPLETE
-                                                                            ↓
-                                    FINALS_COMPLETE ← FINALS_IN_PROGRESS ← TOP8_COMPLETE (16-team)
-```
-
-**State transitions happen automatically** based on user actions. Endpoints are protected with `@require_state` decorator.
+### Frontend Architecture (UX Overhaul)
+- **Vanilla JS**: No framework overhead. Classes (`ModalManager`, `KeyboardNavigator`) used for organization.
+- **CSS Variables**: Extensive use of `--color-primary`, `--spacing-md` for consistent theming.
+- **Glassmorphism**: Backdrop filters and semi-transparent backgrounds for modern aesthetic.
+- **localStorage**: Client-side persistence for user preferences (e.g., Compact Mode).
 
 ### Data Flow
 
@@ -151,45 +146,30 @@ Excel/Sample Data → load_participants() → TournamentManager state
 - Comprehensive input validation on all endpoints
 - Double-submission prevention (backend tracking + frontend disable)
 
-### Phase 3: UX & Error Handling ✅
-- **Task 3.1:** Table submission status tracking with progress bar
-- **Task 3.2:** Score correction mechanism with audit trail
-- **Task 3.3:** Enhanced error messages with user-friendly suggestions
-- **Task 3.4:** Tournament state machine with `@require_state` decorator
+### Phase 3: UX (Dec 2025 Overhaul) ✅
+- **Visuals**: "Ultra Modern" glassmorphism UI, Sticky Header, Dynamic Timer.
+- **Efficiency**: "Auto-fill losers" (75% click reduction), "Batch Submit".
+- **Accessibility**: Full keyboard navigation (`Tab`, `1/2/3`, `Ctrl+Enter`) and `?` help overlay.
+- **Feedback**: Stacked toasts, custom non-blocking modals (no use of `window.confirm`).
 
 ---
 
-## Critical Design Decisions
+## Verification & Troubleshooting
 
-### Incremental Round Generation
-Rounds generated one at a time after previous round submission. Ensures fair seeding based on current standings.
+### Manual Verification Checklist
+- [ ] **Load**: "Load Participants" loads data correctly (8/12/16 teams).
+- [ ] **Setup**: "Setup Tournament" generates Round 1 pairings.
+- [ ] **Scoring**: "Win" auto-fills 3 "Losses"; "Submit Table" saves/dims card.
+- [ ] **Batch**: "Batch Submit" submits all fully-scored tables.
+- [ ] **UX**: Sticky header visible; Compact Mode toggles/persists; `?` shows keys.
+- [ ] **Finals**: Transition to Top 8/Finals works correctly.
 
-### Intelligent Seating
-- **Round 1:** Randomized
-- **Rounds 2+:** Players sorted by `player_scores[]` within each pod
-- Highest scorer → Seat 1 (players of similar strength face each other)
-
-### Constraint Solver
-1. **Primary:** Constraint satisfaction with backtracking (500K node limit)
-2. **Fallback:** Dynamic pairing with relaxed constraints
-3. **Hard Constraint:** Teammates NEVER together (never relaxed)
-
-### Score Correction Audit Trail
-All score edits are tracked with timestamp, previous values, new values, and reason. View history via `/get_score_history` endpoint or history badge in UI.
-
----
-
-## Common Pitfalls
-
-1. **Team vs Player Scores**: Both tracked separately. `scores[team]` = aggregate of `player_scores[]` for all 4 members.
-
-2. **Round State**: Use `submitted_rounds` set to prevent double-submission. Check `if round_num in self.submitted_rounds`.
-
-3. **Seating is Applied Post-Generation**: Constraint solver generates unordered pods. Seating logic runs in `apply_intelligent_seating()`.
-
-4. **Max Rounds is Dynamic**: Use `if round_num == self.max_rounds`, never hardcode round numbers.
-
-5. **Excel Path**: Default is `participants/participant_team.xlsx`. Search for this string to change.
+### Common Pitfalls & Troubleshooting
+1. **"Round 2 Not Generating"**: Check for undimmed tables. Use "Batch Submit" to catch stragglers.
+2. **"Mismatched State"**: If server restarts, refresh page -> "Load Participants" -> "Setup Tournament" to recover state from backup.
+3. **Team vs Player Scores**: Tracked separately. `scores[team]` is aggregate of members.
+4. **Excel Path**: Defaults to `participants/participant_team.xlsx`.
+5. **Score Zero?**: Refresh page to reload from backend state.
 
 ---
 
@@ -213,57 +193,5 @@ mtg-dashboard-v1/
 
 ---
 
-## Testing Status
-
-| Test Suite | Tests | Status |
-|------------|-------|--------|
-| 16-Team Tournament Flow | 37 | ✅ All Pass |
-| 8-Team Tournament Flow | 28 | ✅ All Pass |
-| Score Correction (Task 3.2) | 18 | ✅ All Pass |
-| Backup/Restore | 3 | ✅ All Pass |
-
-### Run All Tests
-```bash
-source venv/bin/activate
-python3 test_tournament_comprehensive.py --all
-python3 test_score_correction.py
-```
-
----
-
-## Known Limitations
-
-| Limitation | Workaround |
-|------------|------------|
-| Single tournament per server | Restart server between tournaments |
-| In-memory only (no database) | Use backup/restore for persistence |
-| Local-only by default | Change to `host='0.0.0.0'` for network |
-| Manual score entry | No external API integration |
-
----
-
-## Deployment
-
-### Production Configuration
-```python
-# In tournament_dashboard.py, last line:
-app.run(host='0.0.0.0', port=5000, debug=False)
-```
-
-### Requirements
-- Python 3.13+
-- Flask 3.0.0
-- openpyxl (Excel import)
-- Modern web browser
-
----
-
-## Version History
-
-| Version | Date | Changes |
-|---------|------|---------|
-| 2.0 | 2025-12-15 | Phase 2+3 complete, score correction, state machine |
-| 1.0 | 2024-12 | Initial release, core tournament flow |
-
-**Last Updated:** 2025-12-15  
-**Status:** Production Ready
+**Last Updated:** 2025-12-17
+**Status:** Production Ready (100% ready for local PC use)

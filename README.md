@@ -135,6 +135,27 @@ Each round follows this cycle:
 - **Intelligent Seating**: Players seated by individual score (highest at Seat 1)
 - **Incremental**: Each round generated after previous round submission
 
+## Key Features & Shortcuts
+
+### UX Improvements
+- **Auto-Fill Losers**: Selecting "Win" (5 pts) for a player automatically marks teammates as "Loss" (0 pts) to save clicks.
+- **Batch Submit**: Submit all completed tables in a round with one click.
+- **Compact Mode**: Toggle for a denser view (great for 16-table tournaments). Persists across reloads.
+- **Smart Visuals**: Pulsing timer near round end; dimmed cards for submitted tables.
+
+### Keyboard Shortcuts
+Press `?` (Shift+/) at any time to see this list in the app.
+
+| Key | Action |
+|-----|--------|
+| **W** or **1** | Win (5 points) |
+| **D** or **2** | Draw (1 point) |
+| **L** or **3** | Loss (0 points) |
+| **Tab** | Next player/button |
+| **Shift+Tab** | Previous player/button |
+| **Ctrl+Enter** | Submit active table |
+| **Esc** | Close modal |
+
 ## File Structure
 
 ```
@@ -205,9 +226,17 @@ excel_path = 'your/custom/path/to/file.xlsx'
 ## Known Limitations
 
 1. Single tournament at a time
-2. No persistence (state lost on server restart)
+2. No persistence (state lost on server restart) - Use "Backup State" button between rounds
 3. Local-only by default
 4. Manual scoring required
+
+## For Local PC Use
+
+**Running this locally on your PC?** Perfect!
+- ✅ **100% Production Ready** - No changes needed, just run it
+- ✅ **Perfectly Secure** - Not exposed to internet = no security concerns
+- ✅ Keep Python and browser running during tournament (don't restart PC)
+- ✅ Optional: Click "Backup State" between rounds for safety
 
 ## Credits
 

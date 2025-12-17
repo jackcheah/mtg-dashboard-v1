@@ -1610,11 +1610,14 @@ def load_data():
         tournament.save_backup()
 
         # State transition: Participants loaded (Phase 3.4)
+        # Only transition to PARTICIPANTS_LOADED if we're in INITIAL state
+        # Don't reset state if tournament is already set up
         if success and len(tournament.teams) > 0:
-            tournament.transition_to(
-                TournamentState.PARTICIPANTS_LOADED,
-                f"Loaded {len(tournament.teams)} teams"
-            )
+            if tournament.state == TournamentState.INITIAL:
+                tournament.transition_to(
+                    TournamentState.PARTICIPANTS_LOADED,
+                    f"Loaded {len(tournament.teams)} teams"
+                )
 
         return jsonify({
             'success': success,

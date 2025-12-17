@@ -1605,8 +1605,7 @@ class UnifiedSwissPairing:
     def _create_non_repeat_team_groups(self, teams: List[str], num_groups: int) -> Optional[List[List[str]]]:
         """
         Create team groups where teams face opponents they haven't met before.
-
-        Uses backtracking to find valid groupings.
+        Crucially, this prioritizes grouping high-scoring teams together (Swiss System).
 
         Args:
             teams: List of team names to group
@@ -1615,7 +1614,8 @@ class UnifiedSwissPairing:
         Returns:
             List of team groups, or None if no valid grouping exists
         """
-        available = set(teams)
+        # Sort teams by score (Highest first) to ensure Swiss pairing
+        sorted_teams = self._sort_teams_by_score(teams)
         groups = []
 
         def can_form_group(candidate_teams: List[str]) -> bool:
@@ -1629,41 +1629,51 @@ class UnifiedSwissPairing:
                         return False
             return True
 
-        def backtrack(remaining: set, current_groups: List[List[str]]) -> bool:
-            """Recursively build valid team groups."""
-            if len(remaining) == 0:
+        def backtrack(remaining: List[str], current_groups: List[List[str]]) -> bool:
+            """Recursively build valid team groups using score-ranked list."""
+            if not remaining:
                 return True
 
             if len(remaining) < 4:
                 return False
 
-            # Try to form a group with the first available team
-            first_team = min(remaining)  # Use min for deterministic ordering
-            remaining.remove(first_team)
-
-            # Find 3 more teams that haven't faced the first team
+            # Always pick the highest-ranked remaining team first
+            first_team = remaining[0]
+            
+            # Candidates are other remaining teams that haven't played first_team
+            # They are already sorted by score because 'remaining' is sorted
             candidates = []
-            for team in remaining:
+            for team in remaining[1:]:
                 if team not in self.team_matchups.get(first_team, set()):
                     candidates.append(team)
 
-            # Try all combinations of 3 from candidates
+            # Optimization: If we don't have enough candidates to form a group of 4, fail early
+            if len(candidates) < 3:
+                return False
+
+            # Try combinations of 3 from candidates
+            # Since candidates are sorted by score, 'combinations' will produce
+            # pairings of highest-ranked accessible opponents first.
             from itertools import combinations
             for combo in combinations(candidates, 3):
                 group = [first_team] + list(combo)
+                
+                # Check if the 3 candidates can play each other
                 if can_form_group(group):
-                    # Remove these teams and recurse
-                    new_remaining = remaining - set(combo)
                     current_groups.append(group)
+                    
+                    # Create new remaining list maintaining order
+                    group_set = set(group)
+                    new_remaining = [t for t in remaining if t not in group_set]
+                    
                     if backtrack(new_remaining, current_groups):
                         return True
+                    
                     current_groups.pop()
 
-            # Backtrack: put the first team back
-            remaining.add(first_team)
             return False
 
-        if backtrack(available, groups):
+        if backtrack(sorted_teams, groups):
             return groups
         return None
 
