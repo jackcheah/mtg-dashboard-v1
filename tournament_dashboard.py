@@ -1870,6 +1870,9 @@ def submit_player_results():
                     semifinals_data = tournament.generate_semifinals_round()
                     if semifinals_data:
                         print("[OK] Semifinals generated successfully!")
+                        # CRITICAL FIX: Update state to enable Top 8 submissions
+                        tournament.state = TournamentState.TOP8_IN_PROGRESS
+                        print(f"[STATE] Transitioning to {tournament.state}")
                     else:
                         print("[ERROR] Failed to generate semifinals")
                 else:
@@ -1878,6 +1881,9 @@ def submit_player_results():
                     semifinals_data = tournament.generate_unified_finals(after_semifinals=False)
                     if semifinals_data:
                         print("[OK] Finals generated successfully!")
+                        # CRITICAL FIX: Update state to enable Finals submissions
+                        tournament.state = TournamentState.FINALS_IN_PROGRESS
+                        print(f"[STATE] Transitioning to {tournament.state}")
                     else:
                         print("[ERROR] Failed to generate finals")
 
@@ -1892,6 +1898,9 @@ def submit_player_results():
                 semifinals_data = tournament.generate_unified_finals(after_semifinals=True)
                 if semifinals_data:
                     print("[OK] Finals generated successfully!")
+                    # CRITICAL FIX: Update state to enable Finals submissions
+                    tournament.state = TournamentState.FINALS_IN_PROGRESS
+                    print(f"[STATE] Transitioning to {tournament.state}")
                 else:
                     print("[ERROR] Failed to generate finals")
 
