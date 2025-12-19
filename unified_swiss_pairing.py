@@ -421,7 +421,7 @@ class UnifiedSwissPairing:
     to provide a robust solution that works for any valid tournament configuration.
     """
     
-    def __init__(self, teams: Dict[str, List[Dict]], tournament_teams: List[str], swiss_rounds_count: int = 4, team_scores: Dict[str, int] = None):
+    def __init__(self, teams: Dict[str, List[Dict]], tournament_teams: List[str], swiss_rounds_count: int = 4, team_scores: Dict[str, int] = None, use_traditional_swiss: bool = True, max_player_optimization_iterations: int = None):
         """
         Initialize the unified Swiss pairing system.
 
@@ -430,12 +430,20 @@ class UnifiedSwissPairing:
             tournament_teams: List of team names for the tournament (4-20 teams)
             swiss_rounds_count: Number of Swiss rounds to generate (3, 4, or 5)
             team_scores: Optional dictionary of team scores for score-based pairing (rounds 2+)
+            use_traditional_swiss: If True, use traditional Swiss (score-first).
+                                   If False, use pod consistency (repeat-avoidance-first)
+            max_player_optimization_iterations: Cap for exhaustive player search.
+                                               None = unlimited for groups with team repeats
         """
         self.teams = teams
         self.tournament_teams = tournament_teams
         self.swiss_rounds_count = swiss_rounds_count
         self.team_scores = team_scores or {}
         self.start_time = time.time()
+
+        # Configuration flags
+        self.use_traditional_swiss = use_traditional_swiss
+        self.max_player_optimization_iterations = max_player_optimization_iterations
         
         # Validate input parameters
         self._validate_tournament_configuration()
@@ -462,6 +470,7 @@ class UnifiedSwissPairing:
         self.player_opponents: Dict[int, Set[int]] = {}
         self.team_matchups: Dict[str, Set[str]] = {}  # NEW: Track team-level matchups
         self.round_solutions: List[List[List[Dict]]] = []
+        self.groups_needing_player_optimization: Dict[int, List[Tuple[str, str]]] = {}  # Track groups with unavoidable team repeats
 
         # Initialize enhanced constraint solver
         self.constraint_solver = HybridConstraintSolver(self)
@@ -1525,9 +1534,9 @@ class UnifiedSwissPairing:
         all_pods = []
 
         # Step 2: Create 4 pods for each team group
-        for team_group in team_groups:
+        for group_idx, team_group in enumerate(team_groups):
             print(f"    Creating pods for team group: {team_group}")
-            pods = self._create_four_pods_for_team_group(team_group, round_num)
+            pods = self._create_four_pods_for_team_group(team_group, round_num, group_index=group_idx)
 
             if pods is None or len(pods) != 4:
                 print(f"[ERROR] Failed to create 4 pods for team group: {team_group}")
@@ -1561,9 +1570,11 @@ class UnifiedSwissPairing:
 
         return all_pods
 
-    def _create_team_groups_for_round(self, round_num: int) -> Optional[List[List[str]]]:
+    def _create_team_groups_for_round_OLD(self, round_num: int) -> Optional[List[List[str]]]:
         """
-        Divide teams into groups of 4 for the round.
+        OLD VERSION - Divide teams into groups of 4 for the round (Pod Consistency approach).
+
+        Kept for reference/rollback purposes.
 
         Round 1: Random grouping
         Rounds 2+: Create new groupings where teams face opponents they haven't met yet
@@ -1601,6 +1612,71 @@ class UnifiedSwissPairing:
                 team_groups.append(group)
 
         return team_groups
+
+    def _create_team_groups_for_round(self, round_num: int) -> List[List[str]]:
+        """
+        Divide teams into groups of 4 for the round.
+
+        Round 1: Random grouping
+        Rounds 2+: Traditional Swiss (score-based) with three-layer repeat avoidance
+
+        Args:
+            round_num: The round number being generated (1-based)
+
+        Returns:
+            List of team groups, each containing 4 team names
+        """
+        available_teams = self.tournament_teams.copy()
+        num_groups = len(available_teams) // 4
+
+        if round_num == 1:
+            # Round 1: Random grouping (existing logic)
+            random.shuffle(available_teams)
+            team_groups = []
+            for i in range(num_groups):
+                group = available_teams[i*4:(i+1)*4]
+                team_groups.append(group)
+            return team_groups
+
+        # Round 2+: Choose algorithm based on configuration
+        if self.use_traditional_swiss:
+            # TRADITIONAL SWISS: Three-layer repeat avoidance
+
+            # LAYER 1: Traditional Swiss score-based grouping
+            groups = self._create_team_groups_traditional_swiss(round_num)
+
+            # LAYER 2: Detect and resolve team-level repeats via swapping
+            repeats = self._detect_repeat_matchups_in_groups(groups)
+
+            unresolvable_groups = []
+            if repeats:
+                groups, unresolvable_groups = self._resolve_repeat_matchups_by_swapping(groups, repeats)
+
+            # Final validation
+            is_valid, violations, groups_with_repeats = self._validate_all_groups_no_repeats(groups)
+
+            # LAYER 3: Mark groups with unavoidable team repeats for player optimization
+            if groups_with_repeats:
+                repeat_info = self._mark_groups_for_player_optimization(groups, groups_with_repeats)
+                # Store for use in player assignment phase
+                self.groups_needing_player_optimization = repeat_info
+            else:
+                self.groups_needing_player_optimization = {}
+
+            # Logging
+            if not is_valid:
+                print(f"\n{'='*60}")
+                print(f"[WARNING] Round {round_num}: Team-level repeat matchups unavoidable")
+                print(f"{'='*60}")
+                for violation in violations:
+                    print(f"  ⚠️  {violation}")
+                print(f"\n[INFO] Player-level optimization will be applied to minimize player repeats")
+                print(f"{'='*60}\n")
+
+            return groups
+        else:
+            # POD CONSISTENCY: Use old algorithm (fallback/rollback)
+            return self._create_team_groups_for_round_OLD(round_num)
 
     def _create_non_repeat_team_groups(self, teams: List[str], num_groups: int) -> Optional[List[List[str]]]:
         """
@@ -1695,16 +1771,376 @@ class UnifiedSwissPairing:
                      key=lambda t: self.team_scores.get(t, 0),
                      reverse=True)
 
-    def _create_four_pods_for_team_group(self, team_group: List[str], round_num: int) -> Optional[List[List[Dict]]]:
+    # ============================================================================
+    # TRADITIONAL SWISS PAIRING IMPLEMENTATION (Three-Layer System)
+    # ============================================================================
+
+    def _create_team_groups_traditional_swiss(self, round_num: int) -> List[List[str]]:
+        """
+        Create team groups using traditional Swiss pairing (score-based).
+
+        Groups teams into brackets of 4 based on current scores:
+        - Top 4 teams (highest scores) → Group 1
+        - Next 4 teams → Group 2
+        - etc.
+
+        Args:
+            round_num: The round number being generated (1-based)
+
+        Returns:
+            List of team groups, each containing 4 team names
+            Note: Groups may contain repeat team matchups (will be resolved in Layer 2)
+        """
+        # Sort teams by score (highest first)
+        sorted_teams = self._sort_teams_by_score(self.tournament_teams.copy())
+
+        # Calculate number of groups (4 teams per group)
+        num_groups = len(sorted_teams) // 4
+
+        # Create groups by slicing sorted list
+        team_groups = []
+        for i in range(num_groups):
+            group = sorted_teams[i*4:(i+1)*4]
+            team_groups.append(group)
+
+        return team_groups
+
+    def _detect_repeat_matchups_in_groups(self, groups: List[List[str]]) -> List[Tuple[int, str, str]]:
+        """
+        Detect all team-level repeat matchups across all groups.
+
+        Args:
+            groups: List of team groups to check
+
+        Returns:
+            List of tuples: (group_index, team1, team2) for each repeat found
+        """
+        repeats = []
+
+        for group_idx, team_group in enumerate(groups):
+            # Check all pairs within this group
+            for i in range(len(team_group)):
+                for j in range(i + 1, len(team_group)):
+                    team1 = team_group[i]
+                    team2 = team_group[j]
+
+                    # Check if these teams have played before
+                    if team2 in self.team_matchups.get(team1, set()):
+                        repeats.append((group_idx, team1, team2))
+
+        return repeats
+
+    def _mark_groups_for_player_optimization(self, groups: List[List[str]],
+                                             groups_with_repeats: List[int]) -> Dict[int, List[Tuple[str, str]]]:
+        """
+        Mark groups that need aggressive player-level optimization.
+
+        These groups have unavoidable team-level repeats and will use exhaustive
+        player assignment search to minimize player-level repeat matchups.
+
+        Args:
+            groups: All team groups
+            groups_with_repeats: Indices of groups with team-level repeats
+
+        Returns:
+            Dict mapping group_index → list of (team1, team2) pairs that are repeats
+
+        Example:
+            {
+                0: [('Team C', 'Team E')],  # Table 1 has C vs E repeat
+                2: [('Team A', 'Team B'), ('Team A', 'Team D')]  # Table 3 has 2 repeats
+            }
+        """
+        optimization_map = {}
+
+        for group_idx in groups_with_repeats:
+            team_group = groups[group_idx]
+            repeat_pairs = []
+
+            # Find all repeat pairs in this group
+            for i in range(len(team_group)):
+                for j in range(i + 1, len(team_group)):
+                    team1 = team_group[i]
+                    team2 = team_group[j]
+
+                    if team2 in self.team_matchups.get(team1, set()):
+                        repeat_pairs.append((team1, team2))
+
+            if repeat_pairs:
+                optimization_map[group_idx] = repeat_pairs
+
+        return optimization_map
+
+    def _validate_all_groups_no_repeats(self, groups: List[List[str]]) -> Tuple[bool, List[str], List[int]]:
+        """
+        Comprehensive validation of all groups for repeat team matchups.
+
+        Checks every group for team-level repeats and collects:
+        - Violation messages (for logging)
+        - Group indices with repeats (for player optimization marking)
+
+        Args:
+            groups: List of team groups to validate
+
+        Returns:
+            (is_valid, violations_list, group_indices_with_repeats)
+
+        Example:
+            (False,
+             ['Table 1: Team C vs Team E (teams played before)'],
+             [0])
+        """
+        violations = []
+        groups_with_repeats = []
+
+        for group_idx, team_group in enumerate(groups):
+            group_name = f"Table {group_idx + 1}"
+            group_has_repeat = False
+
+            for i in range(len(team_group)):
+                for j in range(i + 1, len(team_group)):
+                    team1 = team_group[i]
+                    team2 = team_group[j]
+
+                    if team2 in self.team_matchups.get(team1, set()):
+                        violations.append(
+                            f"{group_name}: {team1} vs {team2} (teams played before)"
+                        )
+                        group_has_repeat = True
+
+            if group_has_repeat:
+                groups_with_repeats.append(group_idx)
+
+        return (len(violations) == 0, violations, groups_with_repeats)
+
+    def _group_has_repeat_matchups(self, team_group: List[str]) -> bool:
+        """
+        Check if any teams in this group have played each other before.
+
+        Args:
+            team_group: List of 4 team names
+
+        Returns:
+            True if any repeat matchup exists, False otherwise
+        """
+        for i in range(len(team_group)):
+            for j in range(i + 1, len(team_group)):
+                team1 = team_group[i]
+                team2 = team_group[j]
+
+                if team2 in self.team_matchups.get(team1, set()):
+                    return True
+
+        return False
+
+    # ============================================================================
+    # LAYER 2: TEAM SWAP ALGORITHM
+    # ============================================================================
+
+    def _resolve_repeat_matchups_by_swapping(self, groups: List[List[str]],
+                                              repeats: List[Tuple[int, str, str]]) -> Tuple[List[List[str]], List[int]]:
+        """
+        Resolve team-level repeat matchups by swapping teams between groups.
+
+        Strategy:
+        1. For each repeat, identify the lower-ranked team in the pair
+        2. Search adjacent brackets for a swap candidate
+        3. Perform swap if it doesn't create new repeats
+        4. Track unresolvable groups
+
+        Args:
+            groups: List of team groups
+            repeats: List of (group_idx, team1, team2) tuples
+
+        Returns:
+            (modified_groups, list_of_unresolvable_group_indices)
+        """
+        # Create mutable copy
+        groups = [g.copy() for g in groups]
+
+        # Track which groups have unresolvable repeats
+        unresolvable_groups = set()
+
+        # Track swap attempts to prevent infinite loops
+        swap_history = set()
+        max_swap_attempts = 10
+
+        for group_idx, team1, team2 in repeats:
+            # Identify lower-ranked team (to swap out)
+            team1_score = self.team_scores.get(team1, 0)
+            team2_score = self.team_scores.get(team2, 0)
+
+            if team1_score < team2_score:
+                problem_team = team1
+            elif team2_score < team1_score:
+                problem_team = team2
+            else:
+                # Same score, pick one arbitrarily (e.g., alphabetically later)
+                problem_team = max(team1, team2)
+
+            # Try to find swap candidate
+            swap_result = self._find_best_swap_candidate(
+                problem_team,
+                group_idx,
+                groups,
+                swap_history,
+                max_attempts=max_swap_attempts
+            )
+
+            if swap_result:
+                target_group_idx, swap_team = swap_result
+
+                # Perform the swap
+                groups[group_idx].remove(problem_team)
+                groups[group_idx].append(swap_team)
+                groups[target_group_idx].remove(swap_team)
+                groups[target_group_idx].append(problem_team)
+
+                # Record swap
+                swap_key = tuple(sorted([problem_team, swap_team]))
+                swap_history.add(swap_key)
+            else:
+                # Cannot resolve this repeat
+                unresolvable_groups.add(group_idx)
+
+        return groups, list(unresolvable_groups)
+
+    def _find_best_swap_candidate(self,
+                                   problem_team: str,
+                                   problem_group_idx: int,
+                                   all_groups: List[List[str]],
+                                   swap_history: Set[Tuple[str, str]],
+                                   max_attempts: int = 10) -> Optional[Tuple[int, str]]:
+        """
+        Find best team to swap with problem_team to resolve repeat matchup.
+
+        Swap priority:
+        1. Adjacent brackets (±1) - minimizes score disruption
+        2. Two brackets away (±2) - acceptable score difference
+        3. Any bracket - last resort
+
+        Args:
+            problem_team: Team that needs to be swapped out
+            problem_group_idx: Index of group containing problem_team
+            all_groups: All team groups
+            swap_history: Set of (team1, team2) swaps already attempted
+            max_attempts: Maximum number of candidates to try
+
+        Returns:
+            (target_group_index, swap_team_name) or None if no valid swap exists
+        """
+        candidates = []
+
+        # Try adjacent groups first (±1 bracket)
+        for offset in [-1, 1]:
+            target_group_idx = problem_group_idx + offset
+            if 0 <= target_group_idx < len(all_groups):
+                for swap_team in all_groups[target_group_idx]:
+                    # Skip if already tried this swap
+                    swap_key = tuple(sorted([problem_team, swap_team]))
+                    if swap_key in swap_history:
+                        continue
+
+                    if self._is_valid_swap(problem_team, swap_team,
+                                           problem_group_idx, target_group_idx,
+                                           all_groups):
+                        score_diff = abs(self.team_scores.get(problem_team, 0) -
+                                        self.team_scores.get(swap_team, 0))
+                        candidates.append((score_diff, target_group_idx, swap_team))
+
+        # If no adjacent swaps found, try ±2 brackets
+        if not candidates and max_attempts > 4:
+            for offset in [-2, 2]:
+                target_group_idx = problem_group_idx + offset
+                if 0 <= target_group_idx < len(all_groups):
+                    for swap_team in all_groups[target_group_idx]:
+                        swap_key = tuple(sorted([problem_team, swap_team]))
+                        if swap_key in swap_history:
+                            continue
+
+                        if self._is_valid_swap(problem_team, swap_team,
+                                              problem_group_idx, target_group_idx,
+                                              all_groups):
+                            score_diff = abs(self.team_scores.get(problem_team, 0) -
+                                            self.team_scores.get(swap_team, 0))
+                            candidates.append((score_diff, target_group_idx, swap_team))
+
+        # If still no candidates, try all groups (last resort)
+        if not candidates and max_attempts > 8:
+            for target_group_idx in range(len(all_groups)):
+                if target_group_idx == problem_group_idx:
+                    continue
+
+                for swap_team in all_groups[target_group_idx]:
+                    swap_key = tuple(sorted([problem_team, swap_team]))
+                    if swap_key in swap_history:
+                        continue
+
+                    if self._is_valid_swap(problem_team, swap_team,
+                                          problem_group_idx, target_group_idx,
+                                          all_groups):
+                        score_diff = abs(self.team_scores.get(problem_team, 0) -
+                                        self.team_scores.get(swap_team, 0))
+                        candidates.append((score_diff, target_group_idx, swap_team))
+
+        # Return swap with smallest score difference
+        if candidates:
+            candidates.sort()  # Sort by score_diff (first element of tuple)
+            return (candidates[0][1], candidates[0][2])
+
+        return None
+
+    def _is_valid_swap(self, team_a: str, team_b: str,
+                       group_a_idx: int, group_b_idx: int,
+                       all_groups: List[List[str]]) -> bool:
+        """
+        Check if swapping team_a (from group_a) with team_b (from group_b)
+        creates any new repeat matchups.
+
+        Args:
+            team_a: First team to swap
+            team_b: Second team to swap
+            group_a_idx: Index of group containing team_a
+            group_b_idx: Index of group containing team_b
+            all_groups: All team groups
+
+        Returns:
+            True if swap is safe (doesn't create new repeats), False otherwise
+        """
+        # Simulate the swap
+        group_a = all_groups[group_a_idx].copy()
+        group_b = all_groups[group_b_idx].copy()
+
+        group_a.remove(team_a)
+        group_a.append(team_b)
+
+        group_b.remove(team_b)
+        group_b.append(team_a)
+
+        # Check both groups for repeats after swap
+        if self._group_has_repeat_matchups(group_a):
+            return False
+
+        if self._group_has_repeat_matchups(group_b):
+            return False
+
+        return True
+
+    # ============================================================================
+    # END OF TRADITIONAL SWISS HELPER FUNCTIONS
+    # ============================================================================
+
+    def _create_four_pods_for_team_group(self, team_group: List[str], round_num: int, group_index: int = None) -> Optional[List[List[Dict]]]:
         """
         Create exactly 4 pods from 4 teams, avoiding player-level repeat matchups.
 
         Uses backtracking to find player assignments that minimize repeat opponents.
-        If repeat matchups cannot be avoided, swaps players to minimize them.
+        If this group has unavoidable team-level repeats, uses exhaustive search.
 
         Args:
             team_group: List of 4 team names
             round_num: The round number (used for rotation calculation)
+            group_index: Index of this group (used to check if player optimization needed)
 
         Returns:
             List of 4 pods, each containing 4 players (one from each team)
@@ -1714,15 +2150,27 @@ class UnifiedSwissPairing:
         for team in team_group:
             team_players[team] = self.teams[team].copy()
 
+        # Check if this group needs maximum player optimization
+        needs_max_optimization = (
+            hasattr(self, 'groups_needing_player_optimization') and
+            group_index is not None and
+            group_index in self.groups_needing_player_optimization
+        )
+
+        if needs_max_optimization:
+            # Log that we're doing exhaustive search
+            repeat_teams = self.groups_needing_player_optimization[group_index]
+            print(f"    [PLAYER OPTIMIZATION] Table {group_index + 1}: Team-level repeat unavoidable")
+            print(f"                         Teams with repeat: {repeat_teams}")
+            print(f"                         Using exhaustive player search to minimize player repeats...")
+
         # Try to find optimal player assignment using backtracking
         best_pods = None
         best_repeat_count = float('inf')
+        best_repeat_details = []
 
-        # Try all permutations of player assignments for each team
-        # Each team has 4 players that need to be assigned to 4 pods
         from itertools import permutations
 
-        # For efficiency, only try permutations for teams after the first
         # First team's players go to pods 0,1,2,3 in order
         first_team = team_group[0]
         first_team_players = team_players[first_team]
@@ -1731,15 +2179,28 @@ class UnifiedSwissPairing:
         other_teams = team_group[1:]
         other_team_perms = [list(permutations(range(4))) for _ in other_teams]
 
-        # Limit search space for performance (try first 24 combinations per team)
-        max_perms = min(24, len(other_team_perms[0]) if other_team_perms else 1)
+        # Adjust search depth based on optimization need
+        if needs_max_optimization:
+            # Exhaustive search: Try ALL permutations (24 per team = 24^3 total)
+            max_perms = len(other_team_perms[0]) if other_team_perms else 1
+            if self.max_player_optimization_iterations:
+                # Apply user-defined cap if set
+                max_perms = min(max_perms, self.max_player_optimization_iterations)
+            print(f"                         Trying {max_perms**len(other_teams):,} permutation combinations...")
+        else:
+            # Normal search: Try first 24 combinations (existing behavior)
+            max_perms = min(24, len(other_team_perms[0]) if other_team_perms else 1)
 
+        iterations = 0
         for perm1 in other_team_perms[0][:max_perms] if other_team_perms else [()]:
             for perm2 in other_team_perms[1][:max_perms] if len(other_team_perms) > 1 else [()]:
                 for perm3 in other_team_perms[2][:max_perms] if len(other_team_perms) > 2 else [()]:
+                    iterations += 1
+
                     # Build pods with this permutation
                     pods = []
                     repeat_count = 0
+                    repeat_details = []
 
                     for pod_idx in range(4):
                         pod = []
@@ -1758,15 +2219,32 @@ class UnifiedSwissPairing:
                         if len(pod) == 4:
                             pods.append(pod)
                             # Count repeat matchups in this pod
-                            repeat_count += self._count_repeat_matchups_in_pod(pod)
+                            if needs_max_optimization:
+                                pod_repeats, pod_details = self._count_and_detail_repeat_matchups_in_pod(pod, pod_idx)
+                                repeat_count += pod_repeats
+                                repeat_details.extend(pod_details)
+                            else:
+                                repeat_count += self._count_repeat_matchups_in_pod(pod)
 
                     if len(pods) == 4 and repeat_count < best_repeat_count:
                         best_pods = pods
                         best_repeat_count = repeat_count
+                        best_repeat_details = repeat_details
 
                         if repeat_count == 0:
                             # Found perfect solution, return immediately
+                            if needs_max_optimization:
+                                print(f"                         ✅ PERFECT: Found zero player repeats after {iterations:,} iterations!")
                             return best_pods
+
+        # Report results for groups with team repeats
+        if needs_max_optimization:
+            if best_repeat_count == 0:
+                print(f"                         ✅ SUCCESS: Zero player-level repeats despite team repeat!")
+            else:
+                print(f"                         ⚠️  MINIMIZED: {best_repeat_count} player repeat(s) (unavoidable)")
+                for detail in best_repeat_details:
+                    print(f"                             - {detail}")
 
         return best_pods
 
@@ -1780,6 +2258,38 @@ class UnifiedSwissPairing:
                 if player2_id in self.player_opponents.get(player1_id, set()):
                     repeat_count += 1
         return repeat_count
+
+    def _count_and_detail_repeat_matchups_in_pod(self, pod: List[Dict], pod_idx: int) -> Tuple[int, List[str]]:
+        """
+        Count and detail player-level repeat matchups in this pod.
+
+        Used for exhaustive player optimization to provide detailed logging.
+
+        Args:
+            pod: List of 4 player dictionaries
+            pod_idx: Pod index for reporting (0-3)
+
+        Returns:
+            (repeat_count, list_of_repeat_descriptions)
+
+        Example:
+            (2, ['Pod 1: Alice vs Bob', 'Pod 3: Carol vs Dave'])
+        """
+        repeat_count = 0
+        details = []
+
+        for i in range(len(pod)):
+            for j in range(i + 1, len(pod)):
+                player1_id = pod[i]['Player ID']
+                player2_id = pod[j]['Player ID']
+                player1_name = pod[i]['Player Name']
+                player2_name = pod[j]['Player Name']
+
+                if player2_id in self.player_opponents.get(player1_id, set()):
+                    repeat_count += 1
+                    details.append(f"Pod {pod_idx + 1}: {player1_name} vs {player2_name}")
+
+        return repeat_count, details
 
     def _have_teams_met_before(self, team_group: List[str]) -> bool:
         """

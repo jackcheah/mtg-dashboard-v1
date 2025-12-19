@@ -5186,37 +5186,37 @@
                             const roundSelect = document.getElementById('round-select');
                             const nextOption = roundSelect.options[roundSelect.selectedIndex + 1];
 
-                            if (nextOption) {
-                                const nextRoundText = nextOption.textContent;
-                                if (nextRoundText.includes('Semifinals')) {
-                                    console.log('Semifinals generated!', data.semifinals);
-                                    showToast('Semifinals Ready!', 'Top 8 teams advance to semifinals!', 'success');
-                                } else if (nextRoundText.includes('Finals')) {
-                                    console.log('Finals generated!', data.semifinals);
-                                    showToast('Finals Ready!', 'Top 4 teams advance to finals!', 'success');
+                                if (nextOption) {
+                                    const nextRoundText = nextOption.textContent;
+                                    if (nextRoundText.includes('Semifinals') || nextRoundText.includes('Top 8')) {
+                                        console.log('Semifinals generated!', data.semifinals);
+                                        showToast('Top 8 Ready!', 'Top 8 teams advance!', 'success');
+                                    } else if (nextRoundText.includes('Finals')) {
+                                        console.log('Finals generated!', data.semifinals);
+                                        showToast('Finals Ready!', 'Top 4 teams advance to finals!', 'success');
+                                    }
+
+                                    // Auto-select next round
+                                    setTimeout(() => {
+                                        document.getElementById('round-select').value = nextOption.value;
+                                        loadRound();
+                                    }, 2000);
                                 }
+                            } else if (roundType === 'semifinals' || roundType === 'top8cut') {
+                                // Just finished Semifinals/Top8
+                                console.log('Finals generated after semifinals!', data.semifinals);
+                                showToast('Finals Ready!', 'Top 4 teams advance to finals!', 'success');
 
-                                // Auto-select next round
-                                setTimeout(() => {
-                                    document.getElementById('round-select').value = nextOption.value;
-                                    loadRound();
-                                }, 2000);
+                                // Auto-select finals
+                                const roundSelect = document.getElementById('round-select');
+                                const nextOption = roundSelect.options[roundSelect.selectedIndex + 1];
+                                if (nextOption) {
+                                    setTimeout(() => {
+                                        document.getElementById('round-select').value = nextOption.value;
+                                        loadRound();
+                                    }, 2000);
+                                }
                             }
-                        } else if (roundType === 'semifinals') {
-                            // Just finished Semifinals
-                            console.log('Finals generated after semifinals!', data.semifinals);
-                            showToast('Finals Ready!', 'Top 4 teams advance to finals!', 'success');
-
-                            // Auto-select finals
-                            const roundSelect = document.getElementById('round-select');
-                            const nextOption = roundSelect.options[roundSelect.selectedIndex + 1];
-                            if (nextOption) {
-                                setTimeout(() => {
-                                    document.getElementById('round-select').value = nextOption.value;
-                                    loadRound();
-                                }, 2000);
-                            }
-                        }
                     }
 
                     // Check if tournament complete (after Finals)

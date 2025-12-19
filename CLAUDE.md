@@ -27,16 +27,20 @@ open http://127.0.0.1:5000
 
 ### Testing
 
+The project now relies on a comprehensive **End-to-End (E2E) Simulation** to verify tournament logic, including the sophisticated Swiss Pairing system.
+
 ```bash
-# Run comprehensive 16-team test suite
-source venv/bin/activate && python3 test_tournament_comprehensive.py --teams 16
-
-# Run score correction tests
-source venv/bin/activate && python3 test_score_correction.py
-
-# Test all team configurations
-python3 test_tournament_comprehensive.py --all
+# Run the Full Tournament Simulation (16 Teams)
+python tests/e2e/simulate_tournament_flow.py
 ```
+
+**What this test does:**
+1.  **Simulates User Actions**: Uses Playwright to click buttons, entering scores like a real user.
+2.  **Verifies Mechanics**: Checks that tables load, rounds advance, and the Champion is declared.
+3.  **Validates Logic**: Real-time verification of Swiss rules:
+    *   **No Repeats**: Ensures players never face the same opponent twice in Swiss rounds.
+    *   **Teammate Avoidance**: Ensures teammates are not paired together.
+    *   **Champion**: Confirms the tournament reaches a conclusion.
 
 ---
 
@@ -135,11 +139,10 @@ Excel/Sample Data → load_participants() → TournamentManager state
 ## Features Implemented
 
 ### Phase 1: Core Tournament Flow ✅
-- Swiss-system pairing with zero repeat matchups
-- Intelligent seating by player scores (Rounds 2+)
-- Automatic next round generation
-- Finals generation with Top 4 advancement
-- Backup/restore functionality
+- **Traditional Swiss Pairing**: Implemented with a 3-Layer Logic (Score -> Swap -> Optimize).
+- **Intelligent Seating**: Players seated by individual score (Rounds 2+).
+- **Automatic Round Generation**: Incremental generation based on previous results.
+- **Finals Generation**: Top 4 advancement (or Top 8 Cut -> Finals for 16 teams).
 
 ### Phase 2: Security & Validation ✅
 - XSS vulnerability prevention (data attributes, event delegation)
@@ -193,5 +196,31 @@ mtg-dashboard-v1/
 
 ---
 
-**Last Updated:** 2025-12-17
-**Status:** Production Ready (100% ready for local PC use)
+---
+
+## Technical Deep Dive: Traditional Swiss Implementation
+
+We have implemented a **Traditional Swiss Pairing** system that prioritizes score-based pairing while maintaining strict avoidance of repeat matchups.
+
+### The 3-Layer Pairing Strategy
+
+**Layer 1: Score-Based Grouping**
+*   Teams are sorted by score and grouped into brackets of 4 (e.g., Rank 1-4, Rank 5-8).
+*   **Goal**: Winners play Winners.
+
+**Layer 2: Intelligent Team Swapping**
+*   If a team-level repeat is detected (e.g., Team A and Team B in the same bracket played before):
+*   **Action**: The system identifies the lowest-ranked problem team and swaps it with a team from an adjacent bracket.
+*   **Priority**: Minimize score disruption (swap with nearest neighbor).
+
+**Layer 3: Exhaustive Player Optimization**
+*   If team-levels repeats are unavoidable (rare, but possible in small events):
+*   **Action**: The system uses an exhaustive permutation search (up to 13,824 combinations) to assign players within the pod.
+*   **Goal**: Minimize player-level repeat matchups even if teams are meeting again.
+
+### Rollback Configuration
+To revert to the legacy "Pod Consistency" algorithm (which prioritizes no repeats over score brackets):
+```python
+# In tournament_dashboard.py
+use_traditional_swiss=False
+```
