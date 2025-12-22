@@ -1914,7 +1914,50 @@
             margin: var(--spacing-xs) 0;
         }
 
+        /* Pod-based matchup styles */
+        .pod-matchup .matchup-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-sm);
+        }
+
+        .pod-info-icon {
+            color: rgba(255, 255, 255, 0.4);
+            cursor: help;
+            transition: color 0.2s ease;
+        }
+
+        .pod-info-icon:hover {
+            color: var(--color-accent);
+        }
+
+        .pod-teams {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-sm);
+        }
+
+        .pod-team {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-sm);
+            padding: var(--spacing-md);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.2s ease;
+        }
+
+        .pod-team:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--color-accent);
+        }
+
         @media (max-width: 768px) {
+            .pod-teams {
+                grid-template-columns: 1fr;
+            }
 
             .bracket-grid.top8cut,
             .bracket-grid.semifinals {
@@ -4214,8 +4257,8 @@
             }
 
             try {
-                // Fetch current standings to get team scores
-                const standingsResponse = await fetch('/standings');
+                // Fetch bracket standings with current round scores only
+                const standingsResponse = await fetch(`/bracket_standings/${currentRound}`);
                 const standingsData = await standingsResponse.json();
 
                 if (!standingsData.standings) {
@@ -4224,46 +4267,71 @@
                 }
 
                 const standings = standingsData.standings;
+                console.log(`Bracket standings for round ${currentRound} (${standingsData.score_type}):`, standings);
 
                 if (roundType === 'top8cut') {
-                    // Show top 8 teams in semifinals bracket
-                    bracketTitleText.textContent = 'Semifinals Bracket - Top 8 Teams';
+                    // Show top 8 teams in semifinals bracket - 2 pods of 4 teams
+                    bracketTitleText.textContent = 'Semifinals Bracket - Top 8 Teams (Current Round Scores)';
                     bracketGrid.className = 'bracket-grid semifinals';
 
-                    const top8 = standings.slice(0, 8);
+                    // Fetch actual pod groupings from table assignments
+                    const groupsResponse = await fetch(`/bracket_groups/${currentRound}`);
+                    const groupsData = await groupsResponse.json();
 
-                    // Create 4 matchups (1v8, 2v7, 3v6, 4v5)
-                    const matchups = [
-                        { teams: [top8[0], top8[7]], label: 'Matchup 1' },
-                        { teams: [top8[1], top8[6]], label: 'Matchup 2' },
-                        { teams: [top8[2], top8[5]], label: 'Matchup 3' },
-                        { teams: [top8[3], top8[4]], label: 'Matchup 4' }
-                    ];
+                    if (groupsData.success) {
+                        // Map team names to their standing data
+                        const pod1Teams = groupsData.pod1.map(teamName =>
+                            standings.find(s => s.team === teamName)
+                        ).filter(t => t); // Remove nulls
 
-                    let html = '';
-                    matchups.forEach((matchup, index) => {
-                        html += generateMatchupHTML(matchup, index + 1);
-                    });
+                        const pod2Teams = groupsData.pod2.map(teamName =>
+                            standings.find(s => s.team === teamName)
+                        ).filter(t => t);
 
-                    bracketGrid.innerHTML = html;
-                    bracketContainer.style.display = 'block';
+                        const pods = [
+                            { teams: pod1Teams, label: 'Matchup 1' },
+                            { teams: pod2Teams, label: 'Matchup 2' }
+                        ];
+
+                        let html = '';
+                        pods.forEach((pod, index) => {
+                            html += generatePodMatchupHTML(pod, index + 1);
+                        });
+
+                        bracketGrid.innerHTML = html;
+                        bracketContainer.style.display = 'block';
+                    } else {
+                        // Fallback to showing all top 8 with ranks
+                        const top8 = standings.slice(0, 8);
+                        const pods = [
+                            { teams: [top8[0], top8[2], top8[4], top8[6]], label: 'Matchup 1' },
+                            { teams: [top8[1], top8[3], top8[5], top8[7]], label: 'Matchup 2' }
+                        ];
+
+                        let html = '';
+                        pods.forEach((pod, index) => {
+                            html += generatePodMatchupHTML(pod, index + 1);
+                        });
+
+                        bracketGrid.innerHTML = html;
+                        bracketContainer.style.display = 'block';
+                    }
 
                 } else if (roundType === 'finals') {
-                    // Show top 4 teams in finals bracket
-                    bracketTitleText.textContent = 'Finals Bracket - Top 4 Teams';
+                    // Show top 4 teams in finals bracket - single pod of 4 teams
+                    bracketTitleText.textContent = 'Finals Bracket - Top 4 Teams (Current Round Scores)';
                     bracketGrid.className = 'bracket-grid finals';
 
                     const top4 = standings.slice(0, 4);
 
-                    // Create 2 matchups (1v4, 2v3)
-                    const matchups = [
-                        { teams: [top4[0], top4[3]], label: 'Finals Matchup 1' },
-                        { teams: [top4[1], top4[2]], label: 'Finals Matchup 2' }
+                    // Create single pod with all 4 teams
+                    const pods = [
+                        { teams: top4, label: 'Finals' }
                     ];
 
                     let html = '';
-                    matchups.forEach((matchup, index) => {
-                        html += generateMatchupHTML(matchup, index + 1);
+                    pods.forEach((pod, index) => {
+                        html += generatePodMatchupHTML(pod, index + 1);
                     });
 
                     bracketGrid.innerHTML = html;
@@ -4276,7 +4344,7 @@
             }
         }
 
-        // Generate HTML for a single matchup
+        // Generate HTML for a single matchup (legacy 1v1 format - kept for compatibility)
         function generateMatchupHTML(matchup, matchupNumber) {
             const team1 = matchup.teams[0];
             const team2 = matchup.teams[1];
@@ -4302,6 +4370,38 @@
                             </div>
                             <div class="team-score">${team2.total_points || 0} pts</div>
                         </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Generate HTML for a pod matchup (4-player format)
+        function generatePodMatchupHTML(pod, podNumber) {
+            if (!pod.teams || pod.teams.length === 0) return '';
+
+            const teamsHTML = pod.teams.map(team => {
+                if (!team) return '';
+                return `
+                    <div class="pod-team">
+                        <div class="team-info">
+                            <div class="team-seed">${team.rank || '?'}</div>
+                            <div class="team-name">${team.team || 'Unknown'}</div>
+                        </div>
+                        <div class="team-score">${team.total_points || 0} pts</div>
+                    </div>
+                `;
+            }).join('');
+
+            return `
+                <div class="bracket-matchup pod-matchup">
+                    <div class="matchup-header">
+                        ${pod.label}
+                        <span class="pod-info-icon" title="Teams are distributed using alternating pairing (1,3,5,7 vs 2,4,6,8) to create balanced competitive groups. This ensures both pods have similar skill distributions rather than clustering all top seeds together.">
+                            <i class="fas fa-info-circle"></i>
+                        </span>
+                    </div>
+                    <div class="pod-teams">
+                        ${teamsHTML}
                     </div>
                 </div>
             `;
@@ -4607,6 +4707,9 @@
                     // Refresh team scores display
                     refreshTeamScores();
 
+                    // Update bracket visualization with edited scores
+                    await updateBracketVisualization(roundNum);
+
                     if (data.edit_count > 0) {
                         showToast('Edit History', `This table has been edited ${data.edit_count} time(s). Click the badge to view history.`, 'info');
                     }
@@ -4747,6 +4850,10 @@
             const tablesContainer = document.getElementById('tables-container');
 
             console.log('displayTables called with:', { round, tableCount: Object.keys(tables).length });
+
+            // Clean up all previous round progress bars - only show current round progress
+            const oldProgressBars = document.querySelectorAll('.submission-progress-container');
+            oldProgressBars.forEach(bar => bar.remove());
 
             tablesGrid.innerHTML = '';
 
@@ -5109,8 +5216,11 @@
                     // Fetch fresh data to update display
                     refreshTeamScores();
 
-                    // Update submission progress (Phase 3.1)
+                    // Update bracket visualization with new scores (Phase 3.1)
                     const roundNum = parseInt(document.getElementById('round-select').value);
+                    await updateBracketVisualization(roundNum);
+
+                    // Update submission progress (Phase 3.1)
                     await updateSubmissionProgress(roundNum);
                 } else if (data.already_submitted) {
                     // Backend says already submitted

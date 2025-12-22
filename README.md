@@ -116,12 +116,56 @@ Each round follows this cycle:
 
 **Team Scores:**
 - Sum of all 4 players' scores for each round
-- Team standings determine Swiss pairings
-- Individual scores determine seating positions
+- Scores are tracked separately for each stage (Swiss, Top 8 Cut, Finals)
+- Team advancement and rankings use stage-specific scoring
 
-**Championship:**
-- Determined by Finals performance
-- Swiss rounds used as tiebreakers if needed
+### Tournament Progression Logic
+
+#### **16-Team Tournament:**
+
+**Swiss Rounds (Rounds 1-4):**
+- All 16 teams compete
+- Scores accumulate across rounds
+- Top 8 teams advance to Top 8 Cut
+
+**Top 8 Cut (Round 5):**
+- Top 8 teams compete in 8 tables (2 pods of 4 teams)
+- **Swiss scores are saved and frozen**
+- **Top 8 Cut scores tracked separately**
+- Advancement to Finals determined by:
+  - **PRIMARY:** Top 8 Cut round scores (Round 5 only)
+  - **TIEBREAKER:** Swiss round scores (Rounds 1-4)
+- Top 4 teams advance to Finals
+
+**Finals (Round 6):**
+- Top 4 teams compete in 4 tables (1 pod)
+- **Finals scores tracked separately**
+- Champion determined by:
+  - **PRIMARY:** Finals round scores (Round 6 only)
+  - **TIEBREAKER:** Swiss + Top 8 Cut combined scores
+- Winner receives championship trophy
+
+#### **8-Team & 12-Team Tournaments:**
+
+**Swiss Rounds (Rounds 1-4):**
+- All teams compete
+- Scores accumulate across rounds
+- Top 4 teams advance to Finals
+
+**Finals (Round 5):**
+- Top 4 teams compete in 4 tables (1 pod)
+- **Swiss scores saved and frozen**
+- **Finals scores tracked separately**
+- Champion determined by:
+  - **PRIMARY:** Finals round scores (Round 5 only)
+  - **TIEBREAKER:** Swiss round scores (Rounds 1-4)
+
+### Key Principles
+
+1. **Current Round Performance Matters Most**: Advancement and winning are primarily determined by performance in the current playoff round
+2. **Previous Rounds as Tiebreakers**: Earlier round scores are only used to break ties
+3. **Separate Score Tracking**: Each stage (Swiss, Top 8 Cut, Finals) tracks scores independently
+4. **Fair Competition**: Teams cannot coast on early performance - they must perform in each playoff stage
 
 ### Pairing Algorithm
 
@@ -142,6 +186,23 @@ Each round follows this cycle:
 - **Batch Submit**: Submit all completed tables in a round with one click.
 - **Compact Mode**: Toggle for a denser view (great for 16-table tournaments). Persists across reloads.
 - **Smart Visuals**: Pulsing timer near round end; dimmed cards for submitted tables.
+
+### Live Bracket Display (Top 8 Cut & Finals)
+
+**Real-Time Score Updates:**
+- Bracket displays **current round scores only** (not accumulated totals)
+- Updates automatically as tables are submitted
+- Shows team rankings with Swiss scores as tiebreaker
+
+**Accurate Matchup Display:**
+- Top 8 Cut: Shows 2 pods of 4 teams matching actual table assignments
+- Finals: Shows single pod with all 4 teams
+- Pod groupings reflect actual table pairings (not just theoretical matchups)
+
+**Visual Indicators:**
+- Teams sorted by current round performance
+- Info icon explains pairing logic
+- Score progression visible in real-time
 
 ### Keyboard Shortcuts
 Press `?` (Shift+/) at any time to see this list in the app.

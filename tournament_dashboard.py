@@ -995,41 +995,67 @@ class TournamentManager:
         print(f"\n[TROPHY] CALCULATING CHAMPION - Teams in finals: {advancing_teams}")
         print(f"[CHART] Final round scores: {self.final_round_scores}")
         print(f"[CHART] Swiss round scores: {self.swiss_round_scores}")
-        
-        # Calculate final round team scores (Round 5 only)
+        if hasattr(self, 'top8_cut_scores'):
+            print(f"[CHART] Top 8 Cut scores: {self.top8_cut_scores}")
+
+        # Calculate final round team scores
         final_standings = []
+        has_top8_cut = hasattr(self, 'top8_cut_scores') and self.top8_cut_scores
+
         for team_name in advancing_teams:
             final_round_points = self.final_round_scores.get(team_name, 0)
             swiss_round_points = self.swiss_round_scores.get(team_name, 0)
-            total_points = final_round_points + swiss_round_points
-            
+            top8_cut_points = self.top8_cut_scores.get(team_name, 0) if has_top8_cut else 0
+
+            # For 16-team: tiebreaker = Swiss + Top 8 Cut
+            # For 8-team: tiebreaker = Swiss only
+            tiebreaker_points = swiss_round_points + top8_cut_points
+            total_points = final_round_points + tiebreaker_points
+
             final_standings.append({
                 'team': team_name,
                 'final_points': final_round_points,
                 'swiss_points': swiss_round_points,
+                'top8_cut_points': top8_cut_points,
+                'tiebreaker_points': tiebreaker_points,
                 'total_points': total_points
             })
-            
-            print(f"  {team_name}: Final={final_round_points} pts, Swiss={swiss_round_points} pts, Total={total_points} pts")
-        
-        # CRITICAL FIX: Sort by FINAL ROUND POINTS first (primary), then Swiss round points as tiebreaker
-        # This ensures the team with highest final round score wins, regardless of Swiss performance
-        # Only if teams are tied on final points do we use Swiss points as tiebreaker
-        print(f"\n[ROTATING] Sorting by: (final_points DESC, swiss_points DESC)")
-        final_standings.sort(key=lambda x: (x['final_points'], x['swiss_points']), reverse=True)
-        
-        print(f"\n[OK] FINAL STANDINGS (sorted by FINAL points first, then Swiss as tiebreaker):")
+
+            if has_top8_cut:
+                print(f"  {team_name}: Final={final_round_points} pts, Top8Cut={top8_cut_points} pts, Swiss={swiss_round_points} pts, Tiebreaker={tiebreaker_points} pts, Total={total_points} pts")
+            else:
+                print(f"  {team_name}: Final={final_round_points} pts, Swiss={swiss_round_points} pts, Total={total_points} pts")
+
+        # Sort by FINAL ROUND POINTS first (primary), then tiebreaker points (Swiss + Top 8 Cut for 16-team)
+        # This ensures the team with highest final round score wins
+        # Only if teams are tied on final points do we use tiebreaker (Swiss or Swiss+Top8Cut)
+        if has_top8_cut:
+            print(f"\n[ROTATING] Sorting by: (final_points DESC, swiss+top8cut DESC)")
+        else:
+            print(f"\n[ROTATING] Sorting by: (final_points DESC, swiss_points DESC)")
+
+        final_standings.sort(key=lambda x: (x['final_points'], x['tiebreaker_points']), reverse=True)
+
+        print(f"\n[OK] FINAL STANDINGS (sorted by FINAL points first, then tiebreaker):")
         for rank, s in enumerate(final_standings, 1):
             medal = "[1st]" if rank == 1 else "[2nd]" if rank == 2 else "[3rd]" if rank == 3 else f"{rank}."
-            print(f"  {medal} {s['team']}: Final={s['final_points']} pts (PRIMARY), Swiss={s['swiss_points']} pts (tiebreaker), Total={s['total_points']} pts")
-        
+            if has_top8_cut:
+                print(f"  {medal} {s['team']}: Final={s['final_points']} pts (PRIMARY), Tiebreaker={s['tiebreaker_points']} pts (Swiss={s['swiss_points']}+Top8={s['top8_cut_points']}), Total={s['total_points']} pts")
+            else:
+                print(f"  {medal} {s['team']}: Final={s['final_points']} pts (PRIMARY), Swiss={s['swiss_points']} pts (tiebreaker), Total={s['total_points']} pts")
+
         if len(final_standings) > 1:
             winner = final_standings[0]
             runner_up = final_standings[1]
             if winner['final_points'] == runner_up['final_points']:
-                print(f"[WARNING]  TIE on final points! Using Swiss points as tiebreaker:")
-                print(f"   Winner: {winner['team']} (Swiss: {winner['swiss_points']} pts)")
-                print(f"   Runner-up: {runner_up['team']} (Swiss: {runner_up['swiss_points']} pts)")
+                if has_top8_cut:
+                    print(f"[WARNING] TIE on final points! Using Swiss+Top8Cut as tiebreaker:")
+                    print(f"   Winner: {winner['team']} (Tiebreaker: {winner['tiebreaker_points']} = Swiss {winner['swiss_points']} + Top8 {winner['top8_cut_points']})")
+                    print(f"   Runner-up: {runner_up['team']} (Tiebreaker: {runner_up['tiebreaker_points']} = Swiss {runner_up['swiss_points']} + Top8 {runner_up['top8_cut_points']})")
+                else:
+                    print(f"[WARNING] TIE on final points! Using Swiss points as tiebreaker:")
+                    print(f"   Winner: {winner['team']} (Swiss: {winner['swiss_points']} pts)")
+                    print(f"   Runner-up: {runner_up['team']} (Swiss: {runner_up['swiss_points']} pts)")
             else:
                 print(f"[OK] Winner determined by final round points: {winner['team']} ({winner['final_points']} pts)")
         
@@ -1082,8 +1108,9 @@ class TournamentManager:
     
     def update_final_round_scores(self, round_num, player_results):
         """Update final round scores separately from Swiss round scores"""
-        if round_num != 5:
-            return  # Only process Round 5
+        # Only process the actual finals round (last round of the tournament)
+        if round_num != self.max_rounds:
+            return  # Only process the finals round (Round 5 for 8-team, Round 6 for 16-team)
         
         # Initialize final round scores if not exists
         if not hasattr(self, 'final_round_scores') or not self.final_round_scores:
@@ -1105,14 +1132,55 @@ class TournamentManager:
         
         # Ensure Swiss round scores are preserved
         if not hasattr(self, 'swiss_round_scores') or not self.swiss_round_scores:
-            # If swiss_round_scores not set, calculate from current total minus final round
+            # If swiss_round_scores not set, calculate it
+            # For 16-team: this should never happen as it's saved before Top 8 Cut
+            # For 8-team: calculate from total before finals
             self.swiss_round_scores = {}
             for team_name in self.teams.keys():
-                swiss_points = self.scores.get(team_name, 0) - self.final_round_scores.get(team_name, 0)
-                self.swiss_round_scores[team_name] = max(0, swiss_points)  # Ensure non-negative
-                
-        print(f"Final round scores updated: {self.final_round_scores}")
-        print(f"Swiss round scores preserved: {self.swiss_round_scores}")
+                # Total accumulated before finals = Swiss + (Top 8 Cut if 16-team tournament)
+                total_before_finals = self.scores.get(team_name, 0) - self.final_round_scores.get(team_name, 0)
+                self.swiss_round_scores[team_name] = max(0, total_before_finals)
+            print(f"[WARNING] Swiss scores not found - calculated from totals: {self.swiss_round_scores}")
+        else:
+            print(f"[OK] Swiss scores already saved: {self.swiss_round_scores}")
+
+        print(f"[FINALS] Final round scores updated: {self.final_round_scores}")
+        print(f"[FINALS] Swiss round scores: {self.swiss_round_scores}")
+
+    def update_top8_cut_scores(self, round_num, player_results):
+        """Update Top 8 Cut round scores separately from Swiss round scores
+
+        For 16-team tournaments:
+        - Top 8 Cut is Round 5 (swiss_rounds_count + 1)
+        - Scores earned in Round 5 are tracked separately
+        - Used to determine Finals advancement (with Swiss as tiebreaker)
+        """
+        # Determine if this is the Top 8 Cut round
+        top8_cut_round = self.swiss_rounds_count + 1 if self.has_semifinals else None
+
+        if round_num != top8_cut_round:
+            return  # Only process Top 8 Cut round
+
+        # Initialize Top 8 Cut scores if not exists
+        if not hasattr(self, 'top8_cut_scores') or not self.top8_cut_scores:
+            self.top8_cut_scores = {}
+            for team_name in self.teams.keys():
+                self.top8_cut_scores[team_name] = 0
+
+        # Add points from this table submission to accumulating Top 8 Cut totals
+        for result in player_results:
+            player_id = result['player_id']
+            points = result['points']
+
+            # Find which team this player belongs to
+            for team_name, players in self.teams.items():
+                for player in players:
+                    if player['Player ID'] == player_id:
+                        self.top8_cut_scores[team_name] += points
+                        break
+
+        print(f"[TOP 8 CUT] Scores updated: {self.top8_cut_scores}")
+        print(f"[TOP 8 CUT] Swiss scores (tiebreaker): {self.swiss_round_scores}")
 
     def generate_unified_finals(self, after_semifinals=False):
         """Generate finals - ALL players from top 4 teams, strength-based seating
@@ -1126,14 +1194,42 @@ class TournamentManager:
         try:
             if after_semifinals:
                 print("[TROPHY] Generating FINALS after semifinals (16-team tournament)")
-                # Use semifinal scores to determine top 4 teams
-                # Semifinal scores are already in self.scores (accumulated)
+                # Use Top 8 Cut scores (primary) with Swiss scores (tiebreaker)
+                # Top 8 Cut scores should be in self.top8_cut_scores
+                # Swiss scores should already be saved from generate_semifinals_round()
+
+                # Sort by: (1) Top 8 Cut scores DESC, (2) Swiss scores DESC (tiebreaker)
+                def get_top8_ranking(team_score_tuple):
+                    team_name = team_score_tuple[0]
+                    top8_score = self.top8_cut_scores.get(team_name, 0) if hasattr(self, 'top8_cut_scores') else 0
+                    swiss_score = self.swiss_round_scores.get(team_name, 0)
+                    return (top8_score, swiss_score)  # Tuple sorting: primary first, tiebreaker second
+
+                sorted_teams = sorted(
+                    self.scores.items(),
+                    key=get_top8_ranking,
+                    reverse=True
+                )
+                top_4_teams = [team for team, score in sorted_teams[:4]]
+
+                print(f"\n[RANK] Finals advancement based on Top 8 Cut scores (Swiss as tiebreaker):")
+                for rank, (team_name, total_score) in enumerate(sorted_teams[:8], 1):  # Show all Top 8
+                    top8_score = self.top8_cut_scores.get(team_name, 0) if hasattr(self, 'top8_cut_scores') else 0
+                    swiss_score = self.swiss_round_scores.get(team_name, 0)
+                    status = "→ FINALS" if rank <= 4 else "eliminated"
+                    print(f"  {rank}. {team_name}: Top8={top8_score} pts (primary), Swiss={swiss_score} pts (tiebreaker) [{status}]")
+
             else:
                 print("[TROPHY] Generating FINALS after Swiss rounds (8-team tournament)")
+                # Save Swiss round scores before finals begin (8-team tournament)
+                if not hasattr(self, 'swiss_round_scores') or not self.swiss_round_scores:
+                    print(f"[SAVE] Preserving Swiss round scores before Finals")
+                    self.swiss_round_scores = dict(self.scores)  # Deep copy current scores as Swiss scores
+                    print(f"Swiss scores saved: {self.swiss_round_scores}")
 
-            # Get top 4 teams by total score
-            sorted_teams = sorted(self.scores.items(), key=lambda x: x[1], reverse=True)
-            top_4_teams = [team for team, score in sorted_teams[:4]]
+                # For 8-team: Use total accumulated scores to get top 4
+                sorted_teams = sorted(self.scores.items(), key=lambda x: x[1], reverse=True)
+                top_4_teams = [team for team, score in sorted_teams[:4]]
 
             print(f"   Top 4 teams advancing to finals:")
             for rank, (team, score) in enumerate(sorted_teams[:4], 1):
@@ -1253,6 +1349,13 @@ class TournamentManager:
         - Players are matched by skill level (rank 1 vs rank 1, etc.)
         """
         try:
+            # CRITICAL: Save Swiss round scores before Top 8 Cut begins
+            # This ensures we can separate Swiss performance from Top 8 Cut performance
+            if not hasattr(self, 'swiss_round_scores') or not self.swiss_round_scores:
+                print(f"[SAVE] Preserving Swiss round scores before Top 8 Cut")
+                self.swiss_round_scores = dict(self.scores)  # Deep copy current scores as Swiss scores
+                print(f"Swiss scores saved: {self.swiss_round_scores}")
+
             # Validate we have enough teams for semifinals
             if len(self.scores) < 8:
                 print(f"[ERROR] Cannot generate semifinals: Only {len(self.scores)} teams (need at least 8)")
@@ -2176,6 +2279,10 @@ def submit_table_results():
             else:
                 # This should never happen due to validation above, but kept for safety
                 print(f"  WARNING: Player ID {player_id} not found in player_scores!")
+
+        # Handle Top 8 Cut round scoring separately (for 16-team tournaments)
+        if hasattr(tournament, 'has_semifinals') and tournament.has_semifinals:
+            tournament.update_top8_cut_scores(round_num, player_results)
 
         # Handle final round scoring separately
         if round_num == tournament.max_rounds:
@@ -3183,6 +3290,7 @@ def get_scores():
         'success': True,
         'scores': tournament.scores,
         'swiss_round_scores': tournament.swiss_round_scores if hasattr(tournament, 'swiss_round_scores') else {},
+        'top8_cut_scores': tournament.top8_cut_scores if hasattr(tournament, 'top8_cut_scores') else {},
         'final_round_scores': tournament.final_round_scores if hasattr(tournament, 'final_round_scores') else {}
     })
 
@@ -3209,6 +3317,7 @@ def standings():
             'rank': idx + 1,
             'team': team_name,
             'score': score,
+            'total_points': score,  # Accumulated total
             'players': tournament.teams.get(team_name, [])
         }
         for idx, (team_name, score) in enumerate(sorted_standings)
@@ -3218,6 +3327,167 @@ def standings():
         'success': True,
         'standings': standings_list,
         'total_teams': len(standings_list)
+    })
+
+@app.route('/bracket_groups/<int:round_num>')
+def bracket_groups(round_num):
+    """Get team groupings for bracket display based on actual table assignments
+
+    For Top 8 Cut: Returns which teams are in Pod 1 vs Pod 2
+    For Finals: Returns all 4 teams in single pod
+    """
+    swiss_rounds = tournament.swiss_rounds_count
+    has_semifinals = hasattr(tournament, 'has_semifinals') and tournament.has_semifinals
+
+    if has_semifinals and round_num == swiss_rounds + 1:
+        # Top 8 Cut: Determine pods from actual table assignments
+        if round_num in tournament.tables:
+            tables = tournament.tables[round_num]
+
+            # Group teams by which tables they appear in
+            # Tables 1-4 = Pod 1, Tables 5-8 = Pod 2
+            pod1_teams = set()
+            pod2_teams = set()
+
+            for table_name, players in tables.items():
+                # Extract table number
+                table_num_str = table_name.replace('Semifinals Table ', '')
+                try:
+                    table_num = int(table_num_str)
+                    # Get unique teams from this table
+                    for player in players:
+                        team_name = None
+                        # Find which team this player belongs to
+                        for t_name, t_players in tournament.teams.items():
+                            for t_player in t_players:
+                                if t_player['Player ID'] == player['Player ID']:
+                                    team_name = t_name
+                                    break
+                            if team_name:
+                                break
+
+                        if team_name:
+                            if table_num <= 4:
+                                pod1_teams.add(team_name)
+                            else:
+                                pod2_teams.add(team_name)
+                except:
+                    pass
+
+            return jsonify({
+                'success': True,
+                'pod1': sorted(list(pod1_teams)),
+                'pod2': sorted(list(pod2_teams)),
+                'round_type': 'top8cut'
+            })
+        else:
+            return jsonify({'success': False, 'error': 'Tables not generated yet'})
+
+    elif round_num == tournament.max_rounds:
+        # Finals: Single pod with top 4 teams
+        if hasattr(tournament, 'finals_data') and tournament.finals_data:
+            advancing_teams = tournament.finals_data.get('advancing_teams', [])
+            return jsonify({
+                'success': True,
+                'pod1': advancing_teams,
+                'pod2': [],
+                'round_type': 'finals'
+            })
+        else:
+            return jsonify({'success': False, 'error': 'Finals not generated yet'})
+    else:
+        return jsonify({'success': False, 'error': 'Not a playoff round'})
+
+@app.route('/bracket_standings/<int:round_num>')
+def bracket_standings(round_num):
+    """Get standings for bracket visualization with current round scores only
+
+    Args:
+        round_num: The current round number
+
+    Returns:
+        Standings with current_round_points (scores earned in this round only)
+        Sorted by the appropriate criteria for the round type
+    """
+    # Determine round type
+    swiss_rounds = tournament.swiss_rounds_count
+    has_semifinals = hasattr(tournament, 'has_semifinals') and tournament.has_semifinals
+
+    # Determine what scores to use for this round
+    if round_num <= swiss_rounds:
+        # Swiss rounds: show accumulated Swiss scores
+        current_round_scores = tournament.scores
+        score_type = 'swiss'
+    elif has_semifinals and round_num == swiss_rounds + 1:
+        # Top 8 Cut round: show ONLY Top 8 Cut scores
+        # Get top 8 teams from Swiss scores, but show their Top 8 Cut scores (or 0 if not yet scored)
+        swiss_scores = tournament.swiss_round_scores if hasattr(tournament, 'swiss_round_scores') else tournament.scores
+        top8_teams_by_swiss = sorted(swiss_scores.items(), key=lambda x: x[1], reverse=True)[:8]
+
+        current_round_scores = {}
+        for team_name, _ in top8_teams_by_swiss:
+            # Use Top 8 Cut score if available, otherwise 0
+            top8_score = tournament.top8_cut_scores.get(team_name, 0) if hasattr(tournament, 'top8_cut_scores') else 0
+            current_round_scores[team_name] = top8_score
+        score_type = 'top8cut'
+
+    elif round_num == tournament.max_rounds:
+        # Finals round: show ONLY Finals scores
+        # Get top 4 teams from previous round, show their Finals scores (or 0 if not yet scored)
+        if has_semifinals:
+            # 16-team: Get top 4 from Top 8 Cut
+            top8_scores = tournament.top8_cut_scores if hasattr(tournament, 'top8_cut_scores') else {}
+            swiss_scores = tournament.swiss_round_scores if hasattr(tournament, 'swiss_round_scores') else {}
+
+            # Sort by Top 8 Cut scores (primary) with Swiss (tiebreaker)
+            def get_top8_ranking(item):
+                team_name, _ = item
+                return (top8_scores.get(team_name, 0), swiss_scores.get(team_name, 0))
+
+            top4_teams = sorted(tournament.scores.items(), key=get_top8_ranking, reverse=True)[:4]
+        else:
+            # 8-team/12-team: Get top 4 from Swiss
+            top4_teams = sorted(tournament.scores.items(), key=lambda x: x[1], reverse=True)[:4]
+
+        current_round_scores = {}
+        for team_name, _ in top4_teams:
+            # Use Finals score if available, otherwise 0
+            finals_score = tournament.final_round_scores.get(team_name, 0) if hasattr(tournament, 'final_round_scores') else 0
+            current_round_scores[team_name] = finals_score
+        score_type = 'finals'
+    else:
+        # Fallback to total scores
+        current_round_scores = tournament.scores
+        score_type = 'total'
+
+    # Sort teams by current round scores (with Swiss as tiebreaker for Top 8 Cut / Finals)
+    if score_type == 'top8cut' or score_type == 'finals':
+        # Sort with Swiss scores as tiebreaker
+        swiss_scores = tournament.swiss_round_scores if hasattr(tournament, 'swiss_round_scores') else {}
+        def get_ranking_with_tiebreaker(item):
+            team_name, current_score = item
+            return (current_score, swiss_scores.get(team_name, 0))
+        sorted_standings = sorted(current_round_scores.items(), key=get_ranking_with_tiebreaker, reverse=True)
+    else:
+        sorted_standings = sorted(current_round_scores.items(), key=lambda x: x[1], reverse=True)
+
+    standings_list = []
+    for idx, (team_name, current_score) in enumerate(sorted_standings):
+        standings_list.append({
+            'rank': idx + 1,
+            'team': team_name,
+            'current_round_points': current_score,  # Scores earned in THIS round only
+            'total_points': current_score,  # For bracket display compatibility
+            'swiss_points': tournament.swiss_round_scores.get(team_name, 0) if hasattr(tournament, 'swiss_round_scores') else 0,
+            'score_type': score_type
+        })
+
+    return jsonify({
+        'success': True,
+        'standings': standings_list,
+        'total_teams': len(standings_list),
+        'round_num': round_num,
+        'score_type': score_type
     })
 
 @app.route('/final_standings')
