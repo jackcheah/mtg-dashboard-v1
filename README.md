@@ -66,7 +66,7 @@ The dashboard will be available at: **http://127.0.0.1:5000**
    ```
 
 2. **Open the Dashboard**
-   - Navigate to http://127.0.0.1:5000 in your web browser
+   - Navigate to http://localhost:5001/ in your web browser
 
 3. **Load Participants**
    - Click the "Load Participants" button

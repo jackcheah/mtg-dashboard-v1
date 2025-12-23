@@ -23,6 +23,11 @@ class TournamentState(Enum):
     FINALS_IN_PROGRESS = "finals_in_progress"     # Finals round in progress
     FINALS_COMPLETE = "finals_complete"           # Finals completed, champion determined
 
+@app.route('/projector')
+def projector_view():
+    """Serve the read-only projector view"""
+    return render_template('projector_view.html')
+
 class TournamentManager:
     def __init__(self):
         self.participants = []
@@ -48,6 +53,13 @@ class TournamentManager:
         # State machine tracking (Phase 3.4)
         self.state = TournamentState.INITIAL
         self.state_history = []  # Track state transitions for debugging
+
+        # Timer State
+        self.timer_running = False
+        self.timer_start_time = None
+        self.timer_paused_at = 0  # Seconds elapsed when paused
+        self.timer_duration = 3000 # Default 50 mins
+        self.backup_file = 'tournament_state.json.bak'
 
     def transition_to(self, new_state: TournamentState, reason: str = ""):
         """Transition to a new state with logging (Phase 3.4)."""
@@ -99,7 +111,8 @@ class TournamentManager:
                 "state": {
                     "current_round": self.current_round,
                     "submitted_rounds": submitted_rounds_list,
-                    "finalized_rounds": finalized_rounds_list
+                    "finalized_rounds": finalized_rounds_list,
+                    "tournament_state": self.state.value
                 },
                 "data": {
                     "teams": self.teams,
@@ -159,8 +172,35 @@ class TournamentManager:
             # Restore State
             state = state_data.get('state', {})
             self.current_round = state.get('current_round', 1)
+            
+            # [SELF-HEALING] Fix current_round if it's stale (e.g. backend restart but tables exist for later rounds)
+            try:
+                raw_tables = state_data.get('data', {}).get('tables', {})
+                max_table_round = 1
+                for r in raw_tables:
+                    if str(r).isdigit():
+                        max_table_round = max(max_table_round, int(r))
+                
+                if self.state != TournamentState.INITIAL and max_table_round > self.current_round:
+                    print(f"[RECOVERY] Healing current_round mismatch: State says {self.current_round}, Tables say {max_table_round}")
+                    self.current_round = max_table_round
+            except Exception as e:
+                print(f"[RECOVERY] Failed to self-heal round: {e}")
+
+            self.submitted_rounds = set(state.get('submitted_rounds', []))
             self.submitted_rounds = set(state.get('submitted_rounds', []))
             self.finalized_rounds = set(state.get('finalized_rounds', []))
+            
+            # Restore Enum State
+            saved_state_str = state.get('tournament_state', 'initial')
+            try:
+                # Find matching enum
+                for s in TournamentState:
+                    if s.value == saved_state_str:
+                        self.state = s
+                        break
+            except:
+                self.state = TournamentState.INITIAL
             
             # Restore Data
             data = state_data.get('data', {})
@@ -224,6 +264,10 @@ class TournamentManager:
     def save_backup(self):
         """Legacy method wrapper"""
         return self.save_state()
+
+    def load_backup(self, filepath):
+        """Legacy method wrapper"""
+        return self.load_state(filepath)
 
     def configure_swiss_rounds(self, rounds):
         """
@@ -1957,6 +2001,8 @@ def submit_player_results():
                 if success:
                     print(f"[OK] Swiss Round {next_round} generated successfully!")
                     next_round_generated = next_round
+                    # CRITICAL FIX: Increment current round
+                    tournament.current_round = next_round
                 else:
                     print(f"[ERROR] Failed to generate Swiss Round {next_round}")
 
@@ -1975,6 +2021,8 @@ def submit_player_results():
                         print("[OK] Semifinals generated successfully!")
                         # CRITICAL FIX: Update state to enable Top 8 submissions
                         tournament.state = TournamentState.TOP8_IN_PROGRESS
+                        # CRITICAL FIX: Increment current round for Top 8
+                        tournament.current_round = last_swiss_round + 1
                         print(f"[STATE] Transitioning to {tournament.state}")
                     else:
                         print("[ERROR] Failed to generate semifinals")
@@ -1986,6 +2034,8 @@ def submit_player_results():
                         print("[OK] Finals generated successfully!")
                         # CRITICAL FIX: Update state to enable Finals submissions
                         tournament.state = TournamentState.FINALS_IN_PROGRESS
+                        # CRITICAL FIX: Increment current round for Finals
+                        tournament.current_round = tournament.max_rounds
                         print(f"[STATE] Transitioning to {tournament.state}")
                     else:
                         print("[ERROR] Failed to generate finals")
@@ -3305,12 +3355,26 @@ def get_player_scores():
 @app.route('/standings')
 def standings():
     """Get current standings (sorted by score)"""
-    # Sort teams by score (descending)
-    sorted_standings = sorted(
-        tournament.scores.items(),
-        key=lambda x: x[1],
-        reverse=True
-    )
+    # Get Swiss round scores for reference (if available)
+    swiss_scores = getattr(tournament, 'swiss_round_scores', {})
+    
+    # Check if we're in playoff phase (Top Cut or Finals)
+    is_playoff = tournament.state.value in ['top8_in_progress', 'top8_complete', 'finals_in_progress', 'finals_complete', 'swiss_complete']
+    
+    if is_playoff and swiss_scores:
+        # During playoffs: Sort by current phase score (total - swiss), then Swiss as tiebreaker
+        sorted_standings = sorted(
+            tournament.scores.items(),
+            key=lambda x: (x[1] - swiss_scores.get(x[0], 0), swiss_scores.get(x[0], 0)),
+            reverse=True
+        )
+    else:
+        # During Swiss: Sort by total score
+        sorted_standings = sorted(
+            tournament.scores.items(),
+            key=lambda x: x[1],
+            reverse=True
+        )
 
     standings_list = [
         {
@@ -3318,6 +3382,8 @@ def standings():
             'team': team_name,
             'score': score,
             'total_points': score,  # Accumulated total
+            'swiss_points': swiss_scores.get(team_name, 0),  # Points from Swiss rounds
+            'current_phase_points': score - swiss_scores.get(team_name, 0),  # Current phase only
             'players': tournament.teams.get(team_name, [])
         }
         for idx, (team_name, score) in enumerate(sorted_standings)
@@ -3326,7 +3392,8 @@ def standings():
     return jsonify({
         'success': True,
         'standings': standings_list,
-        'total_teams': len(standings_list)
+        'total_teams': len(standings_list),
+        'current_state': tournament.state.value  # Include state for phase detection
     })
 
 @app.route('/bracket_groups/<int:round_num>')
@@ -3724,6 +3791,7 @@ def reset_tournament():
         tournament.semifinal_round_scores = {}
         tournament.swiss_round_scores = {}
         tournament.has_semifinals = False
+        tournament.state = TournamentState.INITIAL  # Reset state machine
         tournament.finals_data = None
         tournament.semifinals_data = None
 
@@ -3750,7 +3818,54 @@ def reset_tournament():
             'message': 'Failed to reset tournament'
         })
 
+# ==========================================
+# TIMER ENDPOINTS
+# ==========================================
+
+@app.route('/get_timer')
+def get_timer():
+    """Get current timer state"""
+    elapsed = tournament.timer_paused_at
+    if tournament.timer_running and tournament.timer_start_time:
+        elapsed += (datetime.now() - tournament.timer_start_time).total_seconds()
+    
+    return jsonify({
+        'running': tournament.timer_running,
+        'elapsed': int(elapsed),
+        'duration': tournament.timer_duration
+    })
+
+@app.route('/control_timer', methods=['POST'])
+def control_timer():
+    """Control the tournament timer"""
+    action = request.json.get('action')
+    
+    if action == 'start':
+        if not tournament.timer_running:
+            tournament.timer_start_time = datetime.now()
+            tournament.timer_running = True
+            
+    elif action == 'stop':
+        if tournament.timer_running:
+            # Add elapsed time to paused_at
+            elapsed_since_start = (datetime.now() - tournament.timer_start_time).total_seconds()
+            tournament.timer_paused_at += elapsed_since_start
+            tournament.timer_running = False
+            tournament.timer_start_time = None
+            
+    elif action == 'reset':
+        tournament.timer_running = False
+        tournament.timer_start_time = None
+        tournament.timer_paused_at = 0
+        
+    return jsonify({'success': True})
+
 if __name__ == '__main__':
+    # Attempt to restore state from backup on startup
+    if os.path.exists(tournament.backup_file):
+        print("🔄 Restoring tournament state from backup...")
+        tournament.load_backup(tournament.backup_file)
+    
     import os
     debug_mode = os.getenv('FLASK_ENV') != 'production'
     app.run(debug=debug_mode, host='0.0.0.0', port=5001)

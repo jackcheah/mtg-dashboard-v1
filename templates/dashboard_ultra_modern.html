@@ -50,13 +50,13 @@
             --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
             --shadow-glow: 0 0 20px rgba(139, 92, 246, 0.5);
 
-            /* Spacing */
-            --spacing-xs: 0.5rem;
-            --spacing-sm: 0.75rem;
-            --spacing-md: 1rem;
-            --spacing-lg: 1.5rem;
-            --spacing-xl: 2rem;
-            --spacing-2xl: 3rem;
+            /* Spacing - COMPACT MODE */
+            --spacing-xs: 0.25rem;
+            --spacing-sm: 0.5rem;
+            --spacing-md: 0.75rem;
+            --spacing-lg: 1rem;
+            --spacing-xl: 1.5rem;
+            --spacing-2xl: 2rem;
 
             /* Border Radius */
             --radius-sm: 0.5rem;
@@ -3120,34 +3120,32 @@
 
 
 
-        <!-- Stats Overview -->
-        <div class="stats-grid" id="stats-container" style="display: none;">
-            <div class="stat-card">
-                <div class="stat-label">Total Teams</div>
-                <div class="stat-value" id="stat-teams">0</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Total Players</div>
-                <div class="stat-value" id="stat-players">0</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Current Round</div>
-                <div class="stat-value" id="stat-round">-</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Tournament Status</div>
-                <div class="stat-value" id="stat-status">Not Started</div>
-            </div>
-        </div>
+        <!-- COMPACT STATS & PROGRESS ROW -->
+        <div class="compact-dashboard-row" id="stats-progress-container"
+            style="display: none; grid-template-columns: 2fr 3fr; gap: var(--spacing-md); margin-bottom: var(--spacing-md);">
 
-        <!-- Tournament Progression Tracker -->
-        <div class="progression-tracker" id="progression-tracker" style="display: none;">
-            <div class="progression-title">
-                <i class="fas fa-route"></i>
-                Tournament Progress
+            <!-- Compact Stats -->
+            <div class="stats-mini-grid"
+                style="display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-sm);">
+                <div class="stat-card mini">
+                    <div class="stat-label">Teams / Players</div>
+                    <div class="stat-value"><span id="stat-teams">0</span> / <span id="stat-players">0</span></div>
+                </div>
+                <div class="stat-card mini">
+                    <div class="stat-label">Round / Status</div>
+                    <div class="stat-value"><span id="stat-round">-</span> / <span id="stat-status">Wait</span></div>
+                </div>
             </div>
-            <div class="progression-steps" id="progression-steps">
-                <!-- Steps will be dynamically generated based on tournament structure -->
+
+            <!-- Progression Tracker (Compact) -->
+            <div class="progression-tracker compact" id="progression-tracker"
+                style="display: flex; flex-direction: column; justify-content: center; margin: 0;">
+                <div class="progression-title" style="margin-bottom: 0.5rem; font-size: 0.9rem;">
+                    <i class="fas fa-route"></i> Tournament Progress
+                </div>
+                <div class="progression-steps" id="progression-steps">
+                    <!-- Steps will be dynamically generated -->
+                </div>
             </div>
         </div>
 
@@ -3504,35 +3502,53 @@
             }
         }
 
-        // Timer functionality
-        let timerInterval = null;
+        // Server-Side Timer functionality
         let seconds = 0;
 
-        function startTimer() {
-            if (timerInterval) return;
-
-            timerInterval = setInterval(() => {
-                seconds++;
-                updateTimerDisplay();
-            }, 1000);
-
+        async function startTimer() {
+            await fetch('/control_timer', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'start' })
+            });
             showToast('Timer Started', 'Round timer is now running', 'success');
+            pollTimer();
         }
 
-        function stopTimer() {
-            if (timerInterval) {
-                clearInterval(timerInterval);
-                timerInterval = null;
-                showToast('Timer Stopped', 'Round timer has been paused', 'warning');
+        async function stopTimer() {
+            await fetch('/control_timer', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'stop' })
+            });
+            showToast('Timer Stopped', 'Round timer has been paused', 'warning');
+            pollTimer();
+        }
+
+        async function resetTimer() {
+            await fetch('/control_timer', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'reset' })
+            });
+            showToast('Timer Reset', 'Timer has been reset to 00:00:00', 'success');
+            pollTimer();
+        }
+
+        async function pollTimer() {
+            try {
+                const res = await fetch('/get_timer');
+                const data = await res.json();
+
+                seconds = data.elapsed;
+                updateTimerDisplay();
+            } catch (e) {
+                console.error("Timer sync error", e);
             }
         }
 
-        function resetTimer() {
-            stopTimer();
-            seconds = 0;
-            updateTimerDisplay();
-            showToast('Timer Reset', 'Timer has been reset to 00:00:00', 'success');
-        }
+        // Poll regularly to stay in sync
+        setInterval(pollTimer, 1000);
 
         function updateTimerDisplay() {
             const hrs = Math.floor(seconds / 3600);
@@ -4232,7 +4248,13 @@
             });
 
             stepsContainer.innerHTML = html;
-            tracker.style.display = 'block';
+
+            // Ensure display is flex for the compact layout
+            if (tracker.classList.contains('compact')) {
+                tracker.style.display = 'flex';
+            } else {
+                tracker.style.display = 'block';
+            }
         }
 
         // Update Tournament Bracket Visualization
@@ -4994,7 +5016,7 @@
 
         // Update Stats
         function updateStats(data) {
-            const statsContainer = document.getElementById('stats-container');
+            const statsProgressContainer = document.getElementById('stats-progress-container');
 
             if (data.teams) {
                 document.getElementById('stat-teams').textContent = Object.keys(data.teams).length;
@@ -5002,7 +5024,10 @@
                 document.getElementById('stat-players').textContent = totalPlayers;
             }
 
-            statsContainer.style.display = 'grid';
+            // Show the combined container
+            if (statsProgressContainer) {
+                statsProgressContainer.style.display = 'grid';
+            }
         }
 
         // Track table scores
@@ -5296,37 +5321,37 @@
                             const roundSelect = document.getElementById('round-select');
                             const nextOption = roundSelect.options[roundSelect.selectedIndex + 1];
 
-                                if (nextOption) {
-                                    const nextRoundText = nextOption.textContent;
-                                    if (nextRoundText.includes('Semifinals') || nextRoundText.includes('Top 8')) {
-                                        console.log('Semifinals generated!', data.semifinals);
-                                        showToast('Top 8 Ready!', 'Top 8 teams advance!', 'success');
-                                    } else if (nextRoundText.includes('Finals')) {
-                                        console.log('Finals generated!', data.semifinals);
-                                        showToast('Finals Ready!', 'Top 4 teams advance to finals!', 'success');
-                                    }
-
-                                    // Auto-select next round
-                                    setTimeout(() => {
-                                        document.getElementById('round-select').value = nextOption.value;
-                                        loadRound();
-                                    }, 2000);
+                            if (nextOption) {
+                                const nextRoundText = nextOption.textContent;
+                                if (nextRoundText.includes('Semifinals') || nextRoundText.includes('Top 8')) {
+                                    console.log('Semifinals generated!', data.semifinals);
+                                    showToast('Top 8 Ready!', 'Top 8 teams advance!', 'success');
+                                } else if (nextRoundText.includes('Finals')) {
+                                    console.log('Finals generated!', data.semifinals);
+                                    showToast('Finals Ready!', 'Top 4 teams advance to finals!', 'success');
                                 }
-                            } else if (roundType === 'semifinals' || roundType === 'top8cut') {
-                                // Just finished Semifinals/Top8
-                                console.log('Finals generated after semifinals!', data.semifinals);
-                                showToast('Finals Ready!', 'Top 4 teams advance to finals!', 'success');
 
-                                // Auto-select finals
-                                const roundSelect = document.getElementById('round-select');
-                                const nextOption = roundSelect.options[roundSelect.selectedIndex + 1];
-                                if (nextOption) {
-                                    setTimeout(() => {
-                                        document.getElementById('round-select').value = nextOption.value;
-                                        loadRound();
-                                    }, 2000);
-                                }
+                                // Auto-select next round
+                                setTimeout(() => {
+                                    document.getElementById('round-select').value = nextOption.value;
+                                    loadRound();
+                                }, 2000);
                             }
+                        } else if (roundType === 'semifinals' || roundType === 'top8cut') {
+                            // Just finished Semifinals/Top8
+                            console.log('Finals generated after semifinals!', data.semifinals);
+                            showToast('Finals Ready!', 'Top 4 teams advance to finals!', 'success');
+
+                            // Auto-select finals
+                            const roundSelect = document.getElementById('round-select');
+                            const nextOption = roundSelect.options[roundSelect.selectedIndex + 1];
+                            if (nextOption) {
+                                setTimeout(() => {
+                                    document.getElementById('round-select').value = nextOption.value;
+                                    loadRound();
+                                }, 2000);
+                            }
+                        }
                     }
 
                     // Check if tournament complete (after Finals)

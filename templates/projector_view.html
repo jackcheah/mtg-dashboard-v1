@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tournament Projector View</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            /* High Contrast Colors for Projector */
+            --bg-dark: #0f172a;
+            --text-light: #f8fafc;
+            --accent-primary: #8b5cf6;
+            --accent-secondary: #06b6d4;
+            --bg-card: rgba(30, 41, 59, 0.8);
+            --border-card: rgba(148, 163, 184, 0.2);
+            --timer-color: #fca5a5;
+            /* Bright red-ish for visibility */
+            --gold: #fbbf24;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-light);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Large Header with Timer */
+        .projector-header {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: center;
+            padding: 1.5rem 3rem;
+            background: rgba(15, 23, 42, 0.95);
+            border-bottom: 2px solid var(--accent-primary);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            z-index: 100;
+        }
+
+        .header-left h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-center {
+            text-align: center;
+        }
+
+        .timer-display {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 6rem;
+            /* VERY LARGE */
+            font-weight: 700;
+            color: var(--timer-color);
+            line-height: 1;
+            text-shadow: 0 0 30px rgba(252, 165, 165, 0.4);
+        }
+
+        .round-info {
+            font-size: 1.5rem;
+            color: var(--accent-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-top: 0.5rem;
+        }
+
+        .header-right {
+            text-align: right;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #94a3b8;
+        }
+
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            padding: 2rem;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* View Containers */
+        .view-container {
+            display: none;
+            /* Hidden by default */
+            height: 100%;
+            width: 100%;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .view-container.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Tables Grid (Round In Progress) */
+        .tables-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            height: 100%;
+            overflow-y: auto;
+            padding-bottom: 2rem;
+        }
+
+        .table-card {
+            background: var(--bg-card);
+            border: 2px solid var(--border-card);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .table-header {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-secondary);
+            border-bottom: 1px solid var(--border-card);
+            padding-bottom: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .player-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.25rem;
+            padding: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 0.5rem;
+        }
+
+        .player-name {
+            font-weight: 600;
+        }
+
+        .player-team {
+            font-size: 0.9em;
+            opacity: 0.7;
+        }
+
+        /* Standings List (Round Complete) */
+        .standings-container {
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .standings-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 1.5rem;
+        }
+
+        .standings-table th {
+            text-align: left;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--accent-primary);
+        }
+
+        .standings-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-card);
+        }
+
+        .rank-cell {
+            font-weight: 800;
+            color: var(--accent-secondary);
+            width: 80px;
+        }
+
+        .score-cell {
+            font-weight: 800;
+            text-align: right;
+        }
+
+        /* Winners View */
+        .winners-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            background: radial-gradient(circle at center, rgba(139, 92, 246, 0.2), transparent);
+        }
+
+        .trophy-icon {
+            font-size: 8rem;
+            color: var(--gold);
+            margin-bottom: 2rem;
+            filter: drop-shadow(0 0 30px rgba(251, 191, 36, 0.5));
+            animation: bounce 2s infinite;
+        }
+
+        .winner-title {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #fff;
+        }
+
+        .winner-team-name {
+            font-size: 6rem;
+            font-weight: 900;
+            background: linear-gradient(to right, #f59e0b, #fbbf24);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 2rem;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        /* Notification Overlay */
+        .notification-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s;
+        }
+
+        .notification-overlay.visible {
+            opacity: 1;
+        }
+
+        .notification-content {
+            text-align: center;
+            transform: scale(0.9);
+            transition: transform 0.5s;
+        }
+
+        .notification-overlay.visible .notification-content {
+            transform: scale(1);
+        }
+
+        .notification-title {
+            font-size: 4rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            background: linear-gradient(to right, #fbbf24, #f59e0b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .notification-subtitle {
+            font-size: 2rem;
+            color: #fff;
+        }
+
+        .blink {
+            animation: blinker 1s linear infinite;
+        }
+
+        @keyframes blinker {
+            50% {
+                opacity: 0.5;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="projector-header">
+        <div class="header-left">
+            <h1>MTG Tournament</h1>
+        </div>
+        <div class="header-center">
+            <div id="timerDisplay" class="timer-display">00:00:00</div>
+            <div id="roundInfo" class="round-info">Waiting to Start...</div>
+        </div>
+        <div class="header-right">
+            <div id="clockDisplay">12:00 PM</div>
+        </div>
+    </header>
+
+    <main class="content-area">
+        <!-- View A: Active Round Table Assignments -->
+        <div id="tablesView" class="view-container active">
+            <div id="tablesGrid" class="tables-grid">
+                <div id="waitingMsg"
+                    style="grid-column: 1 / -1; text-align: center; opacity: 0.5; font-size: 2rem; padding-top: 5rem;">
+                    Waiting for Pairings...
+                </div>
+            </div>
+        </div>
+
+        <!-- View B: Standings -->
+        <div id="standingsView" class="view-container">
+            <div class="standings-container">
+                <table class="standings-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Team</th>
+                            <th style="text-align: right;">Points</th>
+                        </tr>
+                    </thead>
+                    <tbody id="standingsBody">
+                        <!-- Populated via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- View C: Winners -->
+        <div id="winnersView" class="view-container">
+            <div class="winners-container">
+                <i class="fas fa-trophy trophy-icon"></i>
+                <div class="winner-title">TOURNAMENT CHAMPIONS</div>
+                <div id="winnerTeamName" class="winner-team-name">Team Name</div>
+                <div style="font-size: 2rem; opacity: 0.8;">Congratulations!</div>
+            </div>
+        </div>
+    </main>
+
+    <div id="notificationOverlay" class="notification-overlay">
+        <div class="notification-content">
+            <div id="notificationTitle" class="notification-title">ROUND OVER</div>
+            <div id="notificationSubtitle" class="notification-subtitle">Please submit results</div>
+        </div>
+    </div>
+
+    <script>
+        // CLIENT SIDE TIMER STATE
+        let timerState = {
+            running: false,
+            serverElapsed: 0,
+            duration: 3000,
+            lastSynced: 0
+        };
+        let lastRound = 0;
+        let lastState = '';
+
+        // Clock
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clockDisplay').textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // High frequency timer tick (Client Side Estimate)
+        setInterval(() => {
+            if (timerState.running) {
+                const now = Date.now();
+                // Calculate elapsed time based on last sync
+                const addedTime = (now - timerState.lastSynced) / 1000;
+                const estimatedElapsed = Math.floor(timerState.serverElapsed + addedTime);
+                renderTimer(estimatedElapsed, timerState.duration);
+            }
+        }, 100); // 10fps update for smooth feel if we added ms, but mostly ensures we don't blink
+
+        function renderTimer(seconds, duration) {
+            // Format HH:MM:SS
+            const h = Math.floor(seconds / 3600).toString().padStart(2, '0');
+            const m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
+            const s = Math.floor(seconds % 60).toString().padStart(2, '0');
+
+            const timerEl = document.getElementById('timerDisplay');
+            timerEl.textContent = `${h}:${m}:${s}`;
+
+            // Visual cues
+            if (seconds >= duration) {
+                timerEl.style.color = '#ef4444'; // Red
+                timerEl.classList.add('blink');
+            } else if (seconds >= duration * 0.9) {
+                timerEl.style.color = '#f59e0b'; // Orange
+                timerEl.classList.remove('blink');
+            } else {
+                timerEl.style.color = '#fca5a5'; // Default
+                timerEl.classList.remove('blink');
+            }
+        }
+
+        // Polling Logic
+        async function fetchState() {
+            try {
+                // 1. Fetch Timer State (Lightweight)
+                // 1. Fetch Timer State (Lightweight)
+                const timerRes = await fetch(`/get_timer?t=${Date.now()}`);
+                const timerData = await timerRes.json();
+
+                if (timerData) {
+                    // Update client state
+                    timerState.running = timerData.running;
+                    timerState.serverElapsed = timerData.elapsed;
+                    timerState.duration = timerData.duration;
+                    timerState.lastSynced = Date.now();
+
+                    // Specific render if stopped (force exact value)
+                    if (!timerState.running) {
+                        renderTimer(timerData.elapsed, timerData.duration);
+                    }
+                }
+
+                // 2. Fetch Tournament State
+                // 2. Fetch Tournament State
+                const stateRes = await fetch(`/get_state_info?t=${Date.now()}`);
+                const stateData = await stateRes.json();
+
+                // 3. Fetch Round Completion Status (if in progress or setup)
+                let roundComplete = false;
+                const currentState = stateData.current_state;
+                // Check during setup, swiss, top8, or finals in progress
+                if (stateData.success && (currentState.includes('in_progress') || currentState === 'tournament_setup')) {
+                    const round = stateData.tournament_info.current_round;
+                    try {
+                        const statusRes = await fetch(`/get_submission_status/${round}?t=${Date.now()}`);
+                        if (statusRes.ok) {
+                            const statusData = await statusRes.json();
+                            if (statusData.success && statusData.progress_percent === 100) {
+                                roundComplete = true;
+                            }
+                        }
+                    } catch (e) {
+                        // Silent error
+                    }
+                }
+
+                if (stateData.success) {
+                    handleStateUpdate(stateData, roundComplete);
+                }
+            } catch (e) {
+                // Silent error to avoid console spam
+            }
+        }
+
+        let displayedRound = 0; // Track which round is currently rendered in DOM
+        let tablesLoaded = false; // Track if tables were successfully loaded for current round
+        let lastServerState = ''; // Track state changes
+
+        function handleStateUpdate(data, roundComplete) {
+            const serverState = data.current_state;
+            const round = data.tournament_info.current_round;
+
+            // Detect state transition - reset tablesLoaded when phase changes
+            let stateJustChanged = false;
+            if (serverState !== lastServerState) {
+                console.log(`[Projector] State changed from ${lastServerState} to ${serverState}`);
+                tablesLoaded = false; // Force table re-fetch on state change
+                stateJustChanged = true;
+                lastServerState = serverState;
+            }
+
+            // Update Round Info Text
+            let roundText = `Round ${round}`;
+            if (serverState.includes('semifinals') || serverState.includes('top8')) roundText = "Semifinals";
+            if (serverState.includes('finals')) roundText = "Finals";
+            if (serverState === 'finals_complete') roundText = "Tournament Complete";
+            document.getElementById('roundInfo').textContent = roundText;
+
+            // State Machine for View Switching
+
+            // Final Winner View
+            if (serverState === 'finals_complete') {
+                showView('winnersView');
+                fetchStandingsForWinner();
+                return;
+            }
+
+            // Show Standings when:
+            // 1. phase is complete (swiss_complete, top8_complete) - waiting for admin to advance
+            // 2. round is complete (all tables submitted) AND we're still in same state (not just transitioned)
+            const isPhaseComplete = serverState === 'swiss_complete' || serverState === 'top8_complete';
+
+            // Skip roundComplete check if state just changed (prevents stale data from blocking new tables)
+            if (isPhaseComplete || (roundComplete && !stateJustChanged)) {
+                console.log(`[Projector] Showing standings: isPhaseComplete=${isPhaseComplete}, roundComplete=${roundComplete}, stateJustChanged=${stateJustChanged}`);
+                showView('standingsView');
+                fetchStandings();
+                return;
+            }
+
+            // Default: Show Tables for current round
+            showView('tablesView');
+
+            // Force re-fetch tables if round changed OR if tables weren't successfully loaded yet
+            if (round !== displayedRound || !tablesLoaded) {
+                console.log(`[Projector] Fetching tables for round ${round} (displayedRound=${displayedRound}, tablesLoaded=${tablesLoaded})`);
+                displayedRound = round;
+                tablesLoaded = false; // Reset until fetch succeeds
+                fetchTables(round);
+            }
+        }
+
+        function showView(viewId) {
+            // Simple optimization: don't re-apply if already active
+            const current = document.querySelector('.view-container.active');
+            if (current && current.id === viewId) return;
+
+            document.querySelectorAll('.view-container').forEach(el => el.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+        }
+
+        async function fetchTables(roundNum) {
+            try {
+                const res = await fetch(`/get_tables/${roundNum}`);
+                const data = await res.json();
+
+                if (data.success && data.tables) {
+                    if (Object.keys(data.tables).length > 0) {
+                        renderTables(data.tables);
+                        tablesLoaded = true; // Mark as successfully loaded
+                        const waitingMsg = document.getElementById('waitingMsg');
+                        if (waitingMsg) waitingMsg.style.display = 'none';
+                    }
+                }
+            } catch (e) { }
+        }
+
+        function renderTables(tables) {
+            const grid = document.getElementById('tablesGrid');
+            const waitingMsg = document.getElementById('waitingMsg');
+
+            // We'll rebuild grid
+            // Note: In a heavier app we'd diff-dom, but here it's fine.
+            // Check if content changed based on stringify?
+            // For now, minimal performance impact for this number of tables.
+
+            grid.innerHTML = '';
+            if (waitingMsg) grid.appendChild(waitingMsg);
+
+            // Natural Sort
+            const sortedKeys = Object.keys(tables).sort((a, b) => {
+                return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
+            });
+
+            sortedKeys.forEach(tableName => {
+                const players = tables[tableName];
+                let playersHtml = '';
+
+                players.forEach(p => {
+                    const pName = p['Player Name'] || p.name || 'Unknown';
+                    const pTeam = p['Team Name'] || p.team || '';
+
+                    playersHtml += `
+                        <div class="player-row">
+                            <span class="player-name">${pName}</span>
+                            <span class="player-team">${pTeam}</span>
+                        </div>
+                    `;
+                });
+
+                const card = `
+                    <div class="table-card">
+                        <div class="table-header">${tableName}</div>
+                        ${playersHtml}
+                    </div>
+                `;
+                grid.innerHTML += card;
+            });
+        }
+
+        async function fetchStandings() {
+            try {
+                const res = await fetch('/standings');
+                const data = await res.json();
+                if (data.success) {
+                    const tbody = document.getElementById('standingsBody');
+                    tbody.innerHTML = '';
+
+                    // Check if we're in Top Cut or Finals (show Swiss scores)
+                    const isPlayoffPhase = data.current_state &&
+                        (data.current_state.includes('top8') ||
+                            data.current_state.includes('finals') ||
+                            data.current_state.includes('swiss_complete'));
+
+                    data.standings.forEach(team => {
+                        // Calculate current phase score (total - swiss)
+                        const currentPhaseScore = team.total_points - (team.swiss_points || 0);
+
+                        // Format score display
+                        let scoreDisplay = `${team.total_points}`;
+                        if (isPlayoffPhase && team.swiss_points > 0) {
+                            // Show: "Current Phase pts (Swiss pts)" e.g., "20 (40 Swiss)"
+                            scoreDisplay = `${currentPhaseScore} <span style="opacity: 0.6; font-size: 0.8em;">(${team.swiss_points} Swiss)</span>`;
+                        }
+
+                        tbody.innerHTML += `
+                            <tr>
+                                <td class="rank-cell">#${team.rank}</td>
+                                <td>${team.team}</td>
+                                <td class="score-cell">${scoreDisplay}</td>
+                            </tr>
+                        `;
+                    });
+                }
+            } catch (e) { }
+        }
+
+        async function fetchStandingsForWinner() {
+            try {
+                const res = await fetch('/standings');
+                const data = await res.json();
+                if (data.success && data.standings.length > 0) {
+                    const winner = data.standings[0];
+                    document.getElementById('winnerTeamName').textContent = winner.team;
+                }
+            } catch (e) { }
+        }
+
+        // Poll every 1 second
+        // Since we removed logs and optimized client-side timer, this is low cost.
+        setInterval(fetchState, 1000);
+        fetchState();
+
+    </script>
+</body>
+
+</html>
