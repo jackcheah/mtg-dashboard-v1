@@ -1,0 +1,4284 @@
+{
+  "rounds": {
+    "1": {
+      "round_num": 1,
+      "round_type": "Swiss",
+      "tables": [
+        {
+          "table_name": "Table 1",
+          "players": [
+            5,
+            9,
+            25,
+            53
+          ],
+          "winner": null
+        },
+        {
+          "table_name": "Table 2",
+          "players": [
+            6,
+            26,
+            54,
+            10
+          ],
+          "winner": 54
+        },
+        {
+          "table_name": "Table 3",
+          "players": [
+            7,
+            55,
+            11,
+            27
+          ],
+          "winner": 11
+        },
+        {
+          "table_name": "Table 4",
+          "players": [
+            28,
+            12,
+            56,
+            8
+          ],
+          "winner": null
+        },
+        {
+          "table_name": "Table 5",
+          "players": [
+            45,
+            1,
+            17,
+            41
+          ],
+          "winner": 17
+        },
+        {
+          "table_name": "Table 6",
+          "players": [
+            42,
+            46,
+            18,
+            2
+          ],
+          "winner": 2
+        },
+        {
+          "table_name": "Table 7",
+          "players": [
+            47,
+            43,
+            3,
+            19
+          ],
+          "winner": 47
+        },
+        {
+          "table_name": "Table 8",
+          "players": [
+            20,
+            4,
+            48,
+            44
+          ],
+          "winner": 48
+        },
+        {
+          "table_name": "Table 9",
+          "players": [
+            21,
+            37,
+            49,
+            61
+          ],
+          "winner": 21
+        },
+        {
+          "table_name": "Table 10",
+          "players": [
+            50,
+            22,
+            62,
+            38
+          ],
+          "winner": 22
+        },
+        {
+          "table_name": "Table 11",
+          "players": [
+            63,
+            23,
+            39,
+            51
+          ],
+          "winner": 39
+        },
+        {
+          "table_name": "Table 12",
+          "players": [
+            52,
+            64,
+            40,
+            24
+          ],
+          "winner": 64
+        },
+        {
+          "table_name": "Table 13",
+          "players": [
+            57,
+            13,
+            33,
+            29
+          ],
+          "winner": null
+        },
+        {
+          "table_name": "Table 14",
+          "players": [
+            34,
+            58,
+            14,
+            30
+          ],
+          "winner": null
+        },
+        {
+          "table_name": "Table 15",
+          "players": [
+            15,
+            59,
+            35,
+            31
+          ],
+          "winner": null
+        },
+        {
+          "table_name": "Table 16",
+          "players": [
+            60,
+            16,
+            36,
+            32
+          ],
+          "winner": 36
+        }
+      ],
+      "table_count": 16,
+      "validation": {
+        "repeats": 0,
+        "conflicts": 0
+      },
+      "summary": {
+        "wins": 11,
+        "draws": 20,
+        "losses": 33
+      }
+    },
+    "2": {
+      "round_num": 2,
+      "round_type": "Swiss",
+      "tables": [
+        {
+          "table_name": "Table 1",
+          "players": [
+            37,
+            62,
+            53,
+            17
+          ],
+          "winner": null
+        },
+        {
+          "table_name": "Table 2",
+          "players": [
+            38,
+            61,
+            54,
+            18
+          ],
+          "winner": null
+        },
+        {
+          "table_name": "Table 3",
+          "players": [
+            39,
+            64,
+            55,
+            19
+          ],
+          "winner": 55
+        },
+        {
+          "table_name": "Table 4",
+          "players": [
+            40,
+            63,
+            56,
+            20
+          ],
+          "winner": 56
+        },
+        {
+          "table_name": "Table 5",
+          "players": [
+            57,
+            41,
+            21,
+            30
+          ],
+          "winner": null
+        },
+        {
+          "table_name": "Table 6",
+          "players": [
+            58,
+            42,
+            22,
+            29
+          ],
+          "winner": null
+        },
+        {
+          "table_name": "Table 7",
+          "players": [
+            59,
+            43,
+            23,
+            32
+          ],
+          "winner": null
+        },
+        {
+          "table_name": "Table 8",
+          "players": [
+            60,
+            44,
+            24,
+            31
+          ],
+          "winner": 24
+        },
+        {
+          "table_name": "Table 9",
+          "players": [
+            49,
+            1,
+            9,
+            13
+          ],
+          "winner": 49
+        },
+        {
+          "table_name": "Table 10",
+          "players": [
+            50,
+            2,
+            10,
+            14
+          ],
+          "winner": null
+        },
+        {
+          "table_name": "Table 11",
+          "players": [
+            51,
+            3,
+            11,
+            15
+          ],
+          "winner": 51
+        },
+        {
+          "table_name": "Table 12",
+          "players": [
+            52,
+            4,
+            12,
+            16
+          ],
+          "winner": 16
+        },
+        {
+          "table_name": "Table 13",
+          "players": [
+            25,
+            33,
+            6,
+            45
+          ],
+          "winner": 6
+        },
+        {
+          "table_name": "Table 14",
+          "players": [
+            26,
+            34,
+            5,
+            46
+          ],
+          "winner": 34
+        },
+        {
+          "table_name": "Table 15",
+          "players": [
+            27,
+            35,
+            8,
+            47
+          ],
+          "winner": 35
+        },
+        {
+          "table_name": "Table 16",
+          "players": [
+            28,
+            36,
+            7,
+            48
+          ],
+          "winner": 7
+        }
+      ],
+      "table_count": 16,
+      "validation": {
+        "repeats": 0,
+        "conflicts": 0
+      },
+      "summary": {
+        "wins": 10,
+        "draws": 24,
+        "losses": 30
+      }
+    },
+    "3": {
+      "round_num": 3,
+      "round_type": "Swiss",
+      "tables": [
+        {
+          "table_name": "Table 1",
+          "players": [
+            37,
+            63,
+            54,
+            19
+          ],
+          "winner": 37
+        },
+        {
+          "table_name": "Table 2",
+          "players": [
+            38,
+            64,
+            53,
+            20
+          ],
+          "winner": 38
+        },
+        {
+          "table_name": "Table 3",
+          "players": [
+            39,
+            61,
+            56,
+            17
+          ],
+          "winner": 61
+        },
+        {
+          "table_name": "Table 4",
+          "players": [
+            40,
+            62,
+            55,
+            18
+          ],
+          "winner": 18
+        },
+        {
+          "table_name": "Table 5",
+          "players": [
+            57,
+            42,
+            23,
+            31
+          ],
+          "winner": 57
+        },
+        {
+          "table_name": "Table 6",
+          "players": [
+            58,
+            41,
+            24,
+            32
+          ],
+          "winner": null
+        },
+        {
+          "table_name": "Table 7",
+          "players": [
+            59,
+            44,
+            21,
+            29
+          ],
+          "winner": 21
+        },
+        {
+          "table_name": "Table 8",
+          "players": [
+            60,
+            43,
+            22,
+            30
+          ],
+          "winner": 43
+        },
+        {
+          "table_name": "Table 9",
+          "players": [
+            49,
+            2,
+            11,
+            16
+          ],
+          "winner": 2
+        },
+        {
+          "table_name": "Table 10",
+          "players": [
+            50,
+            1,
+            12,
+            15
+          ],
+          "winner": null
+        },
+        {
+          "table_name": "Table 11",
+          "players": [
+            51,
+            4,
+            9,
+            14
+          ],
+          "winner": null
+        },
+        {
+          "table_name": "Table 12",
+          "players": [
+            52,
+            3,
+            10,
+            13
+          ],
+          "winner": 13
+        },
+        {
+          "table_name": "Table 13",
+          "players": [
+            25,
+            34,
+            7,
+            47
+          ],
+          "winner": null
+        },
+        {
+          "table_name": "Table 14",
+          "players": [
+            26,
+            33,
+            8,
+            48
+          ],
+          "winner": null
+        },
+        {
+          "table_name": "Table 15",
+          "players": [
+            27,
+            36,
+            5,
+            45
+          ],
+          "winner": null
+        },
+        {
+          "table_name": "Table 16",
+          "players": [
+            28,
+            35,
+            6,
+            46
+          ],
+          "winner": 28
+        }
+      ],
+      "table_count": 16,
+      "validation": {
+        "repeats": 0,
+        "conflicts": 0
+      },
+      "summary": {
+        "wins": 10,
+        "draws": 24,
+        "losses": 30
+      }
+    },
+    "4": {
+      "round_num": 4,
+      "round_type": "Swiss",
+      "tables": [
+        {
+          "table_name": "Table 1",
+          "players": [
+            37,
+            64,
+            56,
+            18
+          ],
+          "winner": 56
+        },
+        {
+          "table_name": "Table 2",
+          "players": [
+            38,
+            63,
+            55,
+            17
+          ],
+          "winner": 17
+        },
+        {
+          "table_name": "Table 3",
+          "players": [
+            39,
+            62,
+            54,
+            20
+          ],
+          "winner": null
+        },
+        {
+          "table_name": "Table 4",
+          "players": [
+            40,
+            61,
+            53,
+            19
+          ],
+          "winner": 19
+        },
+        {
+          "table_name": "Table 5",
+          "players": [
+            57,
+            44,
+            22,
+            32
+          ],
+          "winner": 22
+        },
+        {
+          "table_name": "Table 6",
+          "players": [
+            58,
+            43,
+            21,
+            31
+          ],
+          "winner": 58
+        },
+        {
+          "table_name": "Table 7",
+          "players": [
+            59,
+            42,
+            24,
+            30
+          ],
+          "winner": 59
+        },
+        {
+          "table_name": "Table 8",
+          "players": [
+            60,
+            41,
+            23,
+            29
+          ],
+          "winner": 60
+        },
+        {
+          "table_name": "Table 9",
+          "players": [
+            49,
+            3,
+            12,
+            14
+          ],
+          "winner": 14
+        },
+        {
+          "table_name": "Table 10",
+          "players": [
+            50,
+            4,
+            11,
+            13
+          ],
+          "winner": 4
+        },
+        {
+          "table_name": "Table 11",
+          "players": [
+            51,
+            1,
+            10,
+            16
+          ],
+          "winner": 1
+        },
+        {
+          "table_name": "Table 12",
+          "players": [
+            52,
+            2,
+            9,
+            15
+          ],
+          "winner": 15
+        },
+        {
+          "table_name": "Table 13",
+          "players": [
+            25,
+            36,
+            8,
+            46
+          ],
+          "winner": 46
+        },
+        {
+          "table_name": "Table 14",
+          "players": [
+            26,
+            35,
+            7,
+            45
+          ],
+          "winner": 45
+        },
+        {
+          "table_name": "Table 15",
+          "players": [
+            27,
+            34,
+            6,
+            48
+          ],
+          "winner": null
+        },
+        {
+          "table_name": "Table 16",
+          "players": [
+            28,
+            33,
+            5,
+            47
+          ],
+          "winner": null
+        }
+      ],
+      "table_count": 16,
+      "validation": {
+        "repeats": 0,
+        "conflicts": 0
+      },
+      "summary": {
+        "wins": 13,
+        "draws": 12,
+        "losses": 39
+      }
+    },
+    "5": {
+      "round_num": 5,
+      "round_type": "Top8Cut",
+      "tables": [
+        {
+          "table_name": "Table 1",
+          "players": [
+            1,
+            9,
+            17,
+            25
+          ],
+          "winner": 25
+        },
+        {
+          "table_name": "Table 2",
+          "players": [
+            2,
+            10,
+            18,
+            26
+          ],
+          "winner": 2
+        },
+        {
+          "table_name": "Table 3",
+          "players": [
+            3,
+            11,
+            19,
+            27
+          ],
+          "winner": 19
+        },
+        {
+          "table_name": "Table 4",
+          "players": [
+            4,
+            12,
+            20,
+            28
+          ],
+          "winner": 20
+        },
+        {
+          "table_name": "Table 5",
+          "players": [
+            5,
+            13,
+            21,
+            29
+          ],
+          "winner": 5
+        },
+        {
+          "table_name": "Table 6",
+          "players": [
+            6,
+            14,
+            22,
+            30
+          ],
+          "winner": 30
+        },
+        {
+          "table_name": "Table 7",
+          "players": [
+            7,
+            15,
+            23,
+            31
+          ],
+          "winner": 31
+        },
+        {
+          "table_name": "Table 8",
+          "players": [
+            8,
+            16,
+            24,
+            32
+          ],
+          "winner": 32
+        }
+      ],
+      "table_count": 8,
+      "validation": {
+        "repeats": 0,
+        "conflicts": 0
+      },
+      "summary": {
+        "wins": 8,
+        "draws": 0,
+        "losses": 24
+      }
+    },
+    "6": {
+      "round_num": 6,
+      "round_type": "Finals",
+      "tables": [
+        {
+          "table_name": "Table 1",
+          "players": [
+            1,
+            5,
+            9,
+            13
+          ],
+          "winner": 5
+        },
+        {
+          "table_name": "Table 2",
+          "players": [
+            2,
+            6,
+            10,
+            14
+          ],
+          "winner": null
+        },
+        {
+          "table_name": "Table 3",
+          "players": [
+            3,
+            7,
+            11,
+            15
+          ],
+          "winner": 11
+        },
+        {
+          "table_name": "Table 4",
+          "players": [
+            4,
+            8,
+            12,
+            16
+          ],
+          "winner": 8
+        }
+      ],
+      "table_count": 4,
+      "validation": {
+        "repeats": 0,
+        "conflicts": 0
+      },
+      "summary": {
+        "wins": 3,
+        "draws": 4,
+        "losses": 9
+      }
+    }
+  },
+  "swiss_standings": [
+    {
+      "rank": 1,
+      "team": "Team F",
+      "swiss_points": 29,
+      "top8_points": 0
+    },
+    {
+      "rank": 2,
+      "team": "Team O",
+      "swiss_points": 27,
+      "top8_points": 0
+    },
+    {
+      "rank": 3,
+      "team": "Team D",
+      "swiss_points": 26,
+      "top8_points": 0
+    },
+    {
+      "rank": 4,
+      "team": "Team N",
+      "swiss_points": 25,
+      "top8_points": 0
+    },
+    {
+      "rank": 5,
+      "team": "Team L",
+      "swiss_points": 25,
+      "top8_points": 0
+    },
+    {
+      "rank": 6,
+      "team": "Team A",
+      "swiss_points": 23,
+      "top8_points": 0
+    },
+    {
+      "rank": 7,
+      "team": "Team E",
+      "swiss_points": 23,
+      "top8_points": 0
+    },
+    {
+      "rank": 8,
+      "team": "Team I",
+      "swiss_points": 23,
+      "top8_points": 0
+    },
+    {
+      "rank": 9,
+      "team": "Team J",
+      "swiss_points": 18,
+      "top8_points": 0
+    },
+    {
+      "rank": 10,
+      "team": "Team B",
+      "swiss_points": 17,
+      "top8_points": 0
+    },
+    {
+      "rank": 11,
+      "team": "Team M",
+      "swiss_points": 13,
+      "top8_points": 0
+    },
+    {
+      "rank": 12,
+      "team": "Team P",
+      "swiss_points": 13,
+      "top8_points": 0
+    },
+    {
+      "rank": 13,
+      "team": "Team G",
+      "swiss_points": 12,
+      "top8_points": 0
+    },
+    {
+      "rank": 14,
+      "team": "Team C",
+      "swiss_points": 10,
+      "top8_points": 0
+    },
+    {
+      "rank": 15,
+      "team": "Team K",
+      "swiss_points": 9,
+      "top8_points": 0
+    },
+    {
+      "rank": 16,
+      "team": "Team H",
+      "swiss_points": 7,
+      "top8_points": 0
+    }
+  ],
+  "top8_standings": [
+    {
+      "rank": 1,
+      "team": "Team H",
+      "swiss_points": 7,
+      "top8_points": 15
+    },
+    {
+      "rank": 2,
+      "team": "Team E",
+      "swiss_points": 23,
+      "top8_points": 10
+    },
+    {
+      "rank": 3,
+      "team": "Team A",
+      "swiss_points": 23,
+      "top8_points": 5
+    },
+    {
+      "rank": 4,
+      "team": "Team B",
+      "swiss_points": 17,
+      "top8_points": 5
+    },
+    {
+      "rank": 5,
+      "team": "Team G",
+      "swiss_points": 12,
+      "top8_points": 5
+    },
+    {
+      "rank": 6,
+      "team": "Team F",
+      "swiss_points": 29,
+      "top8_points": 0
+    },
+    {
+      "rank": 7,
+      "team": "Team O",
+      "swiss_points": 27,
+      "top8_points": 0
+    },
+    {
+      "rank": 8,
+      "team": "Team D",
+      "swiss_points": 26,
+      "top8_points": 0
+    },
+    {
+      "rank": 9,
+      "team": "Team N",
+      "swiss_points": 25,
+      "top8_points": 0
+    },
+    {
+      "rank": 10,
+      "team": "Team L",
+      "swiss_points": 25,
+      "top8_points": 0
+    },
+    {
+      "rank": 11,
+      "team": "Team I",
+      "swiss_points": 23,
+      "top8_points": 0
+    },
+    {
+      "rank": 12,
+      "team": "Team J",
+      "swiss_points": 18,
+      "top8_points": 0
+    },
+    {
+      "rank": 13,
+      "team": "Team M",
+      "swiss_points": 13,
+      "top8_points": 0
+    },
+    {
+      "rank": 14,
+      "team": "Team P",
+      "swiss_points": 13,
+      "top8_points": 0
+    },
+    {
+      "rank": 15,
+      "team": "Team C",
+      "swiss_points": 10,
+      "top8_points": 0
+    },
+    {
+      "rank": 16,
+      "team": "Team K",
+      "swiss_points": 9,
+      "top8_points": 0
+    }
+  ],
+  "final_standings": [
+    {
+      "rank": 1,
+      "team": "Team B",
+      "finals_points": 11,
+      "tiebreaker": 22
+    },
+    {
+      "rank": 2,
+      "team": "Team C",
+      "finals_points": 6,
+      "tiebreaker": 10
+    },
+    {
+      "rank": 3,
+      "team": "Team A",
+      "finals_points": 1,
+      "tiebreaker": 28
+    },
+    {
+      "rank": 4,
+      "team": "Team D",
+      "finals_points": 1,
+      "tiebreaker": 26
+    }
+  ],
+  "champion": {
+    "team": "Team B",
+    "finals_points": 11,
+    "top8_points": 5,
+    "swiss_points": 17,
+    "total_points": 33
+  },
+  "mvp": {
+    "player_id": 2,
+    "player_name": "P2_A",
+    "team": "Team A",
+    "total_points": 17
+  },
+  "validation_warnings": [],
+  "errors": [],
+  "player_journeys": {
+    "5": {
+      "name": "P1_B",
+      "team": "Team B",
+      "total_points": 13,
+      "rounds": {
+        "1": {
+          "points": 1,
+          "table": "Table 1",
+          "opponents": [
+            9,
+            25,
+            53
+          ]
+        },
+        "2": {
+          "points": 0,
+          "table": "Table 14",
+          "opponents": [
+            26,
+            34,
+            46
+          ]
+        },
+        "3": {
+          "points": 1,
+          "table": "Table 15",
+          "opponents": [
+            27,
+            36,
+            45
+          ]
+        },
+        "4": {
+          "points": 1,
+          "table": "Table 16",
+          "opponents": [
+            28,
+            33,
+            47
+          ]
+        },
+        "5": {
+          "points": 5,
+          "table": "Table 5",
+          "opponents": [
+            13,
+            21,
+            29
+          ]
+        },
+        "6": {
+          "points": 5,
+          "table": "Table 1",
+          "opponents": [
+            1,
+            9,
+            13
+          ]
+        }
+      }
+    },
+    "9": {
+      "name": "P1_C",
+      "team": "Team C",
+      "total_points": 2,
+      "rounds": {
+        "1": {
+          "points": 1,
+          "table": "Table 1",
+          "opponents": [
+            5,
+            25,
+            53
+          ]
+        },
+        "2": {
+          "points": 0,
+          "table": "Table 9",
+          "opponents": [
+            49,
+            1,
+            13
+          ]
+        },
+        "3": {
+          "points": 1,
+          "table": "Table 11",
+          "opponents": [
+            51,
+            4,
+            14
+          ]
+        },
+        "4": {
+          "points": 0,
+          "table": "Table 12",
+          "opponents": [
+            52,
+            2,
+            15
+          ]
+        },
+        "5": {
+          "points": 0,
+          "table": "Table 1",
+          "opponents": [
+            1,
+            17,
+            25
+          ]
+        },
+        "6": {
+          "points": 0,
+          "table": "Table 1",
+          "opponents": [
+            1,
+            5,
+            13
+          ]
+        }
+      }
+    },
+    "25": {
+      "name": "P1_G",
+      "team": "Team G",
+      "total_points": 7,
+      "rounds": {
+        "1": {
+          "points": 1,
+          "table": "Table 1",
+          "opponents": [
+            5,
+            9,
+            53
+          ]
+        },
+        "2": {
+          "points": 0,
+          "table": "Table 13",
+          "opponents": [
+            33,
+            6,
+            45
+          ]
+        },
+        "3": {
+          "points": 1,
+          "table": "Table 13",
+          "opponents": [
+            34,
+            7,
+            47
+          ]
+        },
+        "4": {
+          "points": 0,
+          "table": "Table 13",
+          "opponents": [
+            36,
+            8,
+            46
+          ]
+        },
+        "5": {
+          "points": 5,
+          "table": "Table 1",
+          "opponents": [
+            1,
+            9,
+            17
+          ]
+        }
+      }
+    },
+    "53": {
+      "name": "P1_N",
+      "team": "Team N",
+      "total_points": 2,
+      "rounds": {
+        "1": {
+          "points": 1,
+          "table": "Table 1",
+          "opponents": [
+            5,
+            9,
+            25
+          ]
+        },
+        "2": {
+          "points": 1,
+          "table": "Table 1",
+          "opponents": [
+            37,
+            62,
+            17
+          ]
+        },
+        "3": {
+          "points": 0,
+          "table": "Table 2",
+          "opponents": [
+            38,
+            64,
+            20
+          ]
+        },
+        "4": {
+          "points": 0,
+          "table": "Table 4",
+          "opponents": [
+            40,
+            61,
+            19
+          ]
+        }
+      }
+    },
+    "6": {
+      "name": "P2_B",
+      "team": "Team B",
+      "total_points": 7,
+      "rounds": {
+        "1": {
+          "points": 0,
+          "table": "Table 2",
+          "opponents": [
+            26,
+            54,
+            10
+          ]
+        },
+        "2": {
+          "points": 5,
+          "table": "Table 13",
+          "opponents": [
+            25,
+            33,
+            45
+          ]
+        },
+        "3": {
+          "points": 0,
+          "table": "Table 16",
+          "opponents": [
+            28,
+            35,
+            46
+          ]
+        },
+        "4": {
+          "points": 1,
+          "table": "Table 15",
+          "opponents": [
+            27,
+            34,
+            48
+          ]
+        },
+        "5": {
+          "points": 0,
+          "table": "Table 6",
+          "opponents": [
+            14,
+            22,
+            30
+          ]
+        },
+        "6": {
+          "points": 1,
+          "table": "Table 2",
+          "opponents": [
+            2,
+            10,
+            14
+          ]
+        }
+      }
+    },
+    "26": {
+      "name": "P2_G",
+      "team": "Team G",
+      "total_points": 1,
+      "rounds": {
+        "1": {
+          "points": 0,
+          "table": "Table 2",
+          "opponents": [
+            6,
+            54,
+            10
+          ]
+        },
+        "2": {
+          "points": 0,
+          "table": "Table 14",
+          "opponents": [
+            34,
+            5,
+            46
+          ]
+        },
+        "3": {
+          "points": 1,
+          "table": "Table 14",
+          "opponents": [
+            33,
+            8,
+            48
+          ]
+        },
+        "4": {
+          "points": 0,
+          "table": "Table 14",
+          "opponents": [
+            35,
+            7,
+            45
+          ]
+        },
+        "5": {
+          "points": 0,
+          "table": "Table 2",
+          "opponents": [
+            2,
+            10,
+            18
+          ]
+        }
+      }
+    },
+    "54": {
+      "name": "P2_N",
+      "team": "Team N",
+      "total_points": 7,
+      "rounds": {
+        "1": {
+          "points": 5,
+          "table": "Table 2",
+          "opponents": [
+            6,
+            26,
+            10
+          ]
+        },
+        "2": {
+          "points": 1,
+          "table": "Table 2",
+          "opponents": [
+            38,
+            61,
+            18
+          ]
+        },
+        "3": {
+          "points": 0,
+          "table": "Table 1",
+          "opponents": [
+            37,
+            63,
+            19
+          ]
+        },
+        "4": {
+          "points": 1,
+          "table": "Table 3",
+          "opponents": [
+            39,
+            62,
+            20
+          ]
+        }
+      }
+    },
+    "10": {
+      "name": "P2_C",
+      "team": "Team C",
+      "total_points": 2,
+      "rounds": {
+        "1": {
+          "points": 0,
+          "table": "Table 2",
+          "opponents": [
+            6,
+            26,
+            54
+          ]
+        },
+        "2": {
+          "points": 1,
+          "table": "Table 10",
+          "opponents": [
+            50,
+            2,
+            14
+          ]
+        },
+        "3": {
+          "points": 0,
+          "table": "Table 12",
+          "opponents": [
+            52,
+            3,
+            13
+          ]
+        },
+        "4": {
+          "points": 0,
+          "table": "Table 11",
+          "opponents": [
+            51,
+            1,
+            16
+          ]
+        },
+        "5": {
+          "points": 0,
+          "table": "Table 2",
+          "opponents": [
+            2,
+            18,
+            26
+          ]
+        },
+        "6": {
+          "points": 1,
+          "table": "Table 2",
+          "opponents": [
+            2,
+            6,
+            14
+          ]
+        }
+      }
+    },
+    "7": {
+      "name": "P3_B",
+      "team": "Team B",
+      "total_points": 6,
+      "rounds": {
+        "1": {
+          "points": 0,
+          "table": "Table 3",
+          "opponents": [
+            55,
+            11,
+            27
+          ]
+        },
+        "2": {
+          "points": 5,
+          "table": "Table 16",
+          "opponents": [
+            28,
+            36,
+            48
+          ]
+        },
+        "3": {
+          "points": 1,
+          "table": "Table 13",
+          "opponents": [
+            25,
+            34,
+            47
+          ]
+        },
+        "4": {
+          "points": 0,
+          "table": "Table 14",
+          "opponents": [
+            26,
+            35,
+            45
+          ]
+        },
+        "5": {
+          "points": 0,
+          "table": "Table 7",
+          "opponents": [
+            15,
+            23,
+            31
+          ]
+        },
+        "6": {
+          "points": 0,
+          "table": "Table 3",
+          "opponents": [
+            3,
+            11,
+            15
+          ]
+        }
+      }
+    },
+    "55": {
+      "name": "P3_N",
+      "team": "Team N",
+      "total_points": 5,
+      "rounds": {
+        "1": {
+          "points": 0,
+          "table": "Table 3",
+          "opponents": [
+            7,
+            11,
+            27
+          ]
+        },
+        "2": {
+          "points": 5,
+          "table": "Table 3",
+          "opponents": [
+            39,
+            64,
+            19
+          ]
+        },
+        "3": {
+          "points": 0,
+          "table": "Table 4",
+          "opponents": [
+            40,
+            62,
+            18
+          ]
+        },
+        "4": {
+          "points": 0,
+          "table": "Table 2",
+          "opponents": [
+            38,
+            63,
+            17
+          ]
+        }
+      }
+    },
+    "11": {
+      "name": "P3_C",
+      "team": "Team C",
+      "total_points": 10,
+      "rounds": {
+        "1": {
+          "points": 5,
+          "table": "Table 3",
+          "opponents": [
+            7,
+            55,
+            27
+          ]
+        },
+        "2": {
+          "points": 0,
+          "table": "Table 11",
+          "opponents": [
+            51,
+            3,
+            15
+          ]
+        },
+        "3": {
+          "points": 0,
+          "table": "Table 9",
+          "opponents": [
+            49,
+            2,
+            16
+          ]
+        },
+        "4": {
+          "points": 0,
+          "table": "Table 10",
+          "opponents": [
+            50,
+            4,
+            13
+          ]
+        },
+        "5": {
+          "points": 0,
+          "table": "Table 3",
+          "opponents": [
+            3,
+            19,
+            27
+          ]
+        },
+        "6": {
+          "points": 5,
+          "table": "Table 3",
+          "opponents": [
+            3,
+            7,
+            15
+          ]
+        }
+      }
+    },
+    "27": {
+      "name": "P3_G",
+      "team": "Team G",
+      "total_points": 2,
+      "rounds": {
+        "1": {
+          "points": 0,
+          "table": "Table 3",
+          "opponents": [
+            7,
+            55,
+            11
+          ]
+        },
+        "2": {
+          "points": 0,
+          "table": "Table 15",
+          "opponents": [
+            35,
+            8,
+            47
+          ]
+        },
+        "3": {
+          "points": 1,
+          "table": "Table 15",
+          "opponents": [
+            36,
+            5,
+            45
+          ]
+        },
+        "4": {
+          "points": 1,
+          "table": "Table 15",
+          "opponents": [
+            34,
+            6,
+            48
+          ]
+        },
+        "5": {
+          "points": 0,
+          "table": "Table 3",
+          "opponents": [
+            3,
+            11,
+            19
+          ]
+        }
+      }
+    },
+    "28": {
+      "name": "P4_G",
+      "team": "Team G",
+      "total_points": 7,
+      "rounds": {
+        "1": {
+          "points": 1,
+          "table": "Table 4",
+          "opponents": [
+            12,
+            56,
+            8
+          ]
+        },
+        "2": {
+          "points": 0,
+          "table": "Table 16",
+          "opponents": [
+            36,
+            7,
+            48
+          ]
+        },
+        "3": {
+          "points": 5,
+          "table": "Table 16",
+          "opponents": [
+            35,
+            6,
+            46
+          ]
+        },
+        "4": {
+          "points": 1,
+          "table": "Table 16",
+          "opponents": [
+            33,
+            5,
+            47
+          ]
+        },
+        "5": {
+          "points": 0,
+          "table": "Table 4",
+          "opponents": [
+            4,
+            12,
+            20
+          ]
+        }
+      }
+    },
+    "12": {
+      "name": "P4_C",
+      "team": "Team C",
+      "total_points": 2,
+      "rounds": {
+        "1": {
+          "points": 1,
+          "table": "Table 4",
+          "opponents": [
+            28,
+            56,
+            8
+          ]
+        },
+        "2": {
+          "points": 0,
+          "table": "Table 12",
+          "opponents": [
+            52,
+            4,
+            16
+          ]
+        },
+        "3": {
+          "points": 1,
+          "table": "Table 10",
+          "opponents": [
+            50,
+            1,
+            15
+          ]
+        },
+        "4": {
+          "points": 0,
+          "table": "Table 9",
+          "opponents": [
+            49,
+            3,
+            14
+          ]
+        },
+        "5": {
+          "points": 0,
+          "table": "Table 4",
+          "opponents": [
+            4,
+            20,
+            28
+          ]
+        },
+        "6": {
+          "points": 0,
+          "table": "Table 4",
+          "opponents": [
+            4,
+            8,
+            16
+          ]
+        }
+      }
+    },
+    "56": {
+      "name": "P4_N",
+      "team": "Team N",
+      "total_points": 11,
+      "rounds": {
+        "1": {
+          "points": 1,
+          "table": "Table 4",
+          "opponents": [
+            28,
+            12,
+            8
+          ]
+        },
+        "2": {
+          "points": 5,
+          "table": "Table 4",
+          "opponents": [
+            40,
+            63,
+            20
+          ]
+        },
+        "3": {
+          "points": 0,
+          "table": "Table 3",
+          "opponents": [
+            39,
+            61,
+            17
+          ]
+        },
+        "4": {
+          "points": 5,
+          "table": "Table 1",
+          "opponents": [
+            37,
+            64,
+            18
+          ]
+        }
+      }
+    },
+    "8": {
+      "name": "P4_B",
+      "team": "Team B",
+      "total_points": 7,
+      "rounds": {
+        "1": {
+          "points": 1,
+          "table": "Table 4",
+          "opponents": [
+            28,
+            12,
+            56
+          ]
+        },
+        "2": {
+          "points": 0,
+          "table": "Table 15",
+          "opponents": [
+            27,
+            35,
+            47
+          ]
+        },
+        "3": {
+          "points": 1,
+          "table": "Table 14",
+          "opponents": [
+            26,
+            33,
+            48
+          ]
+        },
+        "4": {
+          "points": 0,
+          "table": "Table 13",
+          "opponents": [
+            25,
+            36,
+            46
+          ]
+        },
+        "5": {
+          "points": 0,
+          "table": "Table 8",
+          "opponents": [
+            16,
+            24,
+            32
+          ]
+        },
+        "6": {
+          "points": 5,
+          "table": "Table 4",
+          "opponents": [
+            4,
+            12,
+            16
+          ]
+        }
+      }
+    },
+    "45": {
+      "name": "P1_L",
+      "team": "Team L",
+      "total_points": 6,
+      "rounds": {
+        "1": {
+          "points": 0,
+          "table": "Table 5",
+          "opponents": [
+            1,
+            17,
+            41
+          ]
+        },
+        "2": {
+          "points": 0,
+          "table": "Table 13",
+          "opponents": [
+            25,
+            33,
+            6
+          ]
+        },
+        "3": {
+          "points": 1,
+          "table": "Table 15",
+          "opponents": [
+            27,
+            36,
+            5
+          ]
+        },
+        "4": {
+          "points": 5,
+          "table": "Table 14",
+          "opponents": [
+            26,
+            35,
+            7
+          ]
+        }
+      }
+    },
+    "1": {
+      "name": "P1_A",
+      "team": "Team A",
+      "total_points": 6,
+      "rounds": {
+        "1": {
+          "points": 0,
+          "table": "Table 5",
+          "opponents": [
+            45,
+            17,
+            41
+          ]
+        },
+        "2": {
+          "points": 0,
+          "table": "Table 9",
+          "opponents": [
+            49,
+            9,
+            13
+          ]
+        },
+        "3": {
+          "points": 1,
+          "table": "Table 10",
+          "opponents": [
+            50,
+            12,
+            15
+          ]
+        },
+        "4": {
+          "points": 5,
+          "table": "Table 11",
+          "opponents": [
+            51,
+            10,
+            16
+          ]
+        },
+        "5": {
+          "points": 0,
+          "table": "Table 1",
+          "opponents": [
+            9,
+            17,
+            25
+          ]
+        },
+        "6": {
+          "points": 0,
+          "table": "Table 1",
+          "opponents": [
+            5,
+            9,
+            13
+          ]
+        }
+      }
+    },
+    "17": {
+      "name": "P1_E",
+      "team": "Team E",
+      "total_points": 11,
+      "rounds": {
+        "1": {
+          "points": 5,
+          "table": "Table 5",
+          "opponents": [
+            45,
+            1,
+            41
+          ]
+        },
+        "2": {
+          "points": 1,
+          "table": "Table 1",
+          "opponents": [
+            37,
+            62,
+            53
+          ]
+        },
+        "3": {
+          "points": 0,
+          "table": "Table 3",
+          "opponents": [
+            39,
+            61,
+            56
+          ]
+        },
+        "4": {
+          "points": 5,
+          "table": "Table 2",
+          "opponents": [
+            38,
+            63,
+            55
+          ]
+        },
+        "5": {
+          "points": 0,
+          "table": "Table 1",
+          "opponents": [
+            1,
+            9,
+            25
+          ]
+        }
+      }
+    },
+    "41": {
+      "name": "P1_K",
+      "team": "Team K",
+      "total_points": 2,
+      "rounds": {
+        "1": {
+          "points": 0,
+          "table": "Table 5",
+          "opponents": [
+            45,
+            1,
+            17
+          ]
+        },
+        "2": {
+          "points": 1,
+          "table": "Table 5",
+          "opponents": [
+            57,
+            21,
+            30
+          ]
+        },
+        "3": {
+          "points": 1,
+          "table": "Table 6",
+          "opponents": [
+            58,
+            24,
+            32
+          ]
+        },
+        "4": {
+          "points": 0,
+          "table": "Table 8",
+          "opponents": [
+            60,
+            23,
+            29
+          ]
+        }
+      }
+    },
+    "42": {
+      "name": "P2_K",
+      "team": "Team K",
+      "total_points": 1,
+      "rounds": {
+        "1": {
+          "points": 0,
+          "table": "Table 6",
+          "opponents": [
+            46,
+            18,
+            2
+          ]
+        },
+        "2": {
+          "points": 1,
+          "table": "Table 6",
+          "opponents": [
+            58,
+            22,
+            29
+          ]
+        },
+        "3": {
+          "points": 0,
+          "table": "Table 5",
+          "opponents": [
+            57,
+            23,
+            31
+          ]
+        },
+        "4": {
+          "points": 0,
+          "table": "Table 7",
+          "opponents": [
+            59,
+            24,
+            30
+          ]
+        }
+      }
+    },
+    "46": {
+      "name": "P2_L",
+      "team": "Team L",
+      "total_points": 5,
+      "rounds": {
+        "1": {
+          "points": 0,
+          "table": "Table 6",
+          "opponents": [
+            42,
+            18,
+            2
+          ]
+        },
+        "2": {
+          "points": 0,
+          "table": "Table 14",
+          "opponents": [
+            26,
+            34,
+            5
+          ]
+        },
+        "3": {
+          "points": 0,
+          "table": "Table 16",
+          "opponents": [
+            28,
+            35,
+            6
+          ]
+        },
+        "4": {
+          "points": 5,
+          "table": "Table 13",
+          "opponents": [
+            25,
+            36,
+            8
+          ]
+        }
+      }
+    },
+    "18": {
+      "name": "P2_E",
+      "team": "Team E",
+      "total_points": 6,
+      "rounds": {
+        "1": {
+          "points": 0,
+          "table": "Table 6",
+          "opponents": [
+            42,
+            46,
+            2
+          ]
+        },
+        "2": {
+          "points": 1,
+          "table": "Table 2",
+          "opponents": [
+            38,
+            61,
+            54
+          ]
+        },
+        "3": {
+          "points": 5,
+          "table": "Table 4",
+          "opponents": [
+            40,
+            62,
+            55
+          ]
+        },
+        "4": {
+          "points": 0,
+          "table": "Table 1",
+          "opponents": [
+            37,
+            64,
+            56
+          ]
+        },
+        "5": {
+          "points": 0,
+          "table": "Table 2",
+          "opponents": [
+            2,
+            10,
+            26
+          ]
+        }
+      }
+    },
+    "2": {
+      "name": "P2_A",
+      "team": "Team A",
+      "total_points": 17,
+      "rounds": {
+        "1": {
+          "points": 5,
+          "table": "Table 6",
+          "opponents": [
+            42,
+            46,
+            18
+          ]
+        },
+        "2": {
+          "points": 1,
+          "table": "Table 10",
+          "opponents": [
+            50,
+            10,
+            14
+          ]
+        },
+        "3": {
+          "points": 5,
+          "table": "Table 9",
+          "opponents": [
+            49,
+            11,
+            16
+          ]
+        },
+        "4": {
+          "points": 0,
+          "table": "Table 12",
+          "opponents": [
+            52,
+            9,
+            15
+          ]
+        },
+        "5": {
+          "points": 5,
+          "table": "Table 2",
+          "opponents": [
+            10,
+            18,
+            26
+          ]
+        },
+        "6": {
+          "points": 1,
+          "table": "Table 2",
+          "opponents": [
+            6,
+            10,
+            14
+          ]
+        }
+      }
+    },
+    "47": {
+      "name": "P3_L",
+      "team": "Team L",
+      "total_points": 7,
+      "rounds": {
+        "1": {
+          "points": 5,
+          "table": "Table 7",
+          "opponents": [
+            43,
+            3,
+            19
+          ]
+        },
+        "2": {
+          "points": 0,
+          "table": "Table 15",
+          "opponents": [
+            27,
+            35,
+            8
+          ]
+        },
+        "3": {
+          "points": 1,
+          "table": "Table 13",
+          "opponents": [
+            25,
+            34,
+            7
+          ]
+        },
+        "4": {
+          "points": 1,
+          "table": "Table 16",
+          "opponents": [
+            28,
+            33,
+            5
+          ]
+        }
+      }
+    },
+    "43": {
+      "name": "P3_K",
+      "team": "Team K",
+      "total_points": 6,
+      "rounds": {
+        "1": {
+          "points": 0,
+          "table": "Table 7",
+          "opponents": [
+            47,
+            3,
+            19
+          ]
+        },
+        "2": {
+          "points": 1,
+          "table": "Table 7",
+          "opponents": [
+            59,
+            23,
+            32
+          ]
+        },
+        "3": {
+          "points": 5,
+          "table": "Table 8",
+          "opponents": [
+            60,
+            22,
+            30
+          ]
+        },
+        "4": {
+          "points": 0,
+          "table": "Table 6",
+          "opponents": [
+            58,
+            21,
+            31
+          ]
+        }
+      }
+    },
+    "3": {
+      "name": "P3_A",
+      "team": "Team A",
+      "total_points": 0,
+      "rounds": {
+        "1": {
+          "points": 0,
+          "table": "Table 7",
+          "opponents": [
+            47,
+            43,
+            19
+          ]
+        },
+        "2": {
+          "points": 0,
+          "table": "Table 11",
+          "opponents": [
+            51,
+            11,
+            15
+          ]
+        },
+        "3": {
+          "points": 0,
+          "table": "Table 12",
+          "opponents": [
+            52,
+            10,
+            13
+          ]
+        },
+        "4": {
+          "points": 0,
+          "table": "Table 9",
+          "opponents": [
+            49,
+            12,
+            14
+          ]
+        },
+        "5": {
+          "points": 0,
+          "table": "Table 3",
+          "opponents": [
+            11,
+            19,
+            27
+          ]
+        },
+        "6": {
+          "points": 0,
+          "table": "Table 3",
+          "opponents": [
+            7,
+            11,
+            15
+          ]
+        }
+      }
+    },
+    "19": {
+      "name": "P3_E",
+      "team": "Team E",
+      "total_points": 10,
+      "rounds": {
+        "1": {
+          "points": 0,
+          "table": "Table 7",
+          "opponents": [
+            47,
+            43,
+            3
+          ]
+        },
+        "2": {
+          "points": 0,
+          "table": "Table 3",
+          "opponents": [
+            39,
+            64,
+            55
+          ]
+        },
+        "3": {
+          "points": 0,
+          "table": "Table 1",
+          "opponents": [
+            37,
+            63,
+            54
+          ]
+        },
+        "4": {
+          "points": 5,
+          "table": "Table 4",
+          "opponents": [
+            40,
+            61,
+            53
+          ]
+        },
+        "5": {
+          "points": 5,
+          "table": "Table 3",
+          "opponents": [
+            3,
+            11,
+            27
+          ]
+        }
+      }
+    },
+    "20": {
+      "name": "P4_E",
+      "team": "Team E",
+      "total_points": 6,
+      "rounds": {
+        "1": {
+          "points": 0,
+          "table": "Table 8",
+          "opponents": [
+            4,
+            48,
+            44
+          ]
+        },
+        "2": {
+          "points": 0,
+          "table": "Table 4",
+          "opponents": [
+            40,
+            63,
+            56
+          ]
+        },
+        "3": {
+          "points": 0,
+          "table": "Table 2",
+          "opponents": [
+            38,
+            64,
+            53
+          ]
+        },
+        "4": {
+          "points": 1,
+          "table": "Table 3",
+          "opponents": [
+            39,
+            62,
+            54
+          ]
+        },
+        "5": {
+          "points": 5,
+          "table": "Table 4",
+          "opponents": [
+            4,
+            12,
+            28
+          ]
+        }
+      }
+    },
+    "4": {
+      "name": "P4_A",
+      "team": "Team A",
+      "total_points": 6,
+      "rounds": {
+        "1": {
+          "points": 0,
+          "table": "Table 8",
+          "opponents": [
+            20,
+            48,
+            44
+          ]
+        },
+        "2": {
+          "points": 0,
+          "table": "Table 12",
+          "opponents": [
+            52,
+            12,
+            16
+          ]
+        },
+        "3": {
+          "points": 1,
+          "table": "Table 11",
+          "opponents": [
+            51,
+            9,
+            14
+          ]
+        },
+        "4": {
+          "points": 5,
+          "table": "Table 10",
+          "opponents": [
+            50,
+            11,
+            13
+          ]
+        },
+        "5": {
+          "points": 0,
+          "table": "Table 4",
+          "opponents": [
+            12,
+            20,
+            28
+          ]
+        },
+        "6": {
+          "points": 0,
+          "table": "Table 4",
+          "opponents": [
+            8,
+            12,
+            16
+          ]
+        }
+      }
+    },
+    "48": {
+      "name": "P4_L",
+      "team": "Team L",
+      "total_points": 7,
+      "rounds": {
+        "1": {
+          "points": 5,
+          "table": "Table 8",
+          "opponents": [
+            20,
+            4,
+            44
+          ]
+        },
+        "2": {
+          "points": 0,
+          "table": "Table 16",
+          "opponents": [
+            28,
+            36,
+            7
+          ]
+        },
+        "3": {
+          "points": 1,
+          "table": "Table 14",
+          "opponents": [
+            26,
+            33,
+            8
+          ]
+        },
+        "4": {
+          "points": 1,
+          "table": "Table 15",
+          "opponents": [
+            27,
+            34,
+            6
+          ]
+        }
+      }
+    },
+    "44": {
+      "name": "P4_K",
+      "team": "Team K",
+      "total_points": 0,
+      "rounds": {
+        "1": {
+          "points": 0,
+          "table": "Table 8",
+          "opponents": [
+            20,
+            4,
+            48
+          ]
+        },
+        "2": {
+          "points": 0,
+          "table": "Table 8",
+          "opponents": [
+            60,
+            24,
+            31
+          ]
+        },
+        "3": {
+          "points": 0,
+          "table": "Table 7",
+          "opponents": [
+            59,
+            21,
+            29
+          ]
+        },
+        "4": {
+          "points": 0,
+          "table": "Table 5",
+          "opponents": [
+            57,
+            22,
+            32
+          ]
+        }
+      }
+    },
+    "21": {
+      "name": "P1_F",
+      "team": "Team F",
+      "total_points": 11,
+      "rounds": {
+        "1": {
+          "points": 5,
+          "table": "Table 9",
+          "opponents": [
+            37,
+            49,
+            61
+          ]
+        },
+        "2": {
+          "points": 1,
+          "table": "Table 5",
+          "opponents": [
+            57,
+            41,
+            30
+          ]
+        },
+        "3": {
+          "points": 5,
+          "table": "Table 7",
+          "opponents": [
+            59,
+            44,
+            29
+          ]
+        },
+        "4": {
+          "points": 0,
+          "table": "Table 6",
+          "opponents": [
+            58,
+            43,
+            31
+          ]
+        },
+        "5": {
+          "points": 0,
+          "table": "Table 5",
+          "opponents": [
+            5,
+            13,
+            29
+          ]
+        }
+      }
+    },
+    "37": {
+      "name": "P1_J",
+      "team": "Team J",
+      "total_points": 6,
+      "rounds": {
+        "1": {
+          "points": 0,
+          "table": "Table 9",
+          "opponents": [
+            21,
+            49,
+            61
+          ]
+        },
+        "2": {
+          "points": 1,
+          "table": "Table 1",
+          "opponents": [
+            62,
+            53,
+            17
+          ]
+        },
+        "3": {
+          "points": 5,
+          "table": "Table 1",
+          "opponents": [
+            63,
+            54,
+            19
+          ]
+        },
+        "4": {
+          "points": 0,
+          "table": "Table 1",
+          "opponents": [
+            64,
+            56,
+            18
+          ]
+        }
+      }
+    },
+    "49": {
+      "name": "P1_M",
+      "team": "Team M",
+      "total_points": 5,
+      "rounds": {
+        "1": {
+          "points": 0,
+          "table": "Table 9",
+          "opponents": [
+            21,
+            37,
+            61
+          ]
+        },
+        "2": {
+          "points": 5,
+          "table": "Table 9",
+          "opponents": [
+            1,
+            9,
+            13
+          ]
+        },
+        "3": {
+          "points": 0,
+          "table": "Table 9",
+          "opponents": [
+            2,
+            11,
+            16
+          ]
+        },
+        "4": {
+          "points": 0,
+          "table": "Table 9",
+          "opponents": [
+            3,
+            12,
+            14
+          ]
+        }
+      }
+    },
+    "61": {
+      "name": "P1_P",
+      "team": "Team P",
+      "total_points": 6,
+      "rounds": {
+        "1": {
+          "points": 0,
+          "table": "Table 9",
+          "opponents": [
+            21,
+            37,
+            49
+          ]
+        },
+        "2": {
+          "points": 1,
+          "table": "Table 2",
+          "opponents": [
+            38,
+            54,
+            18
+          ]
+        },
+        "3": {
+          "points": 5,
+          "table": "Table 3",
+          "opponents": [
+            39,
+            56,
+            17
+          ]
+        },
+        "4": {
+          "points": 0,
+          "table": "Table 4",
+          "opponents": [
+            40,
+            53,
+            19
+          ]
+        }
+      }
+    },
+    "50": {
+      "name": "P2_M",
+      "team": "Team M",
+      "total_points": 2,
+      "rounds": {
+        "1": {
+          "points": 0,
+          "table": "Table 10",
+          "opponents": [
+            22,
+            62,
+            38
+          ]
+        },
+        "2": {
+          "points": 1,
+          "table": "Table 10",
+          "opponents": [
+            2,
+            10,
+            14
+          ]
+        },
+        "3": {
+          "points": 1,
+          "table": "Table 10",
+          "opponents": [
+            1,
+            12,
+            15
+          ]
+        },
+        "4": {
+          "points": 0,
+          "table": "Table 10",
+          "opponents": [
+            4,
+            11,
+            13
+          ]
+        }
+      }
+    },
+    "22": {
+      "name": "P2_F",
+      "team": "Team F",
+      "total_points": 11,
+      "rounds": {
+        "1": {
+          "points": 5,
+          "table": "Table 10",
+          "opponents": [
+            50,
+            62,
+            38
+          ]
+        },
+        "2": {
+          "points": 1,
+          "table": "Table 6",
+          "opponents": [
+            58,
+            42,
+            29
+          ]
+        },
+        "3": {
+          "points": 0,
+          "table": "Table 8",
+          "opponents": [
+            60,
+            43,
+            30
+          ]
+        },
+        "4": {
+          "points": 5,
+          "table": "Table 5",
+          "opponents": [
+            57,
+            44,
+            32
+          ]
+        },
+        "5": {
+          "points": 0,
+          "table": "Table 6",
+          "opponents": [
+            6,
+            14,
+            30
+          ]
+        }
+      }
+    },
+    "62": {
+      "name": "P2_P",
+      "team": "Team P",
+      "total_points": 2,
+      "rounds": {
+        "1": {
+          "points": 0,
+          "table": "Table 10",
+          "opponents": [
+            50,
+            22,
+            38
+          ]
+        },
+        "2": {
+          "points": 1,
+          "table": "Table 1",
+          "opponents": [
+            37,
+            53,
+            17
+          ]
+        },
+        "3": {
+          "points": 0,
+          "table": "Table 4",
+          "opponents": [
+            40,
+            55,
+            18
+          ]
+        },
+        "4": {
+          "points": 1,
+          "table": "Table 3",
+          "opponents": [
+            39,
+            54,
+            20
+          ]
+        }
+      }
+    },
+    "38": {
+      "name": "P2_J",
+      "team": "Team J",
+      "total_points": 6,
+      "rounds": {
+        "1": {
+          "points": 0,
+          "table": "Table 10",
+          "opponents": [
+            50,
+            22,
+            62
+          ]
+        },
+        "2": {
+          "points": 1,
+          "table": "Table 2",
+          "opponents": [
+            61,
+            54,
+            18
+          ]
+        },
+        "3": {
+          "points": 5,
+          "table": "Table 2",
+          "opponents": [
+            64,
+            53,
+            20
+          ]
+        },
+        "4": {
+          "points": 0,
+          "table": "Table 2",
+          "opponents": [
+            63,
+            55,
+            17
+          ]
+        }
+      }
+    },
+    "63": {
+      "name": "P3_P",
+      "team": "Team P",
+      "total_points": 0,
+      "rounds": {
+        "1": {
+          "points": 0,
+          "table": "Table 11",
+          "opponents": [
+            23,
+            39,
+            51
+          ]
+        },
+        "2": {
+          "points": 0,
+          "table": "Table 4",
+          "opponents": [
+            40,
+            56,
+            20
+          ]
+        },
+        "3": {
+          "points": 0,
+          "table": "Table 1",
+          "opponents": [
+            37,
+            54,
+            19
+          ]
+        },
+        "4": {
+          "points": 0,
+          "table": "Table 2",
+          "opponents": [
+            38,
+            55,
+            17
+          ]
+        }
+      }
+    },
+    "23": {
+      "name": "P3_F",
+      "team": "Team F",
+      "total_points": 1,
+      "rounds": {
+        "1": {
+          "points": 0,
+          "table": "Table 11",
+          "opponents": [
+            63,
+            39,
+            51
+          ]
+        },
+        "2": {
+          "points": 1,
+          "table": "Table 7",
+          "opponents": [
+            59,
+            43,
+            32
+          ]
+        },
+        "3": {
+          "points": 0,
+          "table": "Table 5",
+          "opponents": [
+            57,
+            42,
+            31
+          ]
+        },
+        "4": {
+          "points": 0,
+          "table": "Table 8",
+          "opponents": [
+            60,
+            41,
+            29
+          ]
+        },
+        "5": {
+          "points": 0,
+          "table": "Table 7",
+          "opponents": [
+            7,
+            15,
+            31
+          ]
+        }
+      }
+    },
+    "39": {
+      "name": "P3_J",
+      "team": "Team J",
+      "total_points": 6,
+      "rounds": {
+        "1": {
+          "points": 5,
+          "table": "Table 11",
+          "opponents": [
+            63,
+            23,
+            51
+          ]
+        },
+        "2": {
+          "points": 0,
+          "table": "Table 3",
+          "opponents": [
+            64,
+            55,
+            19
+          ]
+        },
+        "3": {
+          "points": 0,
+          "table": "Table 3",
+          "opponents": [
+            61,
+            56,
+            17
+          ]
+        },
+        "4": {
+          "points": 1,
+          "table": "Table 3",
+          "opponents": [
+            62,
+            54,
+            20
+          ]
+        }
+      }
+    },
+    "51": {
+      "name": "P3_M",
+      "team": "Team M",
+      "total_points": 6,
+      "rounds": {
+        "1": {
+          "points": 0,
+          "table": "Table 11",
+          "opponents": [
+            63,
+            23,
+            39
+          ]
+        },
+        "2": {
+          "points": 5,
+          "table": "Table 11",
+          "opponents": [
+            3,
+            11,
+            15
+          ]
+        },
+        "3": {
+          "points": 1,
+          "table": "Table 11",
+          "opponents": [
+            4,
+            9,
+            14
+          ]
+        },
+        "4": {
+          "points": 0,
+          "table": "Table 11",
+          "opponents": [
+            1,
+            10,
+            16
+          ]
+        }
+      }
+    },
+    "52": {
+      "name": "P4_M",
+      "team": "Team M",
+      "total_points": 0,
+      "rounds": {
+        "1": {
+          "points": 0,
+          "table": "Table 12",
+          "opponents": [
+            64,
+            40,
+            24
+          ]
+        },
+        "2": {
+          "points": 0,
+          "table": "Table 12",
+          "opponents": [
+            4,
+            12,
+            16
+          ]
+        },
+        "3": {
+          "points": 0,
+          "table": "Table 12",
+          "opponents": [
+            3,
+            10,
+            13
+          ]
+        },
+        "4": {
+          "points": 0,
+          "table": "Table 12",
+          "opponents": [
+            2,
+            9,
+            15
+          ]
+        }
+      }
+    },
+    "64": {
+      "name": "P4_P",
+      "team": "Team P",
+      "total_points": 5,
+      "rounds": {
+        "1": {
+          "points": 5,
+          "table": "Table 12",
+          "opponents": [
+            52,
+            40,
+            24
+          ]
+        },
+        "2": {
+          "points": 0,
+          "table": "Table 3",
+          "opponents": [
+            39,
+            55,
+            19
+          ]
+        },
+        "3": {
+          "points": 0,
+          "table": "Table 2",
+          "opponents": [
+            38,
+            53,
+            20
+          ]
+        },
+        "4": {
+          "points": 0,
+          "table": "Table 1",
+          "opponents": [
+            37,
+            56,
+            18
+          ]
+        }
+      }
+    },
+    "40": {
+      "name": "P4_J",
+      "team": "Team J",
+      "total_points": 0,
+      "rounds": {
+        "1": {
+          "points": 0,
+          "table": "Table 12",
+          "opponents": [
+            52,
+            64,
+            24
+          ]
+        },
+        "2": {
+          "points": 0,
+          "table": "Table 4",
+          "opponents": [
+            63,
+            56,
+            20
+          ]
+        },
+        "3": {
+          "points": 0,
+          "table": "Table 4",
+          "opponents": [
+            62,
+            55,
+            18
+          ]
+        },
+        "4": {
+          "points": 0,
+          "table": "Table 4",
+          "opponents": [
+            61,
+            53,
+            19
+          ]
+        }
+      }
+    },
+    "24": {
+      "name": "P4_F",
+      "team": "Team F",
+      "total_points": 6,
+      "rounds": {
+        "1": {
+          "points": 0,
+          "table": "Table 12",
+          "opponents": [
+            52,
+            64,
+            40
+          ]
+        },
+        "2": {
+          "points": 5,
+          "table": "Table 8",
+          "opponents": [
+            60,
+            44,
+            31
+          ]
+        },
+        "3": {
+          "points": 1,
+          "table": "Table 6",
+          "opponents": [
+            58,
+            41,
+            32
+          ]
+        },
+        "4": {
+          "points": 0,
+          "table": "Table 7",
+          "opponents": [
+            59,
+            42,
+            30
+          ]
+        },
+        "5": {
+          "points": 0,
+          "table": "Table 8",
+          "opponents": [
+            8,
+            16,
+            32
+          ]
+        }
+      }
+    },
+    "57": {
+      "name": "P1_O",
+      "team": "Team O",
+      "total_points": 7,
+      "rounds": {
+        "1": {
+          "points": 1,
+          "table": "Table 13",
+          "opponents": [
+            13,
+            33,
+            29
+          ]
+        },
+        "2": {
+          "points": 1,
+          "table": "Table 5",
+          "opponents": [
+            41,
+            21,
+            30
+          ]
+        },
+        "3": {
+          "points": 5,
+          "table": "Table 5",
+          "opponents": [
+            42,
+            23,
+            31
+          ]
+        },
+        "4": {
+          "points": 0,
+          "table": "Table 5",
+          "opponents": [
+            44,
+            22,
+            32
+          ]
+        }
+      }
+    },
+    "13": {
+      "name": "P1_D",
+      "team": "Team D",
+      "total_points": 6,
+      "rounds": {
+        "1": {
+          "points": 1,
+          "table": "Table 13",
+          "opponents": [
+            57,
+            33,
+            29
+          ]
+        },
+        "2": {
+          "points": 0,
+          "table": "Table 9",
+          "opponents": [
+            49,
+            1,
+            9
+          ]
+        },
+        "3": {
+          "points": 5,
+          "table": "Table 12",
+          "opponents": [
+            52,
+            3,
+            10
+          ]
+        },
+        "4": {
+          "points": 0,
+          "table": "Table 10",
+          "opponents": [
+            50,
+            4,
+            11
+          ]
+        },
+        "5": {
+          "points": 0,
+          "table": "Table 5",
+          "opponents": [
+            5,
+            21,
+            29
+          ]
+        },
+        "6": {
+          "points": 0,
+          "table": "Table 1",
+          "opponents": [
+            1,
+            5,
+            9
+          ]
+        }
+      }
+    },
+    "33": {
+      "name": "P1_I",
+      "team": "Team I",
+      "total_points": 3,
+      "rounds": {
+        "1": {
+          "points": 1,
+          "table": "Table 13",
+          "opponents": [
+            57,
+            13,
+            29
+          ]
+        },
+        "2": {
+          "points": 0,
+          "table": "Table 13",
+          "opponents": [
+            25,
+            6,
+            45
+          ]
+        },
+        "3": {
+          "points": 1,
+          "table": "Table 14",
+          "opponents": [
+            26,
+            8,
+            48
+          ]
+        },
+        "4": {
+          "points": 1,
+          "table": "Table 16",
+          "opponents": [
+            28,
+            5,
+            47
+          ]
+        }
+      }
+    },
+    "29": {
+      "name": "P1_H",
+      "team": "Team H",
+      "total_points": 2,
+      "rounds": {
+        "1": {
+          "points": 1,
+          "table": "Table 13",
+          "opponents": [
+            57,
+            13,
+            33
+          ]
+        },
+        "2": {
+          "points": 1,
+          "table": "Table 6",
+          "opponents": [
+            58,
+            42,
+            22
+          ]
+        },
+        "3": {
+          "points": 0,
+          "table": "Table 7",
+          "opponents": [
+            59,
+            44,
+            21
+          ]
+        },
+        "4": {
+          "points": 0,
+          "table": "Table 8",
+          "opponents": [
+            60,
+            41,
+            23
+          ]
+        },
+        "5": {
+          "points": 0,
+          "table": "Table 5",
+          "opponents": [
+            5,
+            13,
+            21
+          ]
+        }
+      }
+    },
+    "34": {
+      "name": "P2_I",
+      "team": "Team I",
+      "total_points": 8,
+      "rounds": {
+        "1": {
+          "points": 1,
+          "table": "Table 14",
+          "opponents": [
+            58,
+            14,
+            30
+          ]
+        },
+        "2": {
+          "points": 5,
+          "table": "Table 14",
+          "opponents": [
+            26,
+            5,
+            46
+          ]
+        },
+        "3": {
+          "points": 1,
+          "table": "Table 13",
+          "opponents": [
+            25,
+            7,
+            47
+          ]
+        },
+        "4": {
+          "points": 1,
+          "table": "Table 15",
+          "opponents": [
+            27,
+            6,
+            48
+          ]
+        }
+      }
+    },
+    "58": {
+      "name": "P2_O",
+      "team": "Team O",
+      "total_points": 8,
+      "rounds": {
+        "1": {
+          "points": 1,
+          "table": "Table 14",
+          "opponents": [
+            34,
+            14,
+            30
+          ]
+        },
+        "2": {
+          "points": 1,
+          "table": "Table 6",
+          "opponents": [
+            42,
+            22,
+            29
+          ]
+        },
+        "3": {
+          "points": 1,
+          "table": "Table 6",
+          "opponents": [
+            41,
+            24,
+            32
+          ]
+        },
+        "4": {
+          "points": 5,
+          "table": "Table 6",
+          "opponents": [
+            43,
+            21,
+            31
+          ]
+        }
+      }
+    },
+    "14": {
+      "name": "P2_D",
+      "team": "Team D",
+      "total_points": 9,
+      "rounds": {
+        "1": {
+          "points": 1,
+          "table": "Table 14",
+          "opponents": [
+            34,
+            58,
+            30
+          ]
+        },
+        "2": {
+          "points": 1,
+          "table": "Table 10",
+          "opponents": [
+            50,
+            2,
+            10
+          ]
+        },
+        "3": {
+          "points": 1,
+          "table": "Table 11",
+          "opponents": [
+            51,
+            4,
+            9
+          ]
+        },
+        "4": {
+          "points": 5,
+          "table": "Table 9",
+          "opponents": [
+            49,
+            3,
+            12
+          ]
+        },
+        "5": {
+          "points": 0,
+          "table": "Table 6",
+          "opponents": [
+            6,
+            22,
+            30
+          ]
+        },
+        "6": {
+          "points": 1,
+          "table": "Table 2",
+          "opponents": [
+            2,
+            6,
+            10
+          ]
+        }
+      }
+    },
+    "30": {
+      "name": "P2_H",
+      "team": "Team H",
+      "total_points": 7,
+      "rounds": {
+        "1": {
+          "points": 1,
+          "table": "Table 14",
+          "opponents": [
+            34,
+            58,
+            14
+          ]
+        },
+        "2": {
+          "points": 1,
+          "table": "Table 5",
+          "opponents": [
+            57,
+            41,
+            21
+          ]
+        },
+        "3": {
+          "points": 0,
+          "table": "Table 8",
+          "opponents": [
+            60,
+            43,
+            22
+          ]
+        },
+        "4": {
+          "points": 0,
+          "table": "Table 7",
+          "opponents": [
+            59,
+            42,
+            24
+          ]
+        },
+        "5": {
+          "points": 5,
+          "table": "Table 6",
+          "opponents": [
+            6,
+            14,
+            22
+          ]
+        }
+      }
+    },
+    "15": {
+      "name": "P3_D",
+      "team": "Team D",
+      "total_points": 7,
+      "rounds": {
+        "1": {
+          "points": 1,
+          "table": "Table 15",
+          "opponents": [
+            59,
+            35,
+            31
+          ]
+        },
+        "2": {
+          "points": 0,
+          "table": "Table 11",
+          "opponents": [
+            51,
+            3,
+            11
+          ]
+        },
+        "3": {
+          "points": 1,
+          "table": "Table 10",
+          "opponents": [
+            50,
+            1,
+            12
+          ]
+        },
+        "4": {
+          "points": 5,
+          "table": "Table 12",
+          "opponents": [
+            52,
+            2,
+            9
+          ]
+        },
+        "5": {
+          "points": 0,
+          "table": "Table 7",
+          "opponents": [
+            7,
+            23,
+            31
+          ]
+        },
+        "6": {
+          "points": 0,
+          "table": "Table 3",
+          "opponents": [
+            3,
+            7,
+            11
+          ]
+        }
+      }
+    },
+    "59": {
+      "name": "P3_O",
+      "team": "Team O",
+      "total_points": 7,
+      "rounds": {
+        "1": {
+          "points": 1,
+          "table": "Table 15",
+          "opponents": [
+            15,
+            35,
+            31
+          ]
+        },
+        "2": {
+          "points": 1,
+          "table": "Table 7",
+          "opponents": [
+            43,
+            23,
+            32
+          ]
+        },
+        "3": {
+          "points": 0,
+          "table": "Table 7",
+          "opponents": [
+            44,
+            21,
+            29
+          ]
+        },
+        "4": {
+          "points": 5,
+          "table": "Table 7",
+          "opponents": [
+            42,
+            24,
+            30
+          ]
+        }
+      }
+    },
+    "35": {
+      "name": "P3_I",
+      "team": "Team I",
+      "total_points": 6,
+      "rounds": {
+        "1": {
+          "points": 1,
+          "table": "Table 15",
+          "opponents": [
+            15,
+            59,
+            31
+          ]
+        },
+        "2": {
+          "points": 5,
+          "table": "Table 15",
+          "opponents": [
+            27,
+            8,
+            47
+          ]
+        },
+        "3": {
+          "points": 0,
+          "table": "Table 16",
+          "opponents": [
+            28,
+            6,
+            46
+          ]
+        },
+        "4": {
+          "points": 0,
+          "table": "Table 14",
+          "opponents": [
+            26,
+            7,
+            45
+          ]
+        }
+      }
+    },
+    "31": {
+      "name": "P3_H",
+      "team": "Team H",
+      "total_points": 6,
+      "rounds": {
+        "1": {
+          "points": 1,
+          "table": "Table 15",
+          "opponents": [
+            15,
+            59,
+            35
+          ]
+        },
+        "2": {
+          "points": 0,
+          "table": "Table 8",
+          "opponents": [
+            60,
+            44,
+            24
+          ]
+        },
+        "3": {
+          "points": 0,
+          "table": "Table 5",
+          "opponents": [
+            57,
+            42,
+            23
+          ]
+        },
+        "4": {
+          "points": 0,
+          "table": "Table 6",
+          "opponents": [
+            58,
+            43,
+            21
+          ]
+        },
+        "5": {
+          "points": 5,
+          "table": "Table 7",
+          "opponents": [
+            7,
+            15,
+            23
+          ]
+        }
+      }
+    },
+    "60": {
+      "name": "P4_O",
+      "team": "Team O",
+      "total_points": 5,
+      "rounds": {
+        "1": {
+          "points": 0,
+          "table": "Table 16",
+          "opponents": [
+            16,
+            36,
+            32
+          ]
+        },
+        "2": {
+          "points": 0,
+          "table": "Table 8",
+          "opponents": [
+            44,
+            24,
+            31
+          ]
+        },
+        "3": {
+          "points": 0,
+          "table": "Table 8",
+          "opponents": [
+            43,
+            22,
+            30
+          ]
+        },
+        "4": {
+          "points": 5,
+          "table": "Table 8",
+          "opponents": [
+            41,
+            23,
+            29
+          ]
+        }
+      }
+    },
+    "16": {
+      "name": "P4_D",
+      "team": "Team D",
+      "total_points": 5,
+      "rounds": {
+        "1": {
+          "points": 0,
+          "table": "Table 16",
+          "opponents": [
+            60,
+            36,
+            32
+          ]
+        },
+        "2": {
+          "points": 5,
+          "table": "Table 12",
+          "opponents": [
+            52,
+            4,
+            12
+          ]
+        },
+        "3": {
+          "points": 0,
+          "table": "Table 9",
+          "opponents": [
+            49,
+            2,
+            11
+          ]
+        },
+        "4": {
+          "points": 0,
+          "table": "Table 11",
+          "opponents": [
+            51,
+            1,
+            10
+          ]
+        },
+        "5": {
+          "points": 0,
+          "table": "Table 8",
+          "opponents": [
+            8,
+            24,
+            32
+          ]
+        },
+        "6": {
+          "points": 0,
+          "table": "Table 4",
+          "opponents": [
+            4,
+            8,
+            12
+          ]
+        }
+      }
+    },
+    "36": {
+      "name": "P4_I",
+      "team": "Team I",
+      "total_points": 6,
+      "rounds": {
+        "1": {
+          "points": 5,
+          "table": "Table 16",
+          "opponents": [
+            60,
+            16,
+            32
+          ]
+        },
+        "2": {
+          "points": 0,
+          "table": "Table 16",
+          "opponents": [
+            28,
+            7,
+            48
+          ]
+        },
+        "3": {
+          "points": 1,
+          "table": "Table 15",
+          "opponents": [
+            27,
+            5,
+            45
+          ]
+        },
+        "4": {
+          "points": 0,
+          "table": "Table 13",
+          "opponents": [
+            25,
+            8,
+            46
+          ]
+        }
+      }
+    },
+    "32": {
+      "name": "P4_H",
+      "team": "Team H",
+      "total_points": 7,
+      "rounds": {
+        "1": {
+          "points": 0,
+          "table": "Table 16",
+          "opponents": [
+            60,
+            16,
+            36
+          ]
+        },
+        "2": {
+          "points": 1,
+          "table": "Table 7",
+          "opponents": [
+            59,
+            43,
+            23
+          ]
+        },
+        "3": {
+          "points": 1,
+          "table": "Table 6",
+          "opponents": [
+            58,
+            41,
+            24
+          ]
+        },
+        "4": {
+          "points": 0,
+          "table": "Table 5",
+          "opponents": [
+            57,
+            44,
+            22
+          ]
+        },
+        "5": {
+          "points": 5,
+          "table": "Table 8",
+          "opponents": [
+            8,
+            16,
+            24
+          ]
+        }
+      }
+    }
+  },
+  "timestamp": "2025-12-26T23:48:28.387472"
+}
