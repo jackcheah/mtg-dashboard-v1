@@ -22,7 +22,7 @@ pip install -r requirements.txt
 python tournament_dashboard.py
 
 # Access dashboard
-open http://127.0.0.1:5000
+open http://127.0.0.1:5001
 ```
 
 ### Testing
@@ -67,7 +67,8 @@ python tests/e2e/simulate_tournament_flow.py
 |-----------|------|-------------|
 | **TournamentManager** | `tournament_dashboard.py` | Central state management, tournament lifecycle |
 | **UnifiedSwissPairing** | `unified_swiss_pairing.py` | Constraint satisfaction solver for pod generation |
-| **Frontend SPA** | `templates/dashboard_ultra_modern.html` | Single HTML file (~4,600 lines) with embedded CSS/JS |
+| **Frontend SPA** | `templates/dashboard_ultra_modern.html` | Single HTML file (~4,640 lines) with embedded CSS/JS |
+| **Projector View** | `templates/projector_view.html` | Read-only audience display (~670 lines) |
 
 ### Frontend Architecture (UX Overhaul)
 - **Vanilla JS**: No framework overhead. Classes (`ModalManager`, `KeyboardNavigator`) used for organization.
@@ -180,21 +181,41 @@ Excel/Sample Data → load_participants() → TournamentManager state
 
 ```
 mtg-dashboard-v1/
-├── tournament_dashboard.py          # Main Flask app (~3400 lines)
-├── unified_swiss_pairing.py         # Pairing algorithm (~1800 lines)
+├── tournament_dashboard.py          # Main Flask app (~3870 lines)
+├── unified_swiss_pairing.py         # Pairing algorithm (~2130 lines)
 ├── templates/
-│   └── dashboard_ultra_modern.html  # Frontend UI (~4600 lines)
-├── test_tournament_comprehensive.py # Full tournament flow tests
-├── test_score_correction.py         # Score editing tests
-├── test_backup_restore.py           # Backup/restore tests
+│   ├── dashboard_ultra_modern.html  # Frontend UI (~4640 lines)
+│   └── projector_view.html          # Projector display (~670 lines)
+├── tests/
+│   └── e2e/                         # End-to-End test suite
+│       ├── README.md                # E2E test documentation
+│       ├── simulate_tournament_flow.py   # Basic E2E simulation
+│       ├── simulate_full_tournament.py   # Comprehensive E2E with tracking
+│       └── generate_16_teams.py          # Test data generator
 ├── participants/
 │   └── participant_team.xlsx        # Default Excel file path
-├── venv/                            # Python virtual environment
-├── requirements.txt                 # Python dependencies
-└── CLAUDE.md                        # This file
+├── requirements.txt                 # Python dependencies (Flask, openpyxl)
+├── Dockerfile                       # Docker container configuration
+├── docker-compose.yml               # Docker Compose setup
+├── TOURNAMENT_SCORING_SYSTEM.md     # Detailed scoring documentation
+├── CLAUDE.md                        # This file
+└── README.md                        # User documentation
 ```
 
 ---
+
+## Docker Deployment
+
+```bash
+# Build and run with Docker Compose
+docker-compose up --build
+
+# Or use the convenience scripts
+./build-and-run.sh    # Mac/Linux
+.\build-and-run.bat   # Windows
+```
+
+The container exposes port 5001 and uses Werkzeug production mode.
 
 ---
 

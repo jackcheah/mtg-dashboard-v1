@@ -54,7 +54,7 @@ pip install flask openpyxl
 python tournament_dashboard.py
 ```
 
-The dashboard will be available at: **http://127.0.0.1:5000**
+The dashboard will be available at: **http://127.0.0.1:5001**
 
 ## Quick Start Guide
 
@@ -204,6 +204,14 @@ Each round follows this cycle:
 - Info icon explains pairing logic
 - Score progression visible in real-time
 
+### Projector View
+
+**Read-Only Display for Audience:**
+- Access at `/projector` for a full-screen, audience-friendly display
+- Large timer with visual warnings (color changes at 90%, blinking when over)
+- Automatic view switching: Pairings → Standings → Champion
+- High-contrast dark theme optimized for projectors
+
 ### Keyboard Shortcuts
 Press `?` (Shift+/) at any time to see this list in the app.
 
@@ -220,16 +228,25 @@ Press `?` (Shift+/) at any time to see this list in the app.
 ## File Structure
 
 ```
-MTG-Tournament-Dashboard-AugmentCode/
-├── tournament_dashboard.py          # Main Flask application (116 KB)
-├── unified_swiss_pairing.py         # Swiss pairing algorithm (78 KB)
+mtg-dashboard-v1/
+├── tournament_dashboard.py          # Main Flask application (~3870 lines)
+├── unified_swiss_pairing.py         # Swiss pairing algorithm (~2130 lines)
 ├── templates/
-│   └── dashboard_ultra_modern.html  # Frontend UI template (135 KB)
+│   ├── dashboard_ultra_modern.html  # Frontend UI template (~4640 lines)
+│   └── projector_view.html          # Read-only projector display (~670 lines)
 ├── participants/                    # Excel participant files
 │   └── participant_team.xlsx        # Default Excel file path
-├── tournament_backups/              # Empty (backup disabled)
+├── tests/
+│   └── e2e/                         # End-to-End test suite
+│       ├── simulate_tournament_flow.py  # Basic E2E simulation
+│       ├── simulate_full_tournament.py  # Comprehensive E2E with tracking
+│       └── generate_16_teams.py         # Test data generator
+├── requirements.txt                 # Python dependencies
+├── Dockerfile                       # Docker container configuration
+├── docker-compose.yml               # Docker Compose setup
 ├── README.md                        # User documentation (this file)
-└── PROJECT_SUMMARY.md               # Technical documentation
+├── CLAUDE.md                        # Developer/AI assistant guide
+└── TOURNAMENT_SCORING_SYSTEM.md     # Detailed scoring documentation
 ```
 
 ## Using Custom Participant Data
@@ -260,6 +277,39 @@ If no Excel file is found, the system automatically loads sample data with 8 tea
 **Note:** To use a different file path, edit line 1358 in `tournament_dashboard.py`:
 ```python
 excel_path = 'your/custom/path/to/file.xlsx'
+```
+
+## Testing (E2E)
+
+A comprehensive **End-to-End test suite** is available in `tests/e2e/`:
+
+```bash
+# Install Playwright
+pip install playwright
+playwright install chromium
+
+# Run E2E simulation (server must be running)
+cd tests/e2e
+python simulate_tournament_flow.py          # Basic simulation
+python simulate_full_tournament.py          # Full simulation with tracking
+```
+
+The E2E tests validate:
+- **Swiss Pairing Rules**: No repeat matchups, teammate separation
+- **Phase Transitions**: Swiss → Top 8 Cut → Finals
+- **Champion Declaration**: Tournament completes successfully
+
+See `tests/e2e/README.md` for detailed documentation.
+
+## Docker Deployment
+
+```bash
+# Build and run with Docker Compose
+docker-compose up --build
+
+# Or use the convenience scripts
+./build-and-run.sh    # Mac/Linux
+.\build-and-run.bat   # Windows
 ```
 
 ## Troubleshooting
