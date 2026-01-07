@@ -12,6 +12,18 @@ A comprehensive web-based tournament management system for Magic: The Gathering 
 - **Finals Generation**: Automatic advancement to finals based on standings
 - **Modern UI**: Clean, responsive interface with real-time updates
 - **Sample Data**: Built-in sample data for testing and demonstrations
+- **Production-Ready Reliability**: Thread-safe operations, automatic backups, and crash recovery
+- **Automatic Backup System**: Saves every 5 minutes + manual backup button for critical moments
+- **Backup Rotation**: Keeps 4 backup files for recovery from corruption
+- **Timer Persistence**: Tournament timer survives server restarts
+- **Backup Health Monitoring**: Real-time visibility into backup status via /backup_health endpoint
+
+- **Production-Ready Reliability**: Thread-safe operations, automatic backups, and crash recovery
+- **Automatic Backup System**: Saves every 5 minutes + manual backup button for critical moments
+- **Backup Rotation**: Keeps 4 backup files for recovery from corruption
+- **Timer Persistence**: Tournament timer survives server restarts
+- **Backup Health Monitoring**: Real-time visibility into backup status via /backup_health endpoint
+
 
 ## System Requirements
 
@@ -334,20 +346,71 @@ docker-compose up --build
 2. Click "Setup Tournament"
 3. Happens if page left open between server restarts
 
+## Production Features (New!)
+
+### Automatic Backup & Recovery System
+
+The system now includes enterprise-grade backup and recovery features for reliable 12+ hour operation:
+
+**Automatic Backups:**
+- Saves tournament state every 5 minutes automatically
+- Backs up after every critical operation (load, setup, score submission)
+- Keeps 4 backup files: current + 3 historical versions
+- Backup rotation protects against file corruption
+
+**Manual Backup:**
+- "Save Backup Now" button in Setup Tournament Controls
+- Use before critical transitions (Round 4, Top 8 Cut, Finals)
+- Instant feedback with toast notifications
+
+**Crash Recovery:**
+- Server automatically restores state from backup on startup
+- Timer continues from where it left off
+- All scores, pairings, and tournament state preserved
+
+**Backup Health Monitoring:**
+- Visit `http://127.0.0.1:5001/backup_health` to check backup status
+- Shows last success/failure timestamps
+- Tracks consecutive backup failures
+- Displays backup file size and location
+
+**Thread Safety:**
+- All operations protected with locks for concurrent access
+- Safe to have multiple browser windows open
+- No data corruption from simultaneous score submissions
+
+### How to Use:
+
+1. **Before Event:** Test the "Save Backup Now" button
+2. **During Event:** System auto-saves every 5 minutes (watch console for "[AUTO-BACKUP]" messages)
+3. **Manual Backups:** Click "Save Backup Now" before Round 4, Top 8 Cut, and Finals
+4. **Monitor Health:** Check console logs for backup success/failure messages
+5. **If Server Crashes:** Just restart - it auto-restores from backup!
+
+### Backup Files Location:
+- `tournament_state.json.bak` (current backup)
+- `tournament_state.json.bak.1` (1 save ago)
+- `tournament_state.json.bak.2` (2 saves ago)  
+- `tournament_state.json.bak.3` (3 saves ago)
+
+---
+
 ## Known Limitations
 
 1. Single tournament at a time
-2. No persistence (state lost on server restart) - Use "Backup State" button between rounds
+2. ~~No persistence~~ **Now has automatic backups!** State persists across restarts
 3. Local-only by default
 4. Manual scoring required
 
 ## For Local PC Use
 
 **Running this locally on your PC?** Perfect!
-- ✅ **100% Production Ready** - No changes needed, just run it
+- ✅ **100% Production Ready** - Enhanced with automatic backups and crash recovery
 - ✅ **Perfectly Secure** - Not exposed to internet = no security concerns
-- ✅ Keep Python and browser running during tournament (don't restart PC)
-- ✅ Optional: Click "Backup State" between rounds for safety
+- ✅ **12+ Hour Stable** - Automatic backups every 5 minutes + timer persistence
+- ✅ **Crash Recovery** - Server restart? No problem! Auto-restores from backup
+- ✅ **Manual Control** - "Save Backup Now" button for peace of mind
+- ✅ Keep Python and browser running during tournament (but restarts are safe now!)
 
 ## Credits
 

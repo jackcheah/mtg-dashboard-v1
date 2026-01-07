@@ -244,7 +244,8 @@ class TournamentManager:
                     if s.value == saved_state_str:
                         self.state = s
                         break
-            except:
+            except (ValueError, AttributeError, KeyError) as e:
+                print(f"[ERROR] Failed to restore state enum '{saved_state_str}': {e}")
                 self.state = TournamentState.INITIAL
 
             # Restore Timer State
@@ -1712,6 +1713,21 @@ tournament = TournamentManager()
 
 # Thread safety lock for concurrent access protection
 tournament_lock = threading.Lock()
+
+
+def periodic_backup_thread(tournament_obj, interval=300):
+    """Background thread to save backup every 5 minutes (300 seconds)"""
+    while True:
+        time.sleep(interval)
+        try:
+            with tournament_lock:
+                success = tournament_obj.save_backup()
+                if success:
+                    print(f"[AUTO-BACKUP] Periodic backup completed at {datetime.now()}")
+                else:
+                    print(f"[AUTO-BACKUP ERROR] Backup failed at {datetime.now()}")
+        except Exception as e:
+            print(f"[AUTO-BACKUP ERROR] {e}")
 
 # Thread-safe decorator for state-modifying endpoints
 def with_lock(f):
@@ -3968,6 +3984,15 @@ if __name__ == '__main__':
         print("[RESTORE] Restoring tournament state from backup...")
         tournament.load_backup(tournament.backup_file)
     
+    
+    # Start periodic backup thread (every 5 minutes)
+    backup_thread = threading.Thread(
+        target=periodic_backup_thread,
+        args=(tournament,),
+        daemon=True  # Daemon thread will stop when main program exits
+    )
+    backup_thread.start()
+    print("[AUTO-BACKUP] Periodic backup thread started (interval: 5 minutes)")
     import os
     debug_mode = os.getenv('FLASK_ENV') != 'production'
     app.run(

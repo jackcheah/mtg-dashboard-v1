@@ -128,6 +128,14 @@ Excel/Sample Data → load_participants() → TournamentManager state
 | `/get_state_info` | GET | Current state and valid next actions |
 | `/get_tables/<round>` | GET | Table assignments for a round |
 
+
+### Backup & Monitoring (New!)
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/save_backup` | POST | Manually trigger backup save |
+| `/backup_health` | GET | Get backup health status (last success/failure, file info) |
+| `/restore_backup` | POST | Restore tournament state from backup file |
+
 ### Finals
 | Endpoint | Method | Description |
 |----------|--------|-------------|
@@ -151,6 +159,17 @@ Excel/Sample Data → load_participants() → TournamentManager state
 - Double-submission prevention (backend tracking + frontend disable)
 
 ### Phase 3: UX (Dec 2025 Overhaul) ✅
+### Phase 4: Production Hardening (Jan 2026) ✅
+- **Thread Safety**: All state-modifying endpoints protected with locks for concurrent access
+- **Automatic Backups**: Background thread saves state every 5 minutes
+- **Backup Rotation**: 4-level rotation system (current + 3 historical backups)
+- **Timer Persistence**: Timer state saved/restored across server restarts
+- **Backup Health Monitoring**: /backup_health endpoint for real-time status
+- **Manual Backup Button**: "Save Backup Now" in frontend for user control
+- **Crash Recovery**: Automatic state restoration on server startup
+- **Improved Error Handling**: Specific exception types with detailed logging
+
+
 - **Visuals**: "Ultra Modern" glassmorphism UI, Sticky Header, Dynamic Timer.
 - **Efficiency**: "Auto-fill losers" (75% click reduction), "Batch Submit".
 - **Accessibility**: Full keyboard navigation (`Tab`, `1/2/3`, `Ctrl+Enter`) and `?` help overlay.
@@ -198,6 +217,9 @@ mtg-dashboard-v1/
 ├── Dockerfile                       # Docker container configuration
 ├── docker-compose.yml               # Docker Compose setup
 ├── TOURNAMENT_SCORING_SYSTEM.md     # Detailed scoring documentation
+├── BACKUP-PLAN.md                   # 12-hour production readiness plan
+├── PHASE1-IMPLEMENTATION-SUMMARY.md # Phase 1 critical fixes documentation
+├── PHASE2-IMPLEMENTATION-SUMMARY.md # Phase 2 high priority fixes documentation
 ├── CLAUDE.md                        # This file
 └── README.md                        # User documentation
 ```

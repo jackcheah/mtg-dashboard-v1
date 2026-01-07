@@ -3083,6 +3083,10 @@
                             <i class="fas fa-trophy"></i>
                             <span>Setup Tournament</span>
                         </button>
+                        <button class="btn btn-primary" onclick="manualBackup()">
+                            <i class="fas fa-save"></i>
+                            <span>Save Backup Now</span>
+                        </button>
                         <button class="btn btn-warning" onclick="restoreBackup()">
                             <i class="fas fa-history"></i>
                             <span>Restore Backup</span>
@@ -3504,6 +3508,7 @@
 
         // Server-Side Timer functionality
         let seconds = 0;
+        let timerIntervalId = null;
 
         async function startTimer() {
             await fetch('/control_timer', {
@@ -3547,8 +3552,30 @@
             }
         }
 
-        // Poll regularly to stay in sync
-        setInterval(pollTimer, 1000);
+        // Timer polling management
+        function startTimerPolling() {
+            // Clear existing interval if any
+            if (timerIntervalId) {
+                clearInterval(timerIntervalId);
+            }
+            // Start new interval
+            timerIntervalId = setInterval(pollTimer, 1000);
+        }
+
+        function stopTimerPolling() {
+            if (timerIntervalId) {
+                clearInterval(timerIntervalId);
+                timerIntervalId = null;
+            }
+        }
+
+        // Start polling on page load
+        startTimerPolling();
+
+        // Clean up on page unload
+        window.addEventListener('beforeunload', () => {
+            stopTimerPolling();
+        });
 
         function updateTimerDisplay() {
             const hrs = Math.floor(seconds / 3600);
@@ -4031,7 +4058,30 @@
             }
         }
 
-        // Restore Backup
+        // Manual Backup
+        async function manualBackup() {
+            try {
+                showToast('Saving...', 'Creating manual backup...', 'info');
+
+                const response = await fetch('/save_backup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showToast('Success', 'Backup saved successfully!', 'success');
+                } else {
+                    showToast('Backup Failed', data.message, 'error');
+                }
+            } catch (error) {
+                showToast('Error', 'Failed to save backup: ' + error.message, 'error');
+                console.error('Manual backup error:', error);
+            }
+        }
+
+                // Restore Backup
         async function restoreBackup() {
             const confirmed = await modalManager.confirm(
                 'Restore Backup',
