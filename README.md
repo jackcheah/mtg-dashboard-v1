@@ -18,12 +18,6 @@ A comprehensive web-based tournament management system for Magic: The Gathering 
 - **Timer Persistence**: Tournament timer survives server restarts
 - **Backup Health Monitoring**: Real-time visibility into backup status via /backup_health endpoint
 
-- **Production-Ready Reliability**: Thread-safe operations, automatic backups, and crash recovery
-- **Automatic Backup System**: Saves every 5 minutes + manual backup button for critical moments
-- **Backup Rotation**: Keeps 4 backup files for recovery from corruption
-- **Timer Persistence**: Tournament timer survives server restarts
-- **Backup Health Monitoring**: Real-time visibility into backup status via /backup_health endpoint
-
 
 ## System Requirements
 
@@ -241,11 +235,11 @@ Press `?` (Shift+/) at any time to see this list in the app.
 
 ```
 mtg-dashboard-v1/
-├── tournament_dashboard.py          # Main Flask application (~3870 lines)
-├── unified_swiss_pairing.py         # Swiss pairing algorithm (~2130 lines)
+├── tournament_dashboard.py          # Main Flask application (~4000 lines)
+├── unified_swiss_pairing.py         # Swiss pairing algorithm (~2370 lines)
 ├── templates/
-│   ├── dashboard_ultra_modern.html  # Frontend UI template (~4640 lines)
-│   └── projector_view.html          # Read-only projector display (~670 lines)
+│   ├── dashboard_ultra_modern.html  # Frontend UI template (~5530 lines)
+│   └── projector_view.html          # Read-only projector display (~700 lines)
 ├── participants/                    # Excel participant files
 │   └── participant_team.xlsx        # Default Excel file path
 ├── tests/
@@ -286,7 +280,7 @@ If no Excel file is found, the system automatically loads sample data with 8 tea
 - Total teams must be 8, 12, or 16
 - Player IDs must be unique
 
-**Note:** To use a different file path, edit line 1358 in `tournament_dashboard.py`:
+**Note:** To use a different file path, edit line 1819 in `tournament_dashboard.py`:
 ```python
 excel_path = 'your/custom/path/to/file.xlsx'
 ```
@@ -359,7 +353,8 @@ The system now includes enterprise-grade backup and recovery features for reliab
 - Backup rotation protects against file corruption
 
 **Manual Backup:**
-- "Save Backup Now" button in Setup Tournament Controls
+- "Save Backup" button available throughout the entire tournament
+- Visible during setup, Swiss rounds, Top 8 Cut, and Finals
 - Use before critical transitions (Round 4, Top 8 Cut, Finals)
 - Instant feedback with toast notifications
 

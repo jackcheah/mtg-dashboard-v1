@@ -67,8 +67,8 @@ python tests/e2e/simulate_tournament_flow.py
 |-----------|------|-------------|
 | **TournamentManager** | `tournament_dashboard.py` | Central state management, tournament lifecycle |
 | **UnifiedSwissPairing** | `unified_swiss_pairing.py` | Constraint satisfaction solver for pod generation |
-| **Frontend SPA** | `templates/dashboard_ultra_modern.html` | Single HTML file (~4,640 lines) with embedded CSS/JS |
-| **Projector View** | `templates/projector_view.html` | Read-only audience display (~670 lines) |
+| **Frontend SPA** | `templates/dashboard_ultra_modern.html` | Single HTML file (~5,530 lines) with embedded CSS/JS |
+| **Projector View** | `templates/projector_view.html` | Read-only audience display (~700 lines) |
 
 ### Frontend Architecture (UX Overhaul)
 - **Vanilla JS**: No framework overhead. Classes (`ModalManager`, `KeyboardNavigator`) used for organization.
@@ -165,7 +165,7 @@ Excel/Sample Data → load_participants() → TournamentManager state
 - **Backup Rotation**: 4-level rotation system (current + 3 historical backups)
 - **Timer Persistence**: Timer state saved/restored across server restarts
 - **Backup Health Monitoring**: /backup_health endpoint for real-time status
-- **Manual Backup Button**: "Save Backup Now" in frontend for user control
+- **Manual Backup Button**: "Save Backup" button available throughout entire tournament (setup, Swiss rounds, Top 8 Cut, Finals)
 - **Crash Recovery**: Automatic state restoration on server startup
 - **Improved Error Handling**: Specific exception types with detailed logging
 
@@ -200,11 +200,11 @@ Excel/Sample Data → load_participants() → TournamentManager state
 
 ```
 mtg-dashboard-v1/
-├── tournament_dashboard.py          # Main Flask app (~3870 lines)
-├── unified_swiss_pairing.py         # Pairing algorithm (~2130 lines)
+├── tournament_dashboard.py          # Main Flask app (~4000 lines)
+├── unified_swiss_pairing.py         # Pairing algorithm (~2370 lines)
 ├── templates/
-│   ├── dashboard_ultra_modern.html  # Frontend UI (~4640 lines)
-│   └── projector_view.html          # Projector display (~670 lines)
+│   ├── dashboard_ultra_modern.html  # Frontend UI (~5530 lines)
+│   └── projector_view.html          # Projector display (~700 lines)
 ├── tests/
 │   └── e2e/                         # End-to-End test suite
 │       ├── README.md                # E2E test documentation
