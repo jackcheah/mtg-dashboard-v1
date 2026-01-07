@@ -7,8 +7,18 @@ import os
 from itertools import combinations
 from enum import Enum
 from functools import wraps
+import threading
+import time
 
 app = Flask(__name__)
+
+# Production configuration
+app.config.update(
+    MAX_CONTENT_LENGTH=16 * 1024 * 1024,  # 16MB max upload
+    JSON_SORT_KEYS=False,  # Performance
+    SEND_FILE_MAX_AGE_DEFAULT=0,  # No caching for dynamic content
+    JSONIFY_PRETTYPRINT_REGULAR=False  # Smaller responses
+)
 
 # Tournament State Machine (Phase 3.4)
 class TournamentState(Enum):
@@ -61,6 +71,11 @@ class TournamentManager:
         self.timer_duration = 3000 # Default 50 mins
         self.backup_file = 'tournament_state.json.bak'
 
+        # Backup health tracking
+        self.last_backup_success = None
+        self.last_backup_failure = None
+        self.consecutive_backup_failures = 0
+
     def transition_to(self, new_state: TournamentState, reason: str = ""):
         """Transition to a new state with logging (Phase 3.4)."""
         old_state = self.state
@@ -92,12 +107,29 @@ class TournamentManager:
                 return obj
 
         try:
+            # Rotate existing backups (keep last 3)
+            for i in range(2, 0, -1):
+                old_file = f"{filepath}.{i}"
+                new_file = f"{filepath}.{i+1}"
+                if os.path.exists(old_file):
+                    try:
+                        os.replace(old_file, new_file)
+                    except Exception as e:
+                        print(f"[BACKUP] Warning: Failed to rotate {old_file}: {e}")
+
+            # Move current backup to .1
+            if os.path.exists(filepath):
+                try:
+                    os.replace(filepath, f"{filepath}.1")
+                except Exception as e:
+                    print(f"[BACKUP] Warning: Failed to rotate current backup: {e}")
+
             # Convert sets to lists for JSON serialization
             submitted_rounds_list = list(self.submitted_rounds)
             finalized_rounds_list = list(self.finalized_rounds)
             # Convert nested sets in round_results (e.g., submitted_tables)
             round_results_serializable = convert_sets_to_lists(self.round_results)
-            
+
             state = {
                 "version": "2.0",
                 "timestamp": datetime.now().isoformat(),
@@ -113,6 +145,12 @@ class TournamentManager:
                     "submitted_rounds": submitted_rounds_list,
                     "finalized_rounds": finalized_rounds_list,
                     "tournament_state": self.state.value
+                },
+                "timer": {
+                    "running": self.timer_running,
+                    "start_time": self.timer_start_time.isoformat() if self.timer_start_time else None,
+                    "paused_at": self.timer_paused_at,
+                    "duration": self.timer_duration
                 },
                 "data": {
                     "teams": self.teams,
@@ -138,12 +176,19 @@ class TournamentManager:
                 os.replace(temp_path, filepath)
             else:
                 os.rename(temp_path, filepath)
-                
+
+            # Track backup success
+            self.last_backup_success = datetime.now()
+            self.consecutive_backup_failures = 0
             print(f"[BACKUP] Tournament state saved successfully to {filepath}")
             return True
-            
+
         except Exception as e:
+            # Track backup failure
+            self.last_backup_failure = datetime.now()
+            self.consecutive_backup_failures += 1
             print(f"[ERROR] Failed to save backup: {e}")
+            print(f"[ERROR] Consecutive failures: {self.consecutive_backup_failures}")
             import traceback
             traceback.print_exc()
             return False
@@ -201,7 +246,16 @@ class TournamentManager:
                         break
             except:
                 self.state = TournamentState.INITIAL
-            
+
+            # Restore Timer State
+            timer_data = state_data.get('timer', {})
+            self.timer_running = timer_data.get('running', False)
+            start_time_str = timer_data.get('start_time')
+            self.timer_start_time = datetime.fromisoformat(start_time_str) if start_time_str else None
+            self.timer_paused_at = timer_data.get('paused_at', 0)
+            self.timer_duration = timer_data.get('duration', 3000)
+            print(f"[BACKUP] Timer restored: running={self.timer_running}, paused_at={self.timer_paused_at}s")
+
             # Restore Data
             data = state_data.get('data', {})
             self.teams = data.get('teams', {})
@@ -1656,6 +1710,27 @@ class TournamentManager:
 # Initialize tournament manager
 tournament = TournamentManager()
 
+# Thread safety lock for concurrent access protection
+tournament_lock = threading.Lock()
+
+# Thread-safe decorator for state-modifying endpoints
+def with_lock(f):
+    """
+    Decorator to ensure thread-safe access to tournament state.
+    Wraps endpoint execution in tournament_lock context.
+
+    Usage:
+        @with_lock
+        def my_endpoint():
+            # This code is protected by tournament_lock
+            ...
+    """
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        with tournament_lock:
+            return f(*args, **kwargs)
+    return decorated_function
+
 # State validation decorator (Phase 3.4)
 def require_state(*allowed_states):
     """
@@ -1690,6 +1765,7 @@ def index():
     return render_template('dashboard_ultra_modern.html')
 
 @app.route('/load_data', methods=['GET', 'POST'])
+@with_lock
 def load_data():
     """Load participant data from Excel file and configure Swiss rounds"""
     try:
@@ -1808,6 +1884,7 @@ def load_data():
         }), 500
 
 @app.route('/restore_backup', methods=['POST'])
+@with_lock
 def restore_backup():
     """Restore tournament state from backup"""
     try:
@@ -1885,6 +1962,7 @@ def configure_swiss_rounds():
     })
 
 @app.route('/setup_tournament', methods=['POST'])
+@with_lock
 @require_state(TournamentState.PARTICIPANTS_LOADED, TournamentState.TOURNAMENT_SETUP)
 def setup_tournament():
     """Setup tournament with all teams in a single group"""
@@ -1934,6 +2012,7 @@ def setup_tournament():
         }), 500
 
 @app.route('/submit_player_results', methods=['POST'])
+@with_lock
 def submit_player_results():
     """Finalize round (without adding points again - they're already added via table submissions)"""
     try:
@@ -2210,6 +2289,7 @@ def submit_player_results():
         }), 500
 
 @app.route('/submit_table_results', methods=['POST'])
+@with_lock
 @require_state(
     TournamentState.TOURNAMENT_SETUP,
     TournamentState.SWISS_IN_PROGRESS,
@@ -2447,6 +2527,7 @@ def get_submission_status(round_num):
 # ============================================
 
 @app.route('/edit_table_results', methods=['POST'])
+@with_lock
 @require_state(
     TournamentState.SWISS_IN_PROGRESS,
     TournamentState.TOP8_IN_PROGRESS,
@@ -3771,6 +3852,25 @@ def save_backup_endpoint():
             'message': f'Error saving backup: {str(e)}'
         }), 500
 
+@app.route('/backup_health', methods=['GET'])
+def backup_health():
+    """Get backup health status for monitoring"""
+    try:
+        return jsonify({
+            'success': True,
+            'last_success': tournament.last_backup_success.isoformat() if tournament.last_backup_success else None,
+            'last_failure': tournament.last_backup_failure.isoformat() if tournament.last_backup_failure else None,
+            'consecutive_failures': tournament.consecutive_backup_failures,
+            'backup_file_exists': os.path.exists(tournament.backup_file),
+            'backup_file_size': os.path.getsize(tournament.backup_file) if os.path.exists(tournament.backup_file) else 0,
+            'backup_file_path': tournament.backup_file
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
 @app.route('/reset_tournament', methods=['POST'])
 def reset_tournament():
     """Reset tournament to initial state"""
@@ -3804,7 +3904,7 @@ def reset_tournament():
         # Delete backup file on reset
         if os.path.exists(tournament.backup_file):
             os.remove(tournament.backup_file)
-            print("🗑️ Backup file deleted")
+            print("[CLEANUP] Backup file deleted")
 
         return jsonify({
             'success': True,
@@ -3823,12 +3923,13 @@ def reset_tournament():
 # ==========================================
 
 @app.route('/get_timer')
+@with_lock
 def get_timer():
     """Get current timer state"""
     elapsed = tournament.timer_paused_at
     if tournament.timer_running and tournament.timer_start_time:
         elapsed += (datetime.now() - tournament.timer_start_time).total_seconds()
-    
+
     return jsonify({
         'running': tournament.timer_running,
         'elapsed': int(elapsed),
@@ -3836,6 +3937,7 @@ def get_timer():
     })
 
 @app.route('/control_timer', methods=['POST'])
+@with_lock
 def control_timer():
     """Control the tournament timer"""
     action = request.json.get('action')
@@ -3863,9 +3965,15 @@ def control_timer():
 if __name__ == '__main__':
     # Attempt to restore state from backup on startup
     if os.path.exists(tournament.backup_file):
-        print("🔄 Restoring tournament state from backup...")
+        print("[RESTORE] Restoring tournament state from backup...")
         tournament.load_backup(tournament.backup_file)
     
     import os
     debug_mode = os.getenv('FLASK_ENV') != 'production'
-    app.run(debug=debug_mode, host='0.0.0.0', port=5001)
+    app.run(
+        debug=debug_mode,
+        host="0.0.0.0",
+        port=5001,
+        threaded=True,  # Enable concurrent requests (safe with locks)
+        use_reloader=False  # Prevent double initialization
+    )
