@@ -51,7 +51,7 @@ Or using a virtual environment (recommended):
 ```bash
 # Windows
 python -m venv venv
-venv\Scriptsctivate
+venv\Scripts\activate
 pip install flask openpyxl
 
 # Mac/Linux
