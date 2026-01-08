@@ -189,12 +189,25 @@ class TournamentSimulator:
                 # Phase 1: Setup
                 self._setup_tournament(page)
                 
+                # Verify Backup (Post-Setup)
+                self._test_manual_backup(page, "Post-Setup")
+                
                 # Phase 2: Swiss Rounds (1-4)
                 for round_num in range(1, self.swiss_rounds + 1):
+                    # Manual Backup before Round 4 (Critical transition)
+                    if round_num == 4:
+                         self._test_manual_backup(page, "Pre-Round 4")
+                    
                     self._play_round(page, round_num, "Swiss")
+                
+                # Verify Backup (Pre-Top 8)
+                self._test_manual_backup(page, "Pre-Top 8")
                 
                 # Phase 3: Top 8 Cut (Round 5)
                 self._play_round(page, self.swiss_rounds + 1, "Top8Cut")
+                
+                # Verify Backup (Pre-Finals)
+                self._test_manual_backup(page, "Pre-Finals")
                 
                 # Phase 4: Finals (Round 6)
                 self._play_round(page, self.swiss_rounds + 2, "Finals")
@@ -574,6 +587,45 @@ class TournamentSimulator:
             })
         
         self.test_results['final_standings'] = final_standings
+    
+    def _test_manual_backup(self, page, context_name):
+        """Test the manual backup functionality."""
+        print(f"\n[{context_name}] Testing Manual Backup...")
+        
+        try:
+            # Find the backup button (match 'Save Backup' or 'Save Backup Now')
+            # There may be multiple buttons (setup vs active), so find the visible one
+            buttons = page.locator("button").filter(has_text="Save Backup").all()
+            backup_btn = None
+            for btn in buttons:
+                if btn.is_visible():
+                    backup_btn = btn
+                    break
+            
+            if not backup_btn:
+                print("  ⚠️  Backup button not visible!")
+                return
+            
+            # Click it
+            backup_btn.click()
+            
+            # Wait for toast notification
+            # The toast might take a moment to appear
+            try:
+                # Wait specifically for the success toast
+                toast = page.locator(".toast-success").filter(has_text="Backup saved successfully").first
+                toast.wait_for(state="visible", timeout=5000)
+                print("  ✅ Backup verified: Success toast appeared")
+            except PlaywrightTimeout:
+                print("  ⚠️  Timeout waiting for backup success toast")
+                # Check if any other toast is visible for debugging
+                visible_toasts = page.locator(".toast-success:visible").all_inner_texts()
+                if visible_toasts:
+                    print(f"      Visible toasts: {visible_toasts}")
+                
+        except Exception as e:
+            print(f"  ❌ Backup test failed: {e}")
+            self.test_results['errors'].append(f"Backup test failed ({context_name}): {e}")
     
     def _generate_report(self):
         """Generate and save the test report."""
