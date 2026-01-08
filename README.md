@@ -113,65 +113,59 @@ Each round follows this cycle:
 - **12 Teams** (48 players): 4 Swiss rounds → Finals (top 4)
 - **16 Teams** (64 players): 4 Swiss rounds → Top 8 Cut → Finals (top 4)
 
-### Scoring System
+### Scoring & Advancement System
 
-**Individual Player Scores:**
-- **Win**: 5 points
-- **Draw**: 1 point
-- **Loss**: 0 points
+The system uses a stage-based scoring approach where performance in the current stage acts as the primary advancement criteria, while previous stages serve as tiebreakers.
 
-**Team Scores:**
-- Sum of all 4 players' scores for each round
-- Scores are tracked separately for each stage (Swiss, Top 8 Cut, Finals)
-- Team advancement and rankings use stage-specific scoring
+#### 1. Core Principles
+1.  **Stage-Specific Scoring**: Scores are tracked separately for Swiss, Top 8 Cut, and Finals.
+2.  **Performance-Based Advancement**: Teams advance based on performance in the *current* stage.
+3.  **Historical Tiebreakers**: Previous round scores are used ONLY to break ties.
+4.  **No Score Carrying**: Teams cannot "coast" on early performance.
 
-### Tournament Progression Logic
+#### 2. Individual Point System
+-   **Win:** 5 points
+-   **Draw:** 1 point
+-   **Loss:** 0 points
+-   **Team Score:** Sum of all 4 players' scores for the round.
 
-#### **16-Team Tournament:**
+#### 3. Tournament Stages (16-Team Format)
 
-**Swiss Rounds (Rounds 1-4):**
-- All 16 teams compete
-- Scores accumulate across rounds
-- Top 8 teams advance to Top 8 Cut
+**Stage 1: Swiss Rounds (Rounds 1-4)**
+-   All 16 teams compete.
+-   Scores accumulate across all 4 rounds.
+-   **Top 8** teams based on total Swiss scores advance to the Top 8 Cut.
 
-**Top 8 Cut (Round 5):**
-- Top 8 teams compete in 8 tables (2 pods of 4 teams)
-- **Swiss scores are saved and frozen**
-- **Top 8 Cut scores tracked separately**
-- Advancement to Finals determined by:
-  - **PRIMARY:** Top 8 Cut round scores (Round 5 only)
-  - **TIEBREAKER:** Swiss round scores (Rounds 1-4)
-- Top 4 teams advance to Finals
+**Stage 2: Top 8 Cut (Round 5)**
+-   8 Teams compete in 2 pods of 4.
+-   **Scoring:** Only points earned in Round 5 count towards advancement.
+-   **Advancement Criteria:**
+    1.  **Primary:** Points earned in Top 8 Cut (Round 5).
+    2.  **Tiebreaker:** Total Swiss Points (Rounds 1-4).
+-   **Top 4** teams advance to Finals.
 
-**Finals (Round 6):**
-- Top 4 teams compete in 4 tables (1 pod)
-- **Finals scores tracked separately**
-- Champion determined by:
-  - **PRIMARY:** Finals round scores (Round 6 only)
-  - **TIEBREAKER:** Swiss + Top 8 Cut combined scores
-- Winner receives championship trophy
+**Stage 3: Finals (Round 6)**
+-   4 Teams compete in a single pod.
+-   **Scoring:** Only points earned in Round 6 count for the title.
+-   **Champion Determination:**
+    1.  **Primary:** Points earned in Finals (Round 6).
+    2.  **Tiebreaker:** Combined Swiss + Top 8 Cut Points (Rounds 1-5).
 
-#### **8-Team & 12-Team Tournaments:**
+*(Note: For 8/12-team formats, the Top 8 Cut is skipped, and top 4 from Swiss advance directly to Finals.)*
 
-**Swiss Rounds (Rounds 1-4):**
-- All teams compete
-- Scores accumulate across rounds
-- Top 4 teams advance to Finals
+### Pairing & Seating Algorithm
 
-**Finals (Round 5):**
-- Top 4 teams compete in 4 tables (1 pod)
-- **Swiss scores saved and frozen**
-- **Finals scores tracked separately**
-- Champion determined by:
-  - **PRIMARY:** Finals round scores (Round 5 only)
-  - **TIEBREAKER:** Swiss round scores (Rounds 1-4)
+**1. Traditional Swiss Pairing**
+-   **Goal:** Winners play Winners. Teams are grouped by score brackets.
+-   **Constraint - Zero Repeats:** Teams will never face the same opponent twice.
+-   **Constraint - Teammate Avoidance:** Teammates will never be paired at the same table.
+-   **Optimization:** If a repeat is unavoidable in a bracket, the system swaps the lowest-ranked team with a neighbor, minimizing score disruption.
 
-### Key Principles
-
-1. **Current Round Performance Matters Most**: Advancement and winning are primarily determined by performance in the current playoff round
-2. **Previous Rounds as Tiebreakers**: Earlier round scores are only used to break ties
-3. **Separate Score Tracking**: Each stage (Swiss, Top 8 Cut, Finals) tracks scores independently
-4. **Fair Competition**: Teams cannot coast on early performance - they must perform in each playoff stage
+**2. Intelligent Seating**
+-   Players are seated at the table based on their individual performance.
+-   **Seat 1:** Highest individual scorer.
+-   **Seat 4:** Lowest individual scorer.
+-   This balances the "Pod A/B/C/D" strength across the tournament.
 
 ### Pairing Algorithm
 

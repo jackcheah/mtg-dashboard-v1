@@ -145,6 +145,63 @@ Excel/Sample Data → load_participants() → TournamentManager state
 
 ---
 
+## Comprehensive Testing Guide (E2E)
+
+The project uses a sophisticated Playwright-based simulation suite to verify the complex tournament logic.
+
+### 1. Test Scripts (`tests/e2e/`)
+
+| Script | Purpose | Recommended For |
+|--------|---------|-----------------|
+| `simulate_full_tournament.py` | **Full Verification**. Tracks every player/team through 6 rounds. Checks Swiss pairings, Top 8 logic, and Finals. Generates `tournament_test_report.json`. | **Pre-Release Validation** |
+| `simulate_tournament_flow.py` | **Basic Check**. Quick run-through of the flow without deep tracking. | **Quick Sanity Check** |
+| `generate_16_teams.py` | **Data Gen**. Creates `participant_team.xlsx` with 16 teams (64 players). | **Test Setup** |
+
+### 2. Running the Full Simulation
+1.  **Start Server**: `python tournament_dashboard.py`
+2.  **Run Test**: `python tests/e2e/simulate_full_tournament.py`
+
+### 3. What It Validates
+*   **Swiss Logic**: Checks 0 repeat matchups and 0 teammate pairings in Swiss rounds.
+*   **Phase Transitions**: Verifies correct advancement from Swiss -> Top 8 -> Finals.
+*   **Champion**: Ensures a winner is declared.
+*   **Backup System**: Verifies "Save Backup" button works at critical stages.
+
+---
+
+## Architecture Deep Dive: Backup & Recovery
+
+The system was hardened for 12-hour production stability (Jan 2026).
+
+### 1. Persistence Layer
+*   **Format**: JSON serialization of the `TournamentManager` state.
+*   **Location**: Root directory (`tournament_state.json.bak`).
+*   **Frequency**:
+    *   **Automatic**: Every 5 minutes (via background daemon thread).
+    *   **Triggered**: On every critical state change (Setup, Score Submit, Round Gen).
+    *   **Manual**: User-initiated via UI button.
+
+### 2. Rotation Strategy (3-Level Redundancy)
+To prevent data corruption during write operations, we maintain 4 files:
+1.  `tournament_state.json.bak`: Latest successful save.
+2.  `tournament_state.json.bak.1`: Previous save (-1).
+3.  `tournament_state.json.bak.2`: Save before that (-2).
+4.  `tournament_state.json.bak.3`: Oldest version (-3).
+
+### 3. Crash Recovery
+*   **Mechanism**: On startup, `TournamentManager` checks for `.bak` files.
+*   **Process**:
+    1.  Loads state into memory.
+    2.  Restores all objects (players, teams, pairings, scores).
+    3.  **Timer Restoration**: Restores `timer_start_time` and `elapsed` so the clock resumes correctly.
+    4.  Frontend automatically syncs with backend state on page load.
+
+### 4. Monitoring
+*   **Endpoint**: `/backup_health` returns JSON status (last success, failures, file size).
+*   **Frontend**: UI polls this endpoint to detect silent backup failures (e.g., disk full).
+
+---
+
 ## Features Implemented
 
 ### Phase 1: Core Tournament Flow ✅
