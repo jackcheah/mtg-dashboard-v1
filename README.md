@@ -56,11 +56,24 @@ pip install flask openpyxl
 
 ### 3. Run the Application
 
+**Every time you work on the project:**
+
 ```bash
+# Option A: Mac/Linux
+source venv/bin/activate
+
+# Option B: Windows (Command Prompt)
+venv\Scripts\activate
+# OR Windows (PowerShell)
+.\venv\Scripts\Activate.ps1
+
+# 2. Start the server
 python tournament_dashboard.py
 ```
 
 The dashboard will be available at: **http://127.0.0.1:5001**
+
+> **Note:** You only need to run `pip install` once (during Step 2). For daily use, just activate and run.
 
 ## Quick Start Guide
 

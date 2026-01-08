@@ -13,17 +13,34 @@ MTG Tournament Dashboard is a production-ready web-based tournament management s
 
 ## Quick Start
 
+### 1. First Time Setup
 ```bash
-# Install dependencies
-source venv/bin/activate  # Mac/Linux
-pip install -r requirements.txt
+# Mac/Linux
+python3 -m venv venv
+source venv/bin/activate
 
-# Run the application
+# Windows
+python -m venv venv
+venv\Scripts\activate
+
+# Install dependencies (only do this when requirements change)
+pip install -r requirements.txt
+```
+
+### 2. Daily Workflow
+```bash
+# 1. Activate environment (Required for every new terminal)
+# Mac/Linux:
+source venv/bin/activate
+# Windows:
+venv\Scripts\activate
+
+# 2. Run application
 python tournament_dashboard.py
+```
 
 # Access dashboard
 open http://127.0.0.1:5001
-```
 
 ### Testing
 
