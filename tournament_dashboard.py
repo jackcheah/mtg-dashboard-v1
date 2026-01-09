@@ -1204,7 +1204,134 @@ class TournamentManager:
         except Exception as e:
             print(f"[ERROR] Error determining tournament winner: {str(e)}")
             return None
-    
+
+    def get_mvp(self):
+        """Get MVP from Top 4 teams - player with highest individual total score
+
+        Returns:
+            dict: {
+                'player_name': str,
+                'team_name': str,
+                'total_score': int
+            } or None if data unavailable
+        """
+        try:
+            # Get final standings
+            final_standings = self.calculate_final_round_standings()
+            if not final_standings or len(final_standings) < 4:
+                print("[MVP] Cannot calculate MVP - insufficient final standings data")
+                return None
+
+            # Get Top 4 team names
+            top4_teams = [team['team'] for team in final_standings[:4]]
+            print(f"[MVP] Calculating MVP among Top 4 teams: {top4_teams}")
+
+            # Find all players belonging to Top 4 teams
+            top4_players = {}
+            for participant in self.participants:
+                team_name = participant.get('Team Name')
+                if team_name in top4_teams:
+                    player_id = participant.get('Player ID')
+                    if player_id in self.player_scores:
+                        top4_players[player_id] = {
+                            'player_name': participant.get('Player Name', 'Unknown'),
+                            'team_name': team_name,
+                            'total_score': self.player_scores[player_id]
+                        }
+
+            if not top4_players:
+                print("[MVP] No players found in Top 4 teams")
+                return None
+
+            # Find player with highest score
+            mvp_id = max(top4_players.keys(), key=lambda pid: top4_players[pid]['total_score'])
+            mvp_data = top4_players[mvp_id]
+
+            print(f"[MVP] MVP: {mvp_data['player_name']} ({mvp_data['team_name']}) - {mvp_data['total_score']} pts")
+
+            return mvp_data
+
+        except Exception as e:
+            print(f"[ERROR] Error calculating MVP: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            return None
+
+    def get_team_tiebreaker_key(self, team_name, total_score):
+        """Calculate comprehensive tiebreaker key for team ranking
+
+        Tiebreaker hierarchy:
+        1. Total team score (primary)
+        2. Best individual player score
+        3. Average player score
+        4. Earliest wins (more wins in earlier rounds)
+
+        Returns:
+            tuple: (total_score, best_player_score, avg_player_score, early_wins_score)
+        """
+        team_players = self.teams.get(team_name, [])
+
+        # Get all player scores for this team
+        player_scores = []
+        for player in team_players:
+            player_id = player.get('Player ID')
+            score = self.player_scores.get(player_id, 0)
+            player_scores.append(score)
+
+        # Tiebreaker 2: Best player score
+        best_player_score = max(player_scores) if player_scores else 0
+
+        # Tiebreaker 3: Average player score (as integer to avoid float comparison issues)
+        avg_player_score = int(sum(player_scores) / len(player_scores) * 1000) if player_scores else 0
+
+        # Tiebreaker 4: Early wins score
+        # Calculate weighted score: Round 1 wins worth more than Round 2, etc.
+        early_wins_score = self.calculate_early_wins_score(team_name)
+
+        return (total_score, best_player_score, avg_player_score, early_wins_score)
+
+    def calculate_early_wins_score(self, team_name):
+        """Calculate weighted score based on when wins occurred
+
+        Wins in earlier rounds are worth more:
+        - Round 1 win: 1000 points
+        - Round 2 win: 100 points
+        - Round 3 win: 10 points
+        - Round 4 win: 1 point
+
+        This ensures teams with more early wins rank higher.
+        """
+        if not hasattr(self, 'round_results') or not self.round_results:
+            return 0
+
+        team_players = self.teams.get(team_name, [])
+        player_ids = [p.get('Player ID') for p in team_players]
+
+        early_wins_score = 0
+        round_weights = {1: 1000, 2: 100, 3: 10, 4: 1}
+
+        # Iterate through each round
+        for round_num in sorted(self.round_results.keys()):
+            if round_num > 4:  # Only consider Swiss rounds (1-4)
+                continue
+
+            if 'players' not in self.round_results[round_num]:
+                continue
+
+            # Get weight for this round (earlier rounds = higher weight)
+            weight = round_weights.get(round_num, 0)
+
+            # Count points scored by team players in this round
+            round_team_points = 0
+            for player_id in player_ids:
+                if player_id in self.round_results[round_num]['players']:
+                    round_team_points += self.round_results[round_num]['players'][player_id]
+
+            # Add weighted score (each point in earlier rounds worth more)
+            early_wins_score += round_team_points * weight
+
+        return early_wins_score
+
     def update_final_round_scores(self, round_num, player_results):
         """Update final round scores separately from Swiss round scores"""
         # Only process the actual finals round (last round of the tournament)
@@ -1293,16 +1420,30 @@ class TournamentManager:
         try:
             if after_semifinals:
                 print("[TROPHY] Generating FINALS after semifinals (16-team tournament)")
-                # Use Top 8 Cut scores (primary) with Swiss scores (tiebreaker)
+                # Use Top 8 Cut scores (primary) with comprehensive tiebreaker
                 # Top 8 Cut scores should be in self.top8_cut_scores
                 # Swiss scores should already be saved from generate_semifinals_round()
 
-                # Sort by: (1) Top 8 Cut scores DESC, (2) Swiss scores DESC (tiebreaker)
+                print(f"[TIEBREAKER] Applying multi-level tiebreaker for Top 4 Finals:")
+                print(f"   1. Top 8 Cut score")
+                print(f"   2. Swiss round score")
+                print(f"   3. Best individual player score")
+                print(f"   4. Average player score")
+                print(f"   5. Early wins (Round 1 > Round 2 > Round 3 > Round 4)")
+
+                # Sort by: (1) Top 8 Cut scores DESC, (2) Comprehensive tiebreaker
                 def get_top8_ranking(team_score_tuple):
                     team_name = team_score_tuple[0]
                     top8_score = self.top8_cut_scores.get(team_name, 0) if hasattr(self, 'top8_cut_scores') else 0
                     swiss_score = self.swiss_round_scores.get(team_name, 0)
-                    return (top8_score, swiss_score)  # Tuple sorting: primary first, tiebreaker second
+
+                    # Get additional tiebreakers (best player, avg, early wins)
+                    tiebreaker_key = self.get_team_tiebreaker_key(team_name, swiss_score)
+                    best_player = tiebreaker_key[1]
+                    avg_player = tiebreaker_key[2]
+                    early_wins = tiebreaker_key[3]
+
+                    return (top8_score, swiss_score, best_player, avg_player, early_wins)
 
                 sorted_teams = sorted(
                     self.scores.items(),
@@ -1311,12 +1452,16 @@ class TournamentManager:
                 )
                 top_4_teams = [team for team, score in sorted_teams[:4]]
 
-                print(f"\n[RANK] Finals advancement based on Top 8 Cut scores (Swiss as tiebreaker):")
+                print(f"\n[RANK] Finals advancement with comprehensive tiebreakers:")
                 for rank, (team_name, total_score) in enumerate(sorted_teams[:8], 1):  # Show all Top 8
                     top8_score = self.top8_cut_scores.get(team_name, 0) if hasattr(self, 'top8_cut_scores') else 0
                     swiss_score = self.swiss_round_scores.get(team_name, 0)
+                    tiebreaker_key = self.get_team_tiebreaker_key(team_name, swiss_score)
+                    best_player = tiebreaker_key[1]
+                    avg_player = tiebreaker_key[2] / 1000.0
+                    early_wins = tiebreaker_key[3]
                     status = "→ FINALS" if rank <= 4 else "eliminated"
-                    print(f"  {rank}. {team_name}: Top8={top8_score} pts (primary), Swiss={swiss_score} pts (tiebreaker) [{status}]")
+                    print(f"  {rank}. {team_name}: Top8={top8_score}, Swiss={swiss_score}, Best={best_player}, Avg={avg_player:.1f}, Early={early_wins} [{status}]")
 
             else:
                 print("[TROPHY] Generating FINALS after Swiss rounds (8-team tournament)")
@@ -1326,13 +1471,27 @@ class TournamentManager:
                     self.swiss_round_scores = dict(self.scores)  # Deep copy current scores as Swiss scores
                     print(f"Swiss scores saved: {self.swiss_round_scores}")
 
-                # For 8-team: Use total accumulated scores to get top 4
-                sorted_teams = sorted(self.scores.items(), key=lambda x: x[1], reverse=True)
+                # For 8-team: Use comprehensive tiebreaker to get top 4
+                print(f"[TIEBREAKER] Applying multi-level tiebreaker for Top 4 Finals:")
+                print(f"   1. Total team score")
+                print(f"   2. Best individual player score")
+                print(f"   3. Average player score")
+                print(f"   4. Early wins (Round 1 > Round 2 > Round 3 > Round 4)")
+
+                def get_ranking_key(team_score_tuple):
+                    team_name, total_score = team_score_tuple
+                    return self.get_team_tiebreaker_key(team_name, total_score)
+
+                sorted_teams = sorted(self.scores.items(), key=get_ranking_key, reverse=True)
                 top_4_teams = [team for team, score in sorted_teams[:4]]
 
-            print(f"   Top 4 teams advancing to finals:")
+            print(f"\n   Top 4 teams advancing to finals (with tiebreakers):")
             for rank, (team, score) in enumerate(sorted_teams[:4], 1):
-                print(f"     {rank}. {team}: {score} pts")
+                tiebreaker_key = self.get_team_tiebreaker_key(team, score)
+                best_player = tiebreaker_key[1]
+                avg_player = tiebreaker_key[2] / 1000.0
+                early_wins = tiebreaker_key[3]
+                print(f"     {rank}. {team}: {score} pts (Best: {best_player}, Avg: {avg_player:.1f}, Early: {early_wins})")
             
             # CRITICAL FIX: Organize players by team, then rank within each team
             # This ensures we can assign one player per team per table
@@ -1463,13 +1622,27 @@ class TournamentManager:
             team_count = len(self.teams)
             print(f"[TROPHY] Generating TOP 8 CUT for {team_count}-team tournament")
 
-            # Get top 8 teams by total score
-            sorted_teams = sorted(self.scores.items(), key=lambda x: x[1], reverse=True)
+            # Get top 8 teams by total score WITH comprehensive tiebreaker
+            print(f"[TIEBREAKER] Applying multi-level tiebreaker system:")
+            print(f"   1. Total team score")
+            print(f"   2. Best individual player score")
+            print(f"   3. Average player score")
+            print(f"   4. Early wins (Round 1 > Round 2 > Round 3 > Round 4)")
+
+            def get_ranking_key(team_score_tuple):
+                team_name, total_score = team_score_tuple
+                return self.get_team_tiebreaker_key(team_name, total_score)
+
+            sorted_teams = sorted(self.scores.items(), key=get_ranking_key, reverse=True)
             top_8_teams = [team for team, score in sorted_teams[:8]]
 
-            print(f"   Top 8 teams advancing to Top 8 Cut:")
+            print(f"\n   Top 8 teams advancing to Top 8 Cut (with tiebreakers):")
             for rank, (team, score) in enumerate(sorted_teams[:8], 1):
-                print(f"     {rank}. {team}: {score} pts")
+                tiebreaker_key = self.get_team_tiebreaker_key(team, score)
+                best_player = tiebreaker_key[1]
+                avg_player = tiebreaker_key[2] / 1000.0  # Convert back from integer
+                early_wins = tiebreaker_key[3]
+                print(f"     {rank}. {team}: {score} pts (Best: {best_player}, Avg: {avg_player:.1f}, Early: {early_wins})")
 
             # Rank players within each team by their Swiss performance
             team_ranked_players = {}

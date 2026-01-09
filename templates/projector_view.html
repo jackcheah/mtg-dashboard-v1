@@ -212,51 +212,65 @@
             text-align: right;
         }
 
-        /* Winners View */
-        .winners-container {
+        /* Winners View - Horizontal Split Layout */
+        .winners-header {
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100%;
-            text-align: center;
+            gap: 1rem;
+            padding: 1rem 0;
             background: radial-gradient(circle at center, rgba(139, 92, 246, 0.2), transparent);
         }
 
-        .trophy-icon {
-            font-size: 8rem;
+        .trophy-icon-small {
+            font-size: 3rem;
             color: var(--gold);
-            margin-bottom: 2rem;
-            filter: drop-shadow(0 0 30px rgba(251, 191, 36, 0.5));
+            filter: drop-shadow(0 0 20px rgba(251, 191, 36, 0.5));
             animation: bounce 2s infinite;
         }
 
-        .winner-title {
-            font-size: 3rem;
-            margin-bottom: 1rem;
+        .winner-title-compact {
+            font-size: 2rem;
+            font-weight: 800;
             color: #fff;
-        }
-
-        .winner-team-name {
-            font-size: 6rem;
-            font-weight: 900;
-            background: linear-gradient(to right, #f59e0b, #fbbf24);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 2rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
         }
 
         @keyframes bounce {
-
-            0%,
-            100% {
+            0%, 100% {
                 transform: translateY(0);
             }
-
             50% {
-                transform: translateY(-20px);
+                transform: translateY(-10px);
             }
+        }
+
+        /* Horizontal Split Layout */
+        .winners-layout {
+            display: grid;
+            grid-template-columns: 1.8fr 1fr;
+            gap: 2rem;
+            height: calc(100vh - 160px);
+            padding: 1.5rem;
+            align-items: center;
+        }
+
+        /* Champion Panel (Left) */
+        .champion-panel {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+
+        /* Runners-up Panel (Right) */
+        .runners-up-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            height: 100%;
+            justify-content: center;
         }
 
         /* Notification Overlay */
@@ -341,6 +355,191 @@
             font-size: 0.85rem;
             background: rgba(255, 255, 255, 0.03);
         }
+
+        /* Champion Card - Large and Golden */
+        .champion-card {
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.3), rgba(245, 158, 11, 0.2));
+            border: 3px solid var(--gold);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 0 40px rgba(251, 191, 36, 0.5), 0 8px 32px rgba(0, 0, 0, 0.4);
+            animation: goldGlow 2s infinite alternate;
+            max-width: 700px;
+        }
+
+        @keyframes goldGlow {
+            0% {
+                box-shadow: 0 0 40px rgba(251, 191, 36, 0.5), 0 8px 32px rgba(0, 0, 0, 0.4);
+            }
+            100% {
+                box-shadow: 0 0 60px rgba(251, 191, 36, 0.8), 0 8px 32px rgba(0, 0, 0, 0.4);
+            }
+        }
+
+        .champion-card .rank-badge {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--gold);
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+        }
+
+        .champion-card .team-name {
+            font-size: 4rem;
+            font-weight: 900;
+            background: linear-gradient(to right, #fbbf24, #f59e0b, #fbbf24);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
+        }
+
+        /* Finalists Container - Vertical Stack */
+        .finalists-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .finalist-card {
+            background: var(--bg-card);
+            border: 2px solid var(--border-card);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .finalist-card .rank-badge {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--accent-secondary);
+            margin-bottom: 0.4rem;
+        }
+
+        .finalist-card .team-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-light);
+            margin-bottom: 0.75rem;
+            line-height: 1.2;
+        }
+
+        /* Score Breakdown Styling with Visual Hierarchy */
+        .score-breakdown {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .score-line {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Champion Card Score Sizes */
+        .champion-card .score-line.final-score {
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: #fbbf24;
+            margin-bottom: 0.5rem;
+        }
+
+        .champion-card .score-line.topcut-score {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #94a3b8;
+        }
+
+        .champion-card .score-line.swiss-score {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #64748b;
+        }
+
+        /* Finalist Card Score Sizes */
+        .finalist-card .score-line.final-score {
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: #fbbf24;
+        }
+
+        .finalist-card .score-line.topcut-score {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #94a3b8;
+        }
+
+        .finalist-card .score-line.swiss-score {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #64748b;
+        }
+
+        .score-label {
+            font-weight: inherit;
+        }
+
+        .score-value {
+            font-weight: inherit;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .score-stars {
+            margin-right: 0.25rem;
+        }
+
+        /* MVP Section - Compact */
+        .mvp-section {
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 2px solid var(--border-card);
+            text-align: center;
+        }
+
+        .mvp-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--accent-primary);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+        }
+
+        .mvp-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .mvp-player-name {
+            font-size: 2rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #8b5cf6, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.2;
+        }
+
+        .mvp-team {
+            font-size: 1.2rem;
+            color: var(--accent-secondary);
+            opacity: 0.8;
+        }
+
+        .mvp-score {
+            font-size: 1.5rem;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--gold);
+            margin-top: 0.25rem;
+        }
     </style>
 </head>
 
@@ -390,11 +589,34 @@
 
         <!-- View C: Winners -->
         <div id="winnersView" class="view-container">
-            <div class="winners-container">
-                <i class="fas fa-trophy trophy-icon"></i>
-                <div class="winner-title">TOURNAMENT CHAMPIONS</div>
-                <div id="winnerTeamName" class="winner-team-name">Team Name</div>
-                <div style="font-size: 2rem; opacity: 0.8;">Congratulations!</div>
+            <div class="winners-header">
+                <i class="fas fa-trophy trophy-icon-small"></i>
+                <div class="winner-title-compact">TOURNAMENT CHAMPIONS</div>
+            </div>
+
+            <div class="winners-layout">
+                <!-- Left Panel: Champion -->
+                <div class="champion-panel">
+                    <div id="championCard">
+                        <!-- Populated via JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Right Panel: Finalists + MVP -->
+                <div class="runners-up-panel">
+                    <!-- Finalists (2nd-4th) -->
+                    <div id="finalistsContainer" class="finalists-container">
+                        <!-- Populated via JavaScript -->
+                    </div>
+
+                    <!-- MVP Section -->
+                    <div id="mvpSection" class="mvp-section">
+                        <div class="mvp-title">TOURNAMENT MVP</div>
+                        <div id="mvpContent" class="mvp-content">
+                            <!-- Populated via JavaScript -->
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </main>
@@ -685,13 +907,112 @@
 
         async function fetchStandingsForWinner() {
             try {
-                const res = await fetch('/standings');
+                const res = await fetch('/final_standings');
                 const data = await res.json();
-                if (data.success && data.standings.length > 0) {
-                    const winner = data.standings[0];
-                    document.getElementById('winnerTeamName').textContent = winner.team;
+                if (data.success && data.final_standings && data.final_standings.length >= 4) {
+                    renderTop4AndMVP(data.final_standings, data.mvp);
                 }
-            } catch (e) { }
+            } catch (e) {
+                console.error('Error fetching final standings:', e);
+            }
+        }
+
+        function renderTop4AndMVP(finalStandings, mvpData) {
+            const championCard = document.getElementById('championCard');
+            const finalistsContainer = document.getElementById('finalistsContainer');
+            const mvpContent = document.getElementById('mvpContent');
+
+            // Clear existing content
+            championCard.innerHTML = '';
+            finalistsContainer.innerHTML = '';
+
+            // Render Champion (Rank 1) in left panel
+            const champion = finalStandings[0];
+            const championElement = createTeamCard(champion, 1, true);
+            championCard.appendChild(championElement);
+
+            // Render Finalists (Ranks 2-4) in right panel
+            for (let i = 1; i < 4 && i < finalStandings.length; i++) {
+                const finalist = finalStandings[i];
+                const finalistCard = createTeamCard(finalist, i + 1, false);
+                finalistsContainer.appendChild(finalistCard);
+            }
+
+            // Render MVP in right panel
+            if (mvpData) {
+                mvpContent.innerHTML = `
+                    <div class="mvp-player-name">${mvpData.player_name}</div>
+                    <div class="mvp-team">${mvpData.team_name}</div>
+                    <div class="mvp-score">${mvpData.total_score} Points</div>
+                `;
+            } else {
+                mvpContent.innerHTML = '<div style="opacity: 0.5;">MVP data unavailable</div>';
+            }
+        }
+
+        function createTeamCard(teamData, rank, isChampion) {
+            const card = document.createElement('div');
+            card.className = isChampion ? 'champion-card' : 'finalist-card';
+
+            const rankBadge = getRankBadge(rank);
+            const scoreBreakdown = createScoreBreakdown(teamData);
+
+            card.innerHTML = `
+                <div class="rank-badge">${rankBadge}</div>
+                <div class="team-name">${teamData.team}</div>
+                <div class="score-breakdown">
+                    ${scoreBreakdown}
+                </div>
+            `;
+
+            return card;
+        }
+
+        function getRankBadge(rank) {
+            switch(rank) {
+                case 1: return '🏆 CHAMPION';
+                case 2: return '🥈 2nd Place';
+                case 3: return '🥉 3rd Place';
+                case 4: return '4th Place';
+                default: return `${rank}th Place`;
+            }
+        }
+
+        function createScoreBreakdown(teamData) {
+            let html = '';
+
+            // Final Score - MOST IMPORTANT (★★★)
+            html += `
+                <div class="score-line final-score">
+                    <span class="score-stars">★★★</span>
+                    <span class="score-label">Final:</span>
+                    <span class="score-value">${teamData.final_points} pts</span>
+                </div>
+            `;
+
+            // Top Cut Score (only if exists) - SECONDARY (★★)
+            if (teamData.top8_cut_points > 0) {
+                html += `
+                    <div class="score-line topcut-score">
+                        <span class="score-stars">★★</span>
+                        <span class="score-label">Top Cut:</span>
+                        <span class="score-value">${teamData.top8_cut_points} pts</span>
+                    </div>
+                `;
+            }
+
+            // Swiss Score - TERTIARY (★)
+            html += `
+                <div class="score-line swiss-score">
+                    <span class="score-stars">★</span>
+                    <span class="score-label">Swiss:</span>
+                    <span class="score-value">${teamData.swiss_points} pts</span>
+                </div>
+            `;
+
+            // Total Score REMOVED per user request
+
+            return html;
         }
 
         // Poll every 1 second
