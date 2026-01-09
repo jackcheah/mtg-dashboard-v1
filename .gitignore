@@ -54,6 +54,6 @@ htmlcov/
 *.log
 .mcp.json
 .claude/settings.local.json
-tournament_state.json.bak
+tournament_state.json.bak*
 .claude/settings.local.json
 
