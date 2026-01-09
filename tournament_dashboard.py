@@ -2148,7 +2148,9 @@ def submit_player_results():
                     print("[OK] Finals generated successfully!")
                     # CRITICAL FIX: Update state to enable Finals submissions
                     tournament.state = TournamentState.FINALS_IN_PROGRESS
-                    print(f"[STATE] Transitioning to {tournament.state}")
+                    # CRITICAL FIX: Increment current round for Finals (Round 6 for 16-team)
+                    tournament.current_round = tournament.max_rounds
+                    print(f"[STATE] Transitioning to {tournament.state}, Round {tournament.current_round}")
                 else:
                     print("[ERROR] Failed to generate finals")
 
@@ -3454,12 +3456,41 @@ def standings():
     """Get current standings (sorted by score)"""
     # Get Swiss round scores for reference (if available)
     swiss_scores = getattr(tournament, 'swiss_round_scores', {})
-    
-    # Check if we're in playoff phase (Top Cut or Finals)
-    is_playoff = tournament.state.value in ['top8_in_progress', 'top8_complete', 'finals_in_progress', 'finals_complete', 'swiss_complete']
-    
+
+    # Check if we're in finals phase - use proper finals calculation
+    if tournament.state.value in ['finals_in_progress', 'finals_complete']:
+        # Use the proper finals calculation which sorts by: Finals pts -> Top8/Swiss tiebreaker
+        final_standings = tournament.calculate_final_round_standings()
+
+        if final_standings:
+            # Convert final_standings to the format expected by the frontend
+            standings_list = [
+                {
+                    'rank': idx + 1,
+                    'team': standing['team'],
+                    'score': standing['total_points'],
+                    'total_points': standing['total_points'],
+                    'swiss_points': standing['swiss_points'],
+                    'top8_cut_points': standing.get('top8_cut_points', 0),
+                    'final_points': standing['final_points'],
+                    'current_phase_points': standing['final_points'],  # Finals points only
+                    'players': tournament.teams.get(standing['team'], [])
+                }
+                for idx, standing in enumerate(final_standings)
+            ]
+
+            return jsonify({
+                'success': True,
+                'standings': standings_list,
+                'total_teams': len(standings_list),
+                'current_state': tournament.state.value
+            })
+
+    # Check if we're in playoff phase (Top Cut)
+    is_playoff = tournament.state.value in ['top8_in_progress', 'top8_complete', 'swiss_complete']
+
     if is_playoff and swiss_scores:
-        # During playoffs: Sort by current phase score (total - swiss), then Swiss as tiebreaker
+        # During Top 8 playoffs: Sort by current phase score (total - swiss), then Swiss as tiebreaker
         sorted_standings = sorted(
             tournament.scores.items(),
             key=lambda x: (x[1] - swiss_scores.get(x[0], 0), swiss_scores.get(x[0], 0)),
