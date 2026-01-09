@@ -73,6 +73,7 @@ python tests/e2e/simulate_tournament_flow.py
 - **Win:** 5 points | **Draw:** 1 point | **Loss:** 0 points
 - Team score = Sum of all 4 players' scores
 - Finals winner determined by finals performance, Swiss as tiebreaker
+- **Tiebreakers:** Best player score → Average player score → Early wins (exponentially weighted by round)
 
 ---
 
@@ -82,10 +83,10 @@ python tests/e2e/simulate_tournament_flow.py
 
 | Component | File | Description |
 |-----------|------|-------------|
-| **TournamentManager** | `tournament_dashboard.py` | Central state management, tournament lifecycle |
+| **TournamentManager** | `tournament_dashboard.py` | Central state management, tournament lifecycle, tiebreaker logic |
 | **UnifiedSwissPairing** | `unified_swiss_pairing.py` | Constraint satisfaction solver for pod generation |
 | **Frontend SPA** | `templates/dashboard_ultra_modern.html` | Single HTML file (~5,530 lines) with embedded CSS/JS |
-| **Projector View** | `templates/projector_view.html` | Read-only audience display (~700 lines) |
+| **Projector View** | `templates/projector_view.html` | Read-only audience display with champion/MVP showcase (~800 lines) |
 
 ### Frontend Architecture (UX Overhaul)
 - **Vanilla JS**: No framework overhead. Classes (`ModalManager`, `KeyboardNavigator`) used for organization.
@@ -153,12 +154,35 @@ Excel/Sample Data → load_participants() → TournamentManager state
 | `/backup_health` | GET | Get backup health status (last success/failure, file info) |
 | `/restore_backup` | POST | Restore tournament state from backup file |
 
-### Finals
+### Finals & Display
 | Endpoint | Method | Description |
 |----------|--------|-------------|
 | `/generate_semifinals_round` | POST | Generate Top 8 Cut (16-team only) |
 | `/generate_finals` | POST | Generate Finals (top 4 teams) |
 | `/standings` | GET | Current team standings |
+| `/final_standings` | GET | **Final standings with MVP calculation** |
+
+---
+
+## Key Backend Methods
+
+### Tiebreaker System (TournamentManager)
+
+**`get_mvp(self)`** (Line ~1208)
+- Finds highest individual scorer among Top 4 teams
+- Returns dict: `{player_name, team_name, total_score}`
+- Used by `/final_standings` endpoint for projector display
+
+**`get_team_tiebreaker_key(team_name, total_score)`** (Line ~1260)
+- Returns tuple for lexicographic sorting: `(total_score, best_player_score, avg_player_score, early_wins_score)`
+- Used by `generate_semifinals_round()` and `generate_unified_finals()`
+- Ensures consistent tiebreaker application across all advancement decisions
+
+**`calculate_early_wins_score(team_name)`** (Line ~1293)
+- Calculates weighted score based on round timing
+- Formula: `Round1_pts × 1000 + Round2_pts × 100 + Round3_pts × 10 + Round4_pts × 1`
+- Example: 2 wins in Round 1 (10 pts × 1000 = 10,000) beats 2 wins in Round 2 (10 pts × 100 = 1,000)
+- Rewards consistent early performance over late surge
 
 ---
 
@@ -233,6 +257,11 @@ To prevent data corruption during write operations, we maintain 4 files:
 - Double-submission prevention (backend tracking + frontend disable)
 
 ### Phase 3: UX (Dec 2025 Overhaul) ✅
+- **Visuals**: "Ultra Modern" glassmorphism UI, Sticky Header, Dynamic Timer.
+- **Efficiency**: "Auto-fill losers" (75% click reduction), "Batch Submit".
+- **Accessibility**: Full keyboard navigation (`Tab`, `1/2/3`, `Ctrl+Enter`) and `?` help overlay.
+- **Feedback**: Stacked toasts, custom non-blocking modals (no use of `window.confirm`).
+
 ### Phase 4: Production Hardening (Jan 2026) ✅
 - **Thread Safety**: All state-modifying endpoints protected with locks for concurrent access
 - **Automatic Backups**: Background thread saves state every 5 minutes
@@ -243,11 +272,12 @@ To prevent data corruption during write operations, we maintain 4 files:
 - **Crash Recovery**: Automatic state restoration on server startup
 - **Improved Error Handling**: Specific exception types with detailed logging
 
-
-- **Visuals**: "Ultra Modern" glassmorphism UI, Sticky Header, Dynamic Timer.
-- **Efficiency**: "Auto-fill losers" (75% click reduction), "Batch Submit".
-- **Accessibility**: Full keyboard navigation (`Tab`, `1/2/3`, `Ctrl+Enter`) and `?` help overlay.
-- **Feedback**: Stacked toasts, custom non-blocking modals (no use of `window.confirm`).
+### Phase 5: Projector Enhancements & Tiebreakers (Jan 2026) ✅
+- **Projector View Enhancement**: Horizontal split layout (champion left, finalists + MVP right)
+- **Visual Score Hierarchy**: Final scores (★★★) > Top Cut (★★) > Swiss (★) with size/color differentiation
+- **MVP Calculation**: Highest individual scorer from Top 4 teams displayed on projector
+- **Comprehensive Tiebreakers**: 4-level system (Total → Best Player → Average → Early Wins)
+- **Early Wins Weighting**: Exponential time advantage (Round 1: 1000x, Round 2: 100x, Round 3: 10x, Round 4: 1x)
 
 ---
 
@@ -294,6 +324,7 @@ mtg-dashboard-v1/
 ├── BACKUP-PLAN.md                   # 12-hour production readiness plan
 ├── PHASE1-IMPLEMENTATION-SUMMARY.md # Phase 1 critical fixes documentation
 ├── PHASE2-IMPLEMENTATION-SUMMARY.md # Phase 2 high priority fixes documentation
+├── PHASE5-IMPLEMENTATION-SUMMARY.md # Phase 5 projector enhancements & tiebreakers
 ├── CLAUDE.md                        # This file
 └── README.md                        # User documentation
 ```

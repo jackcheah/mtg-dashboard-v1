@@ -133,7 +133,7 @@ The system uses a stage-based scoring approach where performance in the current 
 #### 1. Core Principles
 1.  **Stage-Specific Scoring**: Scores are tracked separately for Swiss, Top 8 Cut, and Finals.
 2.  **Performance-Based Advancement**: Teams advance based on performance in the *current* stage.
-3.  **Historical Tiebreakers**: Previous round scores are used ONLY to break ties.
+3.  **Multi-Level Tiebreakers**: Comprehensive tiebreaker system ensures fair advancement.
 4.  **No Score Carrying**: Teams cannot "coast" on early performance.
 
 #### 2. Individual Point System
@@ -148,13 +148,18 @@ The system uses a stage-based scoring approach where performance in the current 
 -   All 16 teams compete.
 -   Scores accumulate across all 4 rounds.
 -   **Top 8** teams based on total Swiss scores advance to the Top 8 Cut.
+-   **Tiebreaker Hierarchy:**
+    1.  Total Team Score (primary)
+    2.  Best Individual Player Score
+    3.  Average Player Score
+    4.  Early Wins Score (Round 1 > Round 2 > Round 3 > Round 4)
 
 **Stage 2: Top 8 Cut (Round 5)**
 -   8 Teams compete in 2 pods of 4.
 -   **Scoring:** Only points earned in Round 5 count towards advancement.
 -   **Advancement Criteria:**
     1.  **Primary:** Points earned in Top 8 Cut (Round 5).
-    2.  **Tiebreaker:** Total Swiss Points (Rounds 1-4).
+    2.  **Tiebreakers:** Swiss Score → Best Player → Average → Early Wins
 -   **Top 4** teams advance to Finals.
 
 **Stage 3: Finals (Round 6)**
@@ -163,6 +168,7 @@ The system uses a stage-based scoring approach where performance in the current 
 -   **Champion Determination:**
     1.  **Primary:** Points earned in Finals (Round 6).
     2.  **Tiebreaker:** Combined Swiss + Top 8 Cut Points (Rounds 1-5).
+-   **MVP Award:** Highest individual scorer among Top 4 teams.
 
 *(Note: For 8/12-team formats, the Top 8 Cut is skipped, and top 4 from Swiss advance directly to Finals.)*
 
@@ -224,6 +230,9 @@ The system uses a stage-based scoring approach where performance in the current 
 - Large timer with visual warnings (color changes at 90%, blinking when over)
 - Automatic view switching: Pairings → Standings → Champion
 - High-contrast dark theme optimized for projectors
+- **Champion Display:** Horizontal split layout (champion on left, finalists + MVP on right)
+- **Detailed Scores:** Shows Final, Top Cut, and Swiss scores with visual hierarchy
+- **MVP Recognition:** Displays highest individual scorer from Top 4 teams
 
 ### Keyboard Shortcuts
 Press `?` (Shift+/) at any time to see this list in the app.
@@ -259,7 +268,10 @@ mtg-dashboard-v1/
 ├── docker-compose.yml               # Docker Compose setup
 ├── README.md                        # User documentation (this file)
 ├── CLAUDE.md                        # Developer/AI assistant guide
-└── TOURNAMENT_SCORING_SYSTEM.md     # Detailed scoring documentation
+├── TOURNAMENT_SCORING_SYSTEM.md     # Detailed scoring documentation
+├── PHASE5-IMPLEMENTATION-SUMMARY.md # Phase 5 implementation details (projector/tiebreakers)
+├── PHASE2-IMPLEMENTATION-SUMMARY.md # Phase 2 implementation details
+└── PHASE1-IMPLEMENTATION-SUMMARY.md # Phase 1 implementation details
 ```
 
 ## Using Custom Participant Data
