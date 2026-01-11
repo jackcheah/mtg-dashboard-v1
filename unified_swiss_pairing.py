@@ -529,10 +529,13 @@ class UnifiedSwissPairing:
     
     def _build_player_list(self):
         """Build the complete player list from tournament teams."""
-        for team_name in self.tournament_teams:
-            for player in self.teams[team_name]:
-                self.players.append(player)
-                self.player_by_id[player['Player ID']] = player
+    for team_name in self.tournament_teams:
+        for player in self.teams[team_name]:
+            self.players.append(player)
+            self.player_by_id[player['Player ID']] = player
+            
+    # Randomize player order to prevent deterministic pod groupings (e.g. Team A always in Seat 1)
+    random.shuffle(self.players)
     
     def generate_all_rounds(self) -> Tuple[bool, List[List[List[Dict]]]]:
         """
@@ -2169,7 +2172,12 @@ class UnifiedSwissPairing:
         best_repeat_count = float('inf')
         best_repeat_details = []
 
+        # Round 1: Collect multiple perfect solutions for random selection
+        perfect_solutions = [] if round_num == 1 else None
+        max_round1_solutions = 100  # Cap to prevent memory issues
+
         from itertools import permutations
+        import random
 
         # First team's players go to pods 0,1,2,3 in order
         first_team = team_group[0]
@@ -2192,9 +2200,16 @@ class UnifiedSwissPairing:
             max_perms = min(24, len(other_team_perms[0]) if other_team_perms else 1)
 
         iterations = 0
+        early_exit = False  # Flag for Round 1 cap
         for perm1 in other_team_perms[0][:max_perms] if other_team_perms else [()]:
+            if early_exit:
+                break
             for perm2 in other_team_perms[1][:max_perms] if len(other_team_perms) > 1 else [()]:
+                if early_exit:
+                    break
                 for perm3 in other_team_perms[2][:max_perms] if len(other_team_perms) > 2 else [()]:
+                    if early_exit:
+                        break
                     iterations += 1
 
                     # Build pods with this permutation
@@ -2232,10 +2247,27 @@ class UnifiedSwissPairing:
                         best_repeat_details = repeat_details
 
                         if repeat_count == 0:
-                            # Found perfect solution, return immediately
-                            if needs_max_optimization:
-                                print(f"                         ✅ PERFECT: Found zero player repeats after {iterations:,} iterations!")
-                            return best_pods
+                            # Round 1: Collect multiple perfect solutions for randomization
+                            if round_num == 1 and perfect_solutions is not None:
+                                # Deep copy the pods to avoid reference issues
+                                pods_copy = [pod[:] for pod in pods]
+                                perfect_solutions.append(pods_copy)
+
+                                # Cap collection to prevent memory issues
+                                if len(perfect_solutions) >= max_round1_solutions:
+                                    early_exit = True
+                                    break
+                            else:
+                                # Round 2+: Return first perfect solution (existing behavior)
+                                if needs_max_optimization:
+                                    print(f"                         ✅ PERFECT: Found zero player repeats after {iterations:,} iterations!")
+                                return best_pods
+
+        # Round 1: Randomly select from collected perfect solutions
+        if round_num == 1 and perfect_solutions:
+            selected_solution = random.choice(perfect_solutions)
+            print(f"    [ROUND 1 RANDOMIZATION] Selected 1 of {len(perfect_solutions)} perfect solutions for enhanced randomization")
+            return selected_solution
 
         # Report results for groups with team repeats
         if needs_max_optimization:

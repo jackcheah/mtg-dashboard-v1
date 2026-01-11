@@ -914,6 +914,12 @@ class TournamentManager:
                         shuffled_pod = pod.copy()
                         random.shuffle(shuffled_pod)
                         self.tables[round_num][table_name] = shuffled_pod
+                        
+                        # Log to verify randomization
+                        if pod_idx < 3:
+                            t_names = [p.get('Team Name', '') for p in shuffled_pod]
+                            print(f"   Round 1, {table_name}: Random seating -> {t_names}")
+                            
                         print(f"   Round {round_num}, {table_name}: Random seating (no prior scores)")
                     else:
                         # Rounds 2+: Intelligent seating based on team scores
