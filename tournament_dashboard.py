@@ -696,6 +696,10 @@ class TournamentManager:
             self.finalized_rounds = set()
         if hasattr(self, 'submitted_rounds'):
             self.submitted_rounds = set()
+            
+        # Reset unified pairing engine
+        self._unified_pairing = None
+        self._tournament_rounds = []
 
         print("[OK] Tournament state reset complete")
         
@@ -1975,6 +1979,8 @@ def load_data():
             use_sample_data = data.get('use_sample_data', False)
             sample_team_count = data.get('sample_team_count', 8)
 
+            force_reload = data.get('force_reload', False)
+
             # Configure Swiss rounds before loading participants
             # Allow reconfiguration if the requested rounds differ from current configuration
             if not tournament.swiss_rounds_configured or tournament.swiss_rounds_count != swiss_rounds:
@@ -1985,8 +1991,8 @@ def load_data():
                         'message': message
                     })
 
-        # Only reload from Excel if teams aren't already loaded
-        if not tournament.teams:
+        # Only reload from Excel if teams aren't already loaded or forced
+        if not tournament.teams or (request.method == 'POST' and force_reload):
             # Check if we should force sample data
             if use_sample_data:
                 print(f"Using sample data with {sample_team_count} teams (forced by request)...")

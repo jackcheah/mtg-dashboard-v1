@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
 """
-Full Tournament E2E Simulation for 16 Players
+Full Tournament E2E Simulation
 
-This script simulates a complete tournament flow from start to finish:
-- Swiss Rounds (1-4): 16 teams compete in 4 rounds of Swiss pairing
-- Top 8 Cut (Round 5): Top 8 teams compete in 2 pods of 4
-- Finals (Round 6): Top 4 teams compete in 1 pod of 4
-- Champion Declaration: Final winner is announced
+This script simulates a complete tournament flow from start to finish.
+Supports 8, 12, and 16 team configurations.
 
-The script tracks every player and team through each phase, validates
-Swiss pairing rules, and records all results for verification.
+Flow:
+- 8/12 Teams: 4 Swiss Rounds -> Finals (Round 5)
+- 16 Teams: 4 Swiss Rounds -> Top 8 Cut (Round 5) -> Finals (Round 6)
+
+Usage:
+    python simulate_full_tournament.py --teams [8|12|16] [--no-gen]
 """
 
 import random
@@ -18,8 +19,18 @@ import os
 import json
 import collections
 import itertools
+import argparse
+import sys
 from datetime import datetime
 from playwright.sync_api import sync_playwright, expect, TimeoutError as PlaywrightTimeout
+
+# Import generator
+try:
+    from generate_teams import generate_teams
+except ImportError:
+    # Handle running from different context
+    sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+    from generate_teams import generate_teams
 
 
 class PlayerTracker:
@@ -123,6 +134,7 @@ class PairingValidator:
             pod_key = frozenset(ids)
             for prev_pod in self.match_history:
                 # Check if any pair of players was together before
+                # In 4-player pods, checking if any pair existed in a previous pod is the strict rule
                 overlap = pod_key & prev_pod
                 if len(overlap) > 1:
                     overlapping_players = list(overlap)
@@ -153,16 +165,27 @@ class PairingValidator:
 class TournamentSimulator:
     """Main simulator class for the tournament E2E test."""
     
-    def __init__(self, url="http://localhost:5001"):
+    def __init__(self, num_teams=16, generate_data=True, url="http://localhost:5001"):
         self.url = url
+        self.num_teams = num_teams
+        self.generate_data = generate_data
+        
         self.players = {}       # player_id -> PlayerTracker
         self.teams = {}         # team_name -> TeamTracker
         self.validator = PairingValidator()
         self.current_round = 0
         self.swiss_rounds = 4
-        self.has_top8 = True    # 16 teams = True
-        self.max_rounds = 6     # 4 Swiss + Top8 + Finals
+        
+        # Determine structure based on team count
+        if self.num_teams >= 16:
+            self.has_top8 = True
+            self.max_rounds = 6     # 4 Swiss + Top8 + Finals
+        else:
+            self.has_top8 = False   # 8 or 12 teams
+            self.max_rounds = 5     # 4 Swiss + Finals
+            
         self.test_results = {
+            'config': {'teams': num_teams, 'has_top8': self.has_top8},
             'rounds': {},
             'swiss_standings': [],
             'top8_standings': [],
@@ -176,9 +199,15 @@ class TournamentSimulator:
     def run_simulation(self):
         """Execute the full tournament simulation."""
         print("\n" + "="*60)
-        print("FULL TOURNAMENT E2E SIMULATION - 16 TEAMS")
+        print(f"FULL TOURNAMENT SIMULATION - {self.num_teams} TEAMS")
         print("="*60)
+        print(f"Structure: 4 Swiss -> {'Top 8 Cut -> ' if self.has_top8 else ''}Finals")
         print(f"Start Time: {datetime.now().isoformat()}")
+        
+        # Generate data if requested
+        if self.generate_data:
+            print(f"\nGenerating data for {self.num_teams} teams...")
+            generate_teams(self.num_teams)
         
         with sync_playwright() as playwright:
             browser = playwright.chromium.launch(headless=False, slow_mo=100)
@@ -200,17 +229,24 @@ class TournamentSimulator:
                     
                     self._play_round(page, round_num, "Swiss")
                 
-                # Verify Backup (Pre-Top 8)
-                self._test_manual_backup(page, "Pre-Top 8")
-                
-                # Phase 3: Top 8 Cut (Round 5)
-                self._play_round(page, self.swiss_rounds + 1, "Top8Cut")
-                
-                # Verify Backup (Pre-Finals)
-                self._test_manual_backup(page, "Pre-Finals")
-                
-                # Phase 4: Finals (Round 6)
-                self._play_round(page, self.swiss_rounds + 2, "Finals")
+                # Phase 3: Top 8 Cut (If applicable)
+                if self.has_top8:
+                    # Verify Backup (Pre-Top 8)
+                    self._test_manual_backup(page, "Pre-Top 8")
+                    
+                    self._play_round(page, self.swiss_rounds + 1, "Top8Cut")
+                    
+                    # Verify Backup (Pre-Finals)
+                    self._test_manual_backup(page, "Pre-Finals")
+                    
+                    # Phase 4: Finals (Round 6)
+                    self._play_round(page, self.swiss_rounds + 2, "Finals")
+                else:
+                    # Direct to Finals (Round 5)
+                    # Verify Backup (Pre-Finals)
+                    self._test_manual_backup(page, "Pre-Finals")
+                    
+                    self._play_round(page, self.swiss_rounds + 1, "Finals")
                 
                 # Phase 5: Verify Champion
                 self._verify_champion(page)
@@ -220,13 +256,18 @@ class TournamentSimulator:
                 import traceback
                 traceback.print_exc()
                 self.test_results['errors'].append(str(e))
+                # Take screenshot on error
+                try:
+                    page.screenshot(path=f"error_screenshot_{datetime.now().strftime('%H%M%S')}.png")
+                except:
+                    pass
             finally:
                 self._generate_report()
                 time.sleep(3)
                 browser.close()
     
     def _setup_tournament(self, page):
-        """Setup the tournament with 16 teams."""
+        """Setup the tournament."""
         print("\n" + "-"*40)
         print("PHASE 1: TOURNAMENT SETUP")
         print("-"*40)
@@ -259,6 +300,14 @@ class TournamentSimulator:
                 print("✅ Participants loaded successfully")
             except PlaywrightTimeout:
                 print("⚠️  Teams grid not found, continuing...")
+        
+        # Verify team count
+        teams_loaded = page.locator(".team-card").count()
+        print(f"Loaded {teams_loaded} teams")
+        
+        if teams_loaded != self.num_teams:
+            print(f"⚠️  WARNING: Expected {self.num_teams} teams, but found {teams_loaded}")
+            self.test_results['errors'].append(f"Team count mismatch: Expected {self.num_teams}, found {teams_loaded}")
         
         # Setup tournament
         print("Setting up tournament...")
@@ -308,6 +357,11 @@ class TournamentSimulator:
                         print(f"  ⚠️  Error extracting player: {e}")
             
             print(f"✅ Extracted {len(self.players)} players in {len(self.teams)} teams")
+            
+            # Additional validation
+            if len(self.teams) != self.num_teams:
+                 print(f"  ❌ Mismatch in extracted teams count vs expected ({self.num_teams})")
+        
         except Exception as e:
             print(f"⚠️  Could not extract player data: {e}")
     
@@ -333,6 +387,10 @@ class TournamentSimulator:
         table_cards = page.locator(".table-card").all()
         num_tables = len(table_cards)
         print(f"Found {num_tables} tables")
+        
+        # 8 teams -> 2 tables swiss, 1 table finals
+        # 12 teams -> 3 tables swiss, 1 table finals
+        # 16 teams -> 4 tables swiss, 2 tables top8, 1 table finals
         
         # Record round data
         round_data = {
@@ -388,6 +446,10 @@ class TournamentSimulator:
             
             # Decide scoring: 70% decisive win, 30% draw
             is_win = random.random() < 0.7
+            
+            # In Finals, we generally want a decisive winner
+            if round_type == "Finals":
+                is_win = True
             
             if is_win and num_players > 0:
                 # Pick one winner, rest lose
@@ -499,9 +561,10 @@ class TournamentSimulator:
         
         if phase == "swiss":
             self.test_results['swiss_standings'] = standings
-            # Mark top 8 teams
-            for i, team in enumerate(sorted_teams[:8]):
-                team.advanced_to_top8 = True
+            # Mark teams advancing to next stage
+            limit = 8 if self.has_top8 else 4
+            for i, team in enumerate(sorted_teams[:limit]):
+                team.advanced_to_top8 = True # Using this property generally for "advanced"
         elif phase == "top8":
             self.test_results['top8_standings'] = standings
             # Mark top 4 teams
@@ -553,7 +616,8 @@ class TournamentSimulator:
             
             print(f"\n🏆 CHAMPION: {champion.team_name}")
             print(f"   Finals: {champion.finals_total} pts")
-            print(f"   Top 8:  {champion.top8_total} pts")
+            if self.has_top8:
+                print(f"   Top 8:  {champion.top8_total} pts")
             print(f"   Swiss:  {champion.swiss_total} pts")
         
         # Calculate MVP
@@ -593,8 +657,7 @@ class TournamentSimulator:
         print(f"\n[{context_name}] Testing Manual Backup...")
         
         try:
-            # Find the backup button (match 'Save Backup' or 'Save Backup Now')
-            # There may be multiple buttons (setup vs active), so find the visible one
+            # Find the backup button
             buttons = page.locator("button").filter(has_text="Save Backup").all()
             backup_btn = None
             for btn in buttons:
@@ -610,7 +673,6 @@ class TournamentSimulator:
             backup_btn.click()
             
             # Wait for toast notification
-            # The toast might take a moment to appear
             try:
                 # Wait specifically for the success toast
                 toast = page.locator(".toast-success").filter(has_text="Backup saved successfully").first
@@ -618,10 +680,6 @@ class TournamentSimulator:
                 print("  ✅ Backup verified: Success toast appeared")
             except PlaywrightTimeout:
                 print("  ⚠️  Timeout waiting for backup success toast")
-                # Check if any other toast is visible for debugging
-                visible_toasts = page.locator(".toast-success:visible").all_inner_texts()
-                if visible_toasts:
-                    print(f"      Visible toasts: {visible_toasts}")
                 
         except Exception as e:
             print(f"  ❌ Backup test failed: {e}")
@@ -647,22 +705,7 @@ class TournamentSimulator:
         # Champion and MVP
         if self.test_results['champion']:
             print(f"\n🏆 Champion: {self.test_results['champion']['team']}")
-        if self.test_results['mvp']:
-            print(f"⭐ MVP: {self.test_results['mvp']['player_name']} ({self.test_results['mvp']['total_points']} pts)")
-        
-        # Final standings
-        print("\n📋 FINAL STANDINGS")
-        for entry in self.test_results.get('final_standings', []):
-            print(f"   {entry['rank']}. {entry['team']}: Finals={entry['finals_points']}, Tiebreaker={entry['tiebreaker']}")
-        
-        # Validation warnings
-        if self.validator.warnings:
-            print("\n⚠️  VALIDATION WARNINGS")
-            for w in self.validator.warnings[:10]:  # Show first 10
-                print(f"   - {w}")
-            if len(self.validator.warnings) > 10:
-                print(f"   ... and {len(self.validator.warnings) - 10} more")
-        
+            
         # Save detailed report to file
         report_path = os.path.join(os.path.dirname(__file__), "tournament_test_report.json")
         
@@ -695,18 +738,20 @@ class TournamentSimulator:
 
 def main():
     """Main entry point."""
+    parser = argparse.ArgumentParser(description="Simulate MTG Tournament")
+    parser.add_argument("--teams", type=int, default=16, choices=[8, 12, 16], help="Number of teams (8, 12, 16)")
+    parser.add_argument("--no-gen", action="store_true", help="Skip data generation")
+    
+    args = parser.parse_args()
+    
     print("="*60)
-    print("MTG Tournament Dashboard - Full E2E Test")
+    print(f"MTG Tournament Dashboard - Full E2E Test ({args.teams} Teams)")
     print("="*60)
-    print("\nThis test will simulate a complete 16-team tournament:")
-    print("  - 4 Swiss Rounds")
-    print("  - Top 8 Cut")
-    print("  - Finals")
-    print("  - Champion Declaration")
+    print("\nThis test will simulate a complete tournament.")
     print("\nMake sure the server is running at http://localhost:5001")
     print("="*60)
     
-    simulator = TournamentSimulator()
+    simulator = TournamentSimulator(num_teams=args.teams, generate_data=not args.no_gen)
     simulator.run_simulation()
 
 

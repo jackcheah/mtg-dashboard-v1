@@ -1,4 +1,8 @@
 {
+  "config": {
+    "teams": 8,
+    "has_top8": false
+  },
   "rounds": {
     "1": {
       "round_num": 1,
@@ -7,173 +11,93 @@
         {
           "table_name": "Table 1",
           "players": [
-            61,
+            29,
+            13,
             17,
-            53,
-            13
+            5
           ],
-          "winner": null
+          "winner": 17
         },
         {
           "table_name": "Table 2",
           "players": [
-            14,
-            62,
+            30,
+            6,
             18,
-            54
+            14
           ],
-          "winner": null
+          "winner": 14
         },
         {
           "table_name": "Table 3",
           "players": [
-            15,
             19,
-            55,
-            63
+            7,
+            31,
+            15
           ],
-          "winner": 19
+          "winner": 7
         },
         {
           "table_name": "Table 4",
           "players": [
+            32,
             16,
-            56,
             20,
-            64
+            8
           ],
-          "winner": 20
+          "winner": 16
         },
         {
           "table_name": "Table 5",
           "players": [
             25,
             21,
-            45,
-            33
+            9,
+            1
           ],
-          "winner": null
+          "winner": 9
         },
         {
           "table_name": "Table 6",
           "players": [
-            46,
-            22,
-            34,
-            26
+            10,
+            2,
+            26,
+            22
           ],
-          "winner": 34
+          "winner": 26
         },
         {
           "table_name": "Table 7",
           "players": [
-            47,
+            11,
             23,
-            27,
-            35
+            3,
+            27
           ],
-          "winner": 27
+          "winner": 11
         },
         {
           "table_name": "Table 8",
           "players": [
-            24,
-            36,
             28,
-            48
-          ],
-          "winner": 48
-        },
-        {
-          "table_name": "Table 9",
-          "players": [
-            41,
-            29,
-            1,
-            49
-          ],
-          "winner": 1
-        },
-        {
-          "table_name": "Table 10",
-          "players": [
-            30,
-            50,
-            2,
-            42
-          ],
-          "winner": null
-        },
-        {
-          "table_name": "Table 11",
-          "players": [
-            31,
-            3,
-            43,
-            51
-          ],
-          "winner": 43
-        },
-        {
-          "table_name": "Table 12",
-          "players": [
-            44,
-            4,
-            32,
-            52
-          ],
-          "winner": null
-        },
-        {
-          "table_name": "Table 13",
-          "players": [
-            9,
-            57,
-            37,
-            5
-          ],
-          "winner": 57
-        },
-        {
-          "table_name": "Table 14",
-          "players": [
-            58,
-            10,
-            38,
-            6
-          ],
-          "winner": 6
-        },
-        {
-          "table_name": "Table 15",
-          "players": [
-            59,
-            39,
-            7,
-            11
-          ],
-          "winner": 59
-        },
-        {
-          "table_name": "Table 16",
-          "players": [
+            24,
             12,
-            8,
-            60,
-            40
+            4
           ],
-          "winner": 40
+          "winner": 28
         }
       ],
-      "table_count": 16,
+      "table_count": 8,
       "validation": {
         "repeats": 0,
         "conflicts": 0
       },
       "summary": {
-        "wins": 11,
-        "draws": 20,
-        "losses": 33
+        "wins": 8,
+        "draws": 0,
+        "losses": 24
       }
     },
     "2": {
@@ -183,610 +107,82 @@
         {
           "table_name": "Table 1",
           "players": [
-            33,
-            53,
-            1,
-            30
-          ],
-          "winner": 30
-        },
-        {
-          "table_name": "Table 2",
-          "players": [
-            34,
-            54,
-            2,
-            29
-          ],
-          "winner": 2
-        },
-        {
-          "table_name": "Table 3",
-          "players": [
-            35,
-            55,
-            3,
-            32
-          ],
-          "winner": null
-        },
-        {
-          "table_name": "Table 4",
-          "players": [
-            36,
-            56,
-            4,
-            31
-          ],
-          "winner": 4
-        },
-        {
-          "table_name": "Table 5",
-          "players": [
             21,
-            13,
-            49,
-            26
-          ],
-          "winner": 26
-        },
-        {
-          "table_name": "Table 6",
-          "players": [
-            22,
-            14,
-            50,
-            25
-          ],
-          "winner": 14
-        },
-        {
-          "table_name": "Table 7",
-          "players": [
-            23,
-            15,
-            51,
-            28
-          ],
-          "winner": null
-        },
-        {
-          "table_name": "Table 8",
-          "players": [
-            24,
-            16,
-            52,
-            27
-          ],
-          "winner": 52
-        },
-        {
-          "table_name": "Table 9",
-          "players": [
-            41,
-            57,
             17,
-            62
+            10,
+            3
           ],
           "winner": null
-        },
-        {
-          "table_name": "Table 10",
-          "players": [
-            42,
-            58,
-            18,
-            61
-          ],
-          "winner": 58
-        },
-        {
-          "table_name": "Table 11",
-          "players": [
-            43,
-            59,
-            19,
-            64
-          ],
-          "winner": null
-        },
-        {
-          "table_name": "Table 12",
-          "players": [
-            44,
-            60,
-            20,
-            63
-          ],
-          "winner": 63
-        },
-        {
-          "table_name": "Table 13",
-          "players": [
-            45,
-            5,
-            38,
-            11
-          ],
-          "winner": 38
-        },
-        {
-          "table_name": "Table 14",
-          "players": [
-            46,
-            6,
-            37,
-            12
-          ],
-          "winner": null
-        },
-        {
-          "table_name": "Table 15",
-          "players": [
-            47,
-            7,
-            40,
-            9
-          ],
-          "winner": 40
-        },
-        {
-          "table_name": "Table 16",
-          "players": [
-            48,
-            8,
-            39,
-            10
-          ],
-          "winner": 10
-        }
-      ],
-      "table_count": 16,
-      "validation": {
-        "repeats": 0,
-        "conflicts": 0
-      },
-      "summary": {
-        "wins": 11,
-        "draws": 20,
-        "losses": 33
-      }
-    },
-    "3": {
-      "round_num": 3,
-      "round_type": "Swiss",
-      "tables": [
-        {
-          "table_name": "Table 1",
-          "players": [
-            33,
-            55,
-            2,
-            31
-          ],
-          "winner": 2
         },
         {
           "table_name": "Table 2",
           "players": [
-            34,
-            56,
-            1,
-            32
-          ],
-          "winner": 32
-        },
-        {
-          "table_name": "Table 3",
-          "players": [
-            35,
-            53,
-            4,
-            29
-          ],
-          "winner": 29
-        },
-        {
-          "table_name": "Table 4",
-          "players": [
-            36,
-            54,
-            3,
-            30
-          ],
-          "winner": 54
-        },
-        {
-          "table_name": "Table 5",
-          "players": [
-            21,
-            14,
-            51,
-            27
-          ],
-          "winner": null
-        },
-        {
-          "table_name": "Table 6",
-          "players": [
             22,
-            13,
-            52,
-            28
-          ],
-          "winner": 13
-        },
-        {
-          "table_name": "Table 7",
-          "players": [
-            23,
-            16,
-            49,
-            25
-          ],
-          "winner": 49
-        },
-        {
-          "table_name": "Table 8",
-          "players": [
-            24,
-            15,
-            50,
-            26
-          ],
-          "winner": null
-        },
-        {
-          "table_name": "Table 9",
-          "players": [
-            41,
-            59,
             18,
-            63
+            9,
+            4
           ],
-          "winner": 18
-        },
-        {
-          "table_name": "Table 10",
-          "players": [
-            42,
-            60,
-            17,
-            64
-          ],
-          "winner": null
-        },
-        {
-          "table_name": "Table 11",
-          "players": [
-            43,
-            57,
-            20,
-            61
-          ],
-          "winner": 20
-        },
-        {
-          "table_name": "Table 12",
-          "players": [
-            44,
-            58,
-            19,
-            62
-          ],
-          "winner": null
-        },
-        {
-          "table_name": "Table 13",
-          "players": [
-            45,
-            6,
-            39,
-            9
-          ],
-          "winner": null
-        },
-        {
-          "table_name": "Table 14",
-          "players": [
-            46,
-            5,
-            40,
-            10
-          ],
-          "winner": 5
-        },
-        {
-          "table_name": "Table 15",
-          "players": [
-            47,
-            8,
-            37,
-            11
-          ],
-          "winner": null
-        },
-        {
-          "table_name": "Table 16",
-          "players": [
-            48,
-            7,
-            38,
-            12
-          ],
-          "winner": 7
-        }
-      ],
-      "table_count": 16,
-      "validation": {
-        "repeats": 0,
-        "conflicts": 0
-      },
-      "summary": {
-        "wins": 10,
-        "draws": 24,
-        "losses": 30
-      }
-    },
-    "4": {
-      "round_num": 4,
-      "round_type": "Swiss",
-      "tables": [
-        {
-          "table_name": "Table 1",
-          "players": [
-            33,
-            56,
-            3,
-            29
-          ],
-          "winner": 29
-        },
-        {
-          "table_name": "Table 2",
-          "players": [
-            34,
-            55,
-            4,
-            30
-          ],
-          "winner": 4
+          "winner": 22
         },
         {
           "table_name": "Table 3",
           "players": [
-            35,
-            54,
-            1,
-            31
+            23,
+            19,
+            12,
+            1
           ],
-          "winner": 35
+          "winner": 23
         },
         {
           "table_name": "Table 4",
           "players": [
-            36,
-            53,
-            2,
-            32
-          ],
-          "winner": 32
-        },
-        {
-          "table_name": "Table 5",
-          "players": [
-            21,
-            16,
-            50,
-            28
-          ],
-          "winner": 28
-        },
-        {
-          "table_name": "Table 6",
-          "players": [
-            22,
-            15,
-            49,
-            27
-          ],
-          "winner": 49
-        },
-        {
-          "table_name": "Table 7",
-          "players": [
-            23,
-            14,
-            52,
-            26
-          ],
-          "winner": null
-        },
-        {
-          "table_name": "Table 8",
-          "players": [
             24,
-            13,
-            51,
-            25
+            20,
+            11,
+            2
           ],
           "winner": 24
         },
         {
-          "table_name": "Table 9",
-          "players": [
-            41,
-            60,
-            19,
-            61
-          ],
-          "winner": null
-        },
-        {
-          "table_name": "Table 10",
-          "players": [
-            42,
-            59,
-            20,
-            62
-          ],
-          "winner": 42
-        },
-        {
-          "table_name": "Table 11",
-          "players": [
-            43,
-            58,
-            17,
-            63
-          ],
-          "winner": 58
-        },
-        {
-          "table_name": "Table 12",
-          "players": [
-            44,
-            57,
-            18,
-            64
-          ],
-          "winner": null
-        },
-        {
-          "table_name": "Table 13",
-          "players": [
-            45,
-            7,
-            37,
-            10
-          ],
-          "winner": 10
-        },
-        {
-          "table_name": "Table 14",
-          "players": [
-            46,
-            8,
-            38,
-            9
-          ],
-          "winner": null
-        },
-        {
-          "table_name": "Table 15",
-          "players": [
-            47,
-            5,
-            39,
-            12
-          ],
-          "winner": 5
-        },
-        {
-          "table_name": "Table 16",
-          "players": [
-            48,
-            6,
-            40,
-            11
-          ],
-          "winner": null
-        }
-      ],
-      "table_count": 16,
-      "validation": {
-        "repeats": 0,
-        "conflicts": 0
-      },
-      "summary": {
-        "wins": 11,
-        "draws": 20,
-        "losses": 33
-      }
-    },
-    "5": {
-      "round_num": 5,
-      "round_type": "Top8Cut",
-      "tables": [
-        {
-          "table_name": "Table 1",
-          "players": [
-            1,
-            9,
-            17,
-            25
-          ],
-          "winner": 25
-        },
-        {
-          "table_name": "Table 2",
-          "players": [
-            2,
-            10,
-            18,
-            26
-          ],
-          "winner": 18
-        },
-        {
-          "table_name": "Table 3",
-          "players": [
-            3,
-            11,
-            19,
-            27
-          ],
-          "winner": null
-        },
-        {
-          "table_name": "Table 4",
-          "players": [
-            4,
-            12,
-            20,
-            28
-          ],
-          "winner": 12
-        },
-        {
           "table_name": "Table 5",
           "players": [
             5,
-            13,
-            21,
-            29
+            30,
+            15,
+            25
           ],
-          "winner": 29
+          "winner": 30
         },
         {
           "table_name": "Table 6",
           "players": [
             6,
-            14,
-            22,
-            30
+            29,
+            16,
+            26
           ],
-          "winner": 30
+          "winner": null
         },
         {
           "table_name": "Table 7",
           "players": [
             7,
-            15,
-            23,
-            31
+            32,
+            13,
+            27
           ],
-          "winner": null
+          "winner": 32
         },
         {
           "table_name": "Table 8",
           "players": [
             8,
-            16,
-            24,
-            32
+            31,
+            14,
+            28
           ],
-          "winner": 8
+          "winner": 31
         }
       ],
       "table_count": 8,
@@ -800,8 +196,200 @@
         "losses": 18
       }
     },
-    "6": {
-      "round_num": 6,
+    "3": {
+      "round_num": 3,
+      "round_type": "Swiss",
+      "tables": [
+        {
+          "table_name": "Table 1",
+          "players": [
+            21,
+            18,
+            12,
+            2
+          ],
+          "winner": 12
+        },
+        {
+          "table_name": "Table 2",
+          "players": [
+            22,
+            17,
+            11,
+            1
+          ],
+          "winner": null
+        },
+        {
+          "table_name": "Table 3",
+          "players": [
+            23,
+            20,
+            10,
+            4
+          ],
+          "winner": 23
+        },
+        {
+          "table_name": "Table 4",
+          "players": [
+            24,
+            19,
+            9,
+            3
+          ],
+          "winner": 19
+        },
+        {
+          "table_name": "Table 5",
+          "players": [
+            5,
+            31,
+            16,
+            27
+          ],
+          "winner": 16
+        },
+        {
+          "table_name": "Table 6",
+          "players": [
+            6,
+            32,
+            15,
+            28
+          ],
+          "winner": 32
+        },
+        {
+          "table_name": "Table 7",
+          "players": [
+            7,
+            29,
+            14,
+            25
+          ],
+          "winner": 14
+        },
+        {
+          "table_name": "Table 8",
+          "players": [
+            8,
+            30,
+            13,
+            26
+          ],
+          "winner": 13
+        }
+      ],
+      "table_count": 8,
+      "validation": {
+        "repeats": 0,
+        "conflicts": 0
+      },
+      "summary": {
+        "wins": 7,
+        "draws": 4,
+        "losses": 21
+      }
+    },
+    "4": {
+      "round_num": 4,
+      "round_type": "Swiss",
+      "tables": [
+        {
+          "table_name": "Table 1",
+          "players": [
+            21,
+            19,
+            11,
+            4
+          ],
+          "winner": 4
+        },
+        {
+          "table_name": "Table 2",
+          "players": [
+            22,
+            20,
+            12,
+            3
+          ],
+          "winner": null
+        },
+        {
+          "table_name": "Table 3",
+          "players": [
+            23,
+            17,
+            9,
+            2
+          ],
+          "winner": null
+        },
+        {
+          "table_name": "Table 4",
+          "players": [
+            24,
+            18,
+            10,
+            1
+          ],
+          "winner": 18
+        },
+        {
+          "table_name": "Table 5",
+          "players": [
+            5,
+            32,
+            14,
+            26
+          ],
+          "winner": null
+        },
+        {
+          "table_name": "Table 6",
+          "players": [
+            6,
+            31,
+            13,
+            25
+          ],
+          "winner": 6
+        },
+        {
+          "table_name": "Table 7",
+          "players": [
+            7,
+            30,
+            16,
+            28
+          ],
+          "winner": 7
+        },
+        {
+          "table_name": "Table 8",
+          "players": [
+            8,
+            29,
+            15,
+            27
+          ],
+          "winner": 29
+        }
+      ],
+      "table_count": 8,
+      "validation": {
+        "repeats": 0,
+        "conflicts": 0
+      },
+      "summary": {
+        "wins": 5,
+        "draws": 12,
+        "losses": 15
+      }
+    },
+    "5": {
+      "round_num": 5,
       "round_type": "Finals",
       "tables": [
         {
@@ -812,7 +400,7 @@
             9,
             13
           ],
-          "winner": 9
+          "winner": 13
         },
         {
           "table_name": "Table 2",
@@ -822,7 +410,7 @@
             10,
             14
           ],
-          "winner": 6
+          "winner": 2
         },
         {
           "table_name": "Table 3",
@@ -832,7 +420,7 @@
             11,
             15
           ],
-          "winner": 7
+          "winner": 15
         },
         {
           "table_name": "Table 4",
@@ -860,431 +448,182 @@
   "swiss_standings": [
     {
       "rank": 1,
-      "team": "Team 17",
-      "swiss_points": 28,
+      "team": "Theta Thunder",
+      "swiss_points": 27,
       "top8_points": 0
     },
     {
       "rank": 2,
-      "team": "4 Buggers lor",
-      "swiss_points": 28,
+      "team": "Delta Squad",
+      "swiss_points": 27,
       "top8_points": 0
     },
     {
       "rank": 3,
-      "team": "Ascendit",
-      "swiss_points": 28,
+      "team": "Zeta Zealots",
+      "swiss_points": 24,
       "top8_points": 0
     },
     {
       "rank": 4,
-      "team": "J Square Sqaured!",
-      "swiss_points": 26,
+      "team": "Epsilon Elite",
+      "swiss_points": 19,
       "top8_points": 0
     },
     {
       "rank": 5,
-      "team": "Keith-ers",
-      "swiss_points": 25,
+      "team": "Gamma Wave",
+      "swiss_points": 19,
       "top8_points": 0
     },
     {
       "rank": 6,
-      "team": "\u6709\u80e1\u987b\u7684\u662f\u4f60\u7238\u7238",
-      "swiss_points": 21,
+      "team": "Beta Force",
+      "swiss_points": 17,
       "top8_points": 0
     },
     {
       "rank": 7,
-      "team": "Dunman Dogs",
-      "swiss_points": 20,
-      "top8_points": 0
-    },
-    {
-      "rank": 8,
-      "team": "Team Kaya",
-      "swiss_points": 20,
-      "top8_points": 0
-    },
-    {
-      "rank": 9,
-      "team": "Team RGB",
-      "swiss_points": 18,
-      "top8_points": 0
-    },
-    {
-      "rank": 10,
-      "team": "Brianstorm",
-      "swiss_points": 16,
-      "top8_points": 0
-    },
-    {
-      "rank": 11,
-      "team": "Magic Hard to Play",
-      "swiss_points": 15,
-      "top8_points": 0
-    },
-    {
-      "rank": 12,
-      "team": "Anti Bluefarm Bluefarm Club",
-      "swiss_points": 13,
-      "top8_points": 0
-    },
-    {
-      "rank": 13,
-      "team": "Vengeful Spirit",
+      "team": "Eta Hawks",
       "swiss_points": 12,
       "top8_points": 0
     },
     {
-      "rank": 14,
-      "team": "2nd Hand Jobs",
-      "swiss_points": 11,
-      "top8_points": 0
-    },
-    {
-      "rank": 15,
-      "team": "______goblin deez",
-      "swiss_points": 10,
-      "top8_points": 0
-    },
-    {
-      "rank": 16,
-      "team": "Snow White and 3 Dwarves",
-      "swiss_points": 8,
-      "top8_points": 0
-    }
-  ],
-  "top8_standings": [
-    {
-      "rank": 1,
-      "team": "4 Buggers lor",
-      "swiss_points": 28,
-      "top8_points": 11
-    },
-    {
-      "rank": 2,
-      "team": "Team 17",
-      "swiss_points": 28,
-      "top8_points": 6
-    },
-    {
-      "rank": 3,
-      "team": "Keith-ers",
-      "swiss_points": 25,
-      "top8_points": 6
-    },
-    {
-      "rank": 4,
-      "team": "Dunman Dogs",
-      "swiss_points": 20,
-      "top8_points": 6
-    },
-    {
-      "rank": 5,
-      "team": "Magic Hard to Play",
-      "swiss_points": 15,
-      "top8_points": 6
-    },
-    {
-      "rank": 6,
-      "team": "Ascendit",
-      "swiss_points": 28,
-      "top8_points": 1
-    },
-    {
-      "rank": 7,
-      "team": "Brianstorm",
-      "swiss_points": 16,
-      "top8_points": 1
-    },
-    {
       "rank": 8,
-      "team": "______goblin deez",
-      "swiss_points": 10,
-      "top8_points": 1
-    },
-    {
-      "rank": 9,
-      "team": "J Square Sqaured!",
-      "swiss_points": 26,
-      "top8_points": 0
-    },
-    {
-      "rank": 10,
-      "team": "\u6709\u80e1\u987b\u7684\u662f\u4f60\u7238\u7238",
-      "swiss_points": 21,
-      "top8_points": 0
-    },
-    {
-      "rank": 11,
-      "team": "Team Kaya",
-      "swiss_points": 20,
-      "top8_points": 0
-    },
-    {
-      "rank": 12,
-      "team": "Team RGB",
-      "swiss_points": 18,
-      "top8_points": 0
-    },
-    {
-      "rank": 13,
-      "team": "Anti Bluefarm Bluefarm Club",
-      "swiss_points": 13,
-      "top8_points": 0
-    },
-    {
-      "rank": 14,
-      "team": "Vengeful Spirit",
-      "swiss_points": 12,
-      "top8_points": 0
-    },
-    {
-      "rank": 15,
-      "team": "2nd Hand Jobs",
-      "swiss_points": 11,
-      "top8_points": 0
-    },
-    {
-      "rank": 16,
-      "team": "Snow White and 3 Dwarves",
-      "swiss_points": 8,
+      "team": "Alpha Strike",
+      "swiss_points": 9,
       "top8_points": 0
     }
   ],
+  "top8_standings": [],
   "final_standings": [
     {
       "rank": 1,
-      "team": "Keith-ers",
+      "team": "Delta Squad",
       "finals_points": 10,
-      "tiebreaker": 31
+      "tiebreaker": 27
     },
     {
       "rank": 2,
-      "team": "Ascendit",
-      "finals_points": 5,
-      "tiebreaker": 29
+      "team": "Alpha Strike",
+      "finals_points": 10,
+      "tiebreaker": 9
     },
     {
       "rank": 3,
-      "team": "Magic Hard to Play",
-      "finals_points": 5,
-      "tiebreaker": 21
+      "team": "Theta Thunder",
+      "finals_points": 0,
+      "tiebreaker": 27
     },
     {
       "rank": 4,
-      "team": "4 Buggers lor",
+      "team": "Zeta Zealots",
       "finals_points": 0,
-      "tiebreaker": 39
+      "tiebreaker": 24
     }
   ],
   "champion": {
-    "team": "Keith-ers",
+    "team": "Delta Squad",
     "finals_points": 10,
-    "top8_points": 6,
-    "swiss_points": 25,
-    "total_points": 41
+    "top8_points": 0,
+    "swiss_points": 27,
+    "total_points": 37
   },
   "mvp": {
-    "player_id": 4,
-    "player_name": "Timothy",
-    "team": "Ascendit",
-    "total_points": 16
+    "player_id": 14,
+    "player_name": "Scout_Delta",
+    "team": "Delta Squad",
+    "total_points": 11
   },
   "validation_warnings": [],
   "errors": [],
   "player_journeys": {
-    "61": {
-      "name": "De Huang",
-      "team": "Anti Bluefarm Bluefarm Club",
-      "total_points": 2,
+    "29": {
+      "name": "Captain_Theta",
+      "team": "Theta Thunder",
+      "total_points": 6,
       "rounds": {
         "1": {
-          "points": 1,
+          "points": 0,
           "table": "Table 1",
           "opponents": [
+            13,
             17,
-            53,
-            13
-          ]
-        },
-        "2": {
-          "points": 0,
-          "table": "Table 10",
-          "opponents": [
-            42,
-            58,
-            18
-          ]
-        },
-        "3": {
-          "points": 0,
-          "table": "Table 11",
-          "opponents": [
-            43,
-            57,
-            20
-          ]
-        },
-        "4": {
-          "points": 1,
-          "table": "Table 9",
-          "opponents": [
-            41,
-            60,
-            19
-          ]
-        }
-      }
-    },
-    "17": {
-      "name": "Terry",
-      "team": "Team 17",
-      "total_points": 3,
-      "rounds": {
-        "1": {
-          "points": 1,
-          "table": "Table 1",
-          "opponents": [
-            61,
-            53,
-            13
+            5
           ]
         },
         "2": {
           "points": 1,
-          "table": "Table 9",
+          "table": "Table 6",
           "opponents": [
-            41,
-            57,
-            62
+            6,
+            16,
+            26
           ]
         },
         "3": {
-          "points": 1,
-          "table": "Table 10",
-          "opponents": [
-            42,
-            60,
-            64
-          ]
-        },
-        "4": {
           "points": 0,
-          "table": "Table 11",
+          "table": "Table 7",
           "opponents": [
-            43,
-            58,
-            63
-          ]
-        },
-        "5": {
-          "points": 0,
-          "table": "Table 1",
-          "opponents": [
-            1,
-            9,
+            7,
+            14,
             25
           ]
-        }
-      }
-    },
-    "53": {
-      "name": "Ray",
-      "team": "Snow White and 3 Dwarves",
-      "total_points": 1,
-      "rounds": {
-        "1": {
-          "points": 1,
-          "table": "Table 1",
-          "opponents": [
-            61,
-            17,
-            13
-          ]
-        },
-        "2": {
-          "points": 0,
-          "table": "Table 1",
-          "opponents": [
-            33,
-            1,
-            30
-          ]
-        },
-        "3": {
-          "points": 0,
-          "table": "Table 3",
-          "opponents": [
-            35,
-            4,
-            29
-          ]
         },
         "4": {
-          "points": 0,
-          "table": "Table 4",
+          "points": 5,
+          "table": "Table 8",
           "opponents": [
-            36,
-            2,
-            32
+            8,
+            15,
+            27
           ]
         }
       }
     },
     "13": {
-      "name": "Bryan",
-      "team": "Brianstorm",
-      "total_points": 6,
+      "name": "Captain_Delta",
+      "team": "Delta Squad",
+      "total_points": 10,
       "rounds": {
         "1": {
-          "points": 1,
+          "points": 0,
           "table": "Table 1",
           "opponents": [
-            61,
+            29,
             17,
-            53
+            5
           ]
         },
         "2": {
           "points": 0,
-          "table": "Table 5",
+          "table": "Table 7",
           "opponents": [
-            21,
-            49,
-            26
+            7,
+            32,
+            27
           ]
         },
         "3": {
           "points": 5,
-          "table": "Table 6",
+          "table": "Table 8",
           "opponents": [
-            22,
-            52,
-            28
+            8,
+            30,
+            26
           ]
         },
         "4": {
           "points": 0,
-          "table": "Table 8",
+          "table": "Table 6",
           "opponents": [
-            24,
-            51,
+            6,
+            31,
             25
           ]
         },
         "5": {
-          "points": 0,
-          "table": "Table 5",
-          "opponents": [
-            5,
-            21,
-            29
-          ]
-        },
-        "6": {
-          "points": 0,
+          "points": 5,
           "table": "Table 1",
           "opponents": [
             1,
@@ -1294,2357 +633,91 @@
         }
       }
     },
-    "14": {
-      "name": "Jun Wei",
-      "team": "Brianstorm",
+    "17": {
+      "name": "Captain_Epsilon",
+      "team": "Epsilon Elite",
       "total_points": 8,
       "rounds": {
         "1": {
-          "points": 1,
-          "table": "Table 2",
-          "opponents": [
-            62,
-            18,
-            54
-          ]
-        },
-        "2": {
-          "points": 5,
-          "table": "Table 6",
-          "opponents": [
-            22,
-            50,
-            25
-          ]
-        },
-        "3": {
-          "points": 1,
-          "table": "Table 5",
-          "opponents": [
-            21,
-            51,
-            27
-          ]
-        },
-        "4": {
-          "points": 1,
-          "table": "Table 7",
-          "opponents": [
-            23,
-            52,
-            26
-          ]
-        },
-        "5": {
-          "points": 0,
-          "table": "Table 6",
-          "opponents": [
-            6,
-            22,
-            30
-          ]
-        },
-        "6": {
-          "points": 0,
-          "table": "Table 2",
-          "opponents": [
-            2,
-            6,
-            10
-          ]
-        }
-      }
-    },
-    "62": {
-      "name": "Yize",
-      "team": "Anti Bluefarm Bluefarm Club",
-      "total_points": 3,
-      "rounds": {
-        "1": {
-          "points": 1,
-          "table": "Table 2",
-          "opponents": [
-            14,
-            18,
-            54
-          ]
-        },
-        "2": {
-          "points": 1,
-          "table": "Table 9",
-          "opponents": [
-            41,
-            57,
-            17
-          ]
-        },
-        "3": {
-          "points": 1,
-          "table": "Table 12",
-          "opponents": [
-            44,
-            58,
-            19
-          ]
-        },
-        "4": {
-          "points": 0,
-          "table": "Table 10",
-          "opponents": [
-            42,
-            59,
-            20
-          ]
-        }
-      }
-    },
-    "18": {
-      "name": "Smith",
-      "team": "Team 17",
-      "total_points": 12,
-      "rounds": {
-        "1": {
-          "points": 1,
-          "table": "Table 2",
-          "opponents": [
-            14,
-            62,
-            54
-          ]
-        },
-        "2": {
-          "points": 0,
-          "table": "Table 10",
-          "opponents": [
-            42,
-            58,
-            61
-          ]
-        },
-        "3": {
-          "points": 5,
-          "table": "Table 9",
-          "opponents": [
-            41,
-            59,
-            63
-          ]
-        },
-        "4": {
-          "points": 1,
-          "table": "Table 12",
-          "opponents": [
-            44,
-            57,
-            64
-          ]
-        },
-        "5": {
-          "points": 5,
-          "table": "Table 2",
-          "opponents": [
-            2,
-            10,
-            26
-          ]
-        }
-      }
-    },
-    "54": {
-      "name": "CK",
-      "team": "Snow White and 3 Dwarves",
-      "total_points": 6,
-      "rounds": {
-        "1": {
-          "points": 1,
-          "table": "Table 2",
-          "opponents": [
-            14,
-            62,
-            18
-          ]
-        },
-        "2": {
-          "points": 0,
-          "table": "Table 2",
-          "opponents": [
-            34,
-            2,
-            29
-          ]
-        },
-        "3": {
-          "points": 5,
-          "table": "Table 4",
-          "opponents": [
-            36,
-            3,
-            30
-          ]
-        },
-        "4": {
-          "points": 0,
-          "table": "Table 3",
-          "opponents": [
-            35,
-            1,
-            31
-          ]
-        }
-      }
-    },
-    "15": {
-      "name": "Noelle",
-      "team": "Brianstorm",
-      "total_points": 3,
-      "rounds": {
-        "1": {
-          "points": 0,
-          "table": "Table 3",
-          "opponents": [
-            19,
-            55,
-            63
-          ]
-        },
-        "2": {
-          "points": 1,
-          "table": "Table 7",
-          "opponents": [
-            23,
-            51,
-            28
-          ]
-        },
-        "3": {
-          "points": 1,
-          "table": "Table 8",
-          "opponents": [
-            24,
-            50,
-            26
-          ]
-        },
-        "4": {
-          "points": 0,
-          "table": "Table 6",
-          "opponents": [
-            22,
-            49,
-            27
-          ]
-        },
-        "5": {
-          "points": 1,
-          "table": "Table 7",
-          "opponents": [
-            7,
-            23,
-            31
-          ]
-        },
-        "6": {
-          "points": 0,
-          "table": "Table 3",
-          "opponents": [
-            3,
-            7,
-            11
-          ]
-        }
-      }
-    },
-    "19": {
-      "name": "Hyuk",
-      "team": "Team 17",
-      "total_points": 9,
-      "rounds": {
-        "1": {
-          "points": 5,
-          "table": "Table 3",
-          "opponents": [
-            15,
-            55,
-            63
-          ]
-        },
-        "2": {
-          "points": 1,
-          "table": "Table 11",
-          "opponents": [
-            43,
-            59,
-            64
-          ]
-        },
-        "3": {
-          "points": 1,
-          "table": "Table 12",
-          "opponents": [
-            44,
-            58,
-            62
-          ]
-        },
-        "4": {
-          "points": 1,
-          "table": "Table 9",
-          "opponents": [
-            41,
-            60,
-            61
-          ]
-        },
-        "5": {
-          "points": 1,
-          "table": "Table 3",
-          "opponents": [
-            3,
-            11,
-            27
-          ]
-        }
-      }
-    },
-    "55": {
-      "name": "Daniel",
-      "team": "Snow White and 3 Dwarves",
-      "total_points": 1,
-      "rounds": {
-        "1": {
-          "points": 0,
-          "table": "Table 3",
-          "opponents": [
-            15,
-            19,
-            63
-          ]
-        },
-        "2": {
-          "points": 1,
-          "table": "Table 3",
-          "opponents": [
-            35,
-            3,
-            32
-          ]
-        },
-        "3": {
-          "points": 0,
-          "table": "Table 1",
-          "opponents": [
-            33,
-            2,
-            31
-          ]
-        },
-        "4": {
-          "points": 0,
-          "table": "Table 2",
-          "opponents": [
-            34,
-            4,
-            30
-          ]
-        }
-      }
-    },
-    "63": {
-      "name": "Cai Jing",
-      "team": "Anti Bluefarm Bluefarm Club",
-      "total_points": 5,
-      "rounds": {
-        "1": {
-          "points": 0,
-          "table": "Table 3",
-          "opponents": [
-            15,
-            19,
-            55
-          ]
-        },
-        "2": {
-          "points": 5,
-          "table": "Table 12",
-          "opponents": [
-            44,
-            60,
-            20
-          ]
-        },
-        "3": {
-          "points": 0,
-          "table": "Table 9",
-          "opponents": [
-            41,
-            59,
-            18
-          ]
-        },
-        "4": {
-          "points": 0,
-          "table": "Table 11",
-          "opponents": [
-            43,
-            58,
-            17
-          ]
-        }
-      }
-    },
-    "16": {
-      "name": "Zulq",
-      "team": "Brianstorm",
-      "total_points": 0,
-      "rounds": {
-        "1": {
-          "points": 0,
-          "table": "Table 4",
-          "opponents": [
-            56,
-            20,
-            64
-          ]
-        },
-        "2": {
-          "points": 0,
-          "table": "Table 8",
-          "opponents": [
-            24,
-            52,
-            27
-          ]
-        },
-        "3": {
-          "points": 0,
-          "table": "Table 7",
-          "opponents": [
-            23,
-            49,
-            25
-          ]
-        },
-        "4": {
-          "points": 0,
-          "table": "Table 5",
-          "opponents": [
-            21,
-            50,
-            28
-          ]
-        },
-        "5": {
-          "points": 0,
-          "table": "Table 8",
-          "opponents": [
-            8,
-            24,
-            32
-          ]
-        },
-        "6": {
-          "points": 0,
-          "table": "Table 4",
-          "opponents": [
-            4,
-            8,
-            12
-          ]
-        }
-      }
-    },
-    "56": {
-      "name": "Larry",
-      "team": "Snow White and 3 Dwarves",
-      "total_points": 0,
-      "rounds": {
-        "1": {
-          "points": 0,
-          "table": "Table 4",
-          "opponents": [
-            16,
-            20,
-            64
-          ]
-        },
-        "2": {
-          "points": 0,
-          "table": "Table 4",
-          "opponents": [
-            36,
-            4,
-            31
-          ]
-        },
-        "3": {
-          "points": 0,
-          "table": "Table 2",
-          "opponents": [
-            34,
-            1,
-            32
-          ]
-        },
-        "4": {
-          "points": 0,
-          "table": "Table 1",
-          "opponents": [
-            33,
-            3,
-            29
-          ]
-        }
-      }
-    },
-    "20": {
-      "name": "Vivian",
-      "team": "Team 17",
-      "total_points": 10,
-      "rounds": {
-        "1": {
-          "points": 5,
-          "table": "Table 4",
-          "opponents": [
-            16,
-            56,
-            64
-          ]
-        },
-        "2": {
-          "points": 0,
-          "table": "Table 12",
-          "opponents": [
-            44,
-            60,
-            63
-          ]
-        },
-        "3": {
-          "points": 5,
-          "table": "Table 11",
-          "opponents": [
-            43,
-            57,
-            61
-          ]
-        },
-        "4": {
-          "points": 0,
-          "table": "Table 10",
-          "opponents": [
-            42,
-            59,
-            62
-          ]
-        },
-        "5": {
-          "points": 0,
-          "table": "Table 4",
-          "opponents": [
-            4,
-            12,
-            28
-          ]
-        }
-      }
-    },
-    "64": {
-      "name": "Vikky",
-      "team": "Anti Bluefarm Bluefarm Club",
-      "total_points": 3,
-      "rounds": {
-        "1": {
-          "points": 0,
-          "table": "Table 4",
-          "opponents": [
-            16,
-            56,
-            20
-          ]
-        },
-        "2": {
-          "points": 1,
-          "table": "Table 11",
-          "opponents": [
-            43,
-            59,
-            19
-          ]
-        },
-        "3": {
-          "points": 1,
-          "table": "Table 10",
-          "opponents": [
-            42,
-            60,
-            17
-          ]
-        },
-        "4": {
-          "points": 1,
-          "table": "Table 12",
-          "opponents": [
-            44,
-            57,
-            18
-          ]
-        }
-      }
-    },
-    "25": {
-      "name": "YX",
-      "team": "Dunman Dogs",
-      "total_points": 6,
-      "rounds": {
-        "1": {
-          "points": 1,
-          "table": "Table 5",
-          "opponents": [
-            21,
-            45,
-            33
-          ]
-        },
-        "2": {
-          "points": 0,
-          "table": "Table 6",
-          "opponents": [
-            22,
-            14,
-            50
-          ]
-        },
-        "3": {
-          "points": 0,
-          "table": "Table 7",
-          "opponents": [
-            23,
-            16,
-            49
-          ]
-        },
-        "4": {
-          "points": 0,
-          "table": "Table 8",
-          "opponents": [
-            24,
-            13,
-            51
-          ]
-        },
-        "5": {
           "points": 5,
           "table": "Table 1",
-          "opponents": [
-            1,
-            9,
-            17
-          ]
-        }
-      }
-    },
-    "21": {
-      "name": "Ronald",
-      "team": "______goblin deez",
-      "total_points": 2,
-      "rounds": {
-        "1": {
-          "points": 1,
-          "table": "Table 5",
-          "opponents": [
-            25,
-            45,
-            33
-          ]
-        },
-        "2": {
-          "points": 0,
-          "table": "Table 5",
-          "opponents": [
-            13,
-            49,
-            26
-          ]
-        },
-        "3": {
-          "points": 1,
-          "table": "Table 5",
-          "opponents": [
-            14,
-            51,
-            27
-          ]
-        },
-        "4": {
-          "points": 0,
-          "table": "Table 5",
-          "opponents": [
-            16,
-            50,
-            28
-          ]
-        },
-        "5": {
-          "points": 0,
-          "table": "Table 5",
-          "opponents": [
-            5,
-            13,
-            29
-          ]
-        }
-      }
-    },
-    "45": {
-      "name": "Campion",
-      "team": "2nd Hand Jobs",
-      "total_points": 2,
-      "rounds": {
-        "1": {
-          "points": 1,
-          "table": "Table 5",
-          "opponents": [
-            25,
-            21,
-            33
-          ]
-        },
-        "2": {
-          "points": 0,
-          "table": "Table 13",
-          "opponents": [
-            5,
-            38,
-            11
-          ]
-        },
-        "3": {
-          "points": 1,
-          "table": "Table 13",
-          "opponents": [
-            6,
-            39,
-            9
-          ]
-        },
-        "4": {
-          "points": 0,
-          "table": "Table 13",
-          "opponents": [
-            7,
-            37,
-            10
-          ]
-        }
-      }
-    },
-    "33": {
-      "name": "CJ",
-      "team": "Vengeful Spirit",
-      "total_points": 1,
-      "rounds": {
-        "1": {
-          "points": 1,
-          "table": "Table 5",
-          "opponents": [
-            25,
-            21,
-            45
-          ]
-        },
-        "2": {
-          "points": 0,
-          "table": "Table 1",
-          "opponents": [
-            53,
-            1,
-            30
-          ]
-        },
-        "3": {
-          "points": 0,
-          "table": "Table 1",
-          "opponents": [
-            55,
-            2,
-            31
-          ]
-        },
-        "4": {
-          "points": 0,
-          "table": "Table 1",
-          "opponents": [
-            56,
-            3,
-            29
-          ]
-        }
-      }
-    },
-    "46": {
-      "name": "Dixon",
-      "team": "2nd Hand Jobs",
-      "total_points": 2,
-      "rounds": {
-        "1": {
-          "points": 0,
-          "table": "Table 6",
-          "opponents": [
-            22,
-            34,
-            26
-          ]
-        },
-        "2": {
-          "points": 1,
-          "table": "Table 14",
-          "opponents": [
-            6,
-            37,
-            12
-          ]
-        },
-        "3": {
-          "points": 0,
-          "table": "Table 14",
-          "opponents": [
-            5,
-            40,
-            10
-          ]
-        },
-        "4": {
-          "points": 1,
-          "table": "Table 14",
-          "opponents": [
-            8,
-            38,
-            9
-          ]
-        }
-      }
-    },
-    "22": {
-      "name": "Ye Yang",
-      "team": "______goblin deez",
-      "total_points": 0,
-      "rounds": {
-        "1": {
-          "points": 0,
-          "table": "Table 6",
-          "opponents": [
-            46,
-            34,
-            26
-          ]
-        },
-        "2": {
-          "points": 0,
-          "table": "Table 6",
-          "opponents": [
-            14,
-            50,
-            25
-          ]
-        },
-        "3": {
-          "points": 0,
-          "table": "Table 6",
-          "opponents": [
-            13,
-            52,
-            28
-          ]
-        },
-        "4": {
-          "points": 0,
-          "table": "Table 6",
-          "opponents": [
-            15,
-            49,
-            27
-          ]
-        },
-        "5": {
-          "points": 0,
-          "table": "Table 6",
-          "opponents": [
-            6,
-            14,
-            30
-          ]
-        }
-      }
-    },
-    "34": {
-      "name": "Jason",
-      "team": "Vengeful Spirit",
-      "total_points": 5,
-      "rounds": {
-        "1": {
-          "points": 5,
-          "table": "Table 6",
-          "opponents": [
-            46,
-            22,
-            26
-          ]
-        },
-        "2": {
-          "points": 0,
-          "table": "Table 2",
-          "opponents": [
-            54,
-            2,
-            29
-          ]
-        },
-        "3": {
-          "points": 0,
-          "table": "Table 2",
-          "opponents": [
-            56,
-            1,
-            32
-          ]
-        },
-        "4": {
-          "points": 0,
-          "table": "Table 2",
-          "opponents": [
-            55,
-            4,
-            30
-          ]
-        }
-      }
-    },
-    "26": {
-      "name": "Tse Shuen",
-      "team": "Dunman Dogs",
-      "total_points": 7,
-      "rounds": {
-        "1": {
-          "points": 0,
-          "table": "Table 6",
-          "opponents": [
-            46,
-            22,
-            34
-          ]
-        },
-        "2": {
-          "points": 5,
-          "table": "Table 5",
-          "opponents": [
-            21,
-            13,
-            49
-          ]
-        },
-        "3": {
-          "points": 1,
-          "table": "Table 8",
-          "opponents": [
-            24,
-            15,
-            50
-          ]
-        },
-        "4": {
-          "points": 1,
-          "table": "Table 7",
-          "opponents": [
-            23,
-            14,
-            52
-          ]
-        },
-        "5": {
-          "points": 0,
-          "table": "Table 2",
-          "opponents": [
-            2,
-            10,
-            18
-          ]
-        }
-      }
-    },
-    "47": {
-      "name": "Yong Xuan",
-      "team": "2nd Hand Jobs",
-      "total_points": 1,
-      "rounds": {
-        "1": {
-          "points": 0,
-          "table": "Table 7",
-          "opponents": [
-            23,
-            27,
-            35
-          ]
-        },
-        "2": {
-          "points": 0,
-          "table": "Table 15",
-          "opponents": [
-            7,
-            40,
-            9
-          ]
-        },
-        "3": {
-          "points": 1,
-          "table": "Table 15",
-          "opponents": [
-            8,
-            37,
-            11
-          ]
-        },
-        "4": {
-          "points": 0,
-          "table": "Table 15",
-          "opponents": [
-            5,
-            39,
-            12
-          ]
-        }
-      }
-    },
-    "23": {
-      "name": "Greg",
-      "team": "______goblin deez",
-      "total_points": 3,
-      "rounds": {
-        "1": {
-          "points": 0,
-          "table": "Table 7",
-          "opponents": [
-            47,
-            27,
-            35
-          ]
-        },
-        "2": {
-          "points": 1,
-          "table": "Table 7",
-          "opponents": [
-            15,
-            51,
-            28
-          ]
-        },
-        "3": {
-          "points": 0,
-          "table": "Table 7",
-          "opponents": [
-            16,
-            49,
-            25
-          ]
-        },
-        "4": {
-          "points": 1,
-          "table": "Table 7",
-          "opponents": [
-            14,
-            52,
-            26
-          ]
-        },
-        "5": {
-          "points": 1,
-          "table": "Table 7",
-          "opponents": [
-            7,
-            15,
-            31
-          ]
-        }
-      }
-    },
-    "27": {
-      "name": "Kai Seng",
-      "team": "Dunman Dogs",
-      "total_points": 7,
-      "rounds": {
-        "1": {
-          "points": 5,
-          "table": "Table 7",
-          "opponents": [
-            47,
-            23,
-            35
-          ]
-        },
-        "2": {
-          "points": 0,
-          "table": "Table 8",
-          "opponents": [
-            24,
-            16,
-            52
-          ]
-        },
-        "3": {
-          "points": 1,
-          "table": "Table 5",
-          "opponents": [
-            21,
-            14,
-            51
-          ]
-        },
-        "4": {
-          "points": 0,
-          "table": "Table 6",
-          "opponents": [
-            22,
-            15,
-            49
-          ]
-        },
-        "5": {
-          "points": 1,
-          "table": "Table 3",
-          "opponents": [
-            3,
-            11,
-            19
-          ]
-        }
-      }
-    },
-    "35": {
-      "name": "Bryan",
-      "team": "Vengeful Spirit",
-      "total_points": 6,
-      "rounds": {
-        "1": {
-          "points": 0,
-          "table": "Table 7",
-          "opponents": [
-            47,
-            23,
-            27
-          ]
-        },
-        "2": {
-          "points": 1,
-          "table": "Table 3",
-          "opponents": [
-            55,
-            3,
-            32
-          ]
-        },
-        "3": {
-          "points": 0,
-          "table": "Table 3",
-          "opponents": [
-            53,
-            4,
-            29
-          ]
-        },
-        "4": {
-          "points": 5,
-          "table": "Table 3",
-          "opponents": [
-            54,
-            1,
-            31
-          ]
-        }
-      }
-    },
-    "24": {
-      "name": "Xavier Ho",
-      "team": "______goblin deez",
-      "total_points": 6,
-      "rounds": {
-        "1": {
-          "points": 0,
-          "table": "Table 8",
-          "opponents": [
-            36,
-            28,
-            48
-          ]
-        },
-        "2": {
-          "points": 0,
-          "table": "Table 8",
-          "opponents": [
-            16,
-            52,
-            27
-          ]
-        },
-        "3": {
-          "points": 1,
-          "table": "Table 8",
-          "opponents": [
-            15,
-            50,
-            26
-          ]
-        },
-        "4": {
-          "points": 5,
-          "table": "Table 8",
-          "opponents": [
-            13,
-            51,
-            25
-          ]
-        },
-        "5": {
-          "points": 0,
-          "table": "Table 8",
-          "opponents": [
-            8,
-            16,
-            32
-          ]
-        }
-      }
-    },
-    "36": {
-      "name": "Wei Jia",
-      "team": "Vengeful Spirit",
-      "total_points": 0,
-      "rounds": {
-        "1": {
-          "points": 0,
-          "table": "Table 8",
-          "opponents": [
-            24,
-            28,
-            48
-          ]
-        },
-        "2": {
-          "points": 0,
-          "table": "Table 4",
-          "opponents": [
-            56,
-            4,
-            31
-          ]
-        },
-        "3": {
-          "points": 0,
-          "table": "Table 4",
-          "opponents": [
-            54,
-            3,
-            30
-          ]
-        },
-        "4": {
-          "points": 0,
-          "table": "Table 4",
-          "opponents": [
-            53,
-            2,
-            32
-          ]
-        }
-      }
-    },
-    "28": {
-      "name": "Kim",
-      "team": "Dunman Dogs",
-      "total_points": 6,
-      "rounds": {
-        "1": {
-          "points": 0,
-          "table": "Table 8",
-          "opponents": [
-            24,
-            36,
-            48
-          ]
-        },
-        "2": {
-          "points": 1,
-          "table": "Table 7",
-          "opponents": [
-            23,
-            15,
-            51
-          ]
-        },
-        "3": {
-          "points": 0,
-          "table": "Table 6",
-          "opponents": [
-            22,
-            13,
-            52
-          ]
-        },
-        "4": {
-          "points": 5,
-          "table": "Table 5",
-          "opponents": [
-            21,
-            16,
-            50
-          ]
-        },
-        "5": {
-          "points": 0,
-          "table": "Table 4",
-          "opponents": [
-            4,
-            12,
-            20
-          ]
-        }
-      }
-    },
-    "48": {
-      "name": "Daryl",
-      "team": "2nd Hand Jobs",
-      "total_points": 6,
-      "rounds": {
-        "1": {
-          "points": 5,
-          "table": "Table 8",
-          "opponents": [
-            24,
-            36,
-            28
-          ]
-        },
-        "2": {
-          "points": 0,
-          "table": "Table 16",
-          "opponents": [
-            8,
-            39,
-            10
-          ]
-        },
-        "3": {
-          "points": 0,
-          "table": "Table 16",
-          "opponents": [
-            7,
-            38,
-            12
-          ]
-        },
-        "4": {
-          "points": 1,
-          "table": "Table 16",
-          "opponents": [
-            6,
-            40,
-            11
-          ]
-        }
-      }
-    },
-    "41": {
-      "name": "Augustine",
-      "team": "Team RGB",
-      "total_points": 2,
-      "rounds": {
-        "1": {
-          "points": 0,
-          "table": "Table 9",
           "opponents": [
             29,
-            1,
-            49
-          ]
-        },
-        "2": {
-          "points": 1,
-          "table": "Table 9",
-          "opponents": [
-            57,
-            17,
-            62
-          ]
-        },
-        "3": {
-          "points": 0,
-          "table": "Table 9",
-          "opponents": [
-            59,
-            18,
-            63
-          ]
-        },
-        "4": {
-          "points": 1,
-          "table": "Table 9",
-          "opponents": [
-            60,
-            19,
-            61
-          ]
-        }
-      }
-    },
-    "29": {
-      "name": "Raynold",
-      "team": "4 Buggers lor",
-      "total_points": 15,
-      "rounds": {
-        "1": {
-          "points": 0,
-          "table": "Table 9",
-          "opponents": [
-            41,
-            1,
-            49
-          ]
-        },
-        "2": {
-          "points": 0,
-          "table": "Table 2",
-          "opponents": [
-            34,
-            54,
-            2
-          ]
-        },
-        "3": {
-          "points": 5,
-          "table": "Table 3",
-          "opponents": [
-            35,
-            53,
-            4
-          ]
-        },
-        "4": {
-          "points": 5,
-          "table": "Table 1",
-          "opponents": [
-            33,
-            56,
-            3
-          ]
-        },
-        "5": {
-          "points": 5,
-          "table": "Table 5",
-          "opponents": [
-            5,
             13,
-            21
-          ]
-        }
-      }
-    },
-    "1": {
-      "name": "Winston",
-      "team": "Ascendit",
-      "total_points": 5,
-      "rounds": {
-        "1": {
-          "points": 5,
-          "table": "Table 9",
-          "opponents": [
-            41,
-            29,
-            49
-          ]
-        },
-        "2": {
-          "points": 0,
-          "table": "Table 1",
-          "opponents": [
-            33,
-            53,
-            30
-          ]
-        },
-        "3": {
-          "points": 0,
-          "table": "Table 2",
-          "opponents": [
-            34,
-            56,
-            32
-          ]
-        },
-        "4": {
-          "points": 0,
-          "table": "Table 3",
-          "opponents": [
-            35,
-            54,
-            31
-          ]
-        },
-        "5": {
-          "points": 0,
-          "table": "Table 1",
-          "opponents": [
-            9,
-            17,
-            25
-          ]
-        },
-        "6": {
-          "points": 0,
-          "table": "Table 1",
-          "opponents": [
-            5,
-            9,
-            13
-          ]
-        }
-      }
-    },
-    "49": {
-      "name": "Xuan",
-      "team": "\u6709\u80e1\u987b\u7684\u662f\u4f60\u7238\u7238",
-      "total_points": 10,
-      "rounds": {
-        "1": {
-          "points": 0,
-          "table": "Table 9",
-          "opponents": [
-            41,
-            29,
-            1
-          ]
-        },
-        "2": {
-          "points": 0,
-          "table": "Table 5",
-          "opponents": [
-            21,
-            13,
-            26
-          ]
-        },
-        "3": {
-          "points": 5,
-          "table": "Table 7",
-          "opponents": [
-            23,
-            16,
-            25
-          ]
-        },
-        "4": {
-          "points": 5,
-          "table": "Table 6",
-          "opponents": [
-            22,
-            15,
-            27
-          ]
-        }
-      }
-    },
-    "30": {
-      "name": "Sean",
-      "team": "4 Buggers lor",
-      "total_points": 11,
-      "rounds": {
-        "1": {
-          "points": 1,
-          "table": "Table 10",
-          "opponents": [
-            50,
-            2,
-            42
-          ]
-        },
-        "2": {
-          "points": 5,
-          "table": "Table 1",
-          "opponents": [
-            33,
-            53,
-            1
-          ]
-        },
-        "3": {
-          "points": 0,
-          "table": "Table 4",
-          "opponents": [
-            36,
-            54,
-            3
-          ]
-        },
-        "4": {
-          "points": 0,
-          "table": "Table 2",
-          "opponents": [
-            34,
-            55,
-            4
-          ]
-        },
-        "5": {
-          "points": 5,
-          "table": "Table 6",
-          "opponents": [
-            6,
-            14,
-            22
-          ]
-        }
-      }
-    },
-    "50": {
-      "name": "Ivan",
-      "team": "\u6709\u80e1\u987b\u7684\u662f\u4f60\u7238\u7238",
-      "total_points": 2,
-      "rounds": {
-        "1": {
-          "points": 1,
-          "table": "Table 10",
-          "opponents": [
-            30,
-            2,
-            42
-          ]
-        },
-        "2": {
-          "points": 0,
-          "table": "Table 6",
-          "opponents": [
-            22,
-            14,
-            25
-          ]
-        },
-        "3": {
-          "points": 1,
-          "table": "Table 8",
-          "opponents": [
-            24,
-            15,
-            26
-          ]
-        },
-        "4": {
-          "points": 0,
-          "table": "Table 5",
-          "opponents": [
-            21,
-            16,
-            28
-          ]
-        }
-      }
-    },
-    "2": {
-      "name": "Alvin",
-      "team": "Ascendit",
-      "total_points": 11,
-      "rounds": {
-        "1": {
-          "points": 1,
-          "table": "Table 10",
-          "opponents": [
-            30,
-            50,
-            42
-          ]
-        },
-        "2": {
-          "points": 5,
-          "table": "Table 2",
-          "opponents": [
-            34,
-            54,
-            29
-          ]
-        },
-        "3": {
-          "points": 5,
-          "table": "Table 1",
-          "opponents": [
-            33,
-            55,
-            31
-          ]
-        },
-        "4": {
-          "points": 0,
-          "table": "Table 4",
-          "opponents": [
-            36,
-            53,
-            32
-          ]
-        },
-        "5": {
-          "points": 0,
-          "table": "Table 2",
-          "opponents": [
-            10,
-            18,
-            26
-          ]
-        },
-        "6": {
-          "points": 0,
-          "table": "Table 2",
-          "opponents": [
-            6,
-            10,
-            14
-          ]
-        }
-      }
-    },
-    "42": {
-      "name": "Silvan",
-      "team": "Team RGB",
-      "total_points": 7,
-      "rounds": {
-        "1": {
-          "points": 1,
-          "table": "Table 10",
-          "opponents": [
-            30,
-            50,
-            2
-          ]
-        },
-        "2": {
-          "points": 0,
-          "table": "Table 10",
-          "opponents": [
-            58,
-            18,
-            61
-          ]
-        },
-        "3": {
-          "points": 1,
-          "table": "Table 10",
-          "opponents": [
-            60,
-            17,
-            64
-          ]
-        },
-        "4": {
-          "points": 5,
-          "table": "Table 10",
-          "opponents": [
-            59,
-            20,
-            62
-          ]
-        }
-      }
-    },
-    "31": {
-      "name": "Marcus",
-      "team": "4 Buggers lor",
-      "total_points": 1,
-      "rounds": {
-        "1": {
-          "points": 0,
-          "table": "Table 11",
-          "opponents": [
-            3,
-            43,
-            51
-          ]
-        },
-        "2": {
-          "points": 0,
-          "table": "Table 4",
-          "opponents": [
-            36,
-            56,
-            4
-          ]
-        },
-        "3": {
-          "points": 0,
-          "table": "Table 1",
-          "opponents": [
-            33,
-            55,
-            2
-          ]
-        },
-        "4": {
-          "points": 0,
-          "table": "Table 3",
-          "opponents": [
-            35,
-            54,
-            1
-          ]
-        },
-        "5": {
-          "points": 1,
-          "table": "Table 7",
-          "opponents": [
-            7,
-            15,
-            23
-          ]
-        }
-      }
-    },
-    "3": {
-      "name": "Vimal",
-      "team": "Ascendit",
-      "total_points": 2,
-      "rounds": {
-        "1": {
-          "points": 0,
-          "table": "Table 11",
-          "opponents": [
-            31,
-            43,
-            51
-          ]
-        },
-        "2": {
-          "points": 1,
-          "table": "Table 3",
-          "opponents": [
-            35,
-            55,
-            32
-          ]
-        },
-        "3": {
-          "points": 0,
-          "table": "Table 4",
-          "opponents": [
-            36,
-            54,
-            30
-          ]
-        },
-        "4": {
-          "points": 0,
-          "table": "Table 1",
-          "opponents": [
-            33,
-            56,
-            29
-          ]
-        },
-        "5": {
-          "points": 1,
-          "table": "Table 3",
-          "opponents": [
-            11,
-            19,
-            27
-          ]
-        },
-        "6": {
-          "points": 0,
-          "table": "Table 3",
-          "opponents": [
-            7,
-            11,
-            15
-          ]
-        }
-      }
-    },
-    "43": {
-      "name": "Ernst",
-      "team": "Team RGB",
-      "total_points": 6,
-      "rounds": {
-        "1": {
-          "points": 5,
-          "table": "Table 11",
-          "opponents": [
-            31,
-            3,
-            51
-          ]
-        },
-        "2": {
-          "points": 1,
-          "table": "Table 11",
-          "opponents": [
-            59,
-            19,
-            64
-          ]
-        },
-        "3": {
-          "points": 0,
-          "table": "Table 11",
-          "opponents": [
-            57,
-            20,
-            61
-          ]
-        },
-        "4": {
-          "points": 0,
-          "table": "Table 11",
-          "opponents": [
-            58,
-            17,
-            63
-          ]
-        }
-      }
-    },
-    "51": {
-      "name": "Een De",
-      "team": "\u6709\u80e1\u987b\u7684\u662f\u4f60\u7238\u7238",
-      "total_points": 2,
-      "rounds": {
-        "1": {
-          "points": 0,
-          "table": "Table 11",
-          "opponents": [
-            31,
-            3,
-            43
-          ]
-        },
-        "2": {
-          "points": 1,
-          "table": "Table 7",
-          "opponents": [
-            23,
-            15,
-            28
-          ]
-        },
-        "3": {
-          "points": 1,
-          "table": "Table 5",
-          "opponents": [
-            21,
-            14,
-            27
-          ]
-        },
-        "4": {
-          "points": 0,
-          "table": "Table 8",
-          "opponents": [
-            24,
-            13,
-            25
-          ]
-        }
-      }
-    },
-    "44": {
-      "name": "Sum",
-      "team": "Team RGB",
-      "total_points": 3,
-      "rounds": {
-        "1": {
-          "points": 1,
-          "table": "Table 12",
-          "opponents": [
-            4,
-            32,
-            52
-          ]
-        },
-        "2": {
-          "points": 0,
-          "table": "Table 12",
-          "opponents": [
-            60,
-            20,
-            63
-          ]
-        },
-        "3": {
-          "points": 1,
-          "table": "Table 12",
-          "opponents": [
-            58,
-            19,
-            62
-          ]
-        },
-        "4": {
-          "points": 1,
-          "table": "Table 12",
-          "opponents": [
-            57,
-            18,
-            64
-          ]
-        }
-      }
-    },
-    "4": {
-      "name": "Timothy",
-      "team": "Ascendit",
-      "total_points": 16,
-      "rounds": {
-        "1": {
-          "points": 1,
-          "table": "Table 12",
-          "opponents": [
-            44,
-            32,
-            52
-          ]
-        },
-        "2": {
-          "points": 5,
-          "table": "Table 4",
-          "opponents": [
-            36,
-            56,
-            31
-          ]
-        },
-        "3": {
-          "points": 0,
-          "table": "Table 3",
-          "opponents": [
-            35,
-            53,
-            29
-          ]
-        },
-        "4": {
-          "points": 5,
-          "table": "Table 2",
-          "opponents": [
-            34,
-            55,
-            30
-          ]
-        },
-        "5": {
-          "points": 0,
-          "table": "Table 4",
-          "opponents": [
-            12,
-            20,
-            28
-          ]
-        },
-        "6": {
-          "points": 5,
-          "table": "Table 4",
-          "opponents": [
-            8,
-            12,
-            16
-          ]
-        }
-      }
-    },
-    "32": {
-      "name": "Jon",
-      "team": "4 Buggers lor",
-      "total_points": 12,
-      "rounds": {
-        "1": {
-          "points": 1,
-          "table": "Table 12",
-          "opponents": [
-            44,
-            4,
-            52
-          ]
-        },
-        "2": {
-          "points": 1,
-          "table": "Table 3",
-          "opponents": [
-            35,
-            55,
-            3
-          ]
-        },
-        "3": {
-          "points": 5,
-          "table": "Table 2",
-          "opponents": [
-            34,
-            56,
-            1
-          ]
-        },
-        "4": {
-          "points": 5,
-          "table": "Table 4",
-          "opponents": [
-            36,
-            53,
-            2
-          ]
-        },
-        "5": {
-          "points": 0,
-          "table": "Table 8",
-          "opponents": [
-            8,
-            16,
-            24
-          ]
-        }
-      }
-    },
-    "52": {
-      "name": "Yao Yang",
-      "team": "\u6709\u80e1\u987b\u7684\u662f\u4f60\u7238\u7238",
-      "total_points": 7,
-      "rounds": {
-        "1": {
-          "points": 1,
-          "table": "Table 12",
-          "opponents": [
-            44,
-            4,
-            32
-          ]
-        },
-        "2": {
-          "points": 5,
-          "table": "Table 8",
-          "opponents": [
-            24,
-            16,
-            27
-          ]
-        },
-        "3": {
-          "points": 0,
-          "table": "Table 6",
-          "opponents": [
-            22,
-            13,
-            28
-          ]
-        },
-        "4": {
-          "points": 1,
-          "table": "Table 7",
-          "opponents": [
-            23,
-            14,
-            26
-          ]
-        }
-      }
-    },
-    "9": {
-      "name": "Louis",
-      "team": "Magic Hard to Play",
-      "total_points": 7,
-      "rounds": {
-        "1": {
-          "points": 0,
-          "table": "Table 13",
-          "opponents": [
-            57,
-            37,
-            5
-          ]
-        },
-        "2": {
-          "points": 0,
-          "table": "Table 15",
-          "opponents": [
-            47,
-            7,
-            40
-          ]
-        },
-        "3": {
-          "points": 1,
-          "table": "Table 13",
-          "opponents": [
-            45,
-            6,
-            39
-          ]
-        },
-        "4": {
-          "points": 1,
-          "table": "Table 14",
-          "opponents": [
-            46,
-            8,
-            38
-          ]
-        },
-        "5": {
-          "points": 0,
-          "table": "Table 1",
-          "opponents": [
-            1,
-            17,
-            25
-          ]
-        },
-        "6": {
-          "points": 5,
-          "table": "Table 1",
-          "opponents": [
-            1,
-            5,
-            13
-          ]
-        }
-      }
-    },
-    "57": {
-      "name": "Jerry",
-      "team": "J Square Sqaured!",
-      "total_points": 7,
-      "rounds": {
-        "1": {
-          "points": 5,
-          "table": "Table 13",
-          "opponents": [
-            9,
-            37,
             5
           ]
         },
         "2": {
           "points": 1,
-          "table": "Table 9",
+          "table": "Table 1",
           "opponents": [
-            41,
-            17,
-            62
+            21,
+            10,
+            3
           ]
         },
         "3": {
-          "points": 0,
-          "table": "Table 11",
+          "points": 1,
+          "table": "Table 2",
           "opponents": [
-            43,
-            20,
-            61
+            22,
+            11,
+            1
           ]
         },
         "4": {
           "points": 1,
-          "table": "Table 12",
+          "table": "Table 3",
           "opponents": [
-            44,
-            18,
-            64
-          ]
-        }
-      }
-    },
-    "37": {
-      "name": "Kieran",
-      "team": "Team Kaya",
-      "total_points": 2,
-      "rounds": {
-        "1": {
-          "points": 0,
-          "table": "Table 13",
-          "opponents": [
+            23,
             9,
-            57,
-            5
-          ]
-        },
-        "2": {
-          "points": 1,
-          "table": "Table 14",
-          "opponents": [
-            46,
-            6,
-            12
-          ]
-        },
-        "3": {
-          "points": 1,
-          "table": "Table 15",
-          "opponents": [
-            47,
-            8,
-            11
-          ]
-        },
-        "4": {
-          "points": 0,
-          "table": "Table 13",
-          "opponents": [
-            45,
-            7,
-            10
+            2
           ]
         }
       }
     },
     "5": {
-      "name": "Glenn",
-      "team": "Keith-ers",
-      "total_points": 10,
+      "name": "Captain_Beta",
+      "team": "Beta Force",
+      "total_points": 1,
       "rounds": {
         "1": {
           "points": 0,
-          "table": "Table 13",
+          "table": "Table 1",
           "opponents": [
-            9,
-            57,
-            37
+            29,
+            13,
+            17
           ]
         },
         "2": {
           "points": 0,
-          "table": "Table 13",
+          "table": "Table 5",
           "opponents": [
-            45,
-            38,
-            11
+            30,
+            15,
+            25
           ]
         },
         "3": {
-          "points": 5,
-          "table": "Table 14",
-          "opponents": [
-            46,
-            40,
-            10
-          ]
-        },
-        "4": {
-          "points": 5,
-          "table": "Table 15",
-          "opponents": [
-            47,
-            39,
-            12
-          ]
-        },
-        "5": {
           "points": 0,
           "table": "Table 5",
           "opponents": [
-            13,
-            21,
-            29
+            31,
+            16,
+            27
           ]
         },
-        "6": {
+        "4": {
+          "points": 1,
+          "table": "Table 5",
+          "opponents": [
+            32,
+            14,
+            26
+          ]
+        },
+        "5": {
           "points": 0,
           "table": "Table 1",
           "opponents": [
@@ -3655,205 +728,92 @@
         }
       }
     },
-    "58": {
-      "name": "Javier",
-      "team": "J Square Sqaured!",
-      "total_points": 11,
+    "30": {
+      "name": "Scout_Theta",
+      "team": "Theta Thunder",
+      "total_points": 5,
       "rounds": {
         "1": {
-          "points": 0,
-          "table": "Table 14",
-          "opponents": [
-            10,
-            38,
-            6
-          ]
-        },
-        "2": {
-          "points": 5,
-          "table": "Table 10",
-          "opponents": [
-            42,
-            18,
-            61
-          ]
-        },
-        "3": {
-          "points": 1,
-          "table": "Table 12",
-          "opponents": [
-            44,
-            19,
-            62
-          ]
-        },
-        "4": {
-          "points": 5,
-          "table": "Table 11",
-          "opponents": [
-            43,
-            17,
-            63
-          ]
-        }
-      }
-    },
-    "10": {
-      "name": "Jed",
-      "team": "Magic Hard to Play",
-      "total_points": 10,
-      "rounds": {
-        "1": {
-          "points": 0,
-          "table": "Table 14",
-          "opponents": [
-            58,
-            38,
-            6
-          ]
-        },
-        "2": {
-          "points": 5,
-          "table": "Table 16",
-          "opponents": [
-            48,
-            8,
-            39
-          ]
-        },
-        "3": {
-          "points": 0,
-          "table": "Table 14",
-          "opponents": [
-            46,
-            5,
-            40
-          ]
-        },
-        "4": {
-          "points": 5,
-          "table": "Table 13",
-          "opponents": [
-            45,
-            7,
-            37
-          ]
-        },
-        "5": {
           "points": 0,
           "table": "Table 2",
           "opponents": [
-            2,
+            6,
             18,
+            14
+          ]
+        },
+        "2": {
+          "points": 5,
+          "table": "Table 5",
+          "opponents": [
+            5,
+            15,
+            25
+          ]
+        },
+        "3": {
+          "points": 0,
+          "table": "Table 8",
+          "opponents": [
+            8,
+            13,
             26
           ]
         },
-        "6": {
-          "points": 0,
-          "table": "Table 2",
-          "opponents": [
-            2,
-            6,
-            14
-          ]
-        }
-      }
-    },
-    "38": {
-      "name": "Axel",
-      "team": "Team Kaya",
-      "total_points": 6,
-      "rounds": {
-        "1": {
-          "points": 0,
-          "table": "Table 14",
-          "opponents": [
-            58,
-            10,
-            6
-          ]
-        },
-        "2": {
-          "points": 5,
-          "table": "Table 13",
-          "opponents": [
-            45,
-            5,
-            11
-          ]
-        },
-        "3": {
-          "points": 0,
-          "table": "Table 16",
-          "opponents": [
-            48,
-            7,
-            12
-          ]
-        },
         "4": {
-          "points": 1,
-          "table": "Table 14",
+          "points": 0,
+          "table": "Table 7",
           "opponents": [
-            46,
-            8,
-            9
+            7,
+            16,
+            28
           ]
         }
       }
     },
     "6": {
-      "name": "Clement",
-      "team": "Keith-ers",
-      "total_points": 13,
+      "name": "Scout_Beta",
+      "team": "Beta Force",
+      "total_points": 6,
       "rounds": {
         "1": {
-          "points": 5,
-          "table": "Table 14",
+          "points": 0,
+          "table": "Table 2",
           "opponents": [
-            58,
-            10,
-            38
+            30,
+            18,
+            14
           ]
         },
         "2": {
           "points": 1,
-          "table": "Table 14",
+          "table": "Table 6",
           "opponents": [
-            46,
-            37,
-            12
+            29,
+            16,
+            26
           ]
         },
         "3": {
-          "points": 1,
-          "table": "Table 13",
+          "points": 0,
+          "table": "Table 6",
           "opponents": [
-            45,
-            39,
-            9
+            32,
+            15,
+            28
           ]
         },
         "4": {
-          "points": 1,
-          "table": "Table 16",
+          "points": 5,
+          "table": "Table 6",
           "opponents": [
-            48,
-            40,
-            11
+            31,
+            13,
+            25
           ]
         },
         "5": {
           "points": 0,
-          "table": "Table 6",
-          "opponents": [
-            14,
-            22,
-            30
-          ]
-        },
-        "6": {
-          "points": 5,
           "table": "Table 2",
           "opponents": [
             2,
@@ -3863,144 +823,187 @@
         }
       }
     },
-    "59": {
-      "name": "Jay",
-      "team": "J Square Sqaured!",
-      "total_points": 6,
+    "18": {
+      "name": "Scout_Epsilon",
+      "team": "Epsilon Elite",
+      "total_points": 5,
       "rounds": {
         "1": {
-          "points": 5,
-          "table": "Table 15",
+          "points": 0,
+          "table": "Table 2",
           "opponents": [
-            39,
-            7,
-            11
+            30,
+            6,
+            14
           ]
         },
         "2": {
-          "points": 1,
-          "table": "Table 11",
+          "points": 0,
+          "table": "Table 2",
           "opponents": [
-            43,
-            19,
-            64
+            22,
+            9,
+            4
           ]
         },
         "3": {
           "points": 0,
-          "table": "Table 9",
+          "table": "Table 1",
           "opponents": [
-            41,
-            18,
-            63
+            21,
+            12,
+            2
           ]
         },
         "4": {
-          "points": 0,
-          "table": "Table 10",
+          "points": 5,
+          "table": "Table 4",
           "opponents": [
-            42,
-            20,
-            62
+            24,
+            10,
+            1
           ]
         }
       }
     },
-    "39": {
-      "name": "Yun",
-      "team": "Team Kaya",
-      "total_points": 1,
+    "14": {
+      "name": "Scout_Delta",
+      "team": "Delta Squad",
+      "total_points": 11,
       "rounds": {
         "1": {
-          "points": 0,
-          "table": "Table 15",
+          "points": 5,
+          "table": "Table 2",
           "opponents": [
-            59,
-            7,
-            11
+            30,
+            6,
+            18
           ]
         },
         "2": {
           "points": 0,
-          "table": "Table 16",
+          "table": "Table 8",
           "opponents": [
-            48,
             8,
-            10
+            31,
+            28
           ]
         },
         "3": {
-          "points": 1,
-          "table": "Table 13",
+          "points": 5,
+          "table": "Table 7",
           "opponents": [
-            45,
+            7,
+            29,
+            25
+          ]
+        },
+        "4": {
+          "points": 1,
+          "table": "Table 5",
+          "opponents": [
+            5,
+            32,
+            26
+          ]
+        },
+        "5": {
+          "points": 0,
+          "table": "Table 2",
+          "opponents": [
+            2,
             6,
-            9
+            10
+          ]
+        }
+      }
+    },
+    "19": {
+      "name": "Striker_Epsilon",
+      "team": "Epsilon Elite",
+      "total_points": 5,
+      "rounds": {
+        "1": {
+          "points": 0,
+          "table": "Table 3",
+          "opponents": [
+            7,
+            31,
+            15
+          ]
+        },
+        "2": {
+          "points": 0,
+          "table": "Table 3",
+          "opponents": [
+            23,
+            12,
+            1
+          ]
+        },
+        "3": {
+          "points": 5,
+          "table": "Table 4",
+          "opponents": [
+            24,
+            9,
+            3
           ]
         },
         "4": {
           "points": 0,
-          "table": "Table 15",
+          "table": "Table 1",
           "opponents": [
-            47,
-            5,
-            12
+            21,
+            11,
+            4
           ]
         }
       }
     },
     "7": {
-      "name": "Jeremiah",
-      "team": "Keith-ers",
-      "total_points": 11,
+      "name": "Striker_Beta",
+      "team": "Beta Force",
+      "total_points": 10,
       "rounds": {
         "1": {
-          "points": 0,
-          "table": "Table 15",
+          "points": 5,
+          "table": "Table 3",
           "opponents": [
-            59,
-            39,
-            11
+            19,
+            31,
+            15
           ]
         },
         "2": {
           "points": 0,
-          "table": "Table 15",
+          "table": "Table 7",
           "opponents": [
-            47,
-            40,
-            9
+            32,
+            13,
+            27
           ]
         },
         "3": {
-          "points": 5,
-          "table": "Table 16",
+          "points": 0,
+          "table": "Table 7",
           "opponents": [
-            48,
-            38,
-            12
+            29,
+            14,
+            25
           ]
         },
         "4": {
-          "points": 0,
-          "table": "Table 13",
+          "points": 5,
+          "table": "Table 7",
           "opponents": [
-            45,
-            37,
-            10
+            30,
+            16,
+            28
           ]
         },
         "5": {
-          "points": 1,
-          "table": "Table 7",
-          "opponents": [
-            15,
-            23,
-            31
-          ]
-        },
-        "6": {
-          "points": 5,
+          "points": 0,
           "table": "Table 3",
           "opponents": [
             3,
@@ -4010,57 +1013,713 @@
         }
       }
     },
-    "11": {
-      "name": "Andrew",
-      "team": "Magic Hard to Play",
-      "total_points": 3,
+    "31": {
+      "name": "Striker_Theta",
+      "team": "Theta Thunder",
+      "total_points": 5,
       "rounds": {
         "1": {
           "points": 0,
-          "table": "Table 15",
+          "table": "Table 3",
           "opponents": [
-            59,
-            39,
-            7
+            19,
+            7,
+            15
+          ]
+        },
+        "2": {
+          "points": 5,
+          "table": "Table 8",
+          "opponents": [
+            8,
+            14,
+            28
+          ]
+        },
+        "3": {
+          "points": 0,
+          "table": "Table 5",
+          "opponents": [
+            5,
+            16,
+            27
+          ]
+        },
+        "4": {
+          "points": 0,
+          "table": "Table 6",
+          "opponents": [
+            6,
+            13,
+            25
+          ]
+        }
+      }
+    },
+    "15": {
+      "name": "Striker_Delta",
+      "team": "Delta Squad",
+      "total_points": 5,
+      "rounds": {
+        "1": {
+          "points": 0,
+          "table": "Table 3",
+          "opponents": [
+            19,
+            7,
+            31
           ]
         },
         "2": {
           "points": 0,
-          "table": "Table 13",
+          "table": "Table 5",
           "opponents": [
-            45,
             5,
-            38
+            30,
+            25
           ]
         },
         "3": {
-          "points": 1,
-          "table": "Table 15",
+          "points": 0,
+          "table": "Table 6",
           "opponents": [
-            47,
+            6,
+            32,
+            28
+          ]
+        },
+        "4": {
+          "points": 0,
+          "table": "Table 8",
+          "opponents": [
             8,
-            37
+            29,
+            27
+          ]
+        },
+        "5": {
+          "points": 5,
+          "table": "Table 3",
+          "opponents": [
+            3,
+            7,
+            11
+          ]
+        }
+      }
+    },
+    "32": {
+      "name": "Guard_Theta",
+      "team": "Theta Thunder",
+      "total_points": 11,
+      "rounds": {
+        "1": {
+          "points": 0,
+          "table": "Table 4",
+          "opponents": [
+            16,
+            20,
+            8
+          ]
+        },
+        "2": {
+          "points": 5,
+          "table": "Table 7",
+          "opponents": [
+            7,
+            13,
+            27
+          ]
+        },
+        "3": {
+          "points": 5,
+          "table": "Table 6",
+          "opponents": [
+            6,
+            15,
+            28
           ]
         },
         "4": {
           "points": 1,
-          "table": "Table 16",
+          "table": "Table 5",
           "opponents": [
-            48,
-            6,
-            40
+            5,
+            14,
+            26
+          ]
+        }
+      }
+    },
+    "16": {
+      "name": "Guard_Delta",
+      "team": "Delta Squad",
+      "total_points": 11,
+      "rounds": {
+        "1": {
+          "points": 5,
+          "table": "Table 4",
+          "opponents": [
+            32,
+            20,
+            8
           ]
         },
-        "5": {
+        "2": {
           "points": 1,
-          "table": "Table 3",
+          "table": "Table 6",
           "opponents": [
-            3,
-            19,
+            6,
+            29,
+            26
+          ]
+        },
+        "3": {
+          "points": 5,
+          "table": "Table 5",
+          "opponents": [
+            5,
+            31,
             27
           ]
         },
-        "6": {
+        "4": {
+          "points": 0,
+          "table": "Table 7",
+          "opponents": [
+            7,
+            30,
+            28
+          ]
+        },
+        "5": {
+          "points": 0,
+          "table": "Table 4",
+          "opponents": [
+            4,
+            8,
+            12
+          ]
+        }
+      }
+    },
+    "20": {
+      "name": "Guard_Epsilon",
+      "team": "Epsilon Elite",
+      "total_points": 1,
+      "rounds": {
+        "1": {
+          "points": 0,
+          "table": "Table 4",
+          "opponents": [
+            32,
+            16,
+            8
+          ]
+        },
+        "2": {
+          "points": 0,
+          "table": "Table 4",
+          "opponents": [
+            24,
+            11,
+            2
+          ]
+        },
+        "3": {
+          "points": 0,
+          "table": "Table 3",
+          "opponents": [
+            23,
+            10,
+            4
+          ]
+        },
+        "4": {
+          "points": 1,
+          "table": "Table 2",
+          "opponents": [
+            22,
+            12,
+            3
+          ]
+        }
+      }
+    },
+    "8": {
+      "name": "Guard_Beta",
+      "team": "Beta Force",
+      "total_points": 0,
+      "rounds": {
+        "1": {
+          "points": 0,
+          "table": "Table 4",
+          "opponents": [
+            32,
+            16,
+            20
+          ]
+        },
+        "2": {
+          "points": 0,
+          "table": "Table 8",
+          "opponents": [
+            31,
+            14,
+            28
+          ]
+        },
+        "3": {
+          "points": 0,
+          "table": "Table 8",
+          "opponents": [
+            30,
+            13,
+            26
+          ]
+        },
+        "4": {
+          "points": 0,
+          "table": "Table 8",
+          "opponents": [
+            29,
+            15,
+            27
+          ]
+        },
+        "5": {
+          "points": 0,
+          "table": "Table 4",
+          "opponents": [
+            4,
+            12,
+            16
+          ]
+        }
+      }
+    },
+    "25": {
+      "name": "Captain_Eta",
+      "team": "Eta Hawks",
+      "total_points": 0,
+      "rounds": {
+        "1": {
+          "points": 0,
+          "table": "Table 5",
+          "opponents": [
+            21,
+            9,
+            1
+          ]
+        },
+        "2": {
+          "points": 0,
+          "table": "Table 5",
+          "opponents": [
+            5,
+            30,
+            15
+          ]
+        },
+        "3": {
+          "points": 0,
+          "table": "Table 7",
+          "opponents": [
+            7,
+            29,
+            14
+          ]
+        },
+        "4": {
+          "points": 0,
+          "table": "Table 6",
+          "opponents": [
+            6,
+            31,
+            13
+          ]
+        }
+      }
+    },
+    "21": {
+      "name": "Captain_Zeta",
+      "team": "Zeta Zealots",
+      "total_points": 1,
+      "rounds": {
+        "1": {
+          "points": 0,
+          "table": "Table 5",
+          "opponents": [
+            25,
+            9,
+            1
+          ]
+        },
+        "2": {
+          "points": 1,
+          "table": "Table 1",
+          "opponents": [
+            17,
+            10,
+            3
+          ]
+        },
+        "3": {
+          "points": 0,
+          "table": "Table 1",
+          "opponents": [
+            18,
+            12,
+            2
+          ]
+        },
+        "4": {
+          "points": 0,
+          "table": "Table 1",
+          "opponents": [
+            19,
+            11,
+            4
+          ]
+        }
+      }
+    },
+    "9": {
+      "name": "Captain_Gamma",
+      "team": "Gamma Wave",
+      "total_points": 6,
+      "rounds": {
+        "1": {
+          "points": 5,
+          "table": "Table 5",
+          "opponents": [
+            25,
+            21,
+            1
+          ]
+        },
+        "2": {
+          "points": 0,
+          "table": "Table 2",
+          "opponents": [
+            22,
+            18,
+            4
+          ]
+        },
+        "3": {
+          "points": 0,
+          "table": "Table 4",
+          "opponents": [
+            24,
+            19,
+            3
+          ]
+        },
+        "4": {
+          "points": 1,
+          "table": "Table 3",
+          "opponents": [
+            23,
+            17,
+            2
+          ]
+        },
+        "5": {
+          "points": 0,
+          "table": "Table 1",
+          "opponents": [
+            1,
+            5,
+            13
+          ]
+        }
+      }
+    },
+    "1": {
+      "name": "Captain_Alpha",
+      "team": "Alpha Strike",
+      "total_points": 1,
+      "rounds": {
+        "1": {
+          "points": 0,
+          "table": "Table 5",
+          "opponents": [
+            25,
+            21,
+            9
+          ]
+        },
+        "2": {
+          "points": 0,
+          "table": "Table 3",
+          "opponents": [
+            23,
+            19,
+            12
+          ]
+        },
+        "3": {
+          "points": 1,
+          "table": "Table 2",
+          "opponents": [
+            22,
+            17,
+            11
+          ]
+        },
+        "4": {
+          "points": 0,
+          "table": "Table 4",
+          "opponents": [
+            24,
+            18,
+            10
+          ]
+        },
+        "5": {
+          "points": 0,
+          "table": "Table 1",
+          "opponents": [
+            5,
+            9,
+            13
+          ]
+        }
+      }
+    },
+    "10": {
+      "name": "Scout_Gamma",
+      "team": "Gamma Wave",
+      "total_points": 1,
+      "rounds": {
+        "1": {
+          "points": 0,
+          "table": "Table 6",
+          "opponents": [
+            2,
+            26,
+            22
+          ]
+        },
+        "2": {
+          "points": 1,
+          "table": "Table 1",
+          "opponents": [
+            21,
+            17,
+            3
+          ]
+        },
+        "3": {
+          "points": 0,
+          "table": "Table 3",
+          "opponents": [
+            23,
+            20,
+            4
+          ]
+        },
+        "4": {
+          "points": 0,
+          "table": "Table 4",
+          "opponents": [
+            24,
+            18,
+            1
+          ]
+        },
+        "5": {
+          "points": 0,
+          "table": "Table 2",
+          "opponents": [
+            2,
+            6,
+            14
+          ]
+        }
+      }
+    },
+    "2": {
+      "name": "Scout_Alpha",
+      "team": "Alpha Strike",
+      "total_points": 6,
+      "rounds": {
+        "1": {
+          "points": 0,
+          "table": "Table 6",
+          "opponents": [
+            10,
+            26,
+            22
+          ]
+        },
+        "2": {
+          "points": 0,
+          "table": "Table 4",
+          "opponents": [
+            24,
+            20,
+            11
+          ]
+        },
+        "3": {
+          "points": 0,
+          "table": "Table 1",
+          "opponents": [
+            21,
+            18,
+            12
+          ]
+        },
+        "4": {
+          "points": 1,
+          "table": "Table 3",
+          "opponents": [
+            23,
+            17,
+            9
+          ]
+        },
+        "5": {
+          "points": 5,
+          "table": "Table 2",
+          "opponents": [
+            6,
+            10,
+            14
+          ]
+        }
+      }
+    },
+    "26": {
+      "name": "Scout_Eta",
+      "team": "Eta Hawks",
+      "total_points": 7,
+      "rounds": {
+        "1": {
+          "points": 5,
+          "table": "Table 6",
+          "opponents": [
+            10,
+            2,
+            22
+          ]
+        },
+        "2": {
+          "points": 1,
+          "table": "Table 6",
+          "opponents": [
+            6,
+            29,
+            16
+          ]
+        },
+        "3": {
+          "points": 0,
+          "table": "Table 8",
+          "opponents": [
+            8,
+            30,
+            13
+          ]
+        },
+        "4": {
+          "points": 1,
+          "table": "Table 5",
+          "opponents": [
+            5,
+            32,
+            14
+          ]
+        }
+      }
+    },
+    "22": {
+      "name": "Scout_Zeta",
+      "team": "Zeta Zealots",
+      "total_points": 7,
+      "rounds": {
+        "1": {
+          "points": 0,
+          "table": "Table 6",
+          "opponents": [
+            10,
+            2,
+            26
+          ]
+        },
+        "2": {
+          "points": 5,
+          "table": "Table 2",
+          "opponents": [
+            18,
+            9,
+            4
+          ]
+        },
+        "3": {
+          "points": 1,
+          "table": "Table 2",
+          "opponents": [
+            17,
+            11,
+            1
+          ]
+        },
+        "4": {
+          "points": 1,
+          "table": "Table 2",
+          "opponents": [
+            20,
+            12,
+            3
+          ]
+        }
+      }
+    },
+    "11": {
+      "name": "Striker_Gamma",
+      "team": "Gamma Wave",
+      "total_points": 6,
+      "rounds": {
+        "1": {
+          "points": 5,
+          "table": "Table 7",
+          "opponents": [
+            23,
+            3,
+            27
+          ]
+        },
+        "2": {
+          "points": 0,
+          "table": "Table 4",
+          "opponents": [
+            24,
+            20,
+            2
+          ]
+        },
+        "3": {
+          "points": 1,
+          "table": "Table 2",
+          "opponents": [
+            22,
+            17,
+            1
+          ]
+        },
+        "4": {
+          "points": 0,
+          "table": "Table 1",
+          "opponents": [
+            21,
+            19,
+            4
+          ]
+        },
+        "5": {
           "points": 0,
           "table": "Table 3",
           "opponents": [
@@ -4071,214 +1730,334 @@
         }
       }
     },
-    "12": {
-      "name": "Dom",
-      "team": "Magic Hard to Play",
-      "total_points": 6,
+    "23": {
+      "name": "Striker_Zeta",
+      "team": "Zeta Zealots",
+      "total_points": 11,
       "rounds": {
         "1": {
           "points": 0,
-          "table": "Table 16",
+          "table": "Table 7",
           "opponents": [
-            8,
-            60,
-            40
+            11,
+            3,
+            27
           ]
         },
         "2": {
-          "points": 1,
-          "table": "Table 14",
+          "points": 5,
+          "table": "Table 3",
           "opponents": [
-            46,
-            6,
-            37
+            19,
+            12,
+            1
           ]
         },
         "3": {
-          "points": 0,
-          "table": "Table 16",
-          "opponents": [
-            48,
-            7,
-            38
-          ]
-        },
-        "4": {
-          "points": 0,
-          "table": "Table 15",
-          "opponents": [
-            47,
-            5,
-            39
-          ]
-        },
-        "5": {
           "points": 5,
-          "table": "Table 4",
+          "table": "Table 3",
           "opponents": [
-            4,
             20,
-            28
-          ]
-        },
-        "6": {
-          "points": 0,
-          "table": "Table 4",
-          "opponents": [
-            4,
-            8,
-            16
-          ]
-        }
-      }
-    },
-    "8": {
-      "name": "Keith",
-      "team": "Keith-ers",
-      "total_points": 7,
-      "rounds": {
-        "1": {
-          "points": 0,
-          "table": "Table 16",
-          "opponents": [
-            12,
-            60,
-            40
-          ]
-        },
-        "2": {
-          "points": 0,
-          "table": "Table 16",
-          "opponents": [
-            48,
-            39,
-            10
-          ]
-        },
-        "3": {
-          "points": 1,
-          "table": "Table 15",
-          "opponents": [
-            47,
-            37,
-            11
+            10,
+            4
           ]
         },
         "4": {
           "points": 1,
-          "table": "Table 14",
+          "table": "Table 3",
           "opponents": [
-            46,
-            38,
-            9
-          ]
-        },
-        "5": {
-          "points": 5,
-          "table": "Table 8",
-          "opponents": [
-            16,
-            24,
-            32
-          ]
-        },
-        "6": {
-          "points": 0,
-          "table": "Table 4",
-          "opponents": [
-            4,
-            12,
-            16
+            17,
+            9,
+            2
           ]
         }
       }
     },
-    "60": {
-      "name": "Jonathan",
-      "team": "J Square Sqaured!",
+    "3": {
+      "name": "Striker_Alpha",
+      "team": "Alpha Strike",
       "total_points": 2,
       "rounds": {
         "1": {
           "points": 0,
-          "table": "Table 16",
+          "table": "Table 7",
           "opponents": [
-            12,
-            8,
-            40
+            11,
+            23,
+            27
           ]
         },
         "2": {
-          "points": 0,
-          "table": "Table 12",
+          "points": 1,
+          "table": "Table 1",
           "opponents": [
-            44,
-            20,
-            63
+            21,
+            17,
+            10
           ]
         },
         "3": {
-          "points": 1,
-          "table": "Table 10",
+          "points": 0,
+          "table": "Table 4",
           "opponents": [
-            42,
-            17,
-            64
+            24,
+            19,
+            9
           ]
         },
         "4": {
           "points": 1,
-          "table": "Table 9",
+          "table": "Table 2",
           "opponents": [
-            41,
-            19,
-            61
+            22,
+            20,
+            12
+          ]
+        },
+        "5": {
+          "points": 0,
+          "table": "Table 3",
+          "opponents": [
+            7,
+            11,
+            15
           ]
         }
       }
     },
-    "40": {
-      "name": "Aron",
-      "team": "Team Kaya",
-      "total_points": 11,
+    "27": {
+      "name": "Striker_Eta",
+      "team": "Eta Hawks",
+      "total_points": 0,
+      "rounds": {
+        "1": {
+          "points": 0,
+          "table": "Table 7",
+          "opponents": [
+            11,
+            23,
+            3
+          ]
+        },
+        "2": {
+          "points": 0,
+          "table": "Table 7",
+          "opponents": [
+            7,
+            32,
+            13
+          ]
+        },
+        "3": {
+          "points": 0,
+          "table": "Table 5",
+          "opponents": [
+            5,
+            31,
+            16
+          ]
+        },
+        "4": {
+          "points": 0,
+          "table": "Table 8",
+          "opponents": [
+            8,
+            29,
+            15
+          ]
+        }
+      }
+    },
+    "28": {
+      "name": "Guard_Eta",
+      "team": "Eta Hawks",
+      "total_points": 5,
       "rounds": {
         "1": {
           "points": 5,
-          "table": "Table 16",
+          "table": "Table 8",
           "opponents": [
+            24,
             12,
+            4
+          ]
+        },
+        "2": {
+          "points": 0,
+          "table": "Table 8",
+          "opponents": [
             8,
-            60
+            31,
+            14
+          ]
+        },
+        "3": {
+          "points": 0,
+          "table": "Table 6",
+          "opponents": [
+            6,
+            32,
+            15
+          ]
+        },
+        "4": {
+          "points": 0,
+          "table": "Table 7",
+          "opponents": [
+            7,
+            30,
+            16
+          ]
+        }
+      }
+    },
+    "24": {
+      "name": "Guard_Zeta",
+      "team": "Zeta Zealots",
+      "total_points": 5,
+      "rounds": {
+        "1": {
+          "points": 0,
+          "table": "Table 8",
+          "opponents": [
+            28,
+            12,
+            4
           ]
         },
         "2": {
           "points": 5,
-          "table": "Table 15",
+          "table": "Table 4",
           "opponents": [
-            47,
-            7,
+            20,
+            11,
+            2
+          ]
+        },
+        "3": {
+          "points": 0,
+          "table": "Table 4",
+          "opponents": [
+            19,
+            9,
+            3
+          ]
+        },
+        "4": {
+          "points": 0,
+          "table": "Table 4",
+          "opponents": [
+            18,
+            10,
+            1
+          ]
+        }
+      }
+    },
+    "12": {
+      "name": "Guard_Gamma",
+      "team": "Gamma Wave",
+      "total_points": 6,
+      "rounds": {
+        "1": {
+          "points": 0,
+          "table": "Table 8",
+          "opponents": [
+            28,
+            24,
+            4
+          ]
+        },
+        "2": {
+          "points": 0,
+          "table": "Table 3",
+          "opponents": [
+            23,
+            19,
+            1
+          ]
+        },
+        "3": {
+          "points": 5,
+          "table": "Table 1",
+          "opponents": [
+            21,
+            18,
+            2
+          ]
+        },
+        "4": {
+          "points": 1,
+          "table": "Table 2",
+          "opponents": [
+            22,
+            20,
+            3
+          ]
+        },
+        "5": {
+          "points": 0,
+          "table": "Table 4",
+          "opponents": [
+            4,
+            8,
+            16
+          ]
+        }
+      }
+    },
+    "4": {
+      "name": "Guard_Alpha",
+      "team": "Alpha Strike",
+      "total_points": 10,
+      "rounds": {
+        "1": {
+          "points": 0,
+          "table": "Table 8",
+          "opponents": [
+            28,
+            24,
+            12
+          ]
+        },
+        "2": {
+          "points": 0,
+          "table": "Table 2",
+          "opponents": [
+            22,
+            18,
             9
           ]
         },
         "3": {
           "points": 0,
-          "table": "Table 14",
+          "table": "Table 3",
           "opponents": [
-            46,
-            5,
+            23,
+            20,
             10
           ]
         },
         "4": {
-          "points": 1,
-          "table": "Table 16",
+          "points": 5,
+          "table": "Table 1",
           "opponents": [
-            48,
-            6,
+            21,
+            19,
             11
+          ]
+        },
+        "5": {
+          "points": 5,
+          "table": "Table 4",
+          "opponents": [
+            8,
+            12,
+            16
           ]
         }
       }
     }
   },
-  "timestamp": "2026-01-08T15:56:42.335429"
+  "timestamp": "2026-01-14T14:28:16.375216"
 }
