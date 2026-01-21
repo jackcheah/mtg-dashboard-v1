@@ -529,13 +529,13 @@ class UnifiedSwissPairing:
     
     def _build_player_list(self):
         """Build the complete player list from tournament teams."""
-    for team_name in self.tournament_teams:
-        for player in self.teams[team_name]:
-            self.players.append(player)
-            self.player_by_id[player['Player ID']] = player
+        for team_name in self.tournament_teams:
+            for player in self.teams[team_name]:
+                self.players.append(player)
+                self.player_by_id[player['Player ID']] = player
             
-    # Randomize player order to prevent deterministic pod groupings (e.g. Team A always in Seat 1)
-    random.shuffle(self.players)
+        # Randomize player order to prevent deterministic pod groupings (e.g. Team A always in Seat 1)
+        random.shuffle(self.players)
     
     def generate_all_rounds(self) -> Tuple[bool, List[List[List[Dict]]]]:
         """

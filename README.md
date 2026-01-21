@@ -4,94 +4,84 @@ A comprehensive web-based tournament management system for Magic: The Gathering 
 
 ## Features
 
-- **Swiss-System Tournament Management**: Supports 8, 12, or 16 teams (4 players per team)
-- **Configurable Swiss Rounds**: Choose between 4 or 5 Swiss rounds  
-- **Automatic Pairing**: Generates optimal pairings with zero repeat matchups
-- **Intelligent Seating**: Score-based seating arrangements (higher-scored players at Seat 1)
-- **Real-time Scoring**: Submit individual player scores and track team standings
-- **Finals Generation**: Automatic advancement to finals based on standings
-- **Modern UI**: Clean, responsive interface with real-time updates
-- **Sample Data**: Built-in sample data for testing and demonstrations
-- **Production-Ready Reliability**: Thread-safe operations, automatic backups, and crash recovery
-- **Automatic Backup System**: Saves every 5 minutes + manual backup button for critical moments
-- **Backup Rotation**: Keeps 4 backup files for recovery from corruption
-- **Timer Persistence**: Tournament timer survives server restarts
-- **Backup Health Monitoring**: Real-time visibility into backup status via /backup_health endpoint
-
+- **Swiss-System Management**: Supports 8, 12, or 16 teams (4 players per team).
+- **Automated Workflow**: Automatic pairing (no repeats), intelligent seating (by score), and round generation.
+- **Robust Scoring**: Track individual and team scores with a comprehensive tiebreaker system.
+- **Production-Ready**: Automatic backups every 5 minutes, crash recovery, and thread-safe operations.
+- **Modern UI**: Responsive "Ultra Modern" glassmorphism interface with dark mode.
+- **Projector View**: Dedicated read-only display for audiences with champion and MVP showcases.
 
 ## System Requirements
-
 - Python 3.8 or higher
-- Flask 2.0+
 - Modern web browser (Chrome, Firefox, Edge, Safari)
 
 ## Installation
 
-### 1. Clone or Download the Repository
-
+### 1. Clone the Repository
 ```bash
 git clone <repository-url>
-cd MTG-Tournament-Dashboard-AugmentCode
+cd MTG-Tournament-Dashboard
 ```
 
 ### 2. Install Dependencies
-
 ```bash
-pip install flask openpyxl
-```
-
-Or using a virtual environment (recommended):
-
-```bash
-# Windows
-python -m venv venv
-venv\Scripts\activate
-pip install flask openpyxl
-
 # Mac/Linux
 python3 -m venv venv
 source venv/bin/activate
 pip install flask openpyxl
+
+# Windows
+python -m venv venv
+venv\Scripts\activate
+pip install flask openpyxl
 ```
 
-### 3. Run the Application
+## Quick Start
 
-**Every time you work on the project:**
-
+### 1. Run the Application
 ```bash
-# Option A: Mac/Linux
-source venv/bin/activate
-
-# Option B: Windows (Command Prompt)
-venv\Scripts\activate
-# OR Windows (PowerShell)
-.\venv\Scripts\Activate.ps1
-
-# 2. Start the server
+# activate your venv first, then:
 python tournament_dashboard.py
 ```
+Access the dashboard at: **http://127.0.0.1:5001**
 
-The dashboard will be available at: **http://127.0.0.1:5001**
+### 2. Tournament Workflow
+1.  **Load Participants**: Click "Load Participants" (loads `participants/participant_team.xlsx` or sample data).
+2.  **Setup**: Click "Setup Tournament" to generate Round 1.
+3.  **Swiss Rounds**: 
+    - Enter results (W/D/L) for each table. 
+    - Click "Submit Table" -> "Submit Round". 
+    - Repeat for 4 rounds.
+4.  **Finals**: The system automatically generates Top 8 (for 16 teams) or Finals (for 8/12 teams).
 
-> **Note:** You only need to run `pip install` once (during Step 2). For daily use, just activate and run.
+### Key Shortcuts
+- **W / 1**: Win
+- **D / 2**: Draw
+- **L / 3**: Loss
+- **Tab**: Next input
+- **Ctrl+Enter**: Submit Table
+- **?**: View all shortcuts
 
-## Quick Start Guide
+## Configuration
 
-### Setting Up a Tournament
+### Custom Participants
+To use your own roster, create an Excel file at `participants/participant_team.xlsx` with columns: `Player ID`, `Player Name`, `Team Name`.
+- Teams must have exactly 4 players.
+- Total teams must be 8, 12, or 16.
 
-1. **Start the Server**
-   ```bash
-   python tournament_dashboard.py
-   ```
+### Backups
+The system automatically backs up state every 5 minutes.
+- **Manual Backup**: Click "Save Backup" in the UI before critical rounds.
+- **Restoration**: Just restart the server (`python tournament_dashboard.py`) to auto-restore the last valid state.
 
-2. **Open the Dashboard**
-   - Navigate to http://localhost:5001/ in your web browser
+## Tournament Rules & Structure
 
-3. **Load Participants**
-   - Click the "Load Participants" button
-   - The system will automatically load sample data with 8 teams (32 players)
-   - Or place your Excel file at `participants/participant_team.xlsx`
+### Structure
+- **8 Teams**: 4 Swiss Rounds → Finals (Top 4)
+- **12 Teams**: 4 Swiss Rounds → Finals (Top 4)
+- **16 Teams**: 4 Swiss Rounds → Top 8 Cut → Finals (Top 4)
 
+<<<<<<< HEAD
 4. **Setup Tournament**
    - Click "Setup Tournament"
    - Round 1 pairings will be generated automatically
@@ -347,96 +337,18 @@ docker-compose up --build
 ./build-and-run.sh    # Mac/Linux
 .\build-and-run.bat   # Windows
 ```
+=======
+### Scoring
+- **Win**: 5 pts | **Draw**: 1 pt | **Loss**: 0 pts
+- **Advancement**: Based on current stage performance.
+- **Tiebreakers**: Total Score → Best Player → Average Player → Early Wins.
+>>>>>>> 9b5323584877a48f640347c2bfae5f205aff42b0
 
 ## Troubleshooting
 
-### Round 2 Not Generating
-
-**Solution:**
-1. Refresh browser (F5)
-2. Select "Swiss Round 2" from dropdown
-3. Ensure all tables submitted before "Submit Round Results"
-
-### Player Scores Show 0
-
-**Solution:**
-1. Refresh page (F5) to reload scores
-2. Backend tracks correctly (check team standings)
-
-### "Round already submitted" Error
-
-**Solution:**
-1. Click "Load Participants"
-2. Click "Setup Tournament"
-3. Happens if page left open between server restarts
-
-## Production Features (New!)
-
-### Automatic Backup & Recovery System
-
-The system now includes enterprise-grade backup and recovery features for reliable 12+ hour operation:
-
-**Automatic Backups:**
-- Saves tournament state every 5 minutes automatically
-- Backs up after every critical operation (load, setup, score submission)
-- Keeps 4 backup files: current + 3 historical versions
-- Backup rotation protects against file corruption
-
-**Manual Backup:**
-- "Save Backup" button available throughout the entire tournament
-- Visible during setup, Swiss rounds, Top 8 Cut, and Finals
-- Use before critical transitions (Round 4, Top 8 Cut, Finals)
-- Instant feedback with toast notifications
-
-**Crash Recovery:**
-- Server automatically restores state from backup on startup
-- Timer continues from where it left off
-- All scores, pairings, and tournament state preserved
-
-**Backup Health Monitoring:**
-- Visit `http://127.0.0.1:5001/backup_health` to check backup status
-- Shows last success/failure timestamps
-- Tracks consecutive backup failures
-- Displays backup file size and location
-
-**Thread Safety:**
-- All operations protected with locks for concurrent access
-- Safe to have multiple browser windows open
-- No data corruption from simultaneous score submissions
-
-### How to Use:
-
-1. **Before Event:** Test the "Save Backup Now" button
-2. **During Event:** System auto-saves every 5 minutes (watch console for "[AUTO-BACKUP]" messages)
-3. **Manual Backups:** Click "Save Backup Now" before Round 4, Top 8 Cut, and Finals
-4. **Monitor Health:** Check console logs for backup success/failure messages
-5. **If Server Crashes:** Just restart - it auto-restores from backup!
-
-### Backup Files Location:
-- `tournament_state.json.bak` (current backup)
-- `tournament_state.json.bak.1` (1 save ago)
-- `tournament_state.json.bak.2` (2 saves ago)  
-- `tournament_state.json.bak.3` (3 saves ago)
-
----
-
-## Known Limitations
-
-1. Single tournament at a time
-2. ~~No persistence~~ **Now has automatic backups!** State persists across restarts
-3. Local-only by default
-4. Manual scoring required
-
-## For Local PC Use
-
-**Running this locally on your PC?** Perfect!
-- ✅ **100% Production Ready** - Enhanced with automatic backups and crash recovery
-- ✅ **Perfectly Secure** - Not exposed to internet = no security concerns
-- ✅ **12+ Hour Stable** - Automatic backups every 5 minutes + timer persistence
-- ✅ **Crash Recovery** - Server restart? No problem! Auto-restores from backup
-- ✅ **Manual Control** - "Save Backup Now" button for peace of mind
-- ✅ Keep Python and browser running during tournament (but restarts are safe now!)
+- **Round Not Generating**: Ensure all tables in the current round are submitted. Refresh the page.
+- **App Not Loading**: Check if port 5001 is in use or the terminal window is closed.
+- **Data Mismatch**: Restart the server to reload ground-truth state from the backup file.
 
 ## Credits
-
-Developed for Knights of Round Table - cEDH Team Championship tournaments.
+Developed for **Knights of Round Table** - cEDH Team Championship tournaments.

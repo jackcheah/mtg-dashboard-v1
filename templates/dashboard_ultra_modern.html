@@ -4113,11 +4113,79 @@
                     top8Option.textContent = 'Top 8 Cut';
                     roundSelect.appendChild(top8Option);
 
+<<<<<<< HEAD
                     // Add Finals
                     const finalsOption = document.createElement('option');
                     finalsOption.value = swissRounds + 2;
                     finalsOption.textContent = 'Finals';
                     roundSelect.appendChild(finalsOption);
+=======
+            // Add Top 8 Cut if applicable (16 teams only)
+            if (hasSemifinals) {
+                const top8Option = document.createElement('option');
+                top8Option.value = swissRounds + 1;
+                top8Option.textContent = 'Top 8 Cut';
+                roundSelect.appendChild(top8Option);
+
+                // Add Finals
+                const finalsOption = document.createElement('option');
+                finalsOption.value = swissRounds + 2;
+                finalsOption.textContent = 'Finals';
+                roundSelect.appendChild(finalsOption);
+            } else {
+                // No Top 8 Cut (8 or 12 teams) - Finals directly after Swiss
+                const finalsOption = document.createElement('option');
+                finalsOption.value = swissRounds + 1;
+                finalsOption.textContent = 'Finals';
+                roundSelect.appendChild(finalsOption);
+            }
+
+            // Restore previous selection if valid
+            const maxRounds = hasSemifinals ? swissRounds + 2 : swissRounds + 1;
+            if (currentValue && parseInt(currentValue) <= maxRounds) {
+                roundSelect.value = currentValue;
+            }
+
+            console.log(`Round selector updated: ${swissRounds} Swiss rounds, Has Top 8 Cut: ${hasSemifinals}, Team count: ${teamCount}`);
+        }
+
+        // Load Participants
+        async function loadParticipants() {
+            try {
+                showToast('Loading...', 'Loading participant data', 'info');
+
+                const response = await fetch('/load_data', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ force_reload: true })
+                });
+                const data = await response.json();
+
+                console.log('Load data response:', data);
+
+                if (data.success && data.teams) {
+
+                    // Store max rounds globally
+                    if (data.max_rounds) {
+                        window.tournamentMaxRounds = data.max_rounds;
+                    }
+
+                    // Update round selector with configured Swiss rounds and tournament structure
+                    const hasSemifinals = data.has_semifinals || false;
+                    const teamCount = data.team_count || Object.keys(data.teams).length;
+                    updateRoundSelector(data.swiss_rounds || 4, hasSemifinals, teamCount);
+
+                    displayTeams(data.teams, data.player_scores);
+                    updateStats(data);
+
+                    const structureMsg = hasSemifinals ?
+                        `${teamCount} teams - ${data.swiss_rounds} Swiss rounds → Top 8 Cut → Finals` :
+                        `${teamCount} teams - ${data.swiss_rounds} Swiss rounds → Finals`;
+                    showToast('Success!', `Loaded ${data.team_count} teams (${data.player_count} players) | ${structureMsg}`, 'success');
+                    document.getElementById('empty-state').style.display = 'none';
+>>>>>>> 9b5323584877a48f640347c2bfae5f205aff42b0
                 } else {
                     // No Top 8 Cut (8 or 12 teams) - Finals directly after Swiss
                     const finalsOption = document.createElement('option');
