@@ -136,11 +136,22 @@ The system uses a stage-based scoring approach where performance in the current 
 3.  **Multi-Level Tiebreakers**: Comprehensive tiebreaker system ensures fair advancement.
 4.  **No Score Carrying**: Teams cannot "coast" on early performance.
 
-#### 2. Individual Point System
--   **Win:** 5 points
--   **Draw:** 1 point
--   **Loss:** 0 points
+#### 2. Scoring Modes
+
+The tournament supports two scoring modes, selected after loading participants:
+
+**Western Mode (Default)**
+-   **Win:** 5 points | **Draw:** 1 point | **Loss:** 0 points
+-   Players start with 0 points
 -   **Team Score:** Sum of all 4 players' scores for the round.
+
+**Japanese Swiss Point Mode**
+-   **Start:** Each player begins with 1000 points
+-   **Each round:** All players contribute 7% of current points to pool
+-   **Win:** Winner takes the entire pool (~280 pts in round 1)
+-   **Draw/Loss:** Players lose their 7% contribution
+-   Points accumulate across rounds (never reset)
+-   See `JAPANESE-IMPLEMENTATION.md` for full details
 
 #### 3. Tournament Stages (16-Team Format)
 

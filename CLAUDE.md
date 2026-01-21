@@ -70,8 +70,23 @@ python tests/e2e/simulate_tournament_flow.py
 | 16    | 64      | 4            | Top 8 Cut + Finals | 6 |
 
 ### Scoring System
+
+The tournament supports two scoring modes, selected after loading participants:
+
+#### Western Mode (Default)
 - **Win:** 5 points | **Draw:** 1 point | **Loss:** 0 points
+- Players start with 0 points
 - Team score = Sum of all 4 players' scores
+
+#### Japanese Swiss Point Mode
+- **Start:** Each player begins with 1000 points
+- **Each round:** All players contribute 7% of their current points to a pool
+- **Win:** Winner takes the entire pool (~280 pts in round 1)
+- **Draw/Loss:** Players lose their 7% contribution
+- Points accumulate across rounds (never reset)
+- See `JAPANESE-IMPLEMENTATION.md` for full details
+
+#### General Rules
 - Finals winner determined by finals performance, Swiss as tiebreaker
 - **Tiebreakers:** Best player score → Average player score → Early wins (exponentially weighted by round)
 
@@ -127,6 +142,7 @@ Excel/Sample Data → load_participants() → TournamentManager state
 | Endpoint | Method | Description |
 |----------|--------|-------------|
 | `/load_data` | POST | Load participants from Excel or sample data |
+| `/set_scoring_mode` | POST | **Set scoring mode (western/japanese) before setup** |
 | `/setup_tournament` | POST | Initialize tournament, generate Round 1 |
 | `/setup_round/<N>` | POST | Generate round N |
 

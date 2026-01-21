@@ -238,9 +238,12 @@
         }
 
         @keyframes bounce {
-            0%, 100% {
+
+            0%,
+            100% {
                 transform: translateY(0);
             }
+
             50% {
                 transform: translateY(-10px);
             }
@@ -372,6 +375,7 @@
             0% {
                 box-shadow: 0 0 40px rgba(251, 191, 36, 0.5), 0 8px 32px rgba(0, 0, 0, 0.4);
             }
+
             100% {
                 box-shadow: 0 0 60px rgba(251, 191, 36, 0.8), 0 8px 32px rgba(0, 0, 0, 0.4);
             }
@@ -540,6 +544,28 @@
             color: var(--gold);
             margin-top: 0.25rem;
         }
+
+        /* Japanese Mode Styling */
+        .japanese-mode-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            box-shadow: 0 2px 10px rgba(220, 38, 38, 0.3);
+            margin-left: 1rem;
+        }
+
+        .japanese-score {
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: -0.02em;
+        }
     </style>
 </head>
 
@@ -639,6 +665,34 @@
         let lastRound = 0;
         let lastState = '';
 
+        // Scoring Mode State (synced from server)
+        let scoringMode = 'western';  // Default, will be updated from server
+        let isJapaneseMode = false;
+
+        // Format score based on scoring mode
+        function formatScore(score) {
+            if (scoringMode === 'japanese' || isJapaneseMode) {
+                return `<span class="japanese-score">${score.toLocaleString()}</span>`;
+            }
+            return score;
+        }
+
+        // Add/remove Japanese mode badge in projector header
+        function updateJapaneseModeBadge() {
+            const headerLeft = document.querySelector('.header-left h1');
+            const existingBadge = document.getElementById('projector-japanese-badge');
+
+            if (isJapaneseMode && !existingBadge && headerLeft) {
+                const badge = document.createElement('span');
+                badge.id = 'projector-japanese-badge';
+                badge.className = 'japanese-mode-badge';
+                badge.innerHTML = '🎌 Japanese';
+                headerLeft.appendChild(badge);
+            } else if (!isJapaneseMode && existingBadge) {
+                existingBadge.remove();
+            }
+        }
+
         // Clock
         function updateClock() {
             const now = new Date();
@@ -705,6 +759,15 @@
                 // 2. Fetch Tournament State
                 const stateRes = await fetch(`/get_state_info?t=${Date.now()}`);
                 const stateData = await stateRes.json();
+
+                // Sync scoring mode from server
+                if (stateData.scoring_mode) {
+                    scoringMode = stateData.scoring_mode;
+                    isJapaneseMode = stateData.is_japanese_mode || (scoringMode === 'japanese');
+
+                    // Add/remove Japanese mode badge in header
+                    updateJapaneseModeBadge();
+                }
 
                 // 3. Fetch Round Completion Status (if in progress or setup)
                 let roundComplete = false;
@@ -969,7 +1032,7 @@
         }
 
         function getRankBadge(rank) {
-            switch(rank) {
+            switch (rank) {
                 case 1: return '🏆 CHAMPION';
                 case 2: return '🥈 2nd Place';
                 case 3: return '🥉 3rd Place';

@@ -33,6 +33,11 @@ class TournamentState(Enum):
     FINALS_IN_PROGRESS = "finals_in_progress"     # Finals round in progress
     FINALS_COMPLETE = "finals_complete"           # Finals completed, champion determined
 
+class ScoringMode(Enum):
+    """Enum representing the scoring calculation mode."""
+    WESTERN = "western"      # Traditional 5/1/0 point system
+    JAPANESE = "japanese"    # 7% pool contribution system (1000 starting points)
+
 @app.route('/projector')
 def projector_view():
     """Serve the read-only projector view"""
@@ -75,6 +80,11 @@ class TournamentManager:
         self.last_backup_success = None
         self.last_backup_failure = None
         self.consecutive_backup_failures = 0
+
+        # Scoring mode configuration (Japanese Swiss Point Mode support)
+        self.scoring_mode = ScoringMode.WESTERN  # Default to Western mode (5/1/0)
+        self.japanese_starting_points = 1000     # Starting points for Japanese mode
+        self.japanese_pool_percentage = 0.07     # 7% pool contribution per round
 
     def transition_to(self, new_state: TournamentState, reason: str = ""):
         """Transition to a new state with logging (Phase 3.4)."""
@@ -138,7 +148,8 @@ class TournamentManager:
                     "max_rounds": self.max_rounds,
                     "has_semifinals": self.has_semifinals,
                     "swiss_rounds_configured": self.swiss_rounds_configured,
-                    "supported_team_counts": self.supported_team_counts
+                    "supported_team_counts": self.supported_team_counts,
+                    "scoring_mode": self.scoring_mode.value  # "western" or "japanese"
                 },
                 "state": {
                     "current_round": self.current_round,
@@ -213,6 +224,15 @@ class TournamentManager:
             self.max_rounds = config.get('max_rounds', 6)
             self.has_semifinals = config.get('has_semifinals', False)
             self.swiss_rounds_configured = config.get('swiss_rounds_configured', False)
+            
+            # Restore scoring mode (backward compatible - default to Western)
+            scoring_mode_str = config.get('scoring_mode', 'western')
+            if scoring_mode_str == 'japanese':
+                self.scoring_mode = ScoringMode.JAPANESE
+                print(f"[BACKUP] Scoring mode restored: JAPANESE (7% pool system)")
+            else:
+                self.scoring_mode = ScoringMode.WESTERN
+                print(f"[BACKUP] Scoring mode restored: WESTERN (5/1/0 points)")
             
             # Restore State
             state = state_data.get('state', {})
@@ -354,6 +374,34 @@ class TournamentManager:
         print(f"[OK] Tournament structure will be determined when teams are loaded")
 
         return True, f"Configured for {self.swiss_rounds_count} Swiss rounds"
+
+    def set_scoring_mode(self, mode: str) -> tuple:
+        """
+        Set the scoring mode before tournament setup.
+        Must be called after participants are loaded but before setup_tournament().
+        
+        Args:
+            mode: "western" or "japanese"
+        
+        Returns:
+            tuple: (success: bool, message: str)
+        """
+        # Validate state - can only set mode before tournament starts
+        if self.state not in [TournamentState.INITIAL, TournamentState.PARTICIPANTS_LOADED]:
+            return False, "Cannot change scoring mode after tournament has started"
+        
+        # Validate mode value
+        mode_lower = mode.lower()
+        if mode_lower == "western":
+            self.scoring_mode = ScoringMode.WESTERN
+            print(f"[CONFIG] Scoring mode set to: WESTERN (5/1/0 points)")
+            return True, "Scoring mode set to Western (5/1/0 point system)"
+        elif mode_lower == "japanese":
+            self.scoring_mode = ScoringMode.JAPANESE
+            print(f"[CONFIG] Scoring mode set to: JAPANESE (7% pool system, 1000 starting points)")
+            return True, "Scoring mode set to Japanese (7% pool system, 1000 starting points)"
+        else:
+            return False, f"Invalid scoring mode: {mode}. Use 'western' or 'japanese'"
 
     def determine_tournament_structure(self):
         """Determine tournament structure based on team count
@@ -686,7 +734,20 @@ class TournamentManager:
         self.player_scores = {}
         for participant in self.participants:
             player_id = participant.get('Player ID')
-            self.player_scores[player_id] = 0
+            # Initialize player scores based on scoring mode
+            if self.scoring_mode == ScoringMode.JAPANESE:
+                self.player_scores[player_id] = self.japanese_starting_points  # 1000
+            else:
+                self.player_scores[player_id] = 0  # Western mode
+        
+        # Log scoring mode for this tournament
+        if self.scoring_mode == ScoringMode.JAPANESE:
+            print(f"[JAPANESE MODE] All {len(self.player_scores)} players initialized with {self.japanese_starting_points} points")
+            # Initialize team scores with sum of player starting points (4 players x 1000 = 4000)
+            for team_name in self.teams:
+                self.scores[team_name] = len(self.teams[team_name]) * self.japanese_starting_points
+        else:
+            print(f"[WESTERN MODE] All {len(self.player_scores)} players initialized with 0 points")
         
         self.round_results = {}
         self.tables = {}
@@ -1074,6 +1135,85 @@ class TournamentManager:
                 if player_id in self.player_scores:
                     team_total += self.player_scores[player_id]
             self.scores[team_name] = team_total
+
+    def calculate_japanese_table_scores(self, table_players: list, winner_id: int = None) -> dict:
+        """
+        Calculate scores for a table using Japanese Swiss Point rules.
+        
+        Args:
+            table_players: List of player dicts at the table
+            winner_id: Player ID of the winner (None = draw)
+        
+        Returns:
+            dict: {player_id: points_change} for each player
+        
+        Rules:
+        1. Each player contributes 7% (rounded) of their current points to the pool
+        2. Winner takes entire pool (net gain = pool - their contribution)
+        3. Losers/Draw participants lose their contribution (net loss = -contribution)
+        """
+        result = {}
+        pool = 0
+        contributions = {}
+        
+        # Step 1: Calculate each player's contribution (7% of current points, rounded)
+        for player in table_players:
+            player_id = player['Player ID']
+            current_points = self.player_scores.get(player_id, self.japanese_starting_points)
+            contribution = round(current_points * self.japanese_pool_percentage)
+            contributions[player_id] = contribution
+            pool += contribution
+        
+        # Step 2: Distribute points based on outcome
+        for player in table_players:
+            player_id = player['Player ID']
+            contribution = contributions[player_id]
+            
+            if winner_id is not None and player_id == winner_id:
+                # Winner: loses contribution but gains entire pool
+                net_change = pool - contribution
+                result[player_id] = net_change
+            else:
+                # Loser or Draw: just loses contribution
+                result[player_id] = -contribution
+        
+        # Log for debugging
+        player_names = {p['Player ID']: p['Player Name'] for p in table_players}
+        print(f"[JAPANESE] Pool: {pool} pts | Contributions: " + 
+              ", ".join([f"{player_names[pid]}: {c}" for pid, c in contributions.items()]))
+        if winner_id:
+            winner_name = player_names.get(winner_id, 'Unknown')
+            net_gain = result[winner_id]
+            print(f"[JAPANESE] Winner: {winner_name} takes pool (+{net_gain} net)")
+        else:
+            print(f"[JAPANESE] DRAW: All players lose their contribution")
+        
+        return result
+
+    def get_table_winner_id(self, table_results: list) -> int:
+        """
+        Determine the winner from table results.
+        
+        A winner is determined when exactly one player has a "Win" (5 points in Western terms).
+        If 0 or 2+ players have wins, it's treated as a draw (returns None).
+        
+        Args:
+            table_results: List of {player_id, points} dicts
+        
+        Returns:
+            int: Player ID of winner, or None if draw
+        """
+        # In Western mode scoring, 5 points = win
+        winners = [r['player_id'] for r in table_results if r.get('points') == 5]
+        
+        if len(winners) == 1:
+            return winners[0]
+        else:
+            # 0 winners or 2+ winners = draw
+            if len(winners) > 1:
+                print(f"[JAPANESE] Multiple winners detected ({len(winners)}), treating as draw")
+            return None
+
     
     def calculate_final_round_standings(self):
         """Calculate final round standings with Swiss round tiebreaker
@@ -2048,6 +2188,7 @@ def load_data():
             'swiss_rounds': tournament.swiss_rounds_count,
             'has_semifinals': tournament.has_semifinals,
             'max_rounds': tournament.max_rounds,
+            'scoring_mode': tournament.scoring_mode.value,
             'message': f'Loaded {len(tournament.teams)} teams - {tournament.swiss_rounds_count} Swiss rounds configured'
         })
 
@@ -2155,6 +2296,38 @@ def configure_swiss_rounds():
         'message': message,
         'swiss_rounds': tournament.swiss_rounds_count
     })
+
+@app.route('/set_scoring_mode', methods=['POST'])
+@with_lock
+def set_scoring_mode():
+    """Set scoring mode before tournament setup (western or japanese)"""
+    try:
+        data = request.get_json()
+        
+        if not data:
+            return jsonify({
+                'success': False,
+                'error': 'No data provided'
+            })
+        
+        mode = data.get('mode', 'western')
+        
+        success, message = tournament.set_scoring_mode(mode)
+        
+        return jsonify({
+            'success': success,
+            'message': message,
+            'scoring_mode': tournament.scoring_mode.value
+        })
+        
+    except Exception as e:
+        print(f"Error in set_scoring_mode: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'success': False,
+            'message': str(e)
+        }), 500
 
 @app.route('/setup_tournament', methods=['POST'])
 @with_lock
@@ -2590,22 +2763,41 @@ def submit_table_results():
         # Store table-specific results
         tournament.round_results[round_num]['table_submissions'][table_name] = player_results
 
-        # Update individual player scores
-        for result in player_results:
-            player_id = result['player_id']
-            points = result['points']
+        # Update individual player scores based on scoring mode
+        if tournament.scoring_mode == ScoringMode.JAPANESE:
+            # Japanese Swiss Point Mode: 7% pool contribution, winner takes all
+            table_players = tournament.tables[round_num][table_name]
+            
+            # Determine winner from results (exactly 1 win = winner, else draw)
+            winner_id = tournament.get_table_winner_id(player_results)
+            
+            # Calculate Japanese scoring
+            score_changes = tournament.calculate_japanese_table_scores(table_players, winner_id)
+            
+            # Apply score changes
+            for player_id, change in score_changes.items():
+                if player_id in tournament.player_scores:
+                    old_score = tournament.player_scores[player_id]
+                    tournament.player_scores[player_id] += change
+                    new_score = tournament.player_scores[player_id]
+                    print(f"  [JAPANESE] Player {player_id}: {old_score} -> {new_score} ({'+' if change >= 0 else ''}{change})")
+        else:
+            # Western Mode: Traditional 5/1/0 point system
+            for result in player_results:
+                player_id = result['player_id']
+                points = result['points']
 
-            print(f"  Processing player_id={player_id}, points={points}")
+                print(f"  Processing player_id={player_id}, points={points}")
 
-            if player_id in tournament.player_scores:
-                # Add points to player's total
-                old_score = tournament.player_scores[player_id]
-                tournament.player_scores[player_id] += points
-                new_score = tournament.player_scores[player_id]
-                print(f"  Updated player {player_id}: {old_score} -> {new_score}")
-            else:
-                # This should never happen due to validation above, but kept for safety
-                print(f"  WARNING: Player ID {player_id} not found in player_scores!")
+                if player_id in tournament.player_scores:
+                    # Add points to player's total
+                    old_score = tournament.player_scores[player_id]
+                    tournament.player_scores[player_id] += points
+                    new_score = tournament.player_scores[player_id]
+                    print(f"  Updated player {player_id}: {old_score} -> {new_score}")
+                else:
+                    # This should never happen due to validation above, but kept for safety
+                    print(f"  WARNING: Player ID {player_id} not found in player_scores!")
 
         # Handle Top 8 Cut round scoring separately (for 16-team tournaments)
         if hasattr(tournament, 'has_semifinals') and tournament.has_semifinals:
@@ -3044,7 +3236,9 @@ def get_tournament_state():
         'swiss_rounds_count': tournament.swiss_rounds_count,
         'max_rounds': tournament.max_rounds,
         'has_semifinals': tournament.has_semifinals,
-        'submission_status': submission_status  # Phase 3.1
+        'submission_status': submission_status,  # Phase 3.1
+        'scoring_mode': tournament.scoring_mode.value,  # "western" or "japanese"
+        'is_japanese_mode': tournament.scoring_mode == ScoringMode.JAPANESE
     }
 
     # Add legacy group support for backward compatibility (all teams in single group)
