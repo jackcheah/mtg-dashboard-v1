@@ -655,6 +655,13 @@
     </div>
 
     <script>
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        let winnersLoaded = false;
+
         // CLIENT SIDE TIMER STATE
         let timerState = {
             running: false,
@@ -803,6 +810,7 @@
         function handleStateUpdate(data, roundComplete) {
             const serverState = data.current_state;
             const round = data.tournament_info.current_round;
+            if (typeof updatePollInterval === 'function') updatePollInterval(serverState);
 
             // Detect state transition - reset tablesLoaded when phase changes
             let stateJustChanged = false;
@@ -825,8 +833,13 @@
             // Final Winner View
             if (serverState === 'finals_complete') {
                 showView('winnersView');
-                fetchStandingsForWinner();
+                if (!winnersLoaded) {
+                    fetchStandingsForWinner();
+                    winnersLoaded = true;
+                }
                 return;
+            } else {
+                winnersLoaded = false;
             }
 
             // Show Standings when:
@@ -910,8 +923,8 @@
                 let playersHtml = '';
 
                 players.forEach(p => {
-                    const pName = p['Player Name'] || p.name || 'Unknown';
-                    const pTeam = p['Team Name'] || p.team || '';
+                    const pName = escapeHtml(p['Player Name'] || p.name || 'Unknown');
+                    const pTeam = escapeHtml(p['Team Name'] || p.team || '');
 
                     playersHtml += `
                         <div class="player-row">
@@ -923,7 +936,7 @@
 
                 const card = `
                     <div class="table-card">
-                        <div class="table-header">${tableName}</div>
+                        <div class="table-header">${escapeHtml(tableName)}</div>
                         ${playersHtml}
                     </div>
                 `;
@@ -959,7 +972,7 @@
                         tbody.innerHTML += `
                             <tr>
                                 <td class="rank-cell">#${team.rank}</td>
-                                <td>${team.team}</td>
+                                <td>${escapeHtml(team.team)}</td>
                                 <td class="score-cell">${scoreDisplay}</td>
                             </tr>
                         `;
@@ -1004,8 +1017,8 @@
             // Render MVP in right panel
             if (mvpData) {
                 mvpContent.innerHTML = `
-                    <div class="mvp-player-name">${mvpData.player_name}</div>
-                    <div class="mvp-team">${mvpData.team_name}</div>
+                    <div class="mvp-player-name">${escapeHtml(mvpData.player_name)}</div>
+                    <div class="mvp-team">${escapeHtml(mvpData.team_name)}</div>
                     <div class="mvp-score">${mvpData.total_score} Points</div>
                 `;
             } else {
@@ -1022,7 +1035,7 @@
 
             card.innerHTML = `
                 <div class="rank-badge">${rankBadge}</div>
-                <div class="team-name">${teamData.team}</div>
+                <div class="team-name">${escapeHtml(teamData.team)}</div>
                 <div class="score-breakdown">
                     ${scoreBreakdown}
                 </div>
@@ -1078,10 +1091,25 @@
             return html;
         }
 
-        // Poll every 1 second
-        // Since we removed logs and optimized client-side timer, this is low cost.
-        setInterval(fetchState, 1000);
-        fetchState();
+        // Adaptive polling: 2s during active play, 5s when idle/complete
+        let pollInterval = 2000;
+        let pollTimerId = null;
+        function schedulePoll() {
+            if (pollTimerId) clearTimeout(pollTimerId);
+            pollTimerId = setTimeout(() => {
+                fetchState().then(() => schedulePoll());
+            }, pollInterval);
+        }
+        function updatePollInterval(state) {
+            if (state === 'finals_complete' || state === 'initial') {
+                pollInterval = 10000;
+            } else if (timerState.running) {
+                pollInterval = 2000;
+            } else {
+                pollInterval = 5000;
+            }
+        }
+        fetchState().then(() => schedulePoll());
 
     </script>
 </body>

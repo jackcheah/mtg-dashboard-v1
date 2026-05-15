@@ -263,7 +263,6 @@ class TournamentSimulator:
                     pass
             finally:
                 self._generate_report()
-                time.sleep(3)
                 browser.close()
     
     def _setup_tournament(self, page):
@@ -283,7 +282,7 @@ class TournamentSimulator:
             print("Resetting existing tournament...")
             page.on("dialog", lambda dialog: dialog.accept())
             reset_btn.click()
-            time.sleep(2)
+            page.wait_for_load_state("networkidle")
             page.reload()
             page.wait_for_load_state("networkidle")
         
@@ -292,8 +291,7 @@ class TournamentSimulator:
         load_btn = page.get_by_role("button", name="Load Participants")
         if load_btn.is_visible():
             load_btn.click()
-            time.sleep(2)
-            
+
             # Wait for teams grid to populate
             try:
                 expect(page.locator("#teams-grid")).not_to_be_empty(timeout=10000)
@@ -314,7 +312,7 @@ class TournamentSimulator:
         setup_btn = page.get_by_role("button", name="Setup Tournament")
         if setup_btn.is_visible():
             setup_btn.click()
-            time.sleep(3)
+            page.wait_for_selector(".table-card", timeout=15000)
             print("✅ Tournament setup complete")
         
         # Extract initial player/team data
@@ -506,7 +504,7 @@ class TournamentSimulator:
         
         if submit_btn.is_visible():
             submit_btn.click()
-            time.sleep(3)
+            page.wait_for_load_state("networkidle", timeout=15000)
         else:
             print("  ⚠️  Submit button not found!")
         
@@ -530,8 +528,8 @@ class TournamentSimulator:
         print(f"\n  Round {round_num} Complete:")
         print(f"    Wins: {wins}, Draws: {draws}, Losses: {losses}")
         
-        # Check for next round or tournament end
-        time.sleep(2)
+        # Wait for round transition to complete
+        page.wait_for_load_state("networkidle", timeout=15000)
         
         # Capture standings after Swiss and Top8
         if round_type == "Swiss" and round_num == self.swiss_rounds:
@@ -577,8 +575,8 @@ class TournamentSimulator:
         print("VERIFYING CHAMPION")
         print("-"*40)
         
-        time.sleep(2)
-        
+        page.wait_for_load_state("networkidle", timeout=15000)
+
         # Check for champion announcement
         if page.get_by_text("Champion:").first.is_visible():
             print("✅ Champion has been declared!")
@@ -753,6 +751,10 @@ def main():
     
     simulator = TournamentSimulator(num_teams=args.teams, generate_data=not args.no_gen)
     simulator.run_simulation()
+
+    if simulator.test_results.get('errors'):
+        print(f"\nExiting with code 1 ({len(simulator.test_results['errors'])} errors)")
+        sys.exit(1)
 
 
 if __name__ == "__main__":

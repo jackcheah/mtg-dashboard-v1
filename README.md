@@ -81,7 +81,6 @@ The system automatically backs up state every 5 minutes.
 - **12 Teams**: 4 Swiss Rounds → Finals (Top 4)
 - **16 Teams**: 4 Swiss Rounds → Top 8 Cut → Finals (Top 4)
 
-<<<<<<< HEAD
 4. **Setup Tournament**
    - Click "Setup Tournament"
    - Round 1 pairings will be generated automatically
@@ -337,12 +336,6 @@ docker-compose up --build
 ./build-and-run.sh    # Mac/Linux
 .\build-and-run.bat   # Windows
 ```
-=======
-### Scoring
-- **Win**: 5 pts | **Draw**: 1 pt | **Loss**: 0 pts
-- **Advancement**: Based on current stage performance.
-- **Tiebreakers**: Total Score → Best Player → Average Player → Early Wins.
->>>>>>> 9b5323584877a48f640347c2bfae5f205aff42b0
 
 ## Troubleshooting
 

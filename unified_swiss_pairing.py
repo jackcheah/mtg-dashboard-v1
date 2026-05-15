@@ -1981,6 +1981,10 @@ class UnifiedSwissPairing:
                 # Same score, pick one arbitrarily (e.g., alphabetically later)
                 problem_team = max(team1, team2)
 
+            # Verify problem_team is still in this group (may have been moved by earlier swap)
+            if problem_team not in groups[group_idx]:
+                continue
+
             # Try to find swap candidate
             swap_result = self._find_best_swap_candidate(
                 problem_team,
