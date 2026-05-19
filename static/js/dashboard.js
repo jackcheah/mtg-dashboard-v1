@@ -407,6 +407,11 @@
 
             function goBackToEventMode() {
                 closeScoringModeModal();
+                selectedScoringModeTemp = null;
+                document.querySelectorAll('#scoring-mode-overlay .scoring-mode-card').forEach(card => {
+                    card.classList.remove('selected');
+                });
+                document.getElementById('confirm-scoring-mode-btn').disabled = true;
                 setTimeout(() => showEventModeModal(), 200);
             }
 
@@ -468,13 +473,17 @@
                         body: JSON.stringify({ mode: selectedScoringModeTemp })
                     });
 
+                    if (!response.ok) {
+                        showToast('Error', `Server error (${response.status}). Please try again.`, 'error');
+                        return;
+                    }
+
                     const data = await response.json();
 
                     if (data.success) {
                         currentScoringMode = selectedScoringModeTemp;
                         closeScoringModeModal();
 
-                        // Show mode-specific message
                         if (currentScoringMode === 'japanese') {
                             showToast('Japanese Mode Selected',
                                 'Players will start with 1000 points. Winner takes 7% pool each round.',
@@ -488,14 +497,16 @@
 
                         // After both event mode and scoring mode are set, proceed to load participants
                         if (currentEventMode) {
-                            setTimeout(() => loadParticipants(), 500);
+                            await loadParticipants();
                         }
                     } else {
                         showToast('Error', data.message || 'Failed to set scoring mode', 'error');
+                        selectedScoringModeTemp = null;
                     }
                 } catch (error) {
                     console.error('Error setting scoring mode:', error);
-                    showToast('Error', 'Failed to set scoring mode', 'error');
+                    showToast('Error', 'Network error setting scoring mode. Please try again.', 'error');
+                    selectedScoringModeTemp = null;
                 }
             }
 
@@ -1033,8 +1044,11 @@
                 if (currentEventMode === 'individual') {
                     // Individual mode: flat ranked list of players
                     teamsArray.forEach(({ teamName, players, teamScore }, index) => {
-                        displayedCount++;
+                        if (!players || players.length === 0) return;
                         const player = players[0];
+                        if (!player) return;
+
+                        displayedCount++;
                         const playerId = player['Player ID'] || player.id;
                         let playerScore = 0;
                         if (playerScores) {
@@ -1082,6 +1096,30 @@
                         </div>
                     `;
 
+                        teamsGrid.appendChild(card);
+                    });
+                }
+
+                // Display dropped players (individual mode only)
+                if (currentEventMode === 'individual' && window._droppedPlayersCache && Object.keys(window._droppedPlayersCache).length > 0) {
+                    const droppedEntries = Object.entries(window._droppedPlayersCache)
+                        .map(([pid, info]) => ({ id: pid, ...info }))
+                        .sort((a, b) => b.score - a.score);
+
+                    droppedEntries.forEach(dp => {
+                        const card = document.createElement('div');
+                        card.className = 'team-card';
+                        card.style.opacity = '0.5';
+                        card.style.borderLeft = '3px solid var(--color-danger)';
+                        card.innerHTML = `
+                        <div class="team-header">
+                            <div class="team-name" style="text-decoration: line-through;">${dp.name}</div>
+                            <div class="team-score">
+                                ${formatScore(dp.score)}
+                                <span style="font-size: 0.65rem; background: var(--color-danger); color: white; padding: 2px 6px; border-radius: 8px; margin-left: 8px;">DROPPED R${dp.dropped_after_round}</span>
+                            </div>
+                        </div>
+                        `;
                         teamsGrid.appendChild(card);
                     });
                 }
@@ -1645,6 +1683,13 @@
                         });
 
                         console.log(`Submission progress: ${data.submitted_count}/${data.total_tables} (${data.progress_percent}%)`);
+
+                        // Show drop player button when all tables submitted (individual mode only)
+                        if (data.is_complete && currentEventMode === 'individual') {
+                            showDropPlayersButton();
+                        } else {
+                            hideDropPlayersButton();
+                        }
                     } else {
                         console.warn('Failed to get submission status:', data.error);
                     }
@@ -2181,26 +2226,33 @@
                     .then(data => {
                         const byePlayers = data.bye_players || {};
                         const roundByes = byePlayers[round] || byePlayers[String(round)] || [];
-                        if (roundByes.length === 0) return;
+                        if (!roundByes || roundByes.length === 0) return;
 
                         const byeCard = document.createElement('div');
                         byeCard.className = 'table-card';
                         byeCard.style.borderColor = 'var(--color-success)';
                         byeCard.style.opacity = '0.85';
 
+                        const byePointsLabel = currentScoringMode === 'japanese' ? 'BYE (no change)' : 'BYE +5';
+
                         const playerNames = roundByes.map(pid => {
-                            const pScore = data.player_scores[pid] || data.player_scores[String(pid)] || 0;
                             // Find player name from teams
-                            for (const [name, players] of Object.entries(data.teams)) {
-                                if (players[0] && (players[0]['Player ID'] === pid || players[0]['Player ID'] === String(pid))) {
+                            for (const [name, players] of Object.entries(data.teams || {})) {
+                                if (!players || !players[0]) continue;
+                                const playerId = players[0]['Player ID'] || players[0].id;
+                                if (String(playerId) === String(pid)) {
                                     return `<div class="table-player" style="padding: 8px 12px; display: flex; align-items: center; gap: 8px;">
                                         <i class="fas fa-forward" style="color: var(--color-success);"></i>
                                         <span>${name}</span>
-                                        <span class="bye-badge" style="margin-left: auto; background: var(--color-success); color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: 700;">BYE +5</span>
+                                        <span style="margin-left: auto; background: var(--color-success); color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: 700;">${byePointsLabel}</span>
                                     </div>`;
                                 }
                             }
-                            return '';
+                            return `<div class="table-player" style="padding: 8px 12px; display: flex; align-items: center; gap: 8px;">
+                                <i class="fas fa-forward" style="color: var(--color-warning);"></i>
+                                <span>Player ${pid}</span>
+                                <span style="margin-left: auto; background: var(--color-success); color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: 700;">${byePointsLabel}</span>
+                            </div>`;
                         }).join('');
 
                         byeCard.innerHTML = `
@@ -2213,6 +2265,141 @@
                         container.appendChild(byeCard);
                     })
                     .catch(err => console.error('Error fetching bye players:', err));
+            }
+
+            // ============================================
+            // PLAYER DROP FEATURE (Individual Events Only)
+            // ============================================
+
+            function showDropPlayersButton() {
+                if (currentEventMode !== 'individual') return;
+
+                // Remove any existing drop button
+                const existing = document.getElementById('drop-players-btn');
+                if (existing) existing.remove();
+
+                const activeControls = document.getElementById('active-round-controls');
+                if (!activeControls) return;
+
+                const btn = document.createElement('button');
+                btn.id = 'drop-players-btn';
+                btn.className = 'btn btn-danger';
+                btn.title = 'Drop players from future rounds';
+                btn.innerHTML = '<i class="fas fa-user-minus"></i><span>Drop Player</span>';
+                btn.onclick = showDropPlayerModal;
+                activeControls.appendChild(btn);
+            }
+
+            function hideDropPlayersButton() {
+                const btn = document.getElementById('drop-players-btn');
+                if (btn) btn.remove();
+            }
+
+            async function showDropPlayerModal() {
+                const currentRound = document.getElementById('round-select').value;
+                if (!currentRound) {
+                    showToast('Error', 'No round selected', 'error');
+                    return;
+                }
+
+                // Fetch current state to get active players
+                try {
+                    const res = await fetch('/get_tournament_state');
+                    const data = await res.json();
+
+                    const teams = data.teams || {};
+                    const playerScores = data.player_scores || {};
+                    const droppedIds = new Set(Object.keys(data.dropped_players || {}).map(Number));
+
+                    // Build player list (active only)
+                    const players = [];
+                    for (const [name, playerArr] of Object.entries(teams)) {
+                        if (!playerArr || !playerArr[0]) continue;
+                        const p = playerArr[0];
+                        const pid = p['Player ID'];
+                        if (droppedIds.has(pid)) continue;
+                        players.push({
+                            id: pid,
+                            name: p['Player Name'] || name,
+                            score: playerScores[pid] || playerScores[String(pid)] || 0
+                        });
+                    }
+
+                    players.sort((a, b) => b.score - a.score);
+
+                    // Build modal content
+                    const playerListHtml = players.map(p => `
+                        <div style="display: flex; align-items: center; padding: 8px 12px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                            <span style="flex: 1; font-weight: 500;">${p.name}</span>
+                            <span style="margin-right: 16px; opacity: 0.7;">${formatScore(p.score)}</span>
+                            <button class="btn btn-danger" style="padding: 4px 12px; font-size: 0.75rem;"
+                                onclick="confirmDropPlayer(${p.id}, '${p.name.replace(/'/g, "\\'")}')">
+                                <i class="fas fa-times"></i> Drop
+                            </button>
+                        </div>
+                    `).join('');
+
+                    const modalHtml = `
+                        <div id="drop-player-overlay" class="scoring-mode-overlay show" style="z-index: 10001;">
+                            <div class="scoring-mode-modal" style="max-width: 500px; max-height: 80vh; overflow-y: auto;">
+                                <h2 class="scoring-mode-title">
+                                    <i class="fas fa-user-minus"></i> Drop Players
+                                </h2>
+                                <p class="scoring-mode-subtitle">Select a player to remove from future rounds. Their score will be frozen.</p>
+                                <div style="margin: 16px 0; border-radius: 8px; background: rgba(0,0,0,0.2); overflow: hidden;">
+                                    ${playerListHtml}
+                                </div>
+                                <div class="scoring-mode-actions">
+                                    <button class="btn btn-secondary" onclick="closeDropPlayerModal()">
+                                        <i class="fas fa-times"></i> Close
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    // Insert modal
+                    const existingModal = document.getElementById('drop-player-overlay');
+                    if (existingModal) existingModal.remove();
+                    document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+                } catch (error) {
+                    console.error('Error showing drop player modal:', error);
+                    showToast('Error', 'Failed to load player list', 'error');
+                }
+            }
+
+            function closeDropPlayerModal() {
+                const modal = document.getElementById('drop-player-overlay');
+                if (modal) modal.remove();
+            }
+
+            async function confirmDropPlayer(playerId, playerName) {
+                const confirmed = confirm(`Drop ${playerName} from the tournament?\n\nThey will not participate in future rounds. Their current score will be frozen.`);
+                if (!confirmed) return;
+
+                const currentRound = document.getElementById('round-select').value;
+
+                try {
+                    const response = await fetch('/drop_player', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ player_id: playerId, round: parseInt(currentRound) })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        showToast('Player Dropped', `${playerName} removed from future rounds.`, 'warning', 4000);
+                        closeDropPlayerModal();
+                        refreshTeamScores();
+                    } else {
+                        showToast('Error', data.message || 'Failed to drop player', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error dropping player:', error);
+                    showToast('Error', 'Network error dropping player', 'error');
+                }
             }
 
             // Update Stats
@@ -2272,6 +2459,15 @@
                     const data = await response.json();
 
                     if (data.success && data.teams) {
+                        // Update dropped players cache from server
+                        if (currentEventMode === 'individual') {
+                            try {
+                                const stateRes = await fetch('/get_tournament_state');
+                                const stateData = await stateRes.json();
+                                window._droppedPlayersCache = stateData.dropped_players || {};
+                            } catch (e) { /* non-critical */ }
+                        }
+
                         // Update team display with fresh scores
                         displayTeams(data.teams, data.player_scores, finalsMode);
                         console.log('Team scores refreshed' + (finalsMode ? ' (finals mode - top 4 only)' : ' (all teams)'));

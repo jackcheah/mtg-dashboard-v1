@@ -117,6 +117,7 @@ class TournamentManager:
         self.bye_players = {}  # round_num → list of player_ids who got byes
         self.has_top_cut = False  # Individual mode: top cut round for >16 players
         self.top_cut_data = None  # Individual mode: top cut round data
+        self.dropped_players = {}  # {player_id: {'name': str, 'score': int, 'dropped_after_round': int}}
 
     def transition_to(self, new_state: TournamentState, reason: str = ""):
         """Transition to a new state with logging (Phase 3.4)."""
@@ -211,7 +212,8 @@ class TournamentManager:
                     "semifinal_round_scores": self.semifinal_round_scores,
                     "final_round_scores": self.final_round_scores,
                     "bye_players": self.bye_players,
-                    "top_cut_data": getattr(self, 'top_cut_data', None)
+                    "top_cut_data": getattr(self, 'top_cut_data', None),
+                    "dropped_players": self.dropped_players
                 }
             }
             
@@ -376,6 +378,8 @@ class TournamentManager:
             raw_bye_players = data.get('bye_players', {})
             self.bye_players = {int(k) if str(k).isdigit() else k: v for k, v in raw_bye_players.items()}
             self.top_cut_data = data.get('top_cut_data', None)
+            raw_dropped = data.get('dropped_players', {})
+            self.dropped_players = {int(k): v for k, v in raw_dropped.items()}
 
             # === CRITICAL: REHYDRATE PAIRING ENGINE ===
             # We must recreate the UnifiedSwissPairing instance and replay the history
@@ -507,6 +511,81 @@ class TournamentManager:
             return True, "Event mode set to Individual (solo players, individual standings)"
         else:
             return False, f"Invalid event mode: {mode}. Use 'team' or 'individual'"
+
+    def drop_player(self, player_id: int, round_num: int) -> tuple:
+        """
+        Drop a player from an individual event after a round is fully submitted
+        but before finalization. The player keeps their score but is excluded
+        from all future rounds.
+
+        Args:
+            player_id: The player's ID
+            round_num: The round that was just completed (all tables submitted)
+
+        Returns:
+            tuple: (success: bool, message: str)
+        """
+        if self.event_mode != EventMode.INDIVIDUAL:
+            return False, "Player drop is only available for individual events"
+
+        if self.state not in [TournamentState.SWISS_IN_PROGRESS, TournamentState.TOURNAMENT_SETUP]:
+            return False, "Cannot drop players outside of Swiss rounds"
+
+        if round_num > self.swiss_rounds_count:
+            return False, "Cannot drop players during playoff rounds"
+
+        # Check round is fully submitted
+        round_data = self.round_results.get(round_num, {})
+        submitted_tables = round_data.get('submitted_tables', set())
+        total_tables = len(self.tables.get(round_num, {}))
+        if len(submitted_tables) < total_tables:
+            return False, "All tables must be submitted before dropping players"
+
+        # Check round is NOT finalized
+        if round_num in self.finalized_rounds:
+            return False, "Cannot drop players after round has been finalized"
+
+        # Validate player exists and is not already dropped
+        if player_id in self.dropped_players:
+            return False, "Player has already been dropped"
+
+        if player_id not in self.player_scores:
+            return False, "Player not found in tournament"
+
+        # Find the player's name
+        player_name = None
+        for p in self.participants:
+            if p.get('Player ID') == player_id:
+                player_name = p.get('Player Name', f'Player {player_id}')
+                break
+
+        if player_name is None:
+            return False, "Player not found in participants"
+
+        # Record the drop
+        self.dropped_players[player_id] = {
+            'name': player_name,
+            'score': self.player_scores[player_id],
+            'dropped_after_round': round_num
+        }
+
+        # Remove from active tournament structures
+        self.participants = [p for p in self.participants if p.get('Player ID') != player_id]
+
+        if player_name in self.teams:
+            del self.teams[player_name]
+        if player_name in self.tournament_teams:
+            self.tournament_teams.remove(player_name)
+        if player_name in self.scores:
+            del self.scores[player_name]
+
+        # Force pairing engine rebuild for next round
+        self._unified_pairing = None
+
+        print(f"[DROP] Player {player_name} (ID: {player_id}) dropped after round {round_num} with {self.dropped_players[player_id]['score']} pts")
+        print(f"[DROP] Active players remaining: {len(self.participants)}")
+
+        return True, f"{player_name} has been dropped from the tournament"
 
     def determine_tournament_structure(self):
         """Determine tournament structure based on team/player count
@@ -2673,6 +2752,41 @@ def set_event_mode():
             'message': str(e)
         }), 500
 
+@app.route('/drop_player', methods=['POST'])
+@with_lock
+def drop_player_endpoint():
+    """Drop a player from an individual event (between rounds, after submission, before finalization)"""
+    try:
+        data = request.get_json()
+
+        if not data:
+            return jsonify({'success': False, 'error': 'No data provided'}), 400
+
+        player_id = data.get('player_id')
+        round_num = data.get('round')
+
+        if player_id is None or round_num is None:
+            return jsonify({'success': False, 'error': 'player_id and round are required'}), 400
+
+        player_id = int(player_id)
+        round_num = int(round_num)
+
+        success, message = tournament.drop_player(player_id, round_num)
+
+        tournament.save_backup()
+
+        return jsonify({
+            'success': success,
+            'message': message,
+            'dropped_players': tournament.dropped_players,
+            'active_player_count': len(tournament.participants)
+        })
+
+    except Exception as e:
+        print(f"Error in drop_player: {e}")
+        traceback.print_exc()
+        return jsonify({'success': False, 'message': str(e)}), 500
+
 @app.route('/setup_tournament', methods=['POST'])
 @with_lock
 @require_state(TournamentState.PARTICIPANTS_LOADED, TournamentState.TOURNAMENT_SETUP)
@@ -2802,7 +2916,7 @@ def _handle_round_transition(round_num):
             else:
                 print(f"[ERROR] Failed to generate Swiss Round {next_round}")
 
-        if round_num == last_swiss_round:
+        elif round_num == last_swiss_round:
             print(f"[TROPHY] Swiss Round {last_swiss_round} completed!")
             tournament.swiss_round_scores = tournament.scores.copy()
 
@@ -3065,16 +3179,22 @@ def submit_table_results():
         if pod_size == 3:
             # 3-player pod: valid combos are (5,0,0), (1,1,1), (1,1,0)
             valid_3p = (
-                (win_count == 1 and loss_count == 2) or
-                (win_count == 0 and draw_count == 3) or
+                (win_count == 1 and loss_count == 2 and draw_count == 0) or
+                (win_count == 0 and draw_count == 3 and loss_count == 0) or
                 (win_count == 0 and draw_count == 2 and loss_count == 1)
             )
             if not valid_3p:
                 return jsonify({'success': False, 'error': f'Invalid scores at {table_name}: For a 3-player pod, valid outcomes are (1 win + 2 losses), (3 draws), or (2 draws + 1 loss).'}), 400
         elif pod_size == 4:
-            # 4-player pod: valid combos are (5,0,0,0), or 2-4 draws + rest losses
-            if win_count == 0 and draw_count < 2:
-                return jsonify({'success': False, 'error': f'Invalid scores at {table_name}: If no winner, at least 2 players must draw.'}), 400
+            # 4-player pod: valid combos are (5,0,0,0), (1,1,0,0), (1,1,1,0), (1,1,1,1)
+            if win_count == 1:
+                if loss_count != 3 or draw_count != 0:
+                    return jsonify({'success': False, 'error': f'Invalid scores at {table_name}: With a winner, all other players must have 0 points (loss).'}), 400
+            elif win_count == 0:
+                if draw_count < 2:
+                    return jsonify({'success': False, 'error': f'Invalid scores at {table_name}: If no winner, at least 2 players must draw.'}), 400
+                if (draw_count + loss_count) != 4:
+                    return jsonify({'success': False, 'error': f'Invalid scores at {table_name}: Point totals do not add up for a 4-player pod.'}), 400
 
         print(f"[OK] Validation passed for Round {round_num}, {table_name}")
         print(f"Player results: {player_results}")
@@ -3647,7 +3767,8 @@ def get_tournament_state():
         'event_mode': tournament.event_mode.value,  # "team" or "individual"
         'is_individual_mode': tournament.event_mode == EventMode.INDIVIDUAL,
         'has_top_cut': getattr(tournament, 'has_top_cut', False),
-        'bye_players': tournament.bye_players
+        'bye_players': tournament.bye_players,
+        'dropped_players': tournament.dropped_players
     }
 
     # Add legacy group support for backward compatibility (all teams in single group)

@@ -1,241 +1,149 @@
 # MTG Tournament Dashboard
 
-A comprehensive web-based tournament management system for Magic: The Gathering (MTG) Commander (cEDH) tournaments. Supports Swiss-system rounds with automatic pairing, intelligent seating, and finals generation.
+A production-ready web-based tournament management system for Magic: The Gathering (MTG) Commander (cEDH) tournaments. Supports both **team events** and **individual events** with Swiss-system rounds, automatic pairing, intelligent seating, and finals management.
 
 ## Features
 
-- **Swiss-System Management**: Supports 8, 12, or 16 teams (4 players per team).
-- **Automated Workflow**: Automatic pairing (no repeats), intelligent seating (by score), and round generation.
-- **Robust Scoring**: Track individual and team scores with a comprehensive tiebreaker system.
-- **Production-Ready**: Automatic backups every 5 minutes, crash recovery, and thread-safe operations.
-- **Modern UI**: Responsive "Ultra Modern" glassmorphism interface with dark mode.
-- **Projector View**: Dedicated read-only display for audiences with champion and MVP showcases.
-
-## System Requirements
-- Python 3.8 or higher
-- Modern web browser (Chrome, Firefox, Edge, Safari)
-
-## Installation
-
-### 1. Clone the Repository
-```bash
-git clone <repository-url>
-cd MTG-Tournament-Dashboard
-```
-
-### 2. Install Dependencies
-```bash
-# Mac/Linux
-python3 -m venv venv
-source venv/bin/activate
-pip install flask openpyxl
-
-# Windows
-python -m venv venv
-venv\Scripts\activate
-pip install flask openpyxl
-```
+- **Dual Event Modes**: Team events (4 players/team, 8-16 teams) and Individual events (16+ solo players)
+- **Dual Scoring Systems**: Western (5/1/0) and Japanese (7% pool, 1000 starting points)
+- **Swiss-System Pairing**: Automatic score-based pairing with repeat-avoidance optimization
+- **Individual Mode Extras**: Bye system, 3-player pods, player drop mid-tournament, Top Cut (top 10)
+- **Production-Ready**: Auto-backups every 5 minutes, crash recovery, thread-safe operations
+- **Modern UI**: Responsive glassmorphism interface with step-by-step setup wizard
+- **Projector View**: Dedicated read-only audience display with champion/MVP showcases
 
 ## Quick Start
 
-### 1. Run the Application
 ```bash
-# activate your venv first, then:
+# Setup
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+
+# Run
 python tournament_dashboard.py
+# Dashboard: http://127.0.0.1:5001
+# Projector: http://127.0.0.1:5001/projector
 ```
-Access the dashboard at: **http://127.0.0.1:5001**
 
-### 2. Tournament Workflow
-1.  **Load Participants**: Click "Load Participants" (loads `participants/participant_team.xlsx` or sample data).
-2.  **Setup**: Click "Setup Tournament" to generate Round 1.
-3.  **Swiss Rounds**: 
-    - Enter results (W/D/L) for each table. 
-    - Click "Submit Table" -> "Submit Round". 
-    - Repeat for 4 rounds.
-4.  **Finals**: The system automatically generates Top 8 (for 16 teams) or Finals (for 8/12 teams).
+## Tournament Workflow
 
-### Key Shortcuts
-- **W / 1**: Win
-- **D / 2**: Draw
-- **L / 3**: Loss
-- **Tab**: Next input
-- **Ctrl+Enter**: Submit Table
-- **?**: View all shortcuts
+### Setup Flow
+1. Click **"Load Participants"** to start the setup wizard
+2. **Step 1**: Select Event Type (Team or Individual)
+3. **Step 2**: Select Scoring Mode (Western or Japanese)
+4. Participants auto-load from `participants/participant_team.xlsx` (or sample data)
+5. Click **"Setup Tournament"** to generate Round 1
+
+### Playing Rounds
+1. View pairings and seating assignments for the current round
+2. Enter scores (W/D/L) for each table, click "Submit Table"
+3. **(Individual mode)** After all tables submitted: optionally drop players
+4. Click "Submit Round Results" to finalize and generate next round
+
+### Finals
+- **Team mode**: Top 4 teams (or Top 8 Cut + Top 4 for 16 teams)
+- **Individual mode (≤16 players)**: Top 4 players advance directly to finals
+- **Individual mode (>16 players)**: Top 10 advance to Top Cut, then Top 4 to finals
+
+---
+
+## Event Modes
+
+### Team Mode
+| Teams | Players | Swiss Rounds | Playoffs | Total Rounds |
+|-------|---------|--------------|----------|--------------|
+| 8     | 32      | 4            | Finals (top 4) | 5 |
+| 12    | 48      | 4            | Finals (top 4) | 5 |
+| 16    | 64      | 4            | Top 8 Cut + Finals | 6 |
+
+- 4 players per team, team standings
+- Teammates never paired in same pod (hard constraint)
+- Tiebreakers: Team score → Best player → Average → Early wins
+
+### Individual Mode
+| Players | Swiss Rounds | Playoffs | Total Rounds |
+|---------|--------------|----------|--------------|
+| 16      | 4            | Finals (top 4, 1 table) | 5 |
+| 17-64+  | 4            | Top Cut (top 10) + Finals | 6 |
+
+- Any number of players (minimum 16)
+- Non-multiple-of-4 handling: 3-player pods and bye system
+- Avoid repeat opponents (optimization, not hard constraint)
+- **Player Drop**: TO can remove players between rounds (score frozen, excluded from future pairings)
+- Tiebreakers: Score → Early wins
+
+---
+
+## Scoring Modes
+
+### Western Mode (Default)
+- **Win:** 5 points | **Draw:** 1 point | **Loss:** 0 points
+- Players start at 0 points
+- Team score = sum of all 4 players' scores
+
+### Japanese Swiss Point Mode
+- **Start:** Each player begins with 1000 points
+- **Each round:** All players at table contribute 7% of current points to a pool
+- **Win:** Winner takes the entire pool
+- **Draw/Loss:** Players lose only their 7% contribution
+- Points accumulate across rounds (never reset)
+- See `JAPANESE-IMPLEMENTATION.md` for full details
+
+---
+
+## Individual Mode Features
+
+### Bye System
+When player count isn't divisible by 4:
+- **Remainder 3**: Last 3 players form a 3-player pod (all play)
+- **Remainder 1-2**: Bottom-ranked players get automatic byes
+- Bye = Win (5pts Western, no change Japanese)
+
+### 3-Player Pod Scoring
+Valid outcomes for 3-player pods:
+- 1 winner + 2 losers (5, 0, 0)
+- 3 draws (1, 1, 1)
+- 2 draws + 1 loser (1, 1, 0)
+
+### Player Drop
+- Available after all tables submit scores, before round finalization
+- Dropped player's score is frozen (no further gains)
+- Dropped players still appear in final standings
+- Pairing engine rebuilds for next round with reduced player count
+
+### Top Cut (>16 players)
+- Top 10 players advance after Swiss rounds
+- Top 2 seeds receive automatic byes
+- Remaining 8 play in 2 tables of 4
+- Top 4 advance to a single Finals table
+
+---
 
 ## Configuration
 
 ### Custom Participants
-To use your own roster, create an Excel file at `participants/participant_team.xlsx` with columns: `Player ID`, `Player Name`, `Team Name`.
-- Teams must have exactly 4 players.
-- Total teams must be 8, 12, or 16.
+Place an Excel file at `participants/participant_team.xlsx`:
+
+**Team mode columns:** `Player ID`, `Player Name`, `Team Name`
+- Teams must have exactly 4 players
+- Total teams: 8, 12, or 16
+
+**Individual mode:** Same Excel format — the Team Name column is ignored. Each row is one player.
+
+### PIN Protection (Optional)
+```bash
+TOURNAMENT_PIN=1234 python tournament_dashboard.py
+```
 
 ### Backups
-The system automatically backs up state every 5 minutes.
-- **Manual Backup**: Click "Save Backup" in the UI before critical rounds.
-- **Restoration**: Just restart the server (`python tournament_dashboard.py`) to auto-restore the last valid state.
+- Auto-saves every 5 minutes
+- Manual: Click "Save Backup" in UI
+- Restore: Restart server (auto-restores) or click "Restore Backup"
 
-## Tournament Rules & Structure
+---
 
-### Structure
-- **8 Teams**: 4 Swiss Rounds → Finals (Top 4)
-- **12 Teams**: 4 Swiss Rounds → Finals (Top 4)
-- **16 Teams**: 4 Swiss Rounds → Top 8 Cut → Finals (Top 4)
-
-4. **Setup Tournament**
-   - Click "Setup Tournament"
-   - Round 1 pairings will be generated automatically
-
-5. **Run Tournament Rounds**
-   - For each table, click W (Win), D (Draw), or L (Loss) for players
-   - Click "Submit Table Results" when all scores are entered
-   - Click "Submit Round Results" to finalize the round
-   - Next round will be generated automatically
-
-6. **Finals**
-   - After Swiss rounds complete, finals will be generated automatically
-   - Top 4 teams advance to finals
-   - Submit finals results to determine the champion
-
-### Tournament Workflow
-```
-Load Participants → Setup Tournament → Swiss Rounds → Finals → Champion
-```
-
-Each round follows this cycle:
-1. View pairings and seating assignments
-2. Enter scores for each table
-3. Submit table results
-4. Submit round results (triggers next round generation)
-
-## Tournament Structure
-
-### Supported Team Counts
-
-- **8 Teams** (32 players): 4 Swiss rounds → Finals (top 4)
-- **12 Teams** (48 players): 4 Swiss rounds → Finals (top 4)
-- **16 Teams** (64 players): 4 Swiss rounds → Top 8 Cut → Finals (top 4)
-
-### Scoring & Advancement System
-
-The system uses a stage-based scoring approach where performance in the current stage acts as the primary advancement criteria, while previous stages serve as tiebreakers.
-
-#### 1. Core Principles
-1.  **Stage-Specific Scoring**: Scores are tracked separately for Swiss, Top 8 Cut, and Finals.
-2.  **Performance-Based Advancement**: Teams advance based on performance in the *current* stage.
-3.  **Multi-Level Tiebreakers**: Comprehensive tiebreaker system ensures fair advancement.
-4.  **No Score Carrying**: Teams cannot "coast" on early performance.
-
-#### 2. Scoring Modes
-
-The tournament supports two scoring modes, selected after loading participants:
-
-**Western Mode (Default)**
--   **Win:** 5 points | **Draw:** 1 point | **Loss:** 0 points
--   Players start with 0 points
--   **Team Score:** Sum of all 4 players' scores for the round.
-
-**Japanese Swiss Point Mode**
--   **Start:** Each player begins with 1000 points
--   **Each round:** All players contribute 7% of current points to pool
--   **Win:** Winner takes the entire pool (~280 pts in round 1)
--   **Draw/Loss:** Players lose their 7% contribution
--   Points accumulate across rounds (never reset)
--   See `JAPANESE-IMPLEMENTATION.md` for full details
-
-#### 3. Tournament Stages (16-Team Format)
-
-**Stage 1: Swiss Rounds (Rounds 1-4)**
--   All 16 teams compete.
--   Scores accumulate across all 4 rounds.
--   **Top 8** teams based on total Swiss scores advance to the Top 8 Cut.
--   **Tiebreaker Hierarchy:**
-    1.  Total Team Score (primary)
-    2.  Best Individual Player Score
-    3.  Average Player Score
-    4.  Early Wins Score (Round 1 > Round 2 > Round 3 > Round 4)
-
-**Stage 2: Top 8 Cut (Round 5)**
--   8 Teams compete in 2 pods of 4.
--   **Scoring:** Only points earned in Round 5 count towards advancement.
--   **Advancement Criteria:**
-    1.  **Primary:** Points earned in Top 8 Cut (Round 5).
-    2.  **Tiebreakers:** Swiss Score → Best Player → Average → Early Wins
--   **Top 4** teams advance to Finals.
-
-**Stage 3: Finals (Round 6)**
--   4 Teams compete in a single pod.
--   **Scoring:** Only points earned in Round 6 count for the title.
--   **Champion Determination:**
-    1.  **Primary:** Points earned in Finals (Round 6).
-    2.  **Tiebreaker:** Combined Swiss + Top 8 Cut Points (Rounds 1-5).
--   **MVP Award:** Highest individual scorer among Top 4 teams.
-
-*(Note: For 8/12-team formats, the Top 8 Cut is skipped, and top 4 from Swiss advance directly to Finals.)*
-
-### Pairing & Seating Algorithm
-
-**1. Traditional Swiss Pairing**
--   **Goal:** Winners play Winners. Teams are grouped by score brackets.
--   **Constraint - Zero Repeats:** Teams will never face the same opponent twice.
--   **Constraint - Teammate Avoidance:** Teammates will never be paired at the same table.
--   **Optimization:** If a repeat is unavoidable in a bracket, the system swaps the lowest-ranked team with a neighbor, minimizing score disruption.
-
-**2. Intelligent Seating**
--   Players are seated at the table based on their individual performance.
--   **Seat 1:** Highest individual scorer.
--   **Seat 4:** Lowest individual scorer.
--   This balances the "Pod A/B/C/D" strength across the tournament.
-
-### Pairing Algorithm
-
-**Constraints:**
-- **Team Separation**: Teammates NEVER paired together (hard constraint)
-- **Zero Repeat Matchups**: Guaranteed no teams face each other twice
-
-**Round Generation:**
-- **Round 1**: Random pairing with random seating
-- **Rounds 2+**: Swiss pairing based on team standings
-- **Intelligent Seating**: Players seated by individual score (highest at Seat 1)
-- **Incremental**: Each round generated after previous round submission
-
-## Key Features & Shortcuts
-
-### UX Improvements
-- **Auto-Fill Losers**: Selecting "Win" (5 pts) for a player automatically marks teammates as "Loss" (0 pts) to save clicks.
-- **Batch Submit**: Submit all completed tables in a round with one click.
-- **Compact Mode**: Toggle for a denser view (great for 16-table tournaments). Persists across reloads.
-- **Smart Visuals**: Pulsing timer near round end; dimmed cards for submitted tables.
-
-### Live Bracket Display (Top 8 Cut & Finals)
-
-**Real-Time Score Updates:**
-- Bracket displays **current round scores only** (not accumulated totals)
-- Updates automatically as tables are submitted
-- Shows team rankings with Swiss scores as tiebreaker
-
-**Accurate Matchup Display:**
-- Top 8 Cut: Shows 2 pods of 4 teams matching actual table assignments
-- Finals: Shows single pod with all 4 teams
-- Pod groupings reflect actual table pairings (not just theoretical matchups)
-
-**Visual Indicators:**
-- Teams sorted by current round performance
-- Info icon explains pairing logic
-- Score progression visible in real-time
-
-### Projector View
-
-**Read-Only Display for Audience:**
-- Access at `/projector` for a full-screen, audience-friendly display
-- Large timer with visual warnings (color changes at 90%, blinking when over)
-- Automatic view switching: Pairings → Standings → Champion
-- High-contrast dark theme optimized for projectors
-- **Champion Display:** Horizontal split layout (champion on left, finalists + MVP on right)
-- **Detailed Scores:** Shows Final, Top Cut, and Swiss scores with visual hierarchy
-- **MVP Recognition:** Displays highest individual scorer from Top 4 teams
-
-### Keyboard Shortcuts
-Press `?` (Shift+/) at any time to see this list in the app.
+## Keyboard Shortcuts
 
 | Key | Action |
 |-----|--------|
@@ -243,105 +151,48 @@ Press `?` (Shift+/) at any time to see this list in the app.
 | **D** or **2** | Draw (1 point) |
 | **L** or **3** | Loss (0 points) |
 | **Tab** | Next player/button |
-| **Shift+Tab** | Previous player/button |
 | **Ctrl+Enter** | Submit active table |
 | **Esc** | Close modal |
+| **?** | Show shortcuts help |
 
-## File Structure
+---
 
-```
-mtg-dashboard-v1/
-├── tournament_dashboard.py          # Main Flask application (~4000 lines)
-├── unified_swiss_pairing.py         # Swiss pairing algorithm (~2370 lines)
-├── templates/
-│   ├── dashboard_ultra_modern.html  # Frontend UI template (~5530 lines)
-│   └── projector_view.html          # Read-only projector display (~700 lines)
-├── participants/                    # Excel participant files
-│   └── participant_team.xlsx        # Default Excel file path
-├── tests/
-│   └── e2e/                         # End-to-End test suite
-│       ├── simulate_tournament_flow.py  # Basic E2E simulation
-│       ├── simulate_full_tournament.py  # Comprehensive E2E with tracking
-│       └── generate_16_teams.py         # Test data generator
-├── requirements.txt                 # Python dependencies
-├── Dockerfile                       # Docker container configuration
-├── docker-compose.yml               # Docker Compose setup
-├── README.md                        # User documentation (this file)
-├── CLAUDE.md                        # Developer/AI assistant guide
-├── TOURNAMENT_SCORING_SYSTEM.md     # Detailed scoring documentation
-├── PHASE5-IMPLEMENTATION-SUMMARY.md # Phase 5 implementation details (projector/tiebreakers)
-├── PHASE2-IMPLEMENTATION-SUMMARY.md # Phase 2 implementation details
-└── PHASE1-IMPLEMENTATION-SUMMARY.md # Phase 1 implementation details
-```
+## Projector View
 
-## Using Custom Participant Data
+Access at `/projector` for audience-friendly display:
+- Large timer with visual warnings
+- Automatic view switching: Pairings → Standings → Champion
+- High-contrast dark theme for projectors
+- Champion display with MVP recognition
 
-### Option 1: Use the Default Path
-Create a directory and Excel file at: `participants/participant_team.xlsx`
+---
+
+## Testing
 
 ```bash
-mkdir participants
-# Place your Excel file in this directory as participant_team.xlsx
+pip install -r requirements-dev.txt
+
+# Unit tests
+pytest tests/unit/ -v
+
+# E2E (server must be running)
+python tests/e2e/simulate_full_tournament.py --teams 8
+
+# Concurrent access tests
+python tests/e2e/test_concurrent.py
 ```
 
-### Option 2: Use Sample Data (Recommended for Testing)
-If no Excel file is found, the system automatically loads sample data with 8 teams (32 players). No setup required!
-
-### Excel File Format
-
-**Required columns:**
-- Player ID (integer)
-- Player Name (string)
-- Team Name (string)
-
-**Important:**
-- Teams must have exactly 4 players
-- Total teams must be 8, 12, or 16
-- Player IDs must be unique
-
-**Note:** To use a different file path, edit line 1819 in `tournament_dashboard.py`:
-```python
-excel_path = 'your/custom/path/to/file.xlsx'
-```
-
-## Testing (E2E)
-
-A comprehensive **End-to-End test suite** is available in `tests/e2e/`:
-
-```bash
-# Install Playwright
-pip install playwright
-playwright install chromium
-
-# Run E2E simulation (server must be running)
-cd tests/e2e
-python simulate_tournament_flow.py          # Basic simulation
-python simulate_full_tournament.py          # Full simulation with tracking
-```
-
-The E2E tests validate:
-- **Swiss Pairing Rules**: No repeat matchups, teammate separation
-- **Phase Transitions**: Swiss → Top 8 Cut → Finals
-- **Champion Declaration**: Tournament completes successfully
-
-See `tests/e2e/README.md` for detailed documentation.
+---
 
 ## Docker Deployment
 
 ```bash
-# Build and run with Docker Compose
-docker-compose up --build
-
-# Or use the convenience scripts
-./build-and-run.sh    # Mac/Linux
-.\build-and-run.bat   # Windows
+docker-compose up -d --build
+# Access at http://localhost:5000
 ```
 
-## Troubleshooting
+---
 
-- **Round Not Generating**: Ensure all tables in the current round are submitted. Refresh the page.
-- **App Not Loading**: Check if port 5001 is in use or the terminal window is closed.
-- **Data Mismatch**: Restart the server to reload ground-truth state from the backup file.
-
-## Credits
-Developed for **Knights of Round Table** - cEDH Team Championship tournaments.
+## System Requirements
+- Python 3.8+
+- Modern web browser (Chrome, Firefox, Edge, Safari)

@@ -4,10 +4,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-MTG Tournament Dashboard is a production-ready web-based tournament management system for **Magic: The Gathering cEDH team tournaments**. It implements Swiss-system pairing with automatic round generation, intelligent seating, and finals management.
+MTG Tournament Dashboard is a production-ready web-based tournament management system for **Magic: The Gathering cEDH tournaments**. It supports both **team events** (4 players per team) and **individual events** (solo players). It implements Swiss-system pairing with automatic round generation, intelligent seating, and finals management.
 
 **Tech Stack:** Python 3.13+ | Flask 3.0+ | Vanilla JavaScript | In-memory state management (with JSON persistence)
-**Developed for:** Knights of Round Table - cEDH Team Championship tournaments
+**Developed for:** Knights of Round Table - cEDH Championship tournaments
 
 ---
 
@@ -43,7 +43,29 @@ python tests/e2e/test_concurrent.py                          # Concurrent access
 
 ---
 
+## Event Modes
+
+The system supports two event modes, selected before loading participants:
+
+### Team Mode (default)
+- 4 players per team, 8/12/16 teams
+- Team standings (sum of player scores)
+- No teammates in same pod (hard constraint)
+- Tiebreakers: Team score → Best player → Average → Early wins
+
+### Individual Mode
+- 16+ solo players (any count)
+- Individual standings (player scores directly)
+- Avoid repeat opponents (soft constraint via optimization)
+- Supports non-multiple-of-4 counts: 3-player pods and bye system
+- Player Drop feature: TO can remove players between rounds
+- Tiebreakers: Score → Early wins
+
+---
+
 ## Tournament Structure
+
+### Team Mode
 
 | Teams | Players | Swiss Rounds | Playoffs | Total Rounds |
 |-------|---------|--------------|----------|--------------|
@@ -51,12 +73,21 @@ python tests/e2e/test_concurrent.py                          # Concurrent access
 | 12    | 48      | 4            | Finals   | 5            |
 | 16    | 64      | 4            | Top 8 Cut + Finals | 6 |
 
-### Scoring
-- **Win:** 5 points | **Draw:** 1 point | **Loss:** 0 points
-- Valid outcomes per table: 1 winner + 3 losers, or 2-4 draws (no winner)
-- Team score = Sum of all 4 players' scores
-- **Tiebreakers:** Best player score -> Average player score -> Early wins (exponentially weighted by round)
-- Finals winner determined by finals performance, Swiss as tiebreaker
+### Individual Mode
+
+| Players | Swiss Rounds | Playoffs | Total Rounds |
+|---------|--------------|----------|--------------|
+| ≤16     | 4            | Finals (top 4) | 5 |
+| 17+     | 4            | Top Cut (top 10) + Finals (top 4) | 6 |
+
+### Scoring Modes (both apply to Team and Individual)
+- **Western:** Win=5, Draw=1, Loss=0. Start at 0 points.
+- **Japanese:** Start at 1000 points. Each round: 7% contributed to pool. Winner takes pool. Losers/draws lose their contribution.
+
+### Score Validation
+- **4-player pods:** 1 winner + 3 losers, OR 2-4 draws + rest losers (no winner)
+- **3-player pods (individual mode):** 1 winner + 2 losers, OR 3 draws, OR 2 draws + 1 loser
+- **Bye players:** 1-2 remainder players get automatic win (5pts Western, no change Japanese)
 
 ---
 
@@ -66,29 +97,35 @@ python tests/e2e/test_concurrent.py                          # Concurrent access
 
 | Component | File(s) | Description |
 |-----------|---------|-------------|
-| **TournamentManager** | `tournament_dashboard.py` | Central state management, tournament lifecycle, tiebreaker logic. Thread-safe with `@with_lock`. |
-| **UnifiedSwissPairing** | `unified_swiss_pairing.py` | Constraint satisfaction solver for pod generation. Guarantees no-teammate pods. |
-| **Dashboard UI** | `templates/dashboard_ultra_modern.html` + `static/css/dashboard.css` + `static/js/dashboard.js` | Split SPA: HTML template (271 lines) links to external CSS (3145 lines) and JS (2507 lines). |
-| **Projector View** | `templates/projector_view.html` | Read-only audience display with adaptive polling and XSS-safe rendering. |
+| **TournamentManager** | `tournament_dashboard.py` | Central state management, tournament lifecycle, scoring, finals. Thread-safe with `@with_lock`. |
+| **UnifiedSwissPairing** | `unified_swiss_pairing.py` | Constraint satisfaction solver. Team mode: no-teammate pods. Individual mode: score-sorted grouping with repeat-avoidance. |
+| **Dashboard UI** | `templates/dashboard_ultra_modern.html` + `static/css/dashboard.css` + `static/js/dashboard.js` | Split SPA with modals for event/scoring mode selection. |
+| **Projector View** | `templates/projector_view.html` | Read-only audience display with adaptive polling. |
+
+### Key Enums
+- **`EventMode`**: TEAM | INDIVIDUAL
+- **`ScoringMode`**: WESTERN | JAPANESE
+- **`TournamentState`**: INITIAL → PARTICIPANTS_LOADED → TOURNAMENT_SETUP → SWISS_IN_PROGRESS → TOP8_IN_PROGRESS → FINALS_IN_PROGRESS → FINALS_COMPLETE
 
 ### Data Flow
-1. **Load**: `load_participants()` reads Excel -> populates `TournamentManager` state.
-2. **Setup**: `setup_tournament()` clears state, generates Round 1 (random seating).
-3. **Swiss Loop**: Submit table scores -> Finalize round (with confirmation) -> Next round auto-generated based on standings.
-4. **Playoffs**: Auto-generated after Swiss — Top 8 Cut (16-team only) then Finals (top 4 teams).
-5. **Champion**: Determined by finals performance (primary) with Swiss+Top8 as tiebreaker.
+1. **Configure**: Select Event Mode (team/individual) → Select Scoring Mode (western/japanese).
+2. **Load**: `load_participants()` reads Excel → populates state. Individual mode: each player becomes a synthetic "team of 1".
+3. **Setup**: `setup_tournament()` validates, initializes scores, generates Round 1.
+4. **Swiss Loop**: Submit table scores → (Optional: Drop players) → Finalize round → Next round auto-generated.
+5. **Playoffs**: Top Cut (if applicable) → Finals. Individual mode: Top 10 cut (top 2 get byes, 8 play), then top 4 finals.
+6. **Champion**: Determined by finals performance (primary) with earlier rounds as tiebreaker.
 
 ### Key Backend Logic
-- **`_handle_round_transition()`**: Shared helper for round finalization — generates next round, finals, or determines winner. Includes recovery if generation fails.
-- **`calculate_early_wins_score()`**: Dynamic weights based on `swiss_rounds_count`, reads from `table_submissions`.
-- **`get_mvp()`**: Highest individual scorer among Top 4 teams only.
-- **Score validation**: Max 1 winner per table; all 4 players must be scored; win cannot coexist with draw.
-- **Round finalization**: Requires ALL tables submitted before round can be finalized.
+- **`_handle_round_transition()`**: Routes to correct next phase based on event mode and round number.
+- **`generate_swiss_round()`**: Creates/rebuilds `UnifiedSwissPairing` engine, handles bye allocation for individual mode.
+- **`drop_player()`**: Individual mode only. Removes player from active structures, forces pairing engine rebuild.
+- **`_generate_round_individual_mode()`**: Score-sorted Swiss pairing for individuals with swap optimization.
+- **Score validation**: Pod-size-aware (3 or 4 players), mode-aware (team vs individual).
 
 ### Persistence
-- **Format**: JSON serialization including `swiss_round_scores`, `top8_cut_scores`, `final_round_scores`.
+- **Format**: JSON with `event_mode`, `scoring_mode`, `dropped_players`, `bye_players`, round results.
 - **Rotation**: 4 backup files (`.bak`, `.bak.1`, `.bak.2`, `.bak.3`).
-- **Auto-Restore**: Tries primary then numbered backups in order. Rehydrates pairing engine constraints by replaying round history.
+- **Rehydration**: Restores pairing engine by replaying round history and constraint tracking.
 
 ---
 
@@ -96,19 +133,44 @@ python tests/e2e/test_concurrent.py                          # Concurrent access
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
+| `/set_event_mode` | POST | Set event mode (team/individual) — must be INITIAL state |
+| `/set_scoring_mode` | POST | Set scoring mode (western/japanese) — before setup |
 | `/load_data` | POST | Load participants from Excel or sample data |
 | `/setup_tournament` | POST | Initialize tournament, generate Round 1 |
 | `/submit_table_results` | POST | Submit scores for a specific table (PIN-protected) |
 | `/submit_player_results` | POST | Finalize round, trigger next round generation |
+| `/drop_player` | POST | Drop a player from individual event (between rounds) |
 | `/edit_table_results` | POST | Edit previously submitted scores (before finalization) |
 | `/revert_table_submission` | POST | Undo a table submission before finalization |
 | `/get_state_info` | GET | Current state and valid next actions |
-| `/get_tournament_state` | GET | Full snapshot (standings, scores, submission status) |
+| `/get_tournament_state` | GET | Full snapshot (standings, scores, event_mode, dropped_players) |
 | `/get_submission_status/<round>` | GET | Per-round submission progress |
 | `/save_backup` | POST | Manually trigger backup save |
 | `/restore_backup` | POST | Restore tournament state from backup |
 | `/final_standings` | GET | Final standings with MVP calculation |
 | `/export/standings` | GET | Download standings as CSV |
+
+---
+
+## Individual Mode Specifics
+
+### Bye System
+- When player count is not divisible by 4:
+  - Remainder 3: Last 3 players form a 3-player pod (all play)
+  - Remainder 1-2: Bottom-ranked players get byes (automatic win)
+- Bye = 5pts (Western) or no change (Japanese)
+
+### Player Drop
+- Available only in individual mode, during Swiss rounds
+- Timing: After all tables submit, before round finalization
+- Effect: Player removed from future pairings, score frozen, still appears in final standings
+- Pairing engine rebuilt for next round to reflect reduced player count
+
+### Top Cut (>16 players)
+- Top 10 players advance after Swiss
+- Top 2 seeds receive byes
+- Remaining 8 play in 2 tables of 4
+- Top 4 then advance to Finals (1 table)
 
 ---
 
@@ -118,19 +180,19 @@ python tests/e2e/test_concurrent.py                          # Concurrent access
 ```bash
 pytest tests/unit/ -v
 ```
-Covers: tiebreaker logic, final standings, MVP, state machine, backup/restore integrity, score validation (illegal combos, incomplete tables, incomplete round finalization).
+Covers: tiebreaker logic, final standings, MVP, state machine, backup/restore integrity, score validation.
 
 ### E2E Tests
 ```bash
 python tests/e2e/simulate_full_tournament.py --teams [8|12|16]
 ```
-Full Playwright simulation: setup -> Swiss -> playoffs -> champion. Uses dynamic waits (not hardcoded sleeps). Returns exit code 1 on failure.
+Full simulation: setup → Swiss → playoffs → champion.
 
 ### Concurrent Tests
 ```bash
 python tests/e2e/test_concurrent.py
 ```
-Thread-safety verification: concurrent table submissions, double finalization rejection, submit-during-edit.
+Thread-safety: concurrent submissions, double finalization rejection.
 
 ---
 
@@ -139,16 +201,16 @@ Thread-safety verification: concurrent table submissions, double finalization re
 ```
 mtg-dashboard-v1/
 ├── tournament_dashboard.py          # Main Flask app + TournamentManager
-├── unified_swiss_pairing.py         # Pairing algorithm
+├── unified_swiss_pairing.py         # Pairing algorithm (team + individual modes)
 ├── static/
-│   ├── css/dashboard.css            # Dashboard styles (3145 lines)
-│   └── js/dashboard.js              # Dashboard logic (2507 lines)
+│   ├── css/dashboard.css            # Dashboard styles
+│   └── js/dashboard.js              # Dashboard logic (event mode, scoring, drops)
 ├── templates/
-│   ├── dashboard_ultra_modern.html  # Dashboard HTML shell (271 lines)
+│   ├── dashboard_ultra_modern.html  # Dashboard HTML (event/scoring mode modals)
 │   └── projector_view.html          # Projector display
 ├── tests/
 │   ├── unit/
-│   │   └── test_tournament_manager.py  # 21 pytest unit tests
+│   │   └── test_tournament_manager.py  # pytest unit tests
 │   └── e2e/
 │       ├── simulate_full_tournament.py # Playwright E2E
 │       ├── test_concurrent.py          # Concurrent access tests
@@ -165,8 +227,14 @@ mtg-dashboard-v1/
 
 ## Swiss Pairing Implementation
 
-**"Traditional Swiss"** in `unified_swiss_pairing.py`:
+### Team Mode (`unified_swiss_pairing.py`)
 1. **Group**: Sort teams by score into brackets of 4.
-2. **Swap**: If repeats/conflicts exist in a bracket, swap lowest team with nearest neighbor.
-3. **Optimize**: Permutation search to minimize player-level repeats within team matchups.
-4. **Guarantees**: No teammates in same pod. Zero repeat matchups for 16 teams / 4 rounds. Minimized repeats for 8/12 teams (mathematically impossible to eliminate all).
+2. **Swap**: If repeats/conflicts exist, swap lowest team with nearest neighbor.
+3. **Optimize**: Permutation search to minimize player-level repeats.
+4. **Guarantees**: No teammates in same pod. Zero repeat matchups for 16 teams / 4 rounds.
+
+### Individual Mode (`_generate_round_individual_mode()`)
+1. **Sort**: All players sorted by score (descending).
+2. **Chunk**: Group into pods of 4 (bottom remainder gets byes or forms 3-player pod).
+3. **Optimize**: Swap players between adjacent pods to minimize repeat opponents.
+4. **Engine rebuild**: After player drops, engine is recreated with reduced player list.

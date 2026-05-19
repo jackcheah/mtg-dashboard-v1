@@ -735,15 +735,17 @@ class UnifiedSwissPairing:
                     if len(pods[j]) != len(pod):
                         continue  # Don't swap between different-sized pods
 
+                    # Calculate old repeat count for pod j BEFORE any swaps
+                    old_repeat_j = self._count_repeat_opponents_in_pod(pods[j])
+
                     # Try each player pair swap
                     for pi in range(len(pod)):
                         for pj in range(len(pods[j])):
-                            # Simulate swap
+                            # Swap
                             pods[i][pi], pods[j][pj] = pods[j][pj], pods[i][pi]
 
                             new_repeat_i = self._count_repeat_opponents_in_pod(pods[i])
                             new_repeat_j = self._count_repeat_opponents_in_pod(pods[j])
-                            old_repeat_j = self._count_repeat_opponents_in_pod(pods[j])
 
                             if (new_repeat_i + new_repeat_j) < (repeat_count + old_repeat_j):
                                 improved = True
