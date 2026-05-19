@@ -50,18 +50,72 @@
             </div>
         </div>
 
+        <!-- Event Mode Selection Modal -->
+        <div id="event-mode-overlay" class="scoring-mode-overlay">
+            <div class="scoring-mode-modal">
+                <div class="setup-step-indicator">
+                    <span class="step-badge active">1</span>
+                    <span class="step-line"></span>
+                    <span class="step-badge">2</span>
+                </div>
+                <h2 class="scoring-mode-title">
+                    <i class="fas fa-gamepad"></i> Step 1: Select Event Type
+                </h2>
+                <p class="scoring-mode-subtitle">Choose the tournament format before loading participants</p>
+
+                <div class="scoring-mode-grid">
+                    <!-- Team Mode Card -->
+                    <div class="scoring-mode-card" data-mode="team" onclick="selectEventMode('team')">
+                        <div class="scoring-mode-icon"><i class="fas fa-users"></i></div>
+                        <div class="scoring-mode-card-title">Team Event</div>
+                        <div class="scoring-mode-card-desc">Teams of 4 players compete together</div>
+                        <ul>
+                            <li><i class="fas fa-check"></i> 4 players per team</li>
+                            <li><i class="fas fa-check"></i> 8, 12, or 16 teams</li>
+                            <li><i class="fas fa-check"></i> Team standings & tiebreakers</li>
+                            <li><i class="fas fa-check"></i> No teammates in same pod</li>
+                        </ul>
+                    </div>
+
+                    <!-- Individual Mode Card -->
+                    <div class="scoring-mode-card" data-mode="individual" onclick="selectEventMode('individual')">
+                        <div class="scoring-mode-icon"><i class="fas fa-user"></i></div>
+                        <div class="scoring-mode-card-title">Individual Event</div>
+                        <div class="scoring-mode-card-desc">Solo players compete individually</div>
+                        <ul>
+                            <li><i class="fas fa-check"></i> 16+ solo players</li>
+                            <li><i class="fas fa-check"></i> Individual standings</li>
+                            <li><i class="fas fa-check"></i> Top Cut for 17+ players</li>
+                            <li><i class="fas fa-check"></i> Avoid repeat opponents</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="scoring-mode-actions">
+                    <button id="confirm-event-mode-btn" class="btn btn-primary" onclick="confirmEventMode()" disabled>
+                        <i class="fas fa-arrow-right"></i> Next: Scoring Mode
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <!-- Scoring Mode Selection Modal -->
         <div id="scoring-mode-overlay" class="scoring-mode-overlay">
             <div class="scoring-mode-modal">
+                <div class="setup-step-indicator">
+                    <span class="step-badge completed"><i class="fas fa-check"></i></span>
+                    <span class="step-line completed"></span>
+                    <span class="step-badge active">2</span>
+                </div>
                 <h2 class="scoring-mode-title">
-                    <i class="fas fa-cog"></i> Select Scoring Mode
+                    <i class="fas fa-calculator"></i> Step 2: Select Scoring Mode
                 </h2>
                 <p class="scoring-mode-subtitle">Choose how points will be calculated in this tournament</p>
 
                 <div class="scoring-mode-grid">
                     <!-- Western Mode Card -->
                     <div class="scoring-mode-card" data-mode="western" onclick="selectScoringMode('western')">
-                        <div class="scoring-mode-icon">🏆</div>
+                        <div class="scoring-mode-icon"><i class="fas fa-trophy"></i></div>
                         <div class="scoring-mode-card-title">Western Mode</div>
                         <div class="scoring-mode-card-desc">Traditional cEDH scoring</div>
                         <ul>
@@ -74,7 +128,7 @@
 
                     <!-- Japanese Mode Card -->
                     <div class="scoring-mode-card" data-mode="japanese" onclick="selectScoringMode('japanese')">
-                        <div class="scoring-mode-icon">🎌</div>
+                        <div class="scoring-mode-icon"><i class="fas fa-yen-sign"></i></div>
                         <div class="scoring-mode-card-title">Japanese Mode</div>
                         <div class="scoring-mode-card-desc">High-stakes pool system</div>
                         <ul>
@@ -87,12 +141,12 @@
                 </div>
 
                 <div class="scoring-mode-actions">
-                    <button class="btn btn-secondary" onclick="closeScoringModeModal()">
-                        <i class="fas fa-times"></i> Cancel
+                    <button class="btn btn-secondary" id="scoring-mode-back-btn" onclick="goBackToEventMode()">
+                        <i class="fas fa-arrow-left"></i> Back
                     </button>
                     <button id="confirm-scoring-mode-btn" class="btn btn-primary" onclick="confirmScoringMode()"
                         disabled>
-                        <i class="fas fa-check"></i> Confirm Selection
+                        <i class="fas fa-check"></i> Confirm & Load
                     </button>
                 </div>
             </div>
@@ -262,7 +316,7 @@
             <div class="empty-state" id="empty-state">
                 <i class="fas fa-rocket"></i>
                 <h3>Ready to Start</h3>
-                <p>Click "Load Participants" to begin your tournament</p>
+                <p>Click "Load Participants" to configure your event type, scoring mode, and load player data</p>
             </div>
         </div>
 

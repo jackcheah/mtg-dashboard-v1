@@ -421,7 +421,7 @@ class UnifiedSwissPairing:
     to provide a robust solution that works for any valid tournament configuration.
     """
     
-    def __init__(self, teams: Dict[str, List[Dict]], tournament_teams: List[str], swiss_rounds_count: int = 4, team_scores: Dict[str, int] = None, use_traditional_swiss: bool = True, max_player_optimization_iterations: int = None):
+    def __init__(self, teams: Dict[str, List[Dict]], tournament_teams: List[str], swiss_rounds_count: int = 4, team_scores: Dict[str, int] = None, use_traditional_swiss: bool = True, max_player_optimization_iterations: int = None, is_individual_mode: bool = False):
         """
         Initialize the unified Swiss pairing system.
 
@@ -434,12 +434,14 @@ class UnifiedSwissPairing:
                                    If False, use pod consistency (repeat-avoidance-first)
             max_player_optimization_iterations: Cap for exhaustive player search.
                                                None = unlimited for groups with team repeats
+            is_individual_mode: If True, skip team constraints and use individual pairing
         """
         self.teams = teams
         self.tournament_teams = tournament_teams
         self.swiss_rounds_count = swiss_rounds_count
         self.team_scores = team_scores or {}
         self.start_time = time.time()
+        self.is_individual_mode = is_individual_mode
 
         # Configuration flags
         self.use_traditional_swiss = use_traditional_swiss
@@ -459,9 +461,7 @@ class UnifiedSwissPairing:
         self.incomplete_pod_size = self.total_players % 4
         
         # For team counts not divisible by 4, we need special handling
-        if len(self.tournament_teams) % 4 != 0:
-            # We can't have proper 4-team pods, so we'll use the best available configuration
-            # This is a limitation that should be documented
+        if not self.is_individual_mode and len(self.tournament_teams) % 4 != 0:
             print(f"[WARNING]  Note: {len(self.tournament_teams)} teams cannot form perfect 4-team pods")
             print(f"   Tournament will use mixed pod sizes for optimal pairing")
         
@@ -484,44 +484,63 @@ class UnifiedSwissPairing:
             self.team_matchups[team_name] = set()
 
         # Calculate if strict team matchup constraint is feasible
-        # For N teams over R rounds, each team faces 3 opponents per round
-        # Total matchups needed: R × 3, Available opponents: N - 1
-        # Strict constraint only if: R × 3 <= N - 1
-        self.enforce_strict_team_matchups = (self.swiss_rounds_count * 3) <= (len(self.tournament_teams) - 1)
+        if self.is_individual_mode:
+            self.enforce_strict_team_matchups = False
+        else:
+            # For N teams over R rounds, each team faces 3 opponents per round
+            # Total matchups needed: R × 3, Available opponents: N - 1
+            # Strict constraint only if: R × 3 <= N - 1
+            self.enforce_strict_team_matchups = (self.swiss_rounds_count * 3) <= (len(self.tournament_teams) - 1)
 
         print(f"[WRENCH] Unified Swiss Pairing initialized")
-        print(f"   Teams: {len(tournament_teams)} ({tournament_teams})")
-        print(f"   Players: {self.total_players}")
-        print(f"   Pods per round: {self.pods_per_round}")
-        print(f"   Incomplete pod size: {self.incomplete_pod_size}")
+        if self.is_individual_mode:
+            print(f"   Mode: INDIVIDUAL")
+            print(f"   Players: {self.total_players}")
+            print(f"   Pods per round: {self.pods_per_round}" + (f" + 1 pod of {self.incomplete_pod_size}" if self.incomplete_pod_size == 3 else ""))
+            if self.incomplete_pod_size in [1, 2]:
+                print(f"   Bye players per round: {self.incomplete_pod_size}")
+        else:
+            print(f"   Teams: {len(tournament_teams)} ({tournament_teams})")
+            print(f"   Players: {self.total_players}")
+            print(f"   Pods per round: {self.pods_per_round}")
+            print(f"   Incomplete pod size: {self.incomplete_pod_size}")
         print(f"   Swiss rounds: {swiss_rounds_count}")
 
-        if self.enforce_strict_team_matchups:
-            print(f"   [OK] Team matchup policy: STRICT (each team faces unique opponents)")
-        else:
-            print(f"   [WARNING]  Team matchup policy: RELAXED (repeat matchups allowed when necessary)")
+        if not self.is_individual_mode:
+            if self.enforce_strict_team_matchups:
+                print(f"   [OK] Team matchup policy: STRICT (each team faces unique opponents)")
+            else:
+                print(f"   [WARNING]  Team matchup policy: RELAXED (repeat matchups allowed when necessary)")
     
     def _validate_tournament_configuration(self):
         """Validate that the tournament configuration is valid."""
+        if self.is_individual_mode:
+            total_players = sum(len(self.teams[t]) for t in self.tournament_teams)
+            if total_players < 16:
+                raise ValueError(f"Individual mode requires at least 16 players, got {total_players}")
+            if self.swiss_rounds_count not in [3, 4, 5]:
+                raise ValueError(f"Swiss rounds must be 3, 4, or 5, got {self.swiss_rounds_count}")
+            return
+
         team_count = len(self.tournament_teams)
-        
+
         if team_count < 4:
             raise ValueError(f"Minimum 4 teams required, got {team_count}")
-        
+
         if team_count > 20:
             raise ValueError(f"Maximum 20 teams supported, got {team_count}")
 
         if self.swiss_rounds_count not in [3, 4, 5]:
             raise ValueError(f"Swiss rounds must be 3, 4, or 5, got {self.swiss_rounds_count}")
-        
+
         # Validate that all teams exist in the teams dictionary
         for team_name in self.tournament_teams:
             if team_name not in self.teams:
                 raise ValueError(f"Team '{team_name}' not found in teams dictionary")
-            
+
             if len(self.teams[team_name]) != 4:
                 raise ValueError(f"Team '{team_name}' must have exactly 4 players, got {len(self.teams[team_name])}")
-        
+
         # Special validation for team counts that don't divide evenly by 4
         if team_count % 4 != 0:
             print(f"[WARNING]  Warning: {team_count} teams will result in incomplete pods")
@@ -599,8 +618,12 @@ class UnifiedSwissPairing:
             print(f"   Using current team scores for pairing")
 
         try:
-            # Use pod-consistency approach for this round
-            round_solution = self._generate_round_with_pod_consistency(round_num)
+            # Route to individual mode if applicable
+            if self.is_individual_mode:
+                round_solution = self._generate_round_individual_mode(round_num)
+            else:
+                # Use pod-consistency approach for this round
+                round_solution = self._generate_round_with_pod_consistency(round_num)
 
             if round_solution is None:
                 print(f"  [ERROR] Failed to generate Round {round_num}")
@@ -630,6 +653,129 @@ class UnifiedSwissPairing:
         """
         self.team_scores = new_scores.copy()
         print(f"   Team scores updated: {self.team_scores}")
+
+    def _generate_round_individual_mode(self, round_num: int) -> Optional[List[List[Dict]]]:
+        """
+        Generate a round for individual mode using score-based Swiss pairing.
+        Players are sorted by score, grouped into pods of 4, with swap optimization
+        to avoid repeat opponents.
+
+        Returns:
+            List of pods (each pod is a list of player dicts), or None on failure.
+            Remainder players (1-2) are excluded — caller handles byes.
+        """
+        print(f"  [INDIVIDUAL] Generating round {round_num} for {len(self.players)} players")
+
+        # Sort players by score (descending), break ties with random shuffle
+        sorted_players = sorted(
+            self.players,
+            key=lambda p: (self.team_scores.get(p['Team Name'], 0), random.random()),
+            reverse=True
+        )
+
+        total = len(sorted_players)
+        remainder = total % 4
+
+        # Players who play this round (exclude bye players)
+        if remainder in [1, 2]:
+            # Bottom 1-2 ranked players get byes
+            playing_players = sorted_players[:total - remainder]
+            bye_players = sorted_players[total - remainder:]
+            print(f"  [INDIVIDUAL] {len(bye_players)} player(s) receive bye this round")
+        elif remainder == 3:
+            # Last 3 form a 3-player pod
+            playing_players = sorted_players
+            bye_players = []
+        else:
+            playing_players = sorted_players
+            bye_players = []
+
+        # Form pods of 4 (and one pod of 3 if remainder==3)
+        pods = []
+        full_pod_count = len(playing_players) // 4
+        for i in range(full_pod_count):
+            pods.append(playing_players[i*4:(i+1)*4])
+
+        if remainder == 3:
+            pods.append(playing_players[full_pod_count*4:])
+
+        # Optimize: swap players between adjacent pods to minimize repeat opponents
+        pods = self._optimize_individual_pods(pods)
+
+        # Store bye player info for caller (accessed via self.last_bye_players)
+        self.last_bye_players = [p['Player ID'] for p in bye_players]
+
+        print(f"  [INDIVIDUAL] Generated {len(pods)} pods" +
+              (f" ({len(bye_players)} byes)" if bye_players else ""))
+        return pods
+
+    def _optimize_individual_pods(self, pods: List[List[Dict]]) -> List[List[Dict]]:
+        """
+        Optimize pods for individual mode by swapping players between adjacent pods
+        to minimize repeat opponent pairings.
+        """
+        if len(pods) <= 1:
+            return pods
+
+        max_iterations = 150
+        improvements = 0
+
+        for _ in range(max_iterations):
+            improved = False
+            for i in range(len(pods)):
+                pod = pods[i]
+                repeat_count = self._count_repeat_opponents_in_pod(pod)
+                if repeat_count == 0:
+                    continue
+
+                # Try swapping with adjacent pods
+                for j in [i-1, i+1]:
+                    if j < 0 or j >= len(pods):
+                        continue
+                    if len(pods[j]) != len(pod):
+                        continue  # Don't swap between different-sized pods
+
+                    # Try each player pair swap
+                    for pi in range(len(pod)):
+                        for pj in range(len(pods[j])):
+                            # Simulate swap
+                            pods[i][pi], pods[j][pj] = pods[j][pj], pods[i][pi]
+
+                            new_repeat_i = self._count_repeat_opponents_in_pod(pods[i])
+                            new_repeat_j = self._count_repeat_opponents_in_pod(pods[j])
+                            old_repeat_j = self._count_repeat_opponents_in_pod(pods[j])
+
+                            if (new_repeat_i + new_repeat_j) < (repeat_count + old_repeat_j):
+                                improved = True
+                                improvements += 1
+                                break
+                            else:
+                                # Revert swap
+                                pods[i][pi], pods[j][pj] = pods[j][pj], pods[i][pi]
+
+                        if improved:
+                            break
+                    if improved:
+                        break
+
+            if not improved:
+                break
+
+        if improvements > 0:
+            print(f"  [INDIVIDUAL] Pod optimization: {improvements} swaps made")
+
+        return pods
+
+    def _count_repeat_opponents_in_pod(self, pod: List[Dict]) -> int:
+        """Count how many player pairs in a pod have already faced each other."""
+        count = 0
+        for i in range(len(pod)):
+            for j in range(i + 1, len(pod)):
+                pid_i = pod[i]['Player ID']
+                pid_j = pod[j]['Player ID']
+                if pid_j in self.player_opponents.get(pid_i, set()):
+                    count += 1
+        return count
 
     def _reset_constraint_tracking(self):
         """Reset constraint tracking for a new generation attempt."""

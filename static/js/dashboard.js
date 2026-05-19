@@ -312,6 +312,105 @@
             }
 
             // ============================================
+            // EVENT MODE SELECTION (Team vs Individual)
+            // ============================================
+
+            let currentEventMode = null;  // null until selected: 'team' or 'individual'
+            let selectedEventModeTemp = null;
+
+            function showEventModeModal() {
+                const overlay = document.getElementById('event-mode-overlay');
+                if (overlay) {
+                    overlay.classList.add('show');
+                    selectedEventModeTemp = null;
+                    document.querySelectorAll('#event-mode-overlay .scoring-mode-card').forEach(card => {
+                        card.classList.remove('selected');
+                    });
+                    document.getElementById('confirm-event-mode-btn').disabled = true;
+                }
+            }
+
+            function closeEventModeModal() {
+                const overlay = document.getElementById('event-mode-overlay');
+                if (overlay) {
+                    overlay.classList.remove('show');
+                }
+            }
+
+            function selectEventMode(mode) {
+                selectedEventModeTemp = mode;
+                document.querySelectorAll('#event-mode-overlay .scoring-mode-card').forEach(card => {
+                    card.classList.remove('selected');
+                });
+                const selectedCard = document.querySelector(`#event-mode-overlay .scoring-mode-card[data-mode="${mode}"]`);
+                if (selectedCard) {
+                    selectedCard.classList.add('selected');
+                }
+                document.getElementById('confirm-event-mode-btn').disabled = false;
+            }
+
+            async function confirmEventMode() {
+                if (!selectedEventModeTemp) return;
+
+                try {
+                    const response = await fetch('/set_event_mode', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ mode: selectedEventModeTemp })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        currentEventMode = selectedEventModeTemp;
+                        closeEventModeModal();
+
+                        if (currentEventMode === 'individual') {
+                            showToast('Individual Event Selected',
+                                'Solo players will compete individually. Top Cut for 17+ players.',
+                                'success', 4000);
+                            addIndividualModeIndicator();
+                        } else {
+                            showToast('Team Event Selected',
+                                'Teams of 4 players will compete together.',
+                                'success', 3000);
+                        }
+
+                        // After event mode is set, show scoring mode modal
+                        showScoringModeModal();
+                    } else {
+                        showToast('Error', data.message || 'Failed to set event mode', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error setting event mode:', error);
+                    showToast('Error', 'Failed to set event mode', 'error');
+                }
+            }
+
+            function addIndividualModeIndicator() {
+                const header = document.querySelector('.header p');
+                if (header) {
+                    // Update subtitle text
+                    header.childNodes[0].textContent = 'Knights of Round Table - CEDH Individual Championship ';
+                    if (!document.getElementById('individual-badge')) {
+                        const badge = document.createElement('span');
+                        badge.id = 'individual-badge';
+                        badge.className = 'japanese-mode-badge';
+                        badge.style.background = 'linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)';
+                        badge.style.boxShadow = '0 2px 10px rgba(139, 92, 246, 0.3)';
+                        badge.innerHTML = '<i class="fas fa-user"></i> Individual';
+                        badge.style.marginLeft = '10px';
+                        header.appendChild(badge);
+                    }
+                }
+            }
+
+            function goBackToEventMode() {
+                closeScoringModeModal();
+                setTimeout(() => showEventModeModal(), 200);
+            }
+
+            // ============================================
             // SCORING MODE SELECTION (Japanese Swiss Point Mode)
             // ============================================
 
@@ -380,12 +479,16 @@
                             showToast('Japanese Mode Selected',
                                 'Players will start with 1000 points. Winner takes 7% pool each round.',
                                 'success', 5000);
-                            // Add badge to header if not exists
                             addJapaneseModeIndicator();
                         } else {
                             showToast('Western Mode Selected',
                                 'Traditional scoring: Win=5, Draw=1, Loss=0',
                                 'success');
+                        }
+
+                        // After both event mode and scoring mode are set, proceed to load participants
+                        if (currentEventMode) {
+                            setTimeout(() => loadParticipants(), 500);
                         }
                     } else {
                         showToast('Error', data.message || 'Failed to set scoring mode', 'error');
@@ -721,12 +824,13 @@
                     roundSelect.appendChild(option);
                 }
 
-                // Add Top 8 Cut if applicable (16 teams only)
-                if (hasSemifinals) {
-                    const top8Option = document.createElement('option');
-                    top8Option.value = swissRounds + 1;
-                    top8Option.textContent = 'Top 8 Cut';
-                    roundSelect.appendChild(top8Option);
+                // Add Top Cut / Top 8 Cut if applicable
+                const hasTopCut = hasSemifinals || (currentEventMode === 'individual' && window.hasIndividualTopCut);
+                if (hasTopCut) {
+                    const topCutOption = document.createElement('option');
+                    topCutOption.value = swissRounds + 1;
+                    topCutOption.textContent = currentEventMode === 'individual' ? 'Top Cut (Top 10)' : 'Top 8 Cut';
+                    roundSelect.appendChild(topCutOption);
 
                     // Add Finals
                     const finalsOption = document.createElement('option');
@@ -734,7 +838,7 @@
                     finalsOption.textContent = 'Finals';
                     roundSelect.appendChild(finalsOption);
                 } else {
-                    // No Top 8 Cut (8 or 12 teams) - Finals directly after Swiss
+                    // Finals directly after Swiss
                     const finalsOption = document.createElement('option');
                     finalsOption.value = swissRounds + 1;
                     finalsOption.textContent = 'Finals';
@@ -752,6 +856,12 @@
 
             // Load Participants
             async function loadParticipants() {
+                // If event mode not set yet, show event mode modal first
+                if (!currentEventMode) {
+                    showEventModeModal();
+                    return;
+                }
+
                 try {
                     showToast('Loading...', 'Loading participant data', 'info');
 
@@ -767,6 +877,23 @@
                     console.log('Load data response:', data);
 
                     if (data.success && data.teams) {
+
+                        // Restore event mode and scoring mode from server state
+                        if (data.event_mode) {
+                            currentEventMode = data.event_mode;
+                            if (currentEventMode === 'individual') {
+                                addIndividualModeIndicator();
+                            }
+                        }
+                        if (data.scoring_mode) {
+                            currentScoringMode = data.scoring_mode;
+                            if (currentScoringMode === 'japanese') {
+                                addJapaneseModeIndicator();
+                            }
+                        }
+                        if (data.has_top_cut) {
+                            window.hasIndividualTopCut = true;
+                        }
 
                         // Store max rounds globally
                         if (data.max_rounds) {
@@ -902,40 +1029,62 @@
                 let displayedCount = 0;
                 let hiddenCount = 0;
 
-                // Display teams in sorted order
-                teamsArray.forEach(({ teamName, players, teamScore }) => {
-                    displayedCount++;
-                    const card = document.createElement('div');
-                    card.className = 'team-card';
-
-                    card.innerHTML = `
-                    <div class="team-header">
-                        <div class="team-name">${teamName}</div>
-                        <div class="team-score">${teamScore} pts</div>
-                    </div>
-                    <div class="player-list">
-                        ${players.map(player => {
+                // Display teams/players in sorted order
+                if (currentEventMode === 'individual') {
+                    // Individual mode: flat ranked list of players
+                    teamsArray.forEach(({ teamName, players, teamScore }, index) => {
+                        displayedCount++;
+                        const player = players[0];
                         const playerId = player['Player ID'] || player.id;
-                        // Try both integer and string keys for player scores
                         let playerScore = 0;
                         if (playerScores) {
                             playerScore = playerScores[playerId] || playerScores[String(playerId)] || 0;
-                        } else {
-                            playerScore = player.score || 0;
                         }
-                        return `
-                                <div class="player-item">
-                                    <div class="player-id">${playerId}</div>
-                                    <div class="player-name">${player['Player Name'] || player.name}</div>
-                                    <div class="player-score">${playerScore} pts</div>
-                                </div>
-                            `;
-                    }).join('')}
-                    </div>
-                `;
+                        const card = document.createElement('div');
+                        card.className = 'team-card';
+                        card.innerHTML = `
+                        <div class="team-header">
+                            <div class="team-name">#${index + 1} ${player['Player Name'] || player.name}</div>
+                            <div class="team-score">${formatScore(playerScore)}</div>
+                        </div>
+                        `;
+                        teamsGrid.appendChild(card);
+                    });
+                } else {
+                    // Team mode: original team cards with nested players
+                    teamsArray.forEach(({ teamName, players, teamScore }) => {
+                        displayedCount++;
+                        const card = document.createElement('div');
+                        card.className = 'team-card';
 
-                    teamsGrid.appendChild(card);
-                });
+                        card.innerHTML = `
+                        <div class="team-header">
+                            <div class="team-name">${teamName}</div>
+                            <div class="team-score">${teamScore} pts</div>
+                        </div>
+                        <div class="player-list">
+                            ${players.map(player => {
+                            const playerId = player['Player ID'] || player.id;
+                            let playerScore = 0;
+                            if (playerScores) {
+                                playerScore = playerScores[playerId] || playerScores[String(playerId)] || 0;
+                            } else {
+                                playerScore = player.score || 0;
+                            }
+                            return `
+                                    <div class="player-item">
+                                        <div class="player-id">${playerId}</div>
+                                        <div class="player-name">${player['Player Name'] || player.name}</div>
+                                        <div class="player-score">${playerScore} pts</div>
+                                    </div>
+                                `;
+                        }).join('')}
+                        </div>
+                    `;
+
+                        teamsGrid.appendChild(card);
+                    });
+                }
 
                 // Force 1 column FINALLY after all cards are added
                 if (isLandscape) {
@@ -1957,7 +2106,7 @@
                                             <div class="table-player-name">
                                                 ${player['Player Name'] || player.name || 'Unknown'}
                                             </div>
-                                            <div class="table-player-team">
+                                            <div class="table-player-team" ${currentEventMode === 'individual' ? 'style="display:none"' : ''}>
                                                 ${player['Team Name'] || player.team || 'Unknown Team'}
                                             </div>
                                         </div>
@@ -2017,7 +2166,53 @@
                 }
 
                 tablesContainer.style.display = 'block';
+
+                // Display bye players for individual mode
+                if (currentEventMode === 'individual') {
+                    displayByePlayers(round, tablesGrid);
+                }
+
                 console.log(`displayTables complete: ${Object.keys(tables).length} tables rendered`);
+            }
+
+            function displayByePlayers(round, container) {
+                fetch('/get_tournament_state')
+                    .then(res => res.json())
+                    .then(data => {
+                        const byePlayers = data.bye_players || {};
+                        const roundByes = byePlayers[round] || byePlayers[String(round)] || [];
+                        if (roundByes.length === 0) return;
+
+                        const byeCard = document.createElement('div');
+                        byeCard.className = 'table-card';
+                        byeCard.style.borderColor = 'var(--color-success)';
+                        byeCard.style.opacity = '0.85';
+
+                        const playerNames = roundByes.map(pid => {
+                            const pScore = data.player_scores[pid] || data.player_scores[String(pid)] || 0;
+                            // Find player name from teams
+                            for (const [name, players] of Object.entries(data.teams)) {
+                                if (players[0] && (players[0]['Player ID'] === pid || players[0]['Player ID'] === String(pid))) {
+                                    return `<div class="table-player" style="padding: 8px 12px; display: flex; align-items: center; gap: 8px;">
+                                        <i class="fas fa-forward" style="color: var(--color-success);"></i>
+                                        <span>${name}</span>
+                                        <span class="bye-badge" style="margin-left: auto; background: var(--color-success); color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: 700;">BYE +5</span>
+                                    </div>`;
+                                }
+                            }
+                            return '';
+                        }).join('');
+
+                        byeCard.innerHTML = `
+                            <div class="table-header" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.1));">
+                                <div class="table-name"><i class="fas fa-forward"></i> Bye This Round</div>
+                                <span class="submitted-badge" style="background: var(--color-success);">Auto-Win</span>
+                            </div>
+                            <div class="table-players">${playerNames}</div>
+                        `;
+                        container.appendChild(byeCard);
+                    })
+                    .catch(err => console.error('Error fetching bye players:', err));
             }
 
             // Update Stats
@@ -2025,8 +2220,17 @@
                 const statsProgressContainer = document.getElementById('stats-progress-container');
 
                 if (data.teams) {
-                    document.getElementById('stat-teams').textContent = Object.keys(data.teams).length;
+                    const teamCount = Object.keys(data.teams).length;
                     const totalPlayers = Object.values(data.teams).reduce((sum, players) => sum + players.length, 0);
+
+                    if (currentEventMode === 'individual') {
+                        document.getElementById('stat-teams').textContent = totalPlayers;
+                        // Update label if possible
+                        const teamsLabel = document.querySelector('[data-stat="teams-label"]');
+                        if (teamsLabel) teamsLabel.textContent = 'Players';
+                    } else {
+                        document.getElementById('stat-teams').textContent = teamCount;
+                    }
                     document.getElementById('stat-players').textContent = totalPlayers;
                 }
 

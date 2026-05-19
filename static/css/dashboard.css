@@ -3122,6 +3122,54 @@
             min-width: 150px;
         }
 
+        /* Setup Wizard Step Indicator */
+        .setup-step-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .step-badge {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--text-sm);
+            font-weight: 700;
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.4);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .step-badge.active {
+            background: var(--color-primary);
+            color: white;
+            border-color: var(--color-primary-light);
+            box-shadow: 0 0 12px rgba(139, 92, 246, 0.4);
+        }
+
+        .step-badge.completed {
+            background: var(--color-success);
+            color: white;
+            border-color: var(--color-success);
+        }
+
+        .step-line {
+            width: 40px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.2);
+            margin: 0 var(--spacing-sm);
+        }
+
+        .step-line.completed {
+            background: var(--color-success);
+        }
+
         /* Japanese Mode Badge */
         .japanese-mode-badge {
             display: inline-flex;
