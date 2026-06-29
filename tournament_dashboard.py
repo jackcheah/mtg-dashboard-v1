@@ -2984,6 +2984,11 @@ def _build_finalization_response(round_num, next_round_generated, semifinals_dat
 
 @app.route('/submit_player_results', methods=['POST'])
 @with_lock
+@require_state(
+    TournamentState.SWISS_IN_PROGRESS,
+    TournamentState.TOP8_IN_PROGRESS,
+    TournamentState.FINALS_IN_PROGRESS
+)
 def submit_player_results():
     """Finalize round (without adding points again - they're already added via table submissions)"""
     try:
@@ -3232,7 +3237,12 @@ def submit_table_results():
             
             # Calculate Japanese scoring
             score_changes = tournament.calculate_japanese_table_scores(table_players, winner_id)
-            
+
+            # Store Japanese deltas for accurate revert/edit
+            if 'japanese_deltas' not in tournament.round_results[round_num]:
+                tournament.round_results[round_num]['japanese_deltas'] = {}
+            tournament.round_results[round_num]['japanese_deltas'][table_name] = score_changes
+
             # Apply score changes
             for player_id, change in score_changes.items():
                 if player_id in tournament.player_scores:
@@ -3385,10 +3395,23 @@ def revert_table_submission():
 
         old_results = tournament.round_results[round_num].get('table_submissions', {}).get(table_name, [])
 
-        for result in old_results:
-            player_id = result['player_id']
-            if player_id in tournament.player_scores:
-                tournament.player_scores[player_id] -= result['points']
+        if tournament.scoring_mode == ScoringMode.JAPANESE:
+            japanese_deltas = tournament.round_results[round_num].get('japanese_deltas', {}).get(table_name, {})
+            if japanese_deltas:
+                for player_id, delta in japanese_deltas.items():
+                    if player_id in tournament.player_scores:
+                        tournament.player_scores[player_id] -= delta
+                del tournament.round_results[round_num]['japanese_deltas'][table_name]
+            else:
+                for result in old_results:
+                    player_id = result['player_id']
+                    if player_id in tournament.player_scores:
+                        tournament.player_scores[player_id] -= result['points']
+        else:
+            for result in old_results:
+                player_id = result['player_id']
+                if player_id in tournament.player_scores:
+                    tournament.player_scores[player_id] -= result['points']
 
         tournament.calculate_team_scores()
         tournament._cached_final_standings = None
@@ -3514,12 +3537,12 @@ def edit_table_results():
                 'suggestion': 'Results must be an array of player scores.'
             }), 400
 
-        if len(new_results) != 4:
+        if len(new_results) not in (3, 4):
             return jsonify({
                 'success': False,
-                'error': f'Expected 4 player results, got {len(new_results)}',
-                'user_message': 'Each table must have exactly 4 player scores.',
-                'suggestion': 'Please provide scores for all 4 players at the table.'
+                'error': f'Expected 3 or 4 player results, got {len(new_results)}',
+                'user_message': 'Each table must have 3 or 4 player scores.',
+                'suggestion': 'Please provide scores for all players at the table.'
             }), 400
 
         # 7. Validate each player result
@@ -3574,6 +3597,33 @@ def edit_table_results():
                     'suggestion': 'Use W=5, D=1, L=0 for scoring.'
                 }), 400
 
+        # 8. Validate score combination based on pod size
+        pod_size = len(new_results)
+        win_count = sum(1 for r in new_results if r['points'] == 5)
+        draw_count = sum(1 for r in new_results if r['points'] == 1)
+        loss_count = sum(1 for r in new_results if r['points'] == 0)
+
+        if win_count > 1:
+            return jsonify({'success': False, 'error': f'Invalid scores: {win_count} winners. Only 1 winner allowed.', 'user_message': 'Only one player can win per table.'}), 400
+        if win_count == 1 and draw_count > 0:
+            return jsonify({'success': False, 'error': 'A win means all others must be losses, not draws.', 'user_message': 'If there is a winner, all others must be losses.'}), 400
+
+        if pod_size == 3:
+            valid_3p = (
+                (win_count == 1 and loss_count == 2 and draw_count == 0) or
+                (win_count == 0 and draw_count == 3 and loss_count == 0) or
+                (win_count == 0 and draw_count == 2 and loss_count == 1)
+            )
+            if not valid_3p:
+                return jsonify({'success': False, 'error': 'Invalid 3-player pod scores. Valid: (1W+2L), (3D), or (2D+1L).', 'user_message': 'Invalid score combination for 3-player pod.'}), 400
+        elif pod_size == 4:
+            if win_count == 1:
+                if loss_count != 3 or draw_count != 0:
+                    return jsonify({'success': False, 'error': 'With a winner, all 3 others must be losses.', 'user_message': 'If there is a winner, all others must be losses.'}), 400
+            elif win_count == 0:
+                if draw_count < 2:
+                    return jsonify({'success': False, 'error': 'If no winner, at least 2 players must draw.', 'user_message': 'Without a winner, at least 2 draws are required.'}), 400
+
         # ========================================
         # PROCESSING BLOCK
         # ========================================
@@ -3604,20 +3654,45 @@ def edit_table_results():
             tournament.round_results[round_num]['score_history'][table_name].append(edit_entry)
 
             # Subtract old scores from player totals
-            for result in old_results:
-                player_id = result['player_id']
-                points = result['points']
-                if player_id in tournament.player_scores:
-                    tournament.player_scores[player_id] -= points
-                    print(f"  [EDIT] Subtracting old score: Player {player_id} -= {points}")
+            if tournament.scoring_mode == ScoringMode.JAPANESE:
+                japanese_deltas = tournament.round_results[round_num].get('japanese_deltas', {}).get(table_name, {})
+                if japanese_deltas:
+                    for player_id, delta in japanese_deltas.items():
+                        if player_id in tournament.player_scores:
+                            tournament.player_scores[player_id] -= delta
+                            print(f"  [EDIT-JAPANESE] Reversing old delta: Player {player_id} -= {delta}")
+                else:
+                    for result in old_results:
+                        player_id = result['player_id']
+                        if player_id in tournament.player_scores:
+                            tournament.player_scores[player_id] -= result['points']
+            else:
+                for result in old_results:
+                    player_id = result['player_id']
+                    points = result['points']
+                    if player_id in tournament.player_scores:
+                        tournament.player_scores[player_id] -= points
+                        print(f"  [EDIT] Subtracting old score: Player {player_id} -= {points}")
 
             # Add new scores to player totals
-            for result in new_results:
-                player_id = result['player_id']
-                points = result['points']
-                if player_id in tournament.player_scores:
-                    tournament.player_scores[player_id] += points
-                    print(f"  [EDIT] Adding new score: Player {player_id} += {points}")
+            if tournament.scoring_mode == ScoringMode.JAPANESE:
+                table_players = tournament.tables[round_num][table_name]
+                winner_id = tournament.get_table_winner_id(new_results)
+                new_deltas = tournament.calculate_japanese_table_scores(table_players, winner_id)
+                for player_id, delta in new_deltas.items():
+                    if player_id in tournament.player_scores:
+                        tournament.player_scores[player_id] += delta
+                        print(f"  [EDIT-JAPANESE] Applying new delta: Player {player_id} += {delta}")
+                if 'japanese_deltas' not in tournament.round_results[round_num]:
+                    tournament.round_results[round_num]['japanese_deltas'] = {}
+                tournament.round_results[round_num]['japanese_deltas'][table_name] = new_deltas
+            else:
+                for result in new_results:
+                    player_id = result['player_id']
+                    points = result['points']
+                    if player_id in tournament.player_scores:
+                        tournament.player_scores[player_id] += points
+                        print(f"  [EDIT] Adding new score: Player {player_id} += {points}")
 
             # Reverse old phase-specific scores before applying new ones
             top8_cut_round = tournament.swiss_rounds_count + 1 if tournament.has_semifinals else None
@@ -4486,18 +4561,24 @@ def validate_integrity():
         issues.append('Player scores not initialized')
     checks_performed.append('Player scores initialized')
 
-    # Check 4: Team count validation
-    team_count = len(tournament.teams)
-    if team_count not in [8, 12, 16]:
-        issues.append(f'Invalid team count: {team_count} (must be 8, 12, or 16)')
-    checks_performed.append('Team count validation')
+    # Check 4: Team/player count validation
+    if tournament.event_mode == EventMode.INDIVIDUAL:
+        player_count = len(tournament.participants)
+        if player_count < 4:
+            issues.append(f'Too few players: {player_count} (minimum 4)')
+        checks_performed.append('Player count validation (individual mode)')
+    else:
+        team_count = len(tournament.teams)
+        if team_count not in [8, 12, 16]:
+            issues.append(f'Invalid team count: {team_count} (must be 8, 12, or 16)')
+        checks_performed.append('Team count validation')
 
-    # Check 5: Player count validation
-    expected_players = team_count * 4
-    actual_players = len(tournament.participants)
-    if actual_players != expected_players:
-        issues.append(f'Player count mismatch: {actual_players} (expected {expected_players})')
-    checks_performed.append('Player count validation')
+        # Check 5: Player count validation
+        expected_players = team_count * 4
+        actual_players = len(tournament.participants)
+        if actual_players != expected_players:
+            issues.append(f'Player count mismatch: {actual_players} (expected {expected_players})')
+        checks_performed.append('Player count validation')
 
     # Check 6: Tables generated
     if tournament.tables:
@@ -4519,6 +4600,7 @@ def validate_integrity():
     })
 
 @app.route('/save_backup', methods=['POST'])
+@with_lock
 def save_backup_endpoint():
     """Manually trigger backup save"""
     try:
@@ -4585,6 +4667,12 @@ def reset_tournament():
         tournament.timer_start_time = None
         tournament.timer_paused_at = 0
         tournament._cached_final_standings = None
+        tournament.event_mode = EventMode.TEAM
+        tournament.scoring_mode = ScoringMode.WESTERN
+        tournament.bye_players = {}
+        tournament.dropped_players = {}
+        tournament.has_top_cut = False
+        tournament.top_cut_data = None
 
         # Delete backup file on reset
         if os.path.exists(tournament.backup_file):

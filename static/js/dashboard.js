@@ -2,6 +2,11 @@
             // UI ENHANCEMENTS & UTILITIES
             // ==========================================
 
+            function escapeHtml(str) {
+                if (!str) return '';
+                return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+            }
+
             class ModalManager {
                 constructor() {
                     this.overlay = null;
@@ -62,11 +67,11 @@
                 async confirm(title, message, confirmText = 'Confirm', cancelText = 'Cancel') {
                     const html = `
                     <div class="custom-modal">
-                        <div class="custom-modal-header">${title}</div>
-                        <div class="custom-modal-body">${message.replace(/\n/g, '<br>')}</div>
+                        <div class="custom-modal-header">${escapeHtml(title)}</div>
+                        <div class="custom-modal-body">${escapeHtml(message).replace(/\n/g, '<br>')}</div>
                         <div class="custom-modal-actions">
-                            <button class="btn btn-secondary js-modal-cancel">${cancelText}</button>
-                            <button class="btn btn-primary js-modal-confirm">${confirmText}</button>
+                            <button class="btn btn-secondary js-modal-cancel">${escapeHtml(cancelText)}</button>
+                            <button class="btn btn-primary js-modal-confirm">${escapeHtml(confirmText)}</button>
                         </div>
                     </div>
                 `;
@@ -76,10 +81,10 @@
                 async prompt(title, message, defaultValue = '', placeholder = '') {
                     const html = `
                     <div class="custom-modal">
-                        <div class="custom-modal-header">${title}</div>
+                        <div class="custom-modal-header">${escapeHtml(title)}</div>
                         <div class="custom-modal-body">
-                            ${message}
-                            <input type="text" class="custom-modal-input" value="${defaultValue}" placeholder="${placeholder}">
+                            ${escapeHtml(message)}
+                            <input type="text" class="custom-modal-input" value="${escapeHtml(defaultValue)}" placeholder="${escapeHtml(placeholder)}">
                         </div>
                         <div class="custom-modal-actions">
                             <button class="btn btn-secondary js-modal-cancel">Cancel</button>
@@ -450,10 +455,10 @@
                 selectedScoringModeTemp = mode;
 
                 // Update UI to show selection
-                document.querySelectorAll('.scoring-mode-card').forEach(card => {
+                document.querySelectorAll('#scoring-mode-overlay .scoring-mode-card').forEach(card => {
                     card.classList.remove('selected');
                 });
-                const selectedCard = document.querySelector(`.scoring-mode-card[data-mode="${mode}"]`);
+                const selectedCard = document.querySelector(`#scoring-mode-overlay .scoring-mode-card[data-mode="${mode}"]`);
                 if (selectedCard) {
                     selectedCard.classList.add('selected');
                 }
@@ -637,6 +642,13 @@
 
             syncTimerFromServer();
 
+            function stopTimerPolling() {
+                if (timerIntervalId) {
+                    clearInterval(timerIntervalId);
+                    timerIntervalId = null;
+                }
+            }
+
             // Clean up on page unload
             window.addEventListener('beforeunload', () => {
                 stopTimerPolling();
@@ -645,7 +657,7 @@
             function updateTimerDisplay() {
                 const hrs = Math.floor(seconds / 3600);
                 const mins = Math.floor((seconds % 3600) / 60);
-                const secs = seconds % 60;
+                const secs = Math.floor(seconds % 60);
 
                 const display = [hrs, mins, secs]
                     .map(num => String(num).padStart(2, '0'))
@@ -698,8 +710,8 @@
                 toast.innerHTML = `
                 <i class="toast-icon ${iconClass}" style="color: ${colorClass}"></i>
                 <div class="toast-content">
-                    <div class="toast-title">${title}</div>
-                    <div class="toast-message">${message}</div>
+                    <div class="toast-title">${escapeHtml(title)}</div>
+                    <div class="toast-message">${escapeHtml(message)}</div>
                 </div>
             `;
 
@@ -1003,6 +1015,7 @@
                     if (finalsTeams) {
                         const teamNameTrimmed = teamName.trim();
                         if (!finalsTeams.has(teamNameTrimmed)) {
+                            hiddenCount++;
                             return;
                         }
                     }
@@ -1058,7 +1071,7 @@
                         card.className = 'team-card';
                         card.innerHTML = `
                         <div class="team-header">
-                            <div class="team-name">#${index + 1} ${player['Player Name'] || player.name}</div>
+                            <div class="team-name">#${index + 1} ${escapeHtml(player['Player Name'] || player.name)}</div>
                             <div class="team-score">${formatScore(playerScore)}</div>
                         </div>
                         `;
@@ -1073,7 +1086,7 @@
 
                         card.innerHTML = `
                         <div class="team-header">
-                            <div class="team-name">${teamName}</div>
+                            <div class="team-name">${escapeHtml(teamName)}</div>
                             <div class="team-score">${teamScore} pts</div>
                         </div>
                         <div class="player-list">
@@ -1088,7 +1101,7 @@
                             return `
                                     <div class="player-item">
                                         <div class="player-id">${playerId}</div>
-                                        <div class="player-name">${player['Player Name'] || player.name}</div>
+                                        <div class="player-name">${escapeHtml(player['Player Name'] || player.name)}</div>
                                         <div class="player-score">${playerScore} pts</div>
                                     </div>
                                 `;
@@ -2104,6 +2117,7 @@
                 // Responsive grid — let CSS handle column count based on viewport
                 const tableCount = Object.keys(tables).length;
                 const width = window.innerWidth;
+                const isLandscape = width >= 1024;
                 let cols = Math.min(tableCount, width >= 1400 ? 4 : width >= 1024 ? 3 : width >= 768 ? 2 : 1);
                 tablesGrid.style.display = 'grid';
                 tablesGrid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
@@ -2133,7 +2147,7 @@
                         ${tableName}
                     </div>
                     <div class="table-score-legend">
-                        <i class="fas fa-star"></i> Win=5pts | Draw=1pt | Loss=0pts
+                        <i class="fas fa-star"></i> ${currentScoringMode === 'japanese' ? '7% Pool | Winner takes all | Losers contribute' : 'Win=5pts | Draw=1pt | Loss=0pts'}
                     </div>
                     <div class="table-players">
                         ${players.map(player => {
@@ -2149,10 +2163,10 @@
                                         <i class="fas fa-user"></i>
                                         <div class="table-player-details">
                                             <div class="table-player-name">
-                                                ${player['Player Name'] || player.name || 'Unknown'}
+                                                ${escapeHtml(player['Player Name'] || player.name || 'Unknown')}
                                             </div>
                                             <div class="table-player-team" ${currentEventMode === 'individual' ? 'style="display:none"' : ''}>
-                                                ${player['Team Name'] || player.team || 'Unknown Team'}
+                                                ${escapeHtml(player['Team Name'] || player.team || 'Unknown Team')}
                                             </div>
                                         </div>
                                     </div>
@@ -2330,10 +2344,10 @@
                     // Build modal content
                     const playerListHtml = players.map(p => `
                         <div style="display: flex; align-items: center; padding: 8px 12px; border-bottom: 1px solid rgba(255,255,255,0.05);">
-                            <span style="flex: 1; font-weight: 500;">${p.name}</span>
+                            <span style="flex: 1; font-weight: 500;">${escapeHtml(p.name)}</span>
                             <span style="margin-right: 16px; opacity: 0.7;">${formatScore(p.score)}</span>
                             <button class="btn btn-danger" style="padding: 4px 12px; font-size: 0.75rem;"
-                                onclick="confirmDropPlayer(${p.id}, '${p.name.replace(/'/g, "\\'")}')">
+                                onclick="confirmDropPlayer(${p.id}, '${escapeHtml(p.name).replace(/'/g, "\\'")}')">
                                 <i class="fas fa-times"></i> Drop
                             </button>
                         </div>
@@ -2455,7 +2469,7 @@
                         }
                     }
 
-                    const response = await fetch('/load_data');
+                    const response = await fetch('/get_tournament_state');
                     const data = await response.json();
 
                     if (data.success && data.teams) {
