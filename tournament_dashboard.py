@@ -102,6 +102,9 @@ class TournamentManager:
         self.timer_duration = 3000 # Default 50 mins
         self.backup_file = 'tournament_state.json.bak'
 
+        # State version counter (incremented on every mutation for ETag support)
+        self._state_version = 0
+
         # Backup health tracking
         self.last_backup_success = None
         self.last_backup_failure = None
@@ -119,6 +122,10 @@ class TournamentManager:
         self.top_cut_data = None  # Individual mode: top cut round data
         self.dropped_players = {}  # {player_id: {'name': str, 'score': int, 'dropped_after_round': int}}
 
+    def bump_version(self):
+        """Increment state version counter for ETag/change detection."""
+        self._state_version += 1
+
     def transition_to(self, new_state: TournamentState, reason: str = ""):
         """Transition to a new state with logging (Phase 3.4)."""
         old_state = self.state
@@ -130,6 +137,7 @@ class TournamentManager:
             'timestamp': datetime.now().isoformat()
         }
         self.state_history.append(transition)
+        self.bump_version()
         print(f"[STATE] {old_state.value} → {new_state.value} ({reason})")
 
 
@@ -3282,12 +3290,15 @@ def submit_table_results():
 
         # Mark table as submitted (prevent double-submission)
         tournament.round_results[round_num]['submitted_tables'].add(table_name)
+        tournament.bump_version()
         print(f"[OK] Table {table_name} marked as submitted for round {round_num}")
 
         # State transition logic (Phase 3.4)
         total_tables = len(tournament.tables.get(round_num, {}))
         submitted_count = len(tournament.round_results[round_num]['submitted_tables'])
         all_tables_submitted = (submitted_count == total_tables)
+        remaining_tables = [t for t in tournament.tables.get(round_num, {}).keys()
+                           if t not in tournament.round_results[round_num]['submitted_tables']]
 
         # Transition from TOURNAMENT_SETUP to SWISS_IN_PROGRESS on first table submission
         if tournament.state == TournamentState.TOURNAMENT_SETUP and round_num == 1:
@@ -3300,13 +3311,24 @@ def submit_table_results():
         # happen in submit_player_results (round finalization), not here.
         # Transitioning here would block score editing before finalization.
 
+        can_finalize = all_tables_submitted and round_num not in tournament.finalized_rounds
+
         return jsonify({
             'success': True,
             'message': f'Results submitted for {table_name}',
             'table': table_name,
             'round': round_num,
             'scores': tournament.scores,
-            'player_scores': tournament.player_scores
+            'player_scores': tournament.player_scores,
+            'submission_status': {
+                'submitted_count': submitted_count,
+                'total_tables': total_tables,
+                'is_complete': all_tables_submitted,
+                'remaining_tables': remaining_tables,
+                'progress_percent': round((submitted_count / total_tables * 100) if total_tables > 0 else 0, 1)
+            },
+            'can_finalize': can_finalize,
+            'version': tournament._state_version
         })
 
     except Exception as e:
@@ -3797,6 +3819,11 @@ def get_score_history(round_num, table_name):
 @app.route('/get_tournament_state')
 def get_tournament_state():
     """Get current tournament state with intelligent seating"""
+    # ETag support: return 304 if client has current version
+    client_version = request.headers.get('If-None-Match')
+    if client_version and client_version == str(tournament._state_version):
+        return '', 304
+
     # Apply intelligent seating to all rounds
     seated_tables = {}
     for round_num in tournament.tables.keys():
@@ -3861,7 +3888,27 @@ def get_tournament_state():
     if final_standings:
         response_data['final_standings'] = final_standings
 
-    return jsonify(response_data)
+    # Add flow guidance
+    current_round = tournament.current_round
+    current_submission = submission_status.get(current_round, {})
+    is_complete = current_submission.get('is_complete', False)
+    can_finalize = is_complete and current_round not in tournament.finalized_rounds
+    remaining = [t for t in tournament.tables.get(current_round, {}).keys()
+                 if t not in tournament.round_results.get(current_round, {}).get('submitted_tables', set())]
+
+    response_data['can_finalize'] = can_finalize
+    response_data['remaining_tables'] = remaining
+    response_data['can_drop_players'] = (
+        tournament.event_mode == EventMode.INDIVIDUAL and
+        is_complete and
+        current_round not in tournament.finalized_rounds and
+        tournament.state == TournamentState.SWISS_IN_PROGRESS
+    )
+    response_data['version'] = tournament._state_version
+
+    resp = jsonify(response_data)
+    resp.headers['ETag'] = str(tournament._state_version)
+    return resp
 
 @app.route('/get_tables/<int:round_num>')
 def get_tables(round_num):
@@ -4698,42 +4745,327 @@ def reset_tournament():
 @app.route('/get_timer')
 @with_lock
 def get_timer():
-    """Get current timer state"""
+    """Get current timer state with remaining time"""
     elapsed = tournament.timer_paused_at
     if tournament.timer_running and tournament.timer_start_time:
         elapsed += (datetime.now() - tournament.timer_start_time).total_seconds()
 
+    elapsed_int = int(elapsed)
+    remaining = max(0, tournament.timer_duration - elapsed_int)
+    expired = elapsed_int >= tournament.timer_duration
+
     return jsonify({
         'running': tournament.timer_running,
-        'elapsed': int(elapsed),
-        'duration': tournament.timer_duration
+        'elapsed': elapsed_int,
+        'duration': tournament.timer_duration,
+        'remaining': remaining,
+        'expired': expired
     })
 
 @app.route('/control_timer', methods=['POST'])
 @with_lock
 def control_timer():
-    """Control the tournament timer"""
-    action = request.json.get('action')
-    
+    """Control the tournament timer with optional duration configuration"""
+    data = request.json or {}
+    action = data.get('action')
+
+    # Allow setting duration with any action or standalone
+    if 'duration' in data:
+        new_duration = int(data['duration'])
+        if 60 <= new_duration <= 7200:
+            tournament.timer_duration = new_duration
+
     if action == 'start':
         if not tournament.timer_running:
             tournament.timer_start_time = datetime.now()
             tournament.timer_running = True
-            
+
     elif action == 'stop':
         if tournament.timer_running:
-            # Add elapsed time to paused_at
             elapsed_since_start = (datetime.now() - tournament.timer_start_time).total_seconds()
             tournament.timer_paused_at += elapsed_since_start
             tournament.timer_running = False
             tournament.timer_start_time = None
-            
+
     elif action == 'reset':
         tournament.timer_running = False
         tournament.timer_start_time = None
         tournament.timer_paused_at = 0
-        
-    return jsonify({'success': True})
+
+    tournament.bump_version()
+
+    # Return full timer state
+    elapsed = tournament.timer_paused_at
+    if tournament.timer_running and tournament.timer_start_time:
+        elapsed += (datetime.now() - tournament.timer_start_time).total_seconds()
+    elapsed_int = int(elapsed)
+
+    return jsonify({
+        'success': True,
+        'running': tournament.timer_running,
+        'elapsed': elapsed_int,
+        'duration': tournament.timer_duration,
+        'remaining': max(0, tournament.timer_duration - elapsed_int),
+        'expired': elapsed_int >= tournament.timer_duration
+    })
+
+# ==========================================
+# UX IMPROVEMENT ENDPOINTS
+# ==========================================
+
+@app.route('/unfinalize_round', methods=['POST'])
+@with_lock
+@require_state(
+    TournamentState.SWISS_IN_PROGRESS,
+    TournamentState.TOP8_IN_PROGRESS,
+    TournamentState.FINALS_IN_PROGRESS
+)
+def unfinalize_round():
+    """Undo the most recently finalized round (only if no subsequent scores exist)."""
+    try:
+        if not tournament.finalized_rounds:
+            return jsonify({'success': False, 'error': 'No rounds have been finalized.', 'user_message': 'Nothing to undo.'}), 400
+
+        last_finalized = max(tournament.finalized_rounds)
+
+        # Safety: reject if subsequent round already has submissions
+        next_round = last_finalized + 1
+        if next_round in tournament.round_results:
+            next_submissions = tournament.round_results[next_round].get('submitted_tables', set())
+            if next_submissions:
+                return jsonify({
+                    'success': False,
+                    'error': f'Round {next_round} already has submissions. Cannot unfinalize round {last_finalized}.',
+                    'user_message': f'Round {next_round} already has scores submitted. Restore from backup to go further back.'
+                }), 400
+
+        tournament.finalized_rounds.discard(last_finalized)
+        tournament.current_round = last_finalized
+        tournament.bump_version()
+
+        return jsonify({
+            'success': True,
+            'message': f'Round {last_finalized} unfinalized. You can now edit scores and re-finalize.',
+            'current_round': last_finalized
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/undrop_player', methods=['POST'])
+@with_lock
+def undrop_player():
+    """Re-add a previously dropped player back into the tournament."""
+    try:
+        if tournament.event_mode != EventMode.INDIVIDUAL:
+            return jsonify({'success': False, 'error': 'Undrop is only available in individual mode.'}), 400
+
+        data = request.json or {}
+        player_id = data.get('player_id')
+        if player_id is None:
+            return jsonify({'success': False, 'error': 'player_id is required.'}), 400
+
+        player_id = int(player_id)
+        if player_id not in tournament.dropped_players:
+            return jsonify({'success': False, 'error': f'Player {player_id} is not in the dropped list.'}), 400
+
+        drop_info = tournament.dropped_players[player_id]
+        player_name = drop_info['name']
+        frozen_score = drop_info['score']
+
+        # Reconstruct the synthetic team entry
+        team_name = player_name
+        player_entry = {'Player Name': player_name, 'Player ID': player_id, 'Team Name': team_name}
+
+        tournament.participants.append(player_entry)
+        tournament.teams[team_name] = [player_entry]
+        if team_name not in tournament.tournament_teams:
+            tournament.tournament_teams.append(team_name)
+        tournament.player_scores[player_id] = frozen_score
+        tournament.scores[team_name] = frozen_score
+
+        del tournament.dropped_players[player_id]
+        tournament.bump_version()
+
+        return jsonify({
+            'success': True,
+            'message': f'{player_name} has been re-added with their frozen score of {frozen_score}.',
+            'player_id': player_id,
+            'active_player_count': len(tournament.participants)
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/find_player/<int:player_id>')
+def find_player(player_id):
+    """Look up which table a player is assigned to in the current round."""
+    current_round = tournament.current_round
+    tables = tournament.tables.get(current_round, {})
+
+    for table_name, players in tables.items():
+        for idx, player in enumerate(players):
+            if player.get('Player ID') == player_id:
+                score = tournament.player_scores.get(player_id, 0)
+                opponents = [{'name': p.get('Player Name', 'Unknown'), 'id': p.get('Player ID')}
+                             for p in players if p.get('Player ID') != player_id]
+                submitted = table_name in tournament.round_results.get(current_round, {}).get('submitted_tables', set())
+                return jsonify({
+                    'success': True,
+                    'player_id': player_id,
+                    'player_name': player.get('Player Name', 'Unknown'),
+                    'team_name': player.get('Team Name', ''),
+                    'table': table_name,
+                    'seat': idx + 1,
+                    'round': current_round,
+                    'score': score,
+                    'opponents': opponents,
+                    'table_submitted': submitted
+                })
+
+    # Check if player is on bye
+    bye_list = tournament.bye_players.get(current_round, [])
+    if player_id in bye_list:
+        score = tournament.player_scores.get(player_id, 0)
+        name = next((p.get('Player Name') for p in tournament.participants if p.get('Player ID') == player_id), 'Unknown')
+        return jsonify({
+            'success': True,
+            'player_id': player_id,
+            'player_name': name,
+            'table': None,
+            'round': current_round,
+            'score': score,
+            'on_bye': True
+        })
+
+    # Check dropped
+    if player_id in tournament.dropped_players:
+        info = tournament.dropped_players[player_id]
+        return jsonify({
+            'success': True,
+            'player_id': player_id,
+            'player_name': info['name'],
+            'table': None,
+            'round': current_round,
+            'score': info['score'],
+            'dropped': True,
+            'dropped_after_round': info.get('dropped_after_round')
+        })
+
+    return jsonify({'success': False, 'error': f'Player {player_id} not found in current round.'}), 404
+
+
+@app.route('/search_player')
+def search_player():
+    """Search for a player by name (partial match)."""
+    query = request.args.get('q', '').strip().lower()
+    if not query or len(query) < 2:
+        return jsonify({'success': False, 'error': 'Query must be at least 2 characters.'}), 400
+
+    results = []
+    for p in tournament.participants:
+        name = p.get('Player Name', '')
+        if query in name.lower():
+            pid = p.get('Player ID')
+            results.append({
+                'player_id': pid,
+                'player_name': name,
+                'team_name': p.get('Team Name', ''),
+                'score': tournament.player_scores.get(pid, 0)
+            })
+
+    # Also search dropped players
+    for pid, info in tournament.dropped_players.items():
+        if query in info['name'].lower():
+            results.append({
+                'player_id': pid,
+                'player_name': info['name'],
+                'score': info['score'],
+                'dropped': True
+            })
+
+    return jsonify({'success': True, 'results': results[:20]})
+
+
+@app.route('/list_backups')
+def list_backups():
+    """List available backup files with metadata."""
+    backups = []
+    base = tournament.backup_file
+    candidates = [base, f"{base}.1", f"{base}.2", f"{base}.3"]
+
+    for filepath in candidates:
+        if os.path.exists(filepath):
+            stat = os.stat(filepath)
+            try:
+                with open(filepath, 'r') as f:
+                    data = json.load(f)
+                    state = data.get('state', 'unknown')
+                    current_round = data.get('current_round', '?')
+                    event_mode = data.get('event_mode', 'unknown')
+            except (json.JSONDecodeError, IOError):
+                state = 'corrupted'
+                current_round = '?'
+                event_mode = '?'
+
+            backups.append({
+                'filepath': filepath,
+                'size_bytes': stat.st_size,
+                'modified': datetime.fromtimestamp(stat.st_mtime).isoformat(),
+                'age_seconds': int((datetime.now() - datetime.fromtimestamp(stat.st_mtime)).total_seconds()),
+                'state': state,
+                'current_round': current_round,
+                'event_mode': event_mode
+            })
+
+    return jsonify({'success': True, 'backups': backups})
+
+
+@app.route('/preview_finalize/<int:round_num>')
+@with_lock
+def preview_finalize(round_num):
+    """Preview what happens if the TO finalizes this round (who advances, what's next)."""
+    try:
+        total_tables = len(tournament.tables.get(round_num, {}))
+        submitted_count = len(tournament.round_results.get(round_num, {}).get('submitted_tables', set()))
+
+        if submitted_count < total_tables:
+            return jsonify({
+                'success': False,
+                'error': f'Only {submitted_count}/{total_tables} tables submitted. Cannot preview finalization.',
+                'user_message': 'All tables must be submitted before previewing finalization.'
+            }), 400
+
+        # Determine what comes next
+        is_last_swiss = round_num >= tournament.swiss_rounds_count
+        has_top_cut = tournament.has_top_cut
+
+        preview = {
+            'success': True,
+            'round': round_num,
+            'is_last_swiss_round': is_last_swiss,
+            'next_phase': None,
+            'advancing_teams': None
+        }
+
+        if is_last_swiss:
+            if has_top_cut:
+                preview['next_phase'] = 'Top Cut (Top 8/10 advance)'
+                # Show top teams/players by score
+                sorted_teams = sorted(tournament.scores.items(), key=lambda x: x[1], reverse=True)
+                cut_size = 10 if tournament.event_mode == EventMode.INDIVIDUAL else 8
+                preview['advancing_teams'] = [{'name': t[0], 'score': t[1]} for t in sorted_teams[:cut_size]]
+            else:
+                preview['next_phase'] = 'Finals (Top 4 advance)'
+                sorted_teams = sorted(tournament.scores.items(), key=lambda x: x[1], reverse=True)
+                preview['advancing_teams'] = [{'name': t[0], 'score': t[1]} for t in sorted_teams[:4]]
+        else:
+            preview['next_phase'] = f'Swiss Round {round_num + 1}'
+
+        return jsonify(preview)
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 
 if __name__ == '__main__':
     # Attempt to restore state from backup on startup

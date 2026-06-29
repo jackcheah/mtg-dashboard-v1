@@ -46,10 +46,37 @@
             --radius-xl: 1.5rem;
             --radius-full: 9999px;
 
+            /* Typography Scale */
+            --text-xs: 0.75rem;
+            --text-sm: 0.875rem;
+            --text-base: 1rem;
+            --text-md: 1.125rem;
+            --text-lg: 1.25rem;
+            --text-xl: 1.5rem;
+            --text-2xl: 1.875rem;
+            --text-3xl: 2.25rem;
+            --text-4xl: 3rem;
+
+            /* Shadows (extended) */
+            --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+
             /* Transitions */
             --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
             --transition-base: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             --transition-slow: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Touch-friendly targets on coarse pointer devices (tablets) */
+        @media (pointer: coarse) {
+            .score-buttons-inline .score-btn {
+                width: 44px;
+                height: 44px;
+                font-size: 1rem;
+            }
+            .btn {
+                min-height: 44px;
+                min-width: 44px;
+            }
         }
 
         /* Reset and Base Styles */
@@ -3190,4 +3217,244 @@
         .japanese-score {
             font-family: 'Inter', monospace;
             letter-spacing: -0.02em;
+        }
+
+        /* ============================================
+           PLAYER/TABLE SEARCH BAR
+           ============================================ */
+
+        .player-search-bar {
+            position: relative;
+            max-width: 480px;
+            margin: 0 auto var(--spacing-md);
+            z-index: 100;
+        }
+
+        .search-input-wrapper {
+            display: flex;
+            align-items: center;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-full);
+            padding: var(--spacing-sm) var(--spacing-lg);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .search-input-wrapper:focus-within {
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+        }
+
+        .search-input-wrapper > i {
+            color: rgba(255, 255, 255, 0.5);
+            margin-right: var(--spacing-sm);
+            font-size: 0.9rem;
+        }
+
+        .search-input-wrapper input {
+            flex: 1;
+            background: none;
+            border: none;
+            outline: none;
+            color: white;
+            font-size: 0.9rem;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .search-input-wrapper input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .search-clear-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.75rem;
+            transition: background 0.2s;
+        }
+
+        .search-clear-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .search-results-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            margin-top: var(--spacing-xs);
+            background: rgba(30, 27, 75, 0.98);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-md);
+            max-height: 300px;
+            overflow-y: auto;
+            box-shadow: var(--shadow-xl);
+            -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(20px);
+        }
+
+        .search-result-item {
+            padding: var(--spacing-sm) var(--spacing-lg);
+            cursor: pointer;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: background 0.15s;
+        }
+
+        .search-result-item:hover {
+            background: rgba(139, 92, 246, 0.15);
+        }
+
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+
+        .search-result-name {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: white;
+        }
+
+        .search-result-name i {
+            color: var(--color-primary-light);
+            font-size: 0.75rem;
+        }
+
+        .search-dropped-badge {
+            font-size: 0.7rem;
+            background: var(--color-danger);
+            color: white;
+            padding: 1px 6px;
+            border-radius: var(--radius-full);
+            font-weight: 700;
+            margin-left: var(--spacing-xs);
+        }
+
+        .search-result-details {
+            display: flex;
+            justify-content: space-between;
+            padding-left: 1.5rem;
+            margin-top: 2px;
+        }
+
+        .search-result-team {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .search-result-score {
+            font-size: 0.75rem;
+            color: var(--color-secondary-light);
+            font-weight: 600;
+        }
+
+        .search-result-table {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.4);
+            padding-left: 1.5rem;
+            margin-top: 2px;
+        }
+
+        .search-result-table i {
+            margin-right: 4px;
+        }
+
+        .search-no-results {
+            padding: var(--spacing-lg);
+            text-align: center;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.85rem;
+        }
+
+        .search-no-results i {
+            margin-right: var(--spacing-xs);
+        }
+
+        /* Search highlight on table card */
+        .table-card.search-highlight {
+            border-color: var(--color-primary) !important;
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.5), 0 0 40px rgba(139, 92, 246, 0.2) !important;
+            animation: search-pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes search-pulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(139, 92, 246, 0.5); }
+            50% { box-shadow: 0 0 30px rgba(139, 92, 246, 0.8), 0 0 60px rgba(139, 92, 246, 0.3); }
+        }
+
+        /* ============================================
+           SETUP WIZARD CLOSE BUTTON
+           ============================================ */
+
+        .wizard-close-btn {
+            position: absolute;
+            top: var(--spacing-md);
+            right: var(--spacing-md);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1rem;
+            transition: all 0.2s;
+            z-index: 10;
+        }
+
+        .wizard-close-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: var(--color-danger);
+            color: var(--color-danger);
+            transform: scale(1.1);
+        }
+
+        .scoring-mode-modal {
+            position: relative;
+        }
+
+        /* ============================================
+           KEYBOARD HELP FLOATING BUTTON
+           ============================================ */
+
+        .keyboard-help-btn {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            border: 1px solid var(--glass-border);
+            color: white;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--shadow-lg);
+            transition: all 0.2s;
+            z-index: 90;
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+        }
+
+        .keyboard-help-btn:hover {
+            transform: scale(1.1);
+            box-shadow: var(--shadow-glow);
         }

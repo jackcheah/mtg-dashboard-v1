@@ -174,7 +174,7 @@
 
         .player-team {
             font-size: 0.9em;
-            opacity: 0.7;
+            opacity: 0.85;
         }
 
         /* Standings List (Round Complete) */
@@ -355,7 +355,7 @@
 
         .tables-grid.high-density .player-row {
             padding: 0.25rem 0.5rem;
-            font-size: 0.85rem;
+            font-size: 1rem;
             background: rgba(255, 255, 255, 0.03);
         }
 
@@ -566,6 +566,46 @@
             font-family: 'JetBrains Mono', monospace;
             letter-spacing: -0.02em;
         }
+
+        /* Submission Progress Indicator */
+        .submission-progress {
+            text-align: center;
+            margin-top: 0.5rem;
+        }
+
+        #projector-progress-text {
+            font-size: 1.2rem;
+            color: #94a3b8;
+            font-weight: 600;
+        }
+
+        .progress-bar-mini {
+            width: 200px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            margin: 0.4rem auto 0;
+            overflow: hidden;
+        }
+
+        .progress-bar-mini-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+
+        /* Timer expired pulsing */
+        @keyframes timerPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .timer-expired {
+            animation: timerPulse 1s ease-in-out infinite;
+            color: #ef4444 !important;
+        }
     </style>
 </head>
 
@@ -578,6 +618,12 @@
         <div class="header-center">
             <div id="timerDisplay" class="timer-display">00:00:00</div>
             <div id="roundInfo" class="round-info">Waiting to Start...</div>
+            <div class="submission-progress" id="projector-submission-progress" style="display:none;">
+                <span id="projector-progress-text">0/0 tables reported</span>
+                <div class="progress-bar-mini">
+                    <div class="progress-bar-mini-fill" id="projector-progress-fill"></div>
+                </div>
+            </div>
         </div>
         <div class="header-right">
             <div id="clockDisplay">12:00 PM</div>
@@ -708,35 +754,41 @@
         setInterval(updateClock, 1000);
         updateClock();
 
-        // High frequency timer tick (Client Side Estimate)
+        // High frequency timer tick (Client Side Estimate) - COUNTDOWN MODE
         setInterval(() => {
             if (timerState.running) {
                 const now = Date.now();
                 // Calculate elapsed time based on last sync
                 const addedTime = (now - timerState.lastSynced) / 1000;
                 const estimatedElapsed = Math.floor(timerState.serverElapsed + addedTime);
-                renderTimer(estimatedElapsed, timerState.duration);
+                // Convert to remaining time (countdown)
+                const remaining = Math.max(0, timerState.duration - estimatedElapsed);
+                renderTimer(remaining, timerState.duration);
             }
-        }, 100); // 10fps update for smooth feel if we added ms, but mostly ensures we don't blink
+        }, 100); // 10fps update for smooth feel
 
-        function renderTimer(seconds, duration) {
-            // Format HH:MM:SS
-            const h = Math.floor(seconds / 3600).toString().padStart(2, '0');
-            const m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
-            const s = Math.floor(seconds % 60).toString().padStart(2, '0');
+        function renderTimer(remaining, duration) {
+            // Format HH:MM:SS of remaining time
+            const h = Math.floor(remaining / 3600).toString().padStart(2, '0');
+            const m = Math.floor((remaining % 3600) / 60).toString().padStart(2, '0');
+            const s = Math.floor(remaining % 60).toString().padStart(2, '0');
 
             const timerEl = document.getElementById('timerDisplay');
             timerEl.textContent = `${h}:${m}:${s}`;
 
-            // Visual cues
-            if (seconds >= duration) {
+            // Visual cues based on remaining time
+            if (remaining <= 0) {
+                timerEl.textContent = '00:00:00';
                 timerEl.style.color = '#ef4444'; // Red
-                timerEl.classList.add('blink');
-            } else if (seconds >= duration * 0.9) {
-                timerEl.style.color = '#f59e0b'; // Orange
+                timerEl.classList.add('timer-expired');
+                timerEl.classList.remove('blink');
+            } else if (remaining <= duration * 0.1) {
+                timerEl.style.color = '#f59e0b'; // Orange when <10% remaining
+                timerEl.classList.remove('timer-expired');
                 timerEl.classList.remove('blink');
             } else {
                 timerEl.style.color = '#fca5a5'; // Default
+                timerEl.classList.remove('timer-expired');
                 timerEl.classList.remove('blink');
             }
         }
@@ -756,9 +808,10 @@
                     timerState.duration = timerData.duration;
                     timerState.lastSynced = Date.now();
 
-                    // Specific render if stopped (force exact value)
+                    // Specific render if stopped (force exact value as countdown)
                     if (!timerState.running) {
-                        renderTimer(timerData.elapsed, timerData.duration);
+                        const remaining = Math.max(0, timerData.duration - timerData.elapsed);
+                        renderTimer(remaining, timerData.duration);
                     }
                 }
 
@@ -789,10 +842,18 @@
                             if (statusData.success && statusData.progress_percent === 100) {
                                 roundComplete = true;
                             }
+                            // Update submission progress indicator
+                            if (statusData.success) {
+                                updateSubmissionProgress(statusData.submitted_count, statusData.total_tables, statusData.progress_percent);
+                            }
                         }
                     } catch (e) {
                         // Silent error
                     }
+                } else {
+                    // Hide progress indicator when not in active round
+                    const progressEl = document.getElementById('projector-submission-progress');
+                    if (progressEl) progressEl.style.display = 'none';
                 }
 
                 if (stateData.success) {
@@ -1089,6 +1150,23 @@
             // Total Score REMOVED per user request
 
             return html;
+        }
+
+        // Submission Progress Indicator Update
+        function updateSubmissionProgress(submitted, total, percent) {
+            const progressEl = document.getElementById('projector-submission-progress');
+            const textEl = document.getElementById('projector-progress-text');
+            const fillEl = document.getElementById('projector-progress-fill');
+
+            if (!progressEl || !textEl || !fillEl) return;
+
+            if (total > 0) {
+                progressEl.style.display = 'block';
+                textEl.textContent = `${submitted}/${total} tables reported`;
+                fillEl.style.width = `${percent}%`;
+            } else {
+                progressEl.style.display = 'none';
+            }
         }
 
         // Adaptive polling: 2s during active play, 5s when idle/complete

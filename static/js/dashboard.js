@@ -628,6 +628,7 @@
                     const data = await res.json();
                     seconds = data.elapsed;
                     timerRunning = data.running;
+                    window.timerDuration = data.duration || 3000;
                     if (timerRunning) {
                         startOffset = seconds;
                         clientStartTime = Date.now();
@@ -655,9 +656,12 @@
             });
 
             function updateTimerDisplay() {
-                const hrs = Math.floor(seconds / 3600);
-                const mins = Math.floor((seconds % 3600) / 60);
-                const secs = Math.floor(seconds % 60);
+                const duration = window.timerDuration || 3000;
+                const remaining = Math.max(0, duration - seconds);
+
+                const hrs = Math.floor(remaining / 3600);
+                const mins = Math.floor((remaining % 3600) / 60);
+                const secs = Math.floor(remaining % 60);
 
                 const display = [hrs, mins, secs]
                     .map(num => String(num).padStart(2, '0'))
@@ -666,16 +670,14 @@
                 const timerEl = document.getElementById('timer');
                 timerEl.textContent = display;
 
-                // Dynamic Timer Visuals
-                // Warning at 45 mins (2700s), Danger at 50 mins (3000s) - Example thresholds
-                // Assuming standard 50min round
-                timerEl.classList.remove('timer-warning', 'timer-danger');
+                // Dynamic Timer Visuals - countdown mode
+                timerEl.classList.remove('timer-warning', 'timer-danger', 'timer-expired');
 
-                if (seconds >= 3000) { // 50 mins
-                    timerEl.classList.add('timer-danger');
+                if (remaining <= 0) {
+                    timerEl.classList.add('timer-expired');
                     // Make unsubmitted cards pulse
                     document.querySelectorAll('.table-card:not(.submitted)').forEach(c => c.classList.add('urgent'));
-                } else if (seconds >= 2700) { // 45 mins
+                } else if (remaining <= 300) { // 5 minutes remaining
                     timerEl.classList.add('timer-warning');
                 }
             }
@@ -1180,6 +1182,8 @@
 
                         // Store tournament configuration globally
                         window.tournamentSwissRounds = swissRounds;
+                        window.swissRoundsCount = swissRounds;
+                        window.hasSemifinals = hasSemifinals;
                         window.totalTeams = teamCount;
 
                         // Store max rounds globally
@@ -1319,6 +1323,20 @@
                         window.playerScores = data.player_scores || {};
 
                         displayTables(data.tables, round);
+
+                        // Update section title with round context
+                        const label = document.getElementById('tables-section-label');
+                        if (label) {
+                            const swissCount = window.swissRoundsCount || 4;
+                            const roundInt = parseInt(round);
+                            if (roundInt <= swissCount) {
+                                label.textContent = `Swiss Round ${roundInt} — Tables`;
+                            } else if (roundInt === swissCount + 1 && window.hasSemifinals) {
+                                label.textContent = 'Top Cut — Tables';
+                            } else {
+                                label.textContent = 'Finals — Tables';
+                            }
+                        }
 
                         // Restore submitted-table visual state from server
                         try {
@@ -1711,6 +1729,52 @@
                 }
             }
 
+            // Remaining Tables Widget - shows which tables still need submission
+            function updateRemainingTablesWidget(submissionStatus) {
+                const tablesContainer = document.getElementById('tables-container');
+                if (!tablesContainer) return;
+
+                let widget = document.getElementById('remaining-tables-widget');
+
+                // If round is already finalized, hide the widget
+                if (submissionStatus.is_finalized) {
+                    if (widget) widget.style.display = 'none';
+                    return;
+                }
+
+                if (!widget) {
+                    widget = document.createElement('div');
+                    widget.id = 'remaining-tables-widget';
+                    widget.style.cssText = 'padding: 10px 16px; border-radius: 8px; margin-bottom: 12px; font-size: 0.85rem; font-weight: 500;';
+                    const tablesGrid = document.getElementById('tables-grid');
+                    if (tablesGrid) {
+                        tablesContainer.insertBefore(widget, tablesGrid);
+                    } else {
+                        tablesContainer.insertBefore(widget, tablesContainer.firstChild);
+                    }
+                }
+
+                widget.style.display = 'block';
+
+                if (submissionStatus.is_complete) {
+                    widget.style.background = 'rgba(16, 185, 129, 0.15)';
+                    widget.style.border = '1px solid rgba(16, 185, 129, 0.4)';
+                    widget.style.color = '#10b981';
+                    widget.innerHTML = '<i class="fas fa-check-circle"></i> All tables submitted! Ready to finalize.';
+                } else {
+                    const submitted = submissionStatus.submitted_count || 0;
+                    const total = submissionStatus.total_tables || 0;
+                    const remaining = submissionStatus.remaining_tables || [];
+                    const remainingText = remaining.length > 0 ? remaining.join(', ') : '';
+
+                    widget.style.background = 'rgba(99, 102, 241, 0.1)';
+                    widget.style.border = '1px solid rgba(99, 102, 241, 0.3)';
+                    widget.style.color = 'rgba(255, 255, 255, 0.85)';
+                    widget.innerHTML = `<i class="fas fa-clipboard-list"></i> ${submitted}/${total} tables submitted` +
+                        (remainingText ? ` &bull; Remaining: ${remainingText}` : '');
+                }
+            }
+
             function markTableAsSubmitted(tableName, roundNum) {
                 const tableCard = document.getElementById(`table-${tableName.replace(/\s+/g, '-')}`);
                 if (!tableCard) return;
@@ -1776,13 +1840,46 @@
 
                 const editBtn = document.createElement('button');
                 editBtn.className = 'edit-scores-btn';
-                editBtn.innerHTML = '<i class="fas fa-edit"></i> Edit Scores';
+                editBtn.innerHTML = '<i class="fas fa-edit"></i> Edit';
                 editBtn.onclick = (e) => {
                     e.stopPropagation();
                     enableScoreEditing(tableName, roundNum);
                 };
 
+                const revertBtn = document.createElement('button');
+                revertBtn.className = 'edit-scores-btn';
+                revertBtn.style.background = 'rgba(239, 68, 68, 0.2)';
+                revertBtn.style.borderColor = 'var(--color-danger)';
+                revertBtn.innerHTML = '<i class="fas fa-undo"></i> Revert';
+                revertBtn.onclick = async (e) => {
+                    e.stopPropagation();
+                    const confirmed = await modalManager.confirm(
+                        'Revert Submission',
+                        `This will completely undo the submission for ${escapeHtml(tableName)}, restoring all player scores to their pre-submission values.\n\nThis cannot be undone.`,
+                        'Revert',
+                        'Cancel'
+                    );
+                    if (!confirmed) return;
+                    try {
+                        const resp = await fetch('/revert_table_submission', {
+                            method: 'POST',
+                            headers: {'Content-Type': 'application/json'},
+                            body: JSON.stringify({round: roundNum, table: tableName})
+                        });
+                        const data = await resp.json();
+                        if (data.success) {
+                            showToast('Reverted', `${tableName} submission undone.`, 'success');
+                            loadRound();
+                        } else {
+                            showToast('Error', data.error || 'Revert failed', 'error');
+                        }
+                    } catch (err) {
+                        showToast('Error', 'Network error during revert', 'error');
+                    }
+                };
+
                 submitBtn.parentElement.appendChild(editBtn);
+                submitBtn.parentElement.appendChild(revertBtn);
 
                 // Check for edit history and add badge
                 checkAndShowEditHistory(tableName, roundNum, tableCard);
@@ -2647,6 +2744,14 @@
                     if (data.success) {
                         showToast('Table Submitted!', `Results recorded for ${tableName}`, 'success');
 
+                        // Update remaining tables widget if submission_status is present
+                        if (data.submission_status) {
+                            updateRemainingTablesWidget(data.submission_status);
+                            // Update canFinalize state
+                            window.canFinalize = data.can_finalize || data.submission_status.is_complete || false;
+                            updateFinalizeButtonState();
+                        }
+
                         // Mark button as submitted
                         if (submitBtn) {
                             submitBtn.classList.add('submitted');
@@ -2694,12 +2799,37 @@
                 }
             }
 
+            // Update finalize button state based on can_finalize
+            function updateFinalizeButtonState() {
+                // Find the finalize/submit round results button
+                const finalizeBtn = document.querySelector('button[onclick="submitRoundResults()"]');
+                if (!finalizeBtn) return;
+
+                if (window.canFinalize === false) {
+                    finalizeBtn.disabled = true;
+                    finalizeBtn.style.opacity = '0.5';
+                    finalizeBtn.style.cursor = 'not-allowed';
+                    finalizeBtn.classList.remove('finalize-pulse');
+                } else {
+                    finalizeBtn.disabled = false;
+                    finalizeBtn.style.opacity = '1';
+                    finalizeBtn.style.cursor = 'pointer';
+                    finalizeBtn.classList.add('finalize-pulse');
+                }
+            }
+
             // Submit all round results and finalize
             async function submitRoundResults() {
                 const currentRound = document.getElementById('round-select').value;
 
                 if (!currentRound) {
                     showToast('Error', 'Please select a round first', 'error');
+                    return;
+                }
+
+                // Gate: check if finalization is allowed
+                if (window.canFinalize === false) {
+                    showToast('Not Ready', 'All tables must be submitted before finalizing the round.', 'warning');
                     return;
                 }
 
@@ -2880,6 +3010,202 @@
                 });
             });
 
+            // ============================================
+            // PLAYER/TABLE SEARCH
+            // ============================================
+
+            let searchDebounceTimer = null;
+
+            // Find which table a player is currently seated at (from loaded round data)
+            function findPlayerTable(playerId) {
+                if (!window.currentTables) return '';
+                for (const [tableName, players] of Object.entries(window.currentTables)) {
+                    for (const player of players) {
+                        const pid = player['Player ID'] || player.id;
+                        if (String(pid) === String(playerId)) {
+                            return tableName;
+                        }
+                    }
+                }
+                return '';
+            }
+
+            function clearPlayerSearch() {
+                const input = document.getElementById('player-search-input');
+                const clearBtn = document.getElementById('search-clear-btn');
+                const dropdown = document.getElementById('search-results-dropdown');
+
+                if (input) input.value = '';
+                if (clearBtn) clearBtn.style.display = 'none';
+                if (dropdown) {
+                    dropdown.innerHTML = '';
+                    dropdown.style.display = 'none';
+                }
+
+                // Remove any existing highlights
+                document.querySelectorAll('.table-card.search-highlight').forEach(card => {
+                    card.classList.remove('search-highlight');
+                });
+            }
+
+            async function handlePlayerSearch(query) {
+                const dropdown = document.getElementById('search-results-dropdown');
+                const clearBtn = document.getElementById('search-clear-btn');
+
+                if (!query || query.trim().length === 0) {
+                    if (dropdown) {
+                        dropdown.innerHTML = '';
+                        dropdown.style.display = 'none';
+                    }
+                    if (clearBtn) clearBtn.style.display = 'none';
+                    return;
+                }
+
+                if (clearBtn) clearBtn.style.display = 'inline-flex';
+
+                try {
+                    const response = await fetch(`/search_player?q=${encodeURIComponent(query.trim())}`);
+                    const data = await response.json();
+
+                    if (!dropdown) return;
+
+                    if (data.results && data.results.length > 0) {
+                        dropdown.innerHTML = data.results.map(result => {
+                            const playerName = result.player_name || result.name || '';
+                            const teamName = result.team_name || result.team || '';
+                            const tableName = result.table || findPlayerTable(result.player_id) || '';
+                            const droppedBadge = result.dropped ? '<span class="search-dropped-badge">(Dropped)</span>' : '';
+                            return `
+                                <div class="search-result-item" onclick="selectSearchResult('${result.player_id}', '${escapeHtml(tableName)}')">
+                                    <div class="search-result-name">
+                                        <i class="fas fa-user"></i>
+                                        ${escapeHtml(playerName)} ${droppedBadge}
+                                    </div>
+                                    <div class="search-result-details">
+                                        <span class="search-result-team">${escapeHtml(teamName)}</span>
+                                        <span class="search-result-score">${result.score !== undefined ? result.score + ' pts' : ''}</span>
+                                    </div>
+                                    ${tableName ? '<div class="search-result-table"><i class="fas fa-chair"></i> ' + escapeHtml(tableName) + '</div>' : ''}
+                                </div>
+                            `;
+                        }).join('');
+                        dropdown.style.display = 'block';
+                    } else {
+                        dropdown.innerHTML = '<div class="search-no-results"><i class="fas fa-search"></i> No results found</div>';
+                        dropdown.style.display = 'block';
+                    }
+                } catch (error) {
+                    console.error('Search error:', error);
+                    if (dropdown) {
+                        dropdown.innerHTML = '<div class="search-no-results">Search unavailable</div>';
+                        dropdown.style.display = 'block';
+                    }
+                }
+            }
+
+            function selectSearchResult(playerId, tableName) {
+                const dropdown = document.getElementById('search-results-dropdown');
+                if (dropdown) {
+                    dropdown.innerHTML = '';
+                    dropdown.style.display = 'none';
+                }
+
+                // Remove previous highlights
+                document.querySelectorAll('.table-card.search-highlight').forEach(card => {
+                    card.classList.remove('search-highlight');
+                });
+
+                if (tableName) {
+                    const cardId = `table-${tableName.replace(/\s+/g, '-')}`;
+                    const card = document.getElementById(cardId);
+                    if (card) {
+                        card.classList.add('search-highlight');
+                        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                        // Remove highlight after 3 seconds
+                        setTimeout(() => {
+                            card.classList.remove('search-highlight');
+                        }, 3000);
+                    }
+                }
+            }
+
+            // Initialize search input listener
+            document.addEventListener('DOMContentLoaded', () => {
+                const searchInput = document.getElementById('player-search-input');
+                if (searchInput) {
+                    searchInput.addEventListener('input', (e) => {
+                        const query = e.target.value;
+
+                        if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
+
+                        searchDebounceTimer = setTimeout(() => {
+                            handlePlayerSearch(query);
+                        }, 300);
+                    });
+
+                    // Close dropdown on escape
+                    searchInput.addEventListener('keydown', (e) => {
+                        if (e.key === 'Escape') {
+                            clearPlayerSearch();
+                            searchInput.blur();
+                        }
+                    });
+                }
+
+                // Close dropdown when clicking outside
+                document.addEventListener('click', (e) => {
+                    const searchBar = document.getElementById('player-search-bar');
+                    if (searchBar && !searchBar.contains(e.target)) {
+                        const dropdown = document.getElementById('search-results-dropdown');
+                        if (dropdown) {
+                            dropdown.style.display = 'none';
+                        }
+                    }
+                });
+            });
+
+            // ============================================
+            // SETUP WIZARD DISMISS (Close Button)
+            // ============================================
+
+            function dismissSetupWizard() {
+                // Only allow dismissing if tournament state is NOT initial
+                if (lastKnownState === 'initial' || lastKnownState === null) {
+                    showToast('Setup Required', 'Please complete setup to continue', 'warning');
+                    return;
+                }
+
+                const eventOverlay = document.getElementById('event-mode-overlay');
+                const scoringOverlay = document.getElementById('scoring-mode-overlay');
+
+                if (eventOverlay) eventOverlay.classList.remove('show');
+                if (scoringOverlay) scoringOverlay.classList.remove('show');
+            }
+
+            // Click-outside-to-dismiss for wizard overlays
+            document.addEventListener('DOMContentLoaded', () => {
+                const eventOverlay = document.getElementById('event-mode-overlay');
+                const scoringOverlay = document.getElementById('scoring-mode-overlay');
+
+                if (eventOverlay) {
+                    eventOverlay.addEventListener('click', (e) => {
+                        // Only dismiss if clicking the overlay background, not the modal content
+                        if (e.target === eventOverlay) {
+                            dismissSetupWizard();
+                        }
+                    });
+                }
+
+                if (scoringOverlay) {
+                    scoringOverlay.addEventListener('click', (e) => {
+                        if (e.target === scoringOverlay) {
+                            dismissSetupWizard();
+                        }
+                    });
+                }
+            });
+
             // Event delegation for score buttons (XSS-safe)
             document.addEventListener('click', function (e) {
                 if (e.target.matches('.score-btn')) {
@@ -2897,8 +3223,25 @@
                     const res = await fetch('/get_state_info');
                     const data = await res.json();
                     const currentState = data.current_state;
+
+                    // Update canFinalize from state info if available
+                    if (data.can_finalize !== undefined) {
+                        window.canFinalize = data.can_finalize;
+                        updateFinalizeButtonState();
+                    }
+
+                    // Show/hide search bar based on tournament state
+                    const searchBar = document.getElementById('player-search-bar');
+                    if (searchBar) {
+                        if (currentState && currentState !== 'initial') {
+                            searchBar.style.display = '';
+                        } else {
+                            searchBar.style.display = 'none';
+                        }
+                    }
+
                     if (lastKnownState && lastKnownState !== 'initial' && currentState === 'initial') {
-                        const restore = confirm('Server appears to have restarted. Restore from backup?');
+                        const restore = await modalManager.confirm('Server Restarted', 'The server appears to have restarted. Would you like to restore from backup?', 'Restore', 'Skip');
                         if (restore) {
                             const restoreRes = await fetch('/restore_backup', { method: 'POST' });
                             const restoreData = await restoreRes.json();
