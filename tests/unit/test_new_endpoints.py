@@ -302,6 +302,31 @@ class TestListBackups:
         if os.path.exists(tournament.backup_file):
             os.remove(tournament.backup_file)
 
+    def test_backup_rotation_creates_numbered_files(self, client):
+        """Verify saving multiple times rotates backup files."""
+        setup_via_api(client, event_mode='team', scoring_mode='western', num_teams=8)
+        base = tournament.backup_file
+
+        # Clean any existing backups
+        for path in [base, f"{base}.1", f"{base}.2", f"{base}.3"]:
+            if os.path.exists(path):
+                os.remove(path)
+
+        # Save 4 times to trigger rotation
+        for _ in range(4):
+            client.post('/save_backup')
+
+        # Verify rotated files exist
+        assert os.path.exists(base), "Primary backup should exist"
+        assert os.path.exists(f"{base}.1"), "Backup .1 should exist"
+        assert os.path.exists(f"{base}.2"), "Backup .2 should exist"
+        assert os.path.exists(f"{base}.3"), "Backup .3 should exist"
+
+        # Cleanup
+        for path in [base, f"{base}.1", f"{base}.2", f"{base}.3"]:
+            if os.path.exists(path):
+                os.remove(path)
+
 
 # ==========================================
 # Preview Finalize
@@ -377,19 +402,20 @@ class TestControlTimer:
         assert data['running'] is True
 
     def test_timer_stop_accumulates_elapsed(self, client):
-        # Start the timer
+        # Start the timer and simulate time passing by backdating start_time
         client.post('/control_timer', json={'action': 'start'})
-        time.sleep(0.1)  # Let some time pass
+        from datetime import timedelta
+        tournament.timer_start_time -= timedelta(seconds=5)
         resp = client.post('/control_timer', json={'action': 'stop'})
         data = resp.get_json()
         assert data['success'] is True
         assert data['running'] is False
-        # Elapsed should be >= 0 (at least some time passed)
-        assert data['elapsed'] >= 0
+        assert data['elapsed'] >= 4
 
     def test_timer_reset_clears(self, client):
         client.post('/control_timer', json={'action': 'start'})
-        time.sleep(0.1)
+        from datetime import timedelta
+        tournament.timer_start_time -= timedelta(seconds=5)
         client.post('/control_timer', json={'action': 'stop'})
 
         resp = client.post('/control_timer', json={'action': 'reset'})

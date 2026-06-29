@@ -1012,6 +1012,7 @@
 
                 // Calculate team scores and create array for sorting
                 const teamsArray = [];
+                let hiddenCount = 0;
                 Object.entries(teams).forEach(([teamName, players]) => {
                     // Skip eliminated teams if in finals mode
                     if (finalsTeams) {
@@ -1053,7 +1054,6 @@
                 });
 
                 let displayedCount = 0;
-                let hiddenCount = 0;
 
                 // Display teams/players in sorted order
                 if (currentEventMode === 'individual') {
@@ -1128,7 +1128,7 @@
                         card.style.borderLeft = '3px solid var(--color-danger)';
                         card.innerHTML = `
                         <div class="team-header">
-                            <div class="team-name" style="text-decoration: line-through;">${dp.name}</div>
+                            <div class="team-name" style="text-decoration: line-through;">${escapeHtml(dp.name)}</div>
                             <div class="team-score">
                                 ${formatScore(dp.score)}
                                 <span style="font-size: 0.65rem; background: var(--color-danger); color: white; padding: 2px 6px; border-radius: 8px; margin-left: 8px;">DROPPED R${dp.dropped_after_round}</span>
@@ -1618,7 +1618,7 @@
                         <div class="matchup-team">
                             <div class="team-info">
                                 <div class="team-seed">${team1.rank || '?'}</div>
-                                <div class="team-name">${team1.team || 'Unknown'}</div>
+                                <div class="team-name">${escapeHtml(team1.team || 'Unknown')}</div>
                             </div>
                             <div class="team-score">${team1.total_points || 0} pts</div>
                         </div>
@@ -1626,7 +1626,7 @@
                         <div class="matchup-team">
                             <div class="team-info">
                                 <div class="team-seed">${team2.rank || '?'}</div>
-                                <div class="team-name">${team2.team || 'Unknown'}</div>
+                                <div class="team-name">${escapeHtml(team2.team || 'Unknown')}</div>
                             </div>
                             <div class="team-score">${team2.total_points || 0} pts</div>
                         </div>
@@ -1645,7 +1645,7 @@
                     <div class="pod-team">
                         <div class="team-info">
                             <div class="team-seed">${team.rank || '?'}</div>
-                            <div class="team-name">${team.team || 'Unknown'}</div>
+                            <div class="team-name">${escapeHtml(team.team || 'Unknown')}</div>
                         </div>
                         <div class="team-score">${team.total_points || 0} pts</div>
                     </div>
@@ -1765,7 +1765,7 @@
                     const submitted = submissionStatus.submitted_count || 0;
                     const total = submissionStatus.total_tables || 0;
                     const remaining = submissionStatus.remaining_tables || [];
-                    const remainingText = remaining.length > 0 ? remaining.join(', ') : '';
+                    const remainingText = remaining.length > 0 ? remaining.map(t => escapeHtml(t)).join(', ') : '';
 
                     widget.style.background = 'rgba(99, 102, 241, 0.1)';
                     widget.style.border = '1px solid rgba(99, 102, 241, 0.3)';
@@ -2154,7 +2154,7 @@
                             <span><strong>Edit #${index + 1}</strong></span>
                             <span>${timestamp}</span>
                         </div>
-                        ${entry.reason ? `<div class="history-entry-reason">"${entry.reason}"</div>` : ''}
+                        ${entry.reason ? `<div class="history-entry-reason">"${escapeHtml(entry.reason)}"</div>` : ''}
                         <div class="history-scores">
                             <div class="history-scores-before">
                                 <h5>Before</h5>
@@ -2354,7 +2354,7 @@
                                 if (String(playerId) === String(pid)) {
                                     return `<div class="table-player" style="padding: 8px 12px; display: flex; align-items: center; gap: 8px;">
                                         <i class="fas fa-forward" style="color: var(--color-success);"></i>
-                                        <span>${name}</span>
+                                        <span>${escapeHtml(name)}</span>
                                         <span style="margin-left: auto; background: var(--color-success); color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: 700;">${byePointsLabel}</span>
                                     </div>`;
                                 }
@@ -2805,7 +2805,7 @@
                 const finalizeBtn = document.querySelector('button[onclick="submitRoundResults()"]');
                 if (!finalizeBtn) return;
 
-                if (window.canFinalize === false) {
+                if (window.canFinalize !== true) {
                     finalizeBtn.disabled = true;
                     finalizeBtn.style.opacity = '0.5';
                     finalizeBtn.style.cursor = 'not-allowed';
@@ -2828,7 +2828,7 @@
                 }
 
                 // Gate: check if finalization is allowed
-                if (window.canFinalize === false) {
+                if (window.canFinalize !== true) {
                     showToast('Not Ready', 'All tables must be submitted before finalizing the round.', 'warning');
                     return;
                 }
@@ -2980,7 +2980,7 @@
                     row.innerHTML = `
                     <div class="${rankClass}">${rank}</div>
                     <div>
-                        <div class="standing-team">${team.team}</div>
+                        <div class="standing-team">${escapeHtml(team.team)}</div>
                         <div class="standing-finals">Finals: ${team.final_points} pts</div>
                         <div class="standing-swiss">Swiss: ${team.swiss_points} pts</div>
                     </div>

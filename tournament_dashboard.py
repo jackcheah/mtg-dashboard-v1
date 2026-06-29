@@ -371,6 +371,12 @@ class TournamentManager:
             for round_data in self.round_results.values():
                 if 'submitted_tables' in round_data and isinstance(round_data['submitted_tables'], list):
                     round_data['submitted_tables'] = set(round_data['submitted_tables'])
+                # Convert japanese_deltas keys from string back to int (JSON stringifies int keys)
+                if 'japanese_deltas' in round_data:
+                    round_data['japanese_deltas'] = {
+                        table_name: {int(pid): delta for pid, delta in deltas.items()}
+                        for table_name, deltas in round_data['japanese_deltas'].items()
+                    }
 
             self._tournament_rounds = data.get('_tournament_rounds', [])
             self.finals_data = data.get('finals_data', {})
@@ -2781,6 +2787,8 @@ def drop_player_endpoint():
 
         success, message = tournament.drop_player(player_id, round_num)
 
+        if success:
+            tournament.bump_version()
         tournament.save_backup()
 
         return jsonify({
@@ -2877,7 +2885,7 @@ def _handle_round_transition(round_num):
                 semifinals_data = tournament.generate_individual_top_cut()
                 if semifinals_data:
                     print("[OK] Individual Top Cut generated successfully!")
-                    tournament.state = TournamentState.TOP8_IN_PROGRESS
+                    tournament.transition_to(TournamentState.TOP8_IN_PROGRESS, "Individual top cut generated")
                     tournament.current_round = last_swiss_round + 1
                 else:
                     print("[ERROR] Failed to generate individual top cut")
@@ -2886,7 +2894,7 @@ def _handle_round_transition(round_num):
                 semifinals_data = tournament.generate_individual_finals(after_top_cut=False)
                 if semifinals_data:
                     print("[OK] Individual Finals generated successfully!")
-                    tournament.state = TournamentState.FINALS_IN_PROGRESS
+                    tournament.transition_to(TournamentState.FINALS_IN_PROGRESS, "Individual finals generated")
                     tournament.current_round = tournament.max_rounds
                 else:
                     print("[ERROR] Failed to generate individual finals")
@@ -2896,7 +2904,7 @@ def _handle_round_transition(round_num):
             semifinals_data = tournament.generate_individual_finals(after_top_cut=True)
             if semifinals_data:
                 print("[OK] Individual Finals generated successfully!")
-                tournament.state = TournamentState.FINALS_IN_PROGRESS
+                tournament.transition_to(TournamentState.FINALS_IN_PROGRESS, "Individual finals generated after top cut")
                 tournament.current_round = tournament.max_rounds
             else:
                 print("[ERROR] Failed to generate individual finals")
@@ -2906,7 +2914,7 @@ def _handle_round_transition(round_num):
             tournament_winner_data = tournament.get_tournament_winner()
             if tournament_winner_data:
                 print(f"[OK] Champion: {tournament_winner_data['winning_team']}")
-                tournament.state = TournamentState.FINALS_COMPLETE
+                tournament.transition_to(TournamentState.FINALS_COMPLETE, "Individual tournament complete")
             else:
                 print("[ERROR] Failed to determine tournament winner")
 
@@ -2933,7 +2941,7 @@ def _handle_round_transition(round_num):
                 semifinals_data = tournament.generate_semifinals_round()
                 if semifinals_data:
                     print("[OK] Semifinals generated successfully!")
-                    tournament.state = TournamentState.TOP8_IN_PROGRESS
+                    tournament.transition_to(TournamentState.TOP8_IN_PROGRESS, "Top 8 cut generated")
                     tournament.current_round = last_swiss_round + 1
                 else:
                     print("[ERROR] Failed to generate semifinals")
@@ -2942,7 +2950,7 @@ def _handle_round_transition(round_num):
                 semifinals_data = tournament.generate_unified_finals(after_semifinals=False)
                 if semifinals_data:
                     print("[OK] Finals generated successfully!")
-                    tournament.state = TournamentState.FINALS_IN_PROGRESS
+                    tournament.transition_to(TournamentState.FINALS_IN_PROGRESS, "Finals generated")
                     tournament.current_round = tournament.max_rounds
                 else:
                     print("[ERROR] Failed to generate finals")
@@ -2953,7 +2961,7 @@ def _handle_round_transition(round_num):
             semifinals_data = tournament.generate_unified_finals(after_semifinals=True)
             if semifinals_data:
                 print("[OK] Finals generated successfully!")
-                tournament.state = TournamentState.FINALS_IN_PROGRESS
+                tournament.transition_to(TournamentState.FINALS_IN_PROGRESS, "Finals generated after top 8 cut")
                 tournament.current_round = tournament.max_rounds
             else:
                 print("[ERROR] Failed to generate finals")
@@ -2963,7 +2971,7 @@ def _handle_round_transition(round_num):
             tournament_winner_data = tournament.get_tournament_winner()
             if tournament_winner_data:
                 print(f"[OK] Champion: {tournament_winner_data['winning_team']}")
-                tournament.state = TournamentState.FINALS_COMPLETE
+                tournament.transition_to(TournamentState.FINALS_COMPLETE, "Tournament complete")
             else:
                 print("[ERROR] Failed to determine tournament winner")
 
@@ -3040,6 +3048,7 @@ def submit_player_results():
             print("Finalizing round WITHOUT adding points again to prevent double counting")
 
             tournament.finalized_rounds.add(round_num)
+            tournament.bump_version()
 
             # Store finalization timestamp in round results
             if round_num not in tournament.round_results:
@@ -3457,6 +3466,8 @@ def revert_table_submission():
         if table_name in tournament.round_results[round_num].get('table_submissions', {}):
             del tournament.round_results[round_num]['table_submissions'][table_name]
 
+        tournament.bump_version()
+
         return jsonify({
             'success': True,
             'message': f'{table_name} submission reverted',
@@ -3747,6 +3758,7 @@ def edit_table_results():
             print(f"[OK] Table {table_name} results edited for round {round_num}")
 
             edit_count = len(tournament.round_results[round_num]['score_history'][table_name])
+            tournament.bump_version()
 
             # Auto-save after edit
             tournament.save_backup()
@@ -4854,6 +4866,7 @@ def unfinalize_round():
 
 @app.route('/undrop_player', methods=['POST'])
 @with_lock
+@require_state(TournamentState.SWISS_IN_PROGRESS, TournamentState.TOURNAMENT_SETUP)
 def undrop_player():
     """Re-add a previously dropped player back into the tournament."""
     try:
@@ -5000,9 +5013,15 @@ def list_backups():
             try:
                 with open(filepath, 'r') as f:
                     data = json.load(f)
-                    state = data.get('state', 'unknown')
-                    current_round = data.get('current_round', '?')
-                    event_mode = data.get('event_mode', 'unknown')
+                    state_block = data.get('state', {})
+                    if isinstance(state_block, dict):
+                        state = state_block.get('tournament_state', 'unknown')
+                        current_round = state_block.get('current_round', '?')
+                    else:
+                        state = str(state_block)
+                        current_round = data.get('current_round', '?')
+                    config_block = data.get('config', {})
+                    event_mode = config_block.get('event_mode', 'unknown') if isinstance(config_block, dict) else 'unknown'
             except (json.JSONDecodeError, IOError):
                 state = 'corrupted'
                 current_round = '?'
