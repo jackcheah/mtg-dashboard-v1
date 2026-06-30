@@ -36,7 +36,7 @@ TOURNAMENT_PIN=1234 python tournament_dashboard.py
 ### 4. Run Tests
 ```bash
 pip install -r requirements-dev.txt
-pytest tests/unit/ -v                                        # 21 unit tests
+pytest tests/unit/ -v                                        # 131 unit tests
 python tests/e2e/simulate_full_tournament.py --teams 8       # E2E (server must be running)
 python tests/e2e/test_concurrent.py                          # Concurrent access tests
 ```
@@ -109,11 +109,12 @@ The system supports two event modes, selected before loading participants:
 
 ### Data Flow
 1. **Configure**: Select Event Mode (team/individual) → Select Scoring Mode (western/japanese).
-2. **Load**: `load_participants()` reads Excel → populates state. Individual mode: each player becomes a synthetic "team of 1".
+2. **Load**: `load_participants()` reads Excel → populates state. If no file found, operator must explicitly opt into sample data (DEMO MODE banner shown). Individual mode: each player becomes a synthetic "team of 1". Duplicate player names auto-disambiguated.
 3. **Setup**: `setup_tournament()` validates, initializes scores, generates Round 1.
 4. **Swiss Loop**: Submit table scores → (Optional: Drop players) → Finalize round → Next round auto-generated.
 5. **Playoffs**: Top Cut (if applicable) → Finals. Individual mode: Top 10 cut (top 2 get byes, 8 play), then top 4 finals.
 6. **Champion**: Determined by finals performance (primary) with earlier rounds as tiebreaker.
+7. **Reset**: At any point, operator can reset tournament (requires typing "RESET" to confirm). Backup files preserved for potential restore.
 
 ### Key Backend Logic
 - **`_handle_round_transition()`**: Routes to correct next phase based on event mode and round number.
@@ -135,13 +136,14 @@ The system supports two event modes, selected before loading participants:
 |----------|--------|-------------|
 | `/set_event_mode` | POST | Set event mode (team/individual) — must be INITIAL state |
 | `/set_scoring_mode` | POST | Set scoring mode (western/japanese) — before setup |
-| `/load_data` | POST | Load participants from Excel or sample data |
+| `/load_data` | POST | Load participants from Excel. Returns `offer_sample: true` if file missing (sample data requires explicit opt-in via `use_sample_data: true`) |
 | `/setup_tournament` | POST | Initialize tournament, generate Round 1 |
 | `/submit_table_results` | POST | Submit scores for a specific table (PIN-protected) |
 | `/submit_player_results` | POST | Finalize round, trigger next round generation |
 | `/drop_player` | POST | Drop a player from individual event (between rounds) |
 | `/edit_table_results` | POST | Edit previously submitted scores (before finalization) |
 | `/revert_table_submission` | POST | Undo a table submission before finalization |
+| `/reset_tournament` | POST | Full reset to INITIAL state. Requires `{"confirm": "RESET"}` body. Backup files preserved |
 | `/get_state_info` | GET | Current state and valid next actions |
 | `/get_tournament_state` | GET | Full snapshot (standings, scores, event_mode, dropped_players) |
 | `/get_submission_status/<round>` | GET | Per-round submission progress |
@@ -176,11 +178,11 @@ The system supports two event modes, selected before loading participants:
 
 ## Testing
 
-### Unit Tests (21 tests)
+### Unit Tests (131 tests)
 ```bash
 pytest tests/unit/ -v
 ```
-Covers: tiebreaker logic, final standings, MVP, state machine, backup/restore integrity, score validation.
+Covers: tiebreaker logic, final standings, MVP, state machine, backup/restore integrity, score validation, reset confirmation, individual mode.
 
 ### E2E Tests
 ```bash

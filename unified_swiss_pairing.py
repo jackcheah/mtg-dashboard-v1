@@ -678,9 +678,12 @@ class UnifiedSwissPairing:
 
         # Players who play this round (exclude bye players)
         if remainder in [1, 2]:
-            # Bottom 1-2 ranked players get byes
-            playing_players = sorted_players[:total - remainder]
-            bye_players = sorted_players[total - remainder:]
+            # Bottom-ranked players get byes, preferring those who haven't had byes before
+            candidates = sorted_players[total - remainder * 2:] if total >= remainder * 2 else sorted_players[total - remainder:]
+            previous_bye_ids = getattr(self, '_previous_bye_ids', set())
+            candidates.sort(key=lambda p: (p['Player ID'] in previous_bye_ids, self.team_scores.get(p['Team Name'], 0)))
+            bye_players = candidates[:remainder]
+            playing_players = [p for p in sorted_players if p not in bye_players]
             print(f"  [INDIVIDUAL] {len(bye_players)} player(s) receive bye this round")
         elif remainder == 3:
             # Last 3 form a 3-player pod

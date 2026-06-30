@@ -184,24 +184,31 @@ class TestResetTournament:
         setup_via_api(client, event_mode='team', scoring_mode='western', num_teams=8)
         assert tournament.state != TournamentState.INITIAL
 
-        resp = client.post('/reset_tournament')
+        resp = client.post('/reset_tournament', json={'confirm': 'RESET'})
         assert resp.status_code == 200
         data = resp.get_json()
         assert data['success'] is True
         assert tournament.state == TournamentState.INITIAL
 
+    def test_reset_rejects_without_confirmation(self, client):
+        setup_via_api(client, event_mode='team', scoring_mode='western', num_teams=8)
+        resp = client.post('/reset_tournament', json={})
+        assert resp.status_code == 400
+        data = resp.get_json()
+        assert data['success'] is False
+
     def test_reset_resets_event_mode_to_team(self, client):
         setup_via_api(client, event_mode='individual', scoring_mode='western', num_teams=16)
         assert tournament.event_mode == EventMode.INDIVIDUAL
 
-        client.post('/reset_tournament')
+        client.post('/reset_tournament', json={'confirm': 'RESET'})
         assert tournament.event_mode == EventMode.TEAM
 
     def test_reset_resets_scoring_mode_to_western(self, client):
         setup_via_api(client, event_mode='team', scoring_mode='japanese', num_teams=8)
         assert tournament.scoring_mode == ScoringMode.JAPANESE
 
-        client.post('/reset_tournament')
+        client.post('/reset_tournament', json={'confirm': 'RESET'})
         assert tournament.scoring_mode == ScoringMode.WESTERN
 
     def test_reset_clears_dropped_players(self, client):
@@ -212,7 +219,7 @@ class TestResetTournament:
         client.post('/drop_player', json={'player_id': pid, 'round': 1})
         assert len(tournament.dropped_players) > 0
 
-        client.post('/reset_tournament')
+        client.post('/reset_tournament', json={'confirm': 'RESET'})
         assert tournament.dropped_players == {}
 
     def test_reset_clears_bye_players(self, client):
@@ -221,5 +228,5 @@ class TestResetTournament:
         setup_via_api(client, event_mode='individual', scoring_mode='western', num_teams=13)
         # After setup, bye_players may have entries for round 1
         # Even if empty, resetting should clear it
-        client.post('/reset_tournament')
+        client.post('/reset_tournament', json={'confirm': 'RESET'})
         assert tournament.bye_players == {}

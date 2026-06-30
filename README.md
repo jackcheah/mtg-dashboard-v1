@@ -32,7 +32,7 @@ python tournament_dashboard.py
 1. Click **"Load Participants"** to start the setup wizard
 2. **Step 1**: Select Event Type (Team or Individual)
 3. **Step 2**: Select Scoring Mode (Western or Japanese)
-4. Participants auto-load from `participants/participant_team.xlsx` (or sample data)
+4. Participants load from `participants/participant_team.xlsx`. If not found, you'll be prompted to load sample data (shown with a DEMO MODE banner)
 5. Click **"Setup Tournament"** to generate Round 1
 
 ### Playing Rounds
@@ -136,12 +136,21 @@ Place an Excel file at `participants/participant_team.xlsx`:
 TOURNAMENT_PIN=1234 python tournament_dashboard.py
 ```
 
-### Backups
+### Backups & Reset
 - Auto-saves every 5 minutes
 - Manual: Click "Save Backup" in UI
 - Restore: Restart server (auto-restores) or click "Restore Backup"
+- **Reset Tournament**: Full reset to start over (requires typing "RESET" to confirm). Backup files are preserved and can still be restored
 
 ---
+
+## Operator Features
+
+- **Auto-restore on refresh**: If a tournament is in progress, the dashboard automatically restores the active round view on page load
+- **Timer alarm**: Audible beep when the round timer reaches zero
+- **Batch submit**: Submit all completed tables at once
+- **Score editing**: Edit submitted scores before round finalization (with audit trail)
+- **Revert submission**: Completely undo a table submission if needed
 
 ## Keyboard Shortcuts
 
@@ -172,7 +181,7 @@ Access at `/projector` for audience-friendly display:
 ```bash
 pip install -r requirements-dev.txt
 
-# Unit tests
+# Unit tests (131 tests)
 pytest tests/unit/ -v
 
 # E2E (server must be running)

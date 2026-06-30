@@ -11,7 +11,8 @@
       "Bash(python:*)",
       "Bash(pkill -9 -f \"tournament_dashboard\")",
       "Bash(lsof -ti:5001)",
-      "Bash(xargs kill -9)"
+      "Bash(xargs kill -9)",
+      "Bash(awk '/^@app.route.*POST/ {route=$0; getline; while \\($0 ~ /^@/\\) {decorator=$0; print route \" + \" decorator; getline}; print route \" + def \" $2} /^@app.route.*GET/ {route=$0; print route}' /Users/jackcheah/Documents/Personal/mtg-dashboard-v1/tournament_dashboard.py)"
     ],
     "deny": []
   },

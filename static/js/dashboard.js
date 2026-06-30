@@ -613,6 +613,7 @@
                     startOffset = 0;
                     clientStartTime = null;
                     timerRunning = false;
+                    window._timerAlarmPlayed = false;
                     if (timerIntervalId) { clearInterval(timerIntervalId); timerIntervalId = null; }
                     updateTimerDisplay();
                     showToast('Timer Reset', 'Timer has been reset to 00:00:00', 'success');
@@ -677,6 +678,22 @@
                     timerEl.classList.add('timer-expired');
                     // Make unsubmitted cards pulse
                     document.querySelectorAll('.table-card:not(.submitted)').forEach(c => c.classList.add('urgent'));
+                    // Audible alarm (once)
+                    if (!window._timerAlarmPlayed) {
+                        window._timerAlarmPlayed = true;
+                        try {
+                            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                            const osc = ctx.createOscillator();
+                            const gain = ctx.createGain();
+                            osc.type = 'square';
+                            osc.frequency.value = 800;
+                            gain.gain.value = 0.3;
+                            osc.connect(gain);
+                            gain.connect(ctx.destination);
+                            osc.start();
+                            setTimeout(() => { osc.stop(); ctx.close(); }, 500);
+                        } catch(e) {}
+                    }
                 } else if (remaining <= 300) { // 5 minutes remaining
                     timerEl.classList.add('timer-warning');
                 }
@@ -939,10 +956,11 @@
                         showToast('Success!', `Loaded ${data.team_count} teams (${data.player_count} players) | ${structureMsg}`, 'success');
                         document.getElementById('empty-state').style.display = 'none';
                     } else {
-                        // If no Excel file, sample data might be loaded
-                        if (data.teams && Object.keys(data.teams).length > 0) {
-
-                            // Update round selector with configured Swiss rounds and tournament structure
+                        // Check if server is offering sample data as fallback
+                        if (data.offer_sample) {
+                            offerSampleData();
+                        } else if (data.teams && Object.keys(data.teams).length > 0) {
+                            // Teams already loaded from a previous session
                             const hasSemifinals = data.has_semifinals || false;
                             const teamCount = Object.keys(data.teams).length;
                             updateRoundSelector(data.swiss_rounds || 4, hasSemifinals, teamCount);
@@ -953,7 +971,7 @@
                             const structureMsg = hasSemifinals ?
                                 `${teamCount} teams - ${data.swiss_rounds} Swiss rounds → Top 8 Cut → Finals` :
                                 `${teamCount} teams - ${data.swiss_rounds} Swiss rounds → Finals`;
-                            showToast('Sample Data Loaded', `Loaded ${teamCount} sample teams | ${structureMsg}`, 'warning');
+                            showToast('Data Loaded', `Loaded ${teamCount} teams | ${structureMsg}`, 'success');
                             document.getElementById('empty-state').style.display = 'none';
                         } else {
                             handleApiError(data, 'Failed to load participants');
@@ -965,6 +983,52 @@
                         'error', 8000);
                     console.error('Load participants error:', error);
                 }
+            }
+
+            // Offer sample data when no participant file is found
+            async function offerSampleData() {
+                const confirmed = await modalManager.confirm(
+                    'No Participant File Found',
+                    'No participant Excel file was found.\n\nWould you like to load sample data for testing/demo purposes?\n\nThis is NOT for real tournaments.',
+                    'Load Sample Data',
+                    'Cancel'
+                );
+                if (!confirmed) return;
+
+                try {
+                    const response = await fetch('/load_data', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ use_sample_data: true, sample_team_count: 8 })
+                    });
+                    const data = await response.json();
+                    if (data.success && data.teams) {
+                        addDemoModeBanner();
+                        if (data.event_mode) currentEventMode = data.event_mode;
+                        if (data.scoring_mode) currentScoringMode = data.scoring_mode;
+                        const hasSemifinals = data.has_semifinals || false;
+                        const teamCount = Object.keys(data.teams).length;
+                        updateRoundSelector(data.swiss_rounds || 4, hasSemifinals, teamCount);
+                        displayTeams(data.teams, data.player_scores);
+                        updateStats(data);
+                        showToast('Sample Data Loaded', `Loaded ${teamCount} sample teams for demo/testing`, 'warning', 5000);
+                        document.getElementById('empty-state').style.display = 'none';
+                    } else {
+                        showToast('Error', data.error || 'Failed to load sample data', 'error');
+                    }
+                } catch (error) {
+                    showToast('Error', 'Network error loading sample data', 'error');
+                }
+            }
+
+            function addDemoModeBanner() {
+                if (document.getElementById('demo-mode-banner')) return;
+                const banner = document.createElement('div');
+                banner.id = 'demo-mode-banner';
+                banner.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; z-index: 9999; background: linear-gradient(90deg, #dc2626, #b91c1c); color: white; text-align: center; padding: 8px 16px; font-weight: 700; font-size: 0.85rem; letter-spacing: 0.5px;';
+                banner.textContent = 'DEMO MODE — Sample data loaded. Not a real tournament.';
+                document.body.prepend(banner);
+                document.body.style.paddingTop = '36px';
             }
 
             // Display Teams
@@ -1236,6 +1300,45 @@
                 }
             }
 
+            // Reset Tournament
+            async function resetTournament() {
+                const confirmed = await modalManager.confirm(
+                    'Reset Tournament',
+                    'This will DELETE ALL tournament data including scores, pairings, and results.\n\nBackup files will be preserved and can be restored.\n\nThis action cannot be undone.',
+                    'Continue',
+                    'Cancel'
+                );
+                if (!confirmed) return;
+
+                const typed = await modalManager.prompt(
+                    'Confirm Reset',
+                    'Type RESET to confirm complete tournament reset:',
+                    '',
+                    'RESET'
+                );
+                if (!typed || typed.toUpperCase() !== 'RESET') {
+                    showToast('Cancelled', 'Tournament reset cancelled.', 'info');
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/reset_tournament', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ confirm: 'RESET' })
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        showToast('Tournament Reset', 'All data cleared. Reloading...', 'success');
+                        setTimeout(() => window.location.reload(), 1000);
+                    } else {
+                        showToast('Error', data.error || 'Reset failed', 'error');
+                    }
+                } catch (error) {
+                    showToast('Error', 'Network error during reset', 'error');
+                }
+            }
+
             // Restore Backup
             async function restoreBackup() {
                 const confirmed = await modalManager.confirm(
@@ -1303,17 +1406,23 @@
                 }
             }
 
+            let _loadRoundId = 0;
             async function loadRound() {
                 const roundSelect = document.getElementById('round-select');
                 const round = roundSelect.value;
 
                 if (!round) return;
 
+                // Guard against rapid calls: only the latest call proceeds
+                const thisLoadId = ++_loadRoundId;
+
                 // Clear stale scores from previous round
                 Object.keys(tableScores).forEach(key => delete tableScores[key]);
+                window.currentRoundScores = {};
 
                 try {
                     const response = await fetch(`/get_tables/${round}`);
+                    if (thisLoadId !== _loadRoundId) return;
                     const data = await response.json();
 
                     console.log('Load round response:', data);
@@ -1714,6 +1823,15 @@
                         });
 
                         console.log(`Submission progress: ${data.submitted_count}/${data.total_tables} (${data.progress_percent}%)`);
+
+                        // Sync can_finalize from server
+                        if (data.can_finalize !== undefined) {
+                            window.canFinalize = data.can_finalize;
+                            updateFinalizeButtonState();
+                        }
+
+                        // Update remaining tables widget
+                        updateRemainingTablesWidget(data);
 
                         // Show drop player button when all tables submitted (individual mode only)
                         if (data.is_complete && currentEventMode === 'individual') {
@@ -2486,7 +2604,12 @@
             }
 
             async function confirmDropPlayer(playerId, playerName) {
-                const confirmed = confirm(`Drop ${playerName} from the tournament?\n\nThey will not participate in future rounds. Their current score will be frozen.`);
+                const confirmed = await modalManager.confirm(
+                    'Drop Player',
+                    `Drop ${playerName} from the tournament?\n\nThey will not participate in future rounds. Their current score will be frozen.`,
+                    'Drop Player',
+                    'Cancel'
+                );
                 if (!confirmed) return;
 
                 const currentRound = document.getElementById('round-select').value;
@@ -2570,13 +2693,9 @@
                     const data = await response.json();
 
                     if (data.success && data.teams) {
-                        // Update dropped players cache from server
+                        // Update dropped players cache from server response
                         if (currentEventMode === 'individual') {
-                            try {
-                                const stateRes = await fetch('/get_tournament_state');
-                                const stateData = await stateRes.json();
-                                window._droppedPlayersCache = stateData.dropped_players || {};
-                            } catch (e) { /* non-critical */ }
+                            window._droppedPlayersCache = data.dropped_players || {};
                         }
 
                         // Update team display with fresh scores
@@ -2810,11 +2929,13 @@
                     finalizeBtn.style.opacity = '0.5';
                     finalizeBtn.style.cursor = 'not-allowed';
                     finalizeBtn.classList.remove('finalize-pulse');
+                    finalizeBtn.title = 'Submit all tables before finalizing the round';
                 } else {
                     finalizeBtn.disabled = false;
                     finalizeBtn.style.opacity = '1';
                     finalizeBtn.style.cursor = 'pointer';
                     finalizeBtn.classList.add('finalize-pulse');
+                    finalizeBtn.title = 'All tables submitted — click to finalize and generate next round';
                 }
             }
 
@@ -2929,9 +3050,19 @@
                                 if (nextRound <= swissRounds) {
                                     showToast('Loading Next Round...', `Moving to Swiss Round ${nextRound}`, 'info');
 
-                                    setTimeout(() => {
-                                        document.getElementById('round-select').value = String(nextRound);
-                                        loadRound();
+                                    setTimeout(async () => {
+                                        try {
+                                            const checkRes = await fetch(`/get_tables/${nextRound}`);
+                                            const checkData = await checkRes.json();
+                                            if (checkData.tables && Object.keys(checkData.tables).length > 0) {
+                                                document.getElementById('round-select').value = String(nextRound);
+                                                loadRound();
+                                            } else {
+                                                showToast('Please Wait', 'Next round is being generated...', 'info');
+                                            }
+                                        } catch (e) {
+                                            showToast('Error', 'Could not load next round', 'error');
+                                        }
                                     }, 1500);
                                 }
                             }
@@ -2960,17 +3091,24 @@
                 const mvpName = document.getElementById('mvp-name');
                 const mvpScore = document.getElementById('mvp-score');
 
-                // Set champion name
-                championName.textContent = winnerData.winning_team;
+                if (!winnerData || !modal) return;
 
-                // Set MVP
-                mvpName.textContent = `${winnerData.mvp_player.name} (${winnerData.mvp_player.team})`;
-                mvpScore.textContent = `${winnerData.mvp_player.total_points} Total Points`;
+                // Set champion name
+                championName.textContent = winnerData.winning_team || 'Champion';
+
+                // Set MVP (null-safe)
+                if (winnerData.mvp_player) {
+                    mvpName.textContent = `${winnerData.mvp_player.name} (${winnerData.mvp_player.team})`;
+                    mvpScore.textContent = `${winnerData.mvp_player.total_points} Total Points`;
+                } else {
+                    mvpName.textContent = 'N/A';
+                    mvpScore.textContent = '';
+                }
 
                 // Build standings list
                 standingsList.innerHTML = '';
 
-                winnerData.final_standings.forEach((team, index) => {
+                (winnerData.final_standings || []).forEach((team, index) => {
                     const row = document.createElement('div');
                     row.className = 'standing-row' + (index === 0 ? ' champion' : '');
 
@@ -3218,11 +3356,13 @@
 
             // Session recovery: detect server restart and prompt backup restore
             let lastKnownState = null;
+            let initialLoadDone = false;
             async function checkServerState() {
                 try {
                     const res = await fetch('/get_state_info');
                     const data = await res.json();
                     const currentState = data.current_state;
+                    const info = data.tournament_info || {};
 
                     // Update canFinalize from state info if available
                     if (data.can_finalize !== undefined) {
@@ -3240,7 +3380,48 @@
                         }
                     }
 
+                    // Auto-restore active tournament view on first page load
+                    if (!initialLoadDone && currentState && currentState !== 'initial' && currentState !== 'participants_loaded') {
+                        initialLoadDone = true;
+                        console.log(`[AUTO-RESTORE] Tournament active (state: ${currentState}, round: ${info.current_round})`);
+
+                        // Restore event/scoring mode from server
+                        const stateRes = await fetch('/get_tournament_state');
+                        const stateData = await stateRes.json();
+                        if (stateData.event_mode) {
+                            currentEventMode = stateData.event_mode;
+                            if (currentEventMode === 'individual') addIndividualModeIndicator();
+                        }
+                        if (stateData.scoring_mode) {
+                            currentScoringMode = stateData.scoring_mode;
+                            if (currentScoringMode === 'japanese') addJapaneseModeIndicator();
+                        }
+
+                        // Update round selector
+                        window.tournamentSwissRounds = info.swiss_rounds_count || 4;
+                        window.swissRoundsCount = info.swiss_rounds_count || 4;
+                        window.hasSemifinals = info.has_semifinals || false;
+                        window.totalTeams = info.team_count || 0;
+                        window.tournamentMaxRounds = info.max_rounds || 5;
+                        window.hasIndividualTopCut = stateData.has_top_cut || false;
+                        updateRoundSelector(info.swiss_rounds_count || 4, info.has_semifinals || false, info.team_count);
+
+                        // Switch to active controls and select current round
+                        showActiveRoundControls();
+                        document.getElementById('round-select').value = String(info.current_round || 1);
+                        loadRound();
+
+                        // Update teams display
+                        if (stateData.teams) {
+                            displayTeams(stateData.teams, stateData.player_scores);
+                            document.getElementById('empty-state').style.display = 'none';
+                        }
+                    } else if (!initialLoadDone) {
+                        initialLoadDone = true;
+                    }
+
                     if (lastKnownState && lastKnownState !== 'initial' && currentState === 'initial') {
+                        initialLoadDone = false;
                         const restore = await modalManager.confirm('Server Restarted', 'The server appears to have restarted. Would you like to restore from backup?', 'Restore', 'Skip');
                         if (restore) {
                             const restoreRes = await fetch('/restore_backup', { method: 'POST' });
