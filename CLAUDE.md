@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 MTG Tournament Dashboard is a production-ready web-based tournament management system for **Magic: The Gathering cEDH tournaments**. It supports both **team events** (4 players per team) and **individual events** (solo players). It implements Swiss-system pairing with automatic round generation, intelligent seating, and finals management.
 
-**Tech Stack:** Python 3.13+ | Flask 3.0+ | Vanilla JavaScript | In-memory state management (with JSON persistence)
+**Tech Stack:** Python 3.9+ | Flask 3.0+ | Vanilla JavaScript | In-memory state management (with JSON persistence)
 **Developed for:** Knights of Round Table - cEDH Championship tournaments
 
 ---
@@ -67,18 +67,20 @@ The system supports two event modes, selected before loading participants:
 
 ### Team Mode
 
-| Teams | Players | Swiss Rounds | Playoffs | Total Rounds |
-|-------|---------|--------------|----------|--------------|
-| 8     | 32      | 4            | Finals   | 5            |
-| 12    | 48      | 4            | Finals   | 5            |
-| 16    | 64      | 4            | Top 8 Cut + Finals | 6 |
+Swiss rounds are configurable: 3, 4 (default), or 5 via `setup_tournament(swiss_rounds=N)` or `/set_swiss_rounds`.
+
+| Teams | Players | Swiss Rounds | Playoffs           | Total Rounds |
+|-------|---------|--------------|--------------------|--------------|
+| 8     | 32      | 3-5          | Finals             | 4-6          |
+| 12    | 48      | 3-5          | Finals             | 4-6          |
+| 16    | 64      | 3-5          | Top 8 Cut + Finals | 5-7          |
 
 ### Individual Mode
 
-| Players | Swiss Rounds | Playoffs | Total Rounds |
-|---------|--------------|----------|--------------|
-| ≤16     | 4            | Finals (top 4) | 5 |
-| 17+     | 4            | Top Cut (top 10) + Finals (top 4) | 6 |
+| Players | Swiss Rounds | Playoffs                          | Total Rounds |
+|---------|--------------|-----------------------------------|--------------|
+| ≤16     | 3-5          | Finals (top 4)                    | 4-6          |
+| 17+     | 3-5          | Top Cut (top 10) + Finals (top 4) | 5-7          |
 
 ### Scoring Modes (both apply to Team and Individual)
 - **Western:** Win=5, Draw=1, Loss=0. Start at 0 points.
@@ -120,7 +122,7 @@ The system supports two event modes, selected before loading participants:
 - **`_handle_round_transition()`**: Routes to correct next phase based on event mode and round number.
 - **`generate_swiss_round()`**: Creates/rebuilds `UnifiedSwissPairing` engine, handles bye allocation for individual mode.
 - **`drop_player()`**: Individual mode only. Removes player from active structures, forces pairing engine rebuild.
-- **`_generate_round_individual_mode()`**: Score-sorted Swiss pairing for individuals with swap optimization.
+- **`UnifiedSwissPairing._generate_round_individual_mode()`** (in `unified_swiss_pairing.py`): Score-sorted Swiss pairing for individuals with swap optimization.
 - **Score validation**: Pod-size-aware (3 or 4 players), mode-aware (team vs individual).
 
 ### Persistence
@@ -151,6 +153,26 @@ The system supports two event modes, selected before loading participants:
 | `/restore_backup` | POST | Restore tournament state from backup |
 | `/final_standings` | GET | Final standings with MVP calculation |
 | `/export/standings` | GET | Download standings as CSV |
+| `/set_swiss_rounds` | POST | Set Swiss round count (3, 4, or 5) |
+| `/unfinalize_round` | POST | Undo most recently finalized round (PIN-protected) |
+| `/undrop_player` | POST | Re-add a dropped player (PIN-protected) |
+| `/get_tables/<round>` | GET | Table assignments for a specific round |
+| `/get_teams` | GET | All teams and players |
+| `/get_scores` | GET | Current team scores |
+| `/get_player_scores` | GET | Individual player scores |
+| `/standings` | GET | Current sorted standings |
+| `/find_player/<player_id>` | GET | Find which table a player is at |
+| `/search_player` | GET | Search player by name (query param `q`) |
+| `/validate_integrity` | GET | Tournament data integrity check |
+| `/validate_round/<round>` | GET | Validate Swiss pairings for a round |
+| `/bracket_groups/<round>` | GET | Bracket display groupings |
+| `/bracket_standings/<round>` | GET | Bracket standings for visualization |
+| `/control_timer` | POST | Start/stop/reset round timer |
+| `/get_timer` | GET | Current timer state |
+| `/list_backups` | GET | List available backup files |
+| `/backup_health` | GET | Backup health status |
+| `/tournament_statistics` | GET | Detailed stats and validation info |
+| `/get_score_history/<round>/<table>` | GET | Score edit audit trail |
 
 ---
 

@@ -276,13 +276,14 @@ class TournamentSimulator:
         page.goto(self.url)
         page.wait_for_load_state("networkidle")
         
-        # Check for existing tournament and reset if needed
-        reset_btn = page.locator("text=Reset Tournament").first
-        if reset_btn.is_visible():
-            print("Resetting existing tournament...")
-            page.on("dialog", lambda dialog: dialog.accept())
-            reset_btn.click()
-            page.wait_for_load_state("networkidle")
+        # Check for existing tournament and reset if needed via API
+        reset_response = page.request.post(
+            f"{self.url}/reset_tournament",
+            data=json.dumps({"confirm": "RESET"}),
+            headers={"Content-Type": "application/json"}
+        )
+        if reset_response.ok:
+            print("Reset existing tournament via API.")
             page.reload()
             page.wait_for_load_state("networkidle")
         

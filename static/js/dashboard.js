@@ -322,6 +322,7 @@
 
             let currentEventMode = null;  // null until selected: 'team' or 'individual'
             let selectedEventModeTemp = null;
+            let initialStateLoaded = false;  // Gate for mode-dependent rendering
 
             function showEventModeModal() {
                 const overlay = document.getElementById('event-mode-overlay');
@@ -395,8 +396,9 @@
             function addIndividualModeIndicator() {
                 const header = document.querySelector('.header p');
                 if (header) {
-                    // Update subtitle text
-                    header.childNodes[0].textContent = 'Knights of Round Table - CEDH Individual Championship ';
+                    // Update subtitle text (find text node safely)
+                    const textNode = Array.from(header.childNodes).find(n => n.nodeType === Node.TEXT_NODE);
+                    if (textNode) textNode.textContent = 'Knights of Round Table - CEDH Individual Championship ';
                     if (!document.getElementById('individual-badge')) {
                         const badge = document.createElement('span');
                         badge.id = 'individual-badge';
@@ -433,9 +435,9 @@
                 const overlay = document.getElementById('scoring-mode-overlay');
                 if (overlay) {
                     overlay.classList.add('show');
-                    // Reset selection state
+                    // Reset selection state (scoped to scoring overlay only)
                     selectedScoringModeTemp = null;
-                    document.querySelectorAll('.scoring-mode-card').forEach(card => {
+                    overlay.querySelectorAll('.scoring-mode-card').forEach(card => {
                         card.classList.remove('selected');
                     });
                     document.getElementById('confirm-scoring-mode-btn').disabled = true;
@@ -566,11 +568,15 @@
 
             async function startTimer() {
                 try {
-                    await fetch('/control_timer', {
+                    const response = await fetch('/control_timer', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ action: 'start' })
                     });
+                    if (!response.ok) {
+                        showToast('Error', 'Failed to start timer - server error', 'error');
+                        return;
+                    }
                     startOffset = seconds;
                     clientStartTime = Date.now();
                     timerRunning = true;
@@ -587,11 +593,15 @@
                     if (clientStartTime) {
                         seconds = startOffset + (Date.now() - clientStartTime) / 1000;
                     }
-                    await fetch('/control_timer', {
+                    const response = await fetch('/control_timer', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ action: 'stop' })
                     });
+                    if (!response.ok) {
+                        showToast('Error', 'Failed to stop timer - server error', 'error');
+                        return;
+                    }
                     timerRunning = false;
                     clientStartTime = null;
                     if (timerIntervalId) { clearInterval(timerIntervalId); timerIntervalId = null; }
@@ -604,11 +614,15 @@
 
             async function resetTimer() {
                 try {
-                    await fetch('/control_timer', {
+                    const response = await fetch('/control_timer', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ action: 'reset' })
                     });
+                    if (!response.ok) {
+                        showToast('Error', 'Failed to reset timer - server error', 'error');
+                        return;
+                    }
                     seconds = 0;
                     startOffset = 0;
                     clientStartTime = null;
@@ -898,7 +912,16 @@
 
             // Load Participants
             async function loadParticipants() {
-                // If event mode not set yet, show event mode modal first
+                // Wait for initial state if not yet loaded
+                if (!currentEventMode && !initialStateLoaded) {
+                    await new Promise(resolve => {
+                        const check = setInterval(() => {
+                            if (initialStateLoaded) { clearInterval(check); resolve(); }
+                        }, 100);
+                        setTimeout(() => { clearInterval(check); resolve(); }, 5000);
+                    });
+                }
+                // If event mode still not set after state load, show modal
                 if (!currentEventMode) {
                     showEventModeModal();
                     return;
@@ -1363,14 +1386,28 @@
                     if (data.success) {
                         showToast('Success', data.message, 'success');
 
-                        // Reload data to refresh UI
-                        await loadParticipants(); // Refresh teams/scores
+                        // Fetch restored state to set event/scoring mode BEFORE loadParticipants
+                        try {
+                            const stateRes = await fetch('/get_state_info');
+                            const stateData = await stateRes.json();
+                            if (stateData.event_mode) {
+                                currentEventMode = stateData.event_mode;
+                                if (currentEventMode === 'individual') addIndividualModeIndicator();
+                            }
+                            if (stateData.scoring_mode) {
+                                currentScoringMode = stateData.scoring_mode;
+                                if (currentScoringMode === 'japanese') addJapaneseModeIndicator();
+                            }
+                            initialStateLoaded = true;
+                        } catch (e) { /* best effort */ }
+
+                        await loadParticipants();
 
                         // Check if tournament is active and switch controls
                         if (data.current_round) {
                             showActiveRoundControls();
                             document.getElementById('round-select').value = data.current_round;
-                            loadRound(); // Load tables for current round
+                            loadRound();
                         }
                     } else {
                         showToast('Restore Failed', data.message, 'error');
@@ -1427,7 +1464,7 @@
 
                     console.log('Load round response:', data);
 
-                    if (data.tables) {
+                    if (data.success && data.tables) {
                         window.currentTables = data.tables;
                         window.playerScores = data.player_scores || {};
 
@@ -1536,7 +1573,7 @@
                 // Get tournament configuration
                 const swissRounds = window.tournamentSwissRounds || 4;
                 const totalTeams = window.totalTeams || 0;
-                const hasSemifinals = totalTeams === 16;
+                const hasSemifinals = window.hasSemifinals || totalTeams === 16;
 
                 // Define tournament phases
                 const phases = [];
@@ -1615,7 +1652,7 @@
                 // Get tournament configuration
                 const swissRounds = window.tournamentSwissRounds || 4;
                 const totalTeams = window.totalTeams || 0;
-                const hasSemifinals = totalTeams === 16;
+                const hasSemifinals = window.hasSemifinals || totalTeams === 16;
 
                 const roundType = getRoundType(currentRound);
 
@@ -1711,37 +1748,6 @@
                     console.error('Error updating bracket visualization:', error);
                     bracketContainer.style.display = 'none';
                 }
-            }
-
-            // Generate HTML for a single matchup (legacy 1v1 format - kept for compatibility)
-            function generateMatchupHTML(matchup, matchupNumber) {
-                const team1 = matchup.teams[0];
-                const team2 = matchup.teams[1];
-
-                if (!team1 || !team2) return '';
-
-                return `
-                <div class="bracket-matchup">
-                    <div class="matchup-header">${matchup.label}</div>
-                    <div class="matchup-teams">
-                        <div class="matchup-team">
-                            <div class="team-info">
-                                <div class="team-seed">${team1.rank || '?'}</div>
-                                <div class="team-name">${escapeHtml(team1.team || 'Unknown')}</div>
-                            </div>
-                            <div class="team-score">${team1.total_points || 0} pts</div>
-                        </div>
-                        <div class="bracket-vs">VS</div>
-                        <div class="matchup-team">
-                            <div class="team-info">
-                                <div class="team-seed">${team2.rank || '?'}</div>
-                                <div class="team-name">${escapeHtml(team2.team || 'Unknown')}</div>
-                            </div>
-                            <div class="team-score">${team2.total_points || 0} pts</div>
-                        </div>
-                    </div>
-                </div>
-            `;
             }
 
             // Generate HTML for a pod matchup (4-player format)
@@ -2561,8 +2567,9 @@
                         <div style="display: flex; align-items: center; padding: 8px 12px; border-bottom: 1px solid rgba(255,255,255,0.05);">
                             <span style="flex: 1; font-weight: 500;">${escapeHtml(p.name)}</span>
                             <span style="margin-right: 16px; opacity: 0.7;">${formatScore(p.score)}</span>
-                            <button class="btn btn-danger" style="padding: 4px 12px; font-size: 0.75rem;"
-                                onclick="confirmDropPlayer(${p.id}, '${escapeHtml(p.name).replace(/'/g, "\\'")}')">
+                            <button class="btn btn-danger drop-player-btn" style="padding: 4px 12px; font-size: 0.75rem;"
+                                data-player-id="${p.id}"
+                                data-player-name="${escapeHtml(p.name)}">
                                 <i class="fas fa-times"></i> Drop
                             </button>
                         </div>
@@ -2591,6 +2598,16 @@
                     const existingModal = document.getElementById('drop-player-overlay');
                     if (existingModal) existingModal.remove();
                     document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+                    // Attach drop button handlers (safe from XSS — no inline JS)
+                    document.querySelectorAll('.drop-player-btn').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            confirmDropPlayer(
+                                parseInt(this.dataset.playerId),
+                                this.dataset.playerName
+                            );
+                        });
+                    });
 
                 } catch (error) {
                     console.error('Error showing drop player modal:', error);
@@ -2979,6 +2996,11 @@
                         })
                     });
 
+                    if (!response.ok) {
+                        const errData = await response.json().catch(() => ({}));
+                        showToast('Error', errData.error || `Server error (${response.status}). Please try again.`, 'error');
+                        return;
+                    }
                     const data = await response.json();
 
                     if (data.success) {
@@ -3308,8 +3330,8 @@
             // ============================================
 
             function dismissSetupWizard() {
-                // Only allow dismissing if tournament state is NOT initial
-                if (lastKnownState === 'initial' || lastKnownState === null) {
+                // Only block dismiss if we KNOW state is initial (not when unknown/null)
+                if (lastKnownState === 'initial') {
                     showToast('Setup Required', 'Please complete setup to continue', 'warning');
                     return;
                 }
@@ -3435,9 +3457,10 @@
                         }
                     }
                     lastKnownState = currentState;
+                    initialStateLoaded = true;
                 } catch (e) { }
+                setTimeout(checkServerState, 5000);
             }
-            setInterval(checkServerState, 5000);
 
             // Auto-load on page load
             window.addEventListener('DOMContentLoaded', () => {

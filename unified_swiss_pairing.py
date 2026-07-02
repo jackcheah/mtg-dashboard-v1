@@ -168,37 +168,6 @@ class HybridConstraintSolver:
         
         return valid_candidates
     
-    def solve_with_enhanced_backtracking(self, available_players: List[Dict]) -> Optional[List[List[Dict]]]:
-        """
-        Solve round using enhanced constraint satisfaction with intelligent backtracking.
-        
-        Args:
-            available_players: List of players to assign to pods
-            
-        Returns:
-            List of pods or None if no solution found
-        """
-        self.backtrack_stats = {'nodes_explored': 0, 'backtracks': 0, 'pruned_branches': 0}
-        
-        # Build constraint graph
-        constraint_graph = self.build_constraint_graph(available_players)
-        self.constraint_graph = constraint_graph
-        
-        # Calculate initial constraint degrees
-        constraint_degrees = self.calculate_constraint_degrees(available_players, constraint_graph)
-        
-        # Sort players by most-constrained-first heuristic
-        sorted_players = sorted(available_players, 
-                              key=lambda p: constraint_degrees[p['Player ID']], 
-                              reverse=True)
-        
-        result = self._backtrack_with_constraints(sorted_players, [], constraint_graph)
-        
-        print(f"    Backtrack stats: {self.backtrack_stats['nodes_explored']} nodes, "
-              f"{self.backtrack_stats['backtracks']} backtracks, "
-              f"{self.backtrack_stats['pruned_branches']} pruned")
-        
-        return result
     
     def _backtrack_with_constraints(self, available_players: List[Dict], current_pods: List[List[Dict]], 
                                   constraint_graph: Dict[int, Set[int]]) -> Optional[List[List[Dict]]]:
@@ -460,10 +429,12 @@ class UnifiedSwissPairing:
         self.pods_per_round = self.total_players // 4
         self.incomplete_pod_size = self.total_players % 4
         
-        # For team counts not divisible by 4, we need special handling
+        # Team mode requires team count divisible by 4
         if not self.is_individual_mode and len(self.tournament_teams) % 4 != 0:
-            print(f"[WARNING]  Note: {len(self.tournament_teams)} teams cannot form perfect 4-team pods")
-            print(f"   Tournament will use mixed pod sizes for optimal pairing")
+            raise ValueError(
+                f"Team mode requires team count divisible by 4. "
+                f"Got {len(self.tournament_teams)} teams. Supported counts: 8, 12, 16."
+            )
         
         # Initialize constraint tracking
         self.used_pairings: Set[Tuple[int, int]] = set()
@@ -556,49 +527,6 @@ class UnifiedSwissPairing:
         # Randomize player order to prevent deterministic pod groupings (e.g. Team A always in Seat 1)
         random.shuffle(self.players)
     
-    def generate_all_rounds(self) -> Tuple[bool, List[List[List[Dict]]]]:
-        """
-        Generate all Swiss rounds using the unified algorithm.
-        
-        Returns:
-            Tuple of (success, list_of_round_pairings)
-        """
-        print("[ROCKET] Generating all Swiss rounds with unified algorithm...")
-        
-        # Try multiple approaches in order of preference
-        approaches = [
-            ("Enhanced Constraint Satisfaction", self._solve_with_constraint_satisfaction),
-            ("Dynamic Pairing with Backtracking", self._solve_with_dynamic_pairing),
-            ("Relaxed Constraint Optimization", self._solve_with_relaxed_constraints)
-        ]
-        
-        for approach_name, solve_method in approaches:
-            print(f"\n--- Attempting {approach_name} ---")
-            
-            # Reset state for new attempt
-            self._reset_constraint_tracking()
-            
-            try:
-                success, solution = solve_method()
-                
-                if success:
-                    self.round_solutions = solution
-                    generation_time = time.time() - self.start_time
-                    
-                    print(f"[OK] {approach_name} succeeded!")
-                    print(f"   Generation time: {generation_time:.2f} seconds")
-                    print(f"   Total rounds: {len(solution)}")
-                    
-                    return True, solution
-                else:
-                    print(f"[ERROR] {approach_name} failed")
-                    
-            except Exception as e:
-                print(f"[ERROR] {approach_name} error: {str(e)}")
-                continue
-        
-        print("[ERROR] All approaches failed to generate valid tournament")
-        return False, []
 
     def generate_single_round(self, round_num: int) -> Tuple[bool, List[List[Dict]]]:
         """
@@ -628,6 +556,24 @@ class UnifiedSwissPairing:
             if round_solution is None:
                 print(f"  [ERROR] Failed to generate Round {round_num}")
                 return False, []
+
+            # Check for repeat matchups BEFORE updating constraints
+            self.last_round_had_repeats = False
+            for pod in round_solution:
+                player_ids = [p['Player ID'] for p in pod]
+                for i in range(len(player_ids)):
+                    for j in range(i + 1, len(player_ids)):
+                        pair = tuple(sorted([player_ids[i], player_ids[j]]))
+                        if pair in self.used_pairings:
+                            self.last_round_had_repeats = True
+                            break
+                    if self.last_round_had_repeats:
+                        break
+                if self.last_round_had_repeats:
+                    break
+
+            if self.last_round_had_repeats:
+                print(f"  [WARNING] Round {round_num} contains unavoidable repeat matchups")
 
             # Update constraints after this round
             self._update_constraints_after_round(round_solution)
@@ -766,6 +712,32 @@ class UnifiedSwissPairing:
             if not improved:
                 break
 
+        # Special pass: optimize 3-player pod by swapping with adjacent 4-player pod
+        three_player_indices = [i for i, p in enumerate(pods) if len(p) == 3]
+        for three_idx in three_player_indices:
+            repeat_3 = self._count_repeat_opponents_in_pod(pods[three_idx])
+            if repeat_3 == 0:
+                continue
+            adjacent_idx = three_idx - 1 if three_idx > 0 else three_idx + 1
+            if adjacent_idx < 0 or adjacent_idx >= len(pods) or len(pods[adjacent_idx]) != 4:
+                continue
+            old_repeat_adj = self._count_repeat_opponents_in_pod(pods[adjacent_idx])
+            best_swap = None
+            best_total = repeat_3 + old_repeat_adj
+            for pi in range(len(pods[three_idx])):
+                for pj in range(len(pods[adjacent_idx])):
+                    pods[three_idx][pi], pods[adjacent_idx][pj] = pods[adjacent_idx][pj], pods[three_idx][pi]
+                    new_total = (self._count_repeat_opponents_in_pod(pods[three_idx]) +
+                                 self._count_repeat_opponents_in_pod(pods[adjacent_idx]))
+                    if new_total < best_total:
+                        best_swap = (pi, pj)
+                        best_total = new_total
+                    pods[three_idx][pi], pods[adjacent_idx][pj] = pods[adjacent_idx][pj], pods[three_idx][pi]
+            if best_swap:
+                pi, pj = best_swap
+                pods[three_idx][pi], pods[adjacent_idx][pj] = pods[adjacent_idx][pj], pods[three_idx][pi]
+                improvements += 1
+
         if improvements > 0:
             print(f"  [INDIVIDUAL] Pod optimization: {improvements} swaps made")
 
@@ -790,732 +762,7 @@ class UnifiedSwissPairing:
         for team_name in self.team_matchups:
             self.team_matchups[team_name].clear()
         self.round_solutions.clear()
-    
-    def _solve_with_constraint_satisfaction(self) -> Tuple[bool, List[List[List[Dict]]]]:
-        """
-        Primary algorithm: Team-grouping approach with pod consistency guarantee.
 
-        Returns:
-            Tuple of (success, solution)
-        """
-        solution = []
-
-        for round_num in range(1, self.swiss_rounds_count + 1):
-            print(f"  Solving Round {round_num}...")
-
-            # Use new pod-consistency approach
-            round_solution = self._generate_round_with_pod_consistency(round_num)
-
-            if round_solution is None:
-                print(f"  [ERROR] Failed to solve Round {round_num}")
-                return False, []
-
-            solution.append(round_solution)
-            self._update_constraints_after_round(round_solution)
-
-            print(f"  [OK] Round {round_num} solved ({len(round_solution)} pods)")
-
-        return True, solution
-    
-    def _solve_round_with_backtracking(self, round_num: int) -> Optional[List[List[Dict]]]:
-        """
-        Solve a single round using enhanced constraint satisfaction with intelligent backtracking.
-        
-        Args:
-            round_num: The round number being solved
-            
-        Returns:
-            List of pods or None if no solution found
-        """
-        available_players = self.players.copy()
-        
-        print(f"    Using enhanced constraint satisfaction solver...")
-        
-        # Use the enhanced constraint solver
-        result = self.constraint_solver.solve_with_enhanced_backtracking(available_players)
-        
-        if result is not None:
-            print(f"    [OK] Enhanced solver succeeded")
-            return result
-        
-        print(f"    [ERROR] Enhanced solver failed, trying fallback...")
-        
-        # Fallback to original backtracking if enhanced solver fails
-        available_players.sort(key=lambda p: self._count_valid_opponents(p), reverse=False)
-        return self._backtrack_round_solution(available_players, [])
-    
-    def _backtrack_round_solution(self, available_players: List[Dict], current_pods: List[List[Dict]]) -> Optional[List[List[Dict]]]:
-        """
-        Use backtracking to find a valid round solution.
-        
-        Args:
-            available_players: Players not yet assigned to pods
-            current_pods: Pods constructed so far
-            
-        Returns:
-            Complete list of pods or None if no solution
-        """
-        # Base case: all pods filled
-        expected_pods = self.pods_per_round + (1 if self.incomplete_pod_size > 0 else 0)
-        
-        if len(current_pods) == expected_pods:
-            return current_pods if len(available_players) == 0 else None
-        
-        # Determine pod size for next pod
-        if len(current_pods) < self.pods_per_round:
-            pod_size = 4
-        else:
-            pod_size = self.incomplete_pod_size
-        
-        # Try to create next pod
-        next_pod = self._find_valid_pod(available_players, pod_size)
-        
-        if next_pod is None:
-            return None
-        
-        # Recursively try this pod assignment
-        new_available = [p for p in available_players if p not in next_pod]
-        new_pods = current_pods + [next_pod]
-        
-        result = self._backtrack_round_solution(new_available, new_pods)
-        
-        if result is not None:
-            return result
-        
-        # If that didn't work, try other pod combinations
-        return self._try_alternative_pods(available_players, current_pods, pod_size)
-    
-    def _find_valid_pod(self, available_players: List[Dict], pod_size: int) -> Optional[List[Dict]]:
-        """
-        Find a valid pod from available players using constraint satisfaction.
-        
-        Args:
-            available_players: List of available players
-            pod_size: Required pod size (3 or 4)
-            
-        Returns:
-            List of players forming a valid pod, or None
-        """
-        # For 4-player pods, ensure team separation
-        if pod_size == 4:
-            return self._find_team_separated_pod(available_players)
-        else:
-            # For 3-player pods, find best available combination
-            return self._find_best_three_player_pod(available_players)
-    
-    def _find_team_separated_pod(self, available_players: List[Dict]) -> Optional[List[Dict]]:
-        """Find a 4-player pod with one player from each of 4 different teams."""
-        # Group players by team
-        players_by_team = {}
-        for player in available_players:
-            team = player['Team Name']
-            if team not in players_by_team:
-                players_by_team[team] = []
-            players_by_team[team].append(player)
-        
-        # Need at least 4 teams with available players
-        available_teams = [team for team, players in players_by_team.items() if len(players) > 0]
-        
-        if len(available_teams) < 4:
-            return None
-        
-        # Try combinations of 4 teams
-        for team_combo in combinations(available_teams, 4):
-            # Try all combinations of one player from each team
-            team_players = [players_by_team[team] for team in team_combo]
-            
-            for player_combo in self._cartesian_product(team_players):
-                if self._is_valid_pod(list(player_combo)):
-                    return list(player_combo)
-        
-        return None
-    
-    def _find_best_three_player_pod(self, available_players: List[Dict]) -> Optional[List[Dict]]:
-        """Find the best 3-player pod minimizing constraint violations."""
-        best_pod = None
-        min_violations = float('inf')
-        
-        for pod_combo in combinations(available_players, 3):
-            pod = list(pod_combo)
-            violations = self._count_pod_violations(pod)
-            
-            if violations < min_violations:
-                min_violations = violations
-                best_pod = pod
-                
-                # If we found a perfect pod, use it
-                if violations == 0:
-                    break
-        
-        return best_pod
-    
-    def _cartesian_product(self, lists: List[List]) -> List[Tuple]:
-        """Generate cartesian product of lists."""
-        if not lists:
-            return [()]
-        
-        result = []
-        for item in lists[0]:
-            for rest in self._cartesian_product(lists[1:]):
-                result.append((item,) + rest)
-        
-        return result
-    
-    def _is_valid_pod(self, pod: List[Dict]) -> bool:
-        """Check if a pod satisfies all hard constraints."""
-        if len(pod) < 3 or len(pod) > 4:
-            return False
-
-        # For 4-player pods, check team separation
-        if len(pod) == 4:
-            teams = {player['Team Name'] for player in pod}
-            if len(teams) != 4:
-                return False
-
-        # NEW: Check for repeat team matchups across all Swiss rounds
-        # Only enforce if strict team matchup constraint is enabled
-        if self.enforce_strict_team_matchups:
-            teams_in_pod = [player['Team Name'] for player in pod]
-            for i in range(len(teams_in_pod)):
-                for j in range(i + 1, len(teams_in_pod)):
-                    team1 = teams_in_pod[i]
-                    team2 = teams_in_pod[j]
-
-                    # If these teams have already faced each other, pod is invalid
-                    if team2 in self.team_matchups.get(team1, set()):
-                        return False
-
-        # Check for repeat player opponents
-        for i in range(len(pod)):
-            for j in range(i + 1, len(pod)):
-                player1_id = pod[i]['Player ID']
-                player2_id = pod[j]['Player ID']
-
-                if player2_id in self.player_opponents.get(player1_id, set()):
-                    return False
-
-        return True
-    
-    def _count_pod_violations(self, pod: List[Dict]) -> int:
-        """Count constraint violations in a pod."""
-        violations = 0
-
-        # Count teammate violations
-        teams = [player['Team Name'] for player in pod]
-        team_counts = {}
-        for team in teams:
-            team_counts[team] = team_counts.get(team, 0) + 1
-
-        for count in team_counts.values():
-            if count > 1:
-                violations += count - 1
-
-        # NEW: Count repeat team matchup violations
-        # Only count if strict team matchup constraint is enabled
-        if self.enforce_strict_team_matchups:
-            teams_in_pod = [player['Team Name'] for player in pod]
-            for i in range(len(teams_in_pod)):
-                for j in range(i + 1, len(teams_in_pod)):
-                    team1 = teams_in_pod[i]
-                    team2 = teams_in_pod[j]
-
-                    if team2 in self.team_matchups.get(team1, set()):
-                        violations += 1
-
-        # Count repeat player opponent violations
-        for i in range(len(pod)):
-            for j in range(i + 1, len(pod)):
-                player1_id = pod[i]['Player ID']
-                player2_id = pod[j]['Player ID']
-
-                if player2_id in self.player_opponents.get(player1_id, set()):
-                    violations += 1
-
-        return violations
-    
-    def _count_valid_opponents(self, player: Dict) -> int:
-        """Count how many valid opponents a player has (for heuristic ordering)."""
-        player_id = player['Player ID']
-        player_team = player['Team Name']
-        
-        count = 0
-        for other_player in self.players:
-            if (other_player['Player ID'] != player_id and 
-                other_player['Team Name'] != player_team and
-                other_player['Player ID'] not in self.player_opponents.get(player_id, set())):
-                count += 1
-        
-        return count
-    
-    def _try_alternative_pods(self, available_players: List[Dict], current_pods: List[List[Dict]], pod_size: int) -> Optional[List[List[Dict]]]:
-        """Try alternative pod combinations when backtracking fails."""
-        # This is a simplified fallback - in a full implementation,
-        # we would try different pod combinations systematically
-        return None
-    
-    def _solve_with_dynamic_pairing(self) -> Tuple[bool, List[List[List[Dict]]]]:
-        """
-        Enhanced fallback algorithm: Dynamic pairing with intelligent heuristics and multiple strategies.
-        
-        Returns:
-            Tuple of (success, solution)
-        """
-        strategies = [
-            ("Constraint-Guided Random", self._dynamic_pairing_constraint_guided),
-            ("Team-Balanced Random", self._dynamic_pairing_team_balanced),
-            ("Pure Random", self._dynamic_pairing_pure_random)
-        ]
-        
-        for strategy_name, strategy_method in strategies:
-            print(f"    Trying {strategy_name} strategy...")
-            
-            max_attempts = 500  # Reduced per strategy but multiple strategies
-            
-            for attempt in range(max_attempts):
-                self._reset_constraint_tracking()
-                
-                success, solution = strategy_method()
-                
-                if success:
-                    print(f"    [OK] {strategy_name} succeeded on attempt {attempt + 1}")
-                    return True, solution
-                
-                if (attempt + 1) % 100 == 0:
-                    print(f"      Attempt {attempt + 1}/{max_attempts}...")
-            
-            print(f"    [ERROR] {strategy_name} failed after {max_attempts} attempts")
-        
-        return False, []
-    
-    def _dynamic_pairing_constraint_guided(self) -> Tuple[bool, List[List[List[Dict]]]]:
-        """Dynamic pairing guided by constraint analysis."""
-        solution = []
-        
-        for round_num in range(1, self.swiss_rounds_count + 1):
-            # Build constraint graph for this round
-            constraint_graph = self.constraint_solver.build_constraint_graph(self.players)
-            
-            # Generate round using constraint guidance
-            round_solution = self._generate_round_with_constraint_guidance(constraint_graph)
-            
-            if round_solution is None:
-                return False, []
-            
-            solution.append(round_solution)
-            self._update_constraints_after_round(round_solution)
-        
-        return True, solution
-    
-    def _dynamic_pairing_team_balanced(self) -> Tuple[bool, List[List[List[Dict]]]]:
-        """Dynamic pairing with team balance optimization."""
-        solution = []
-        
-        for round_num in range(1, self.swiss_rounds_count + 1):
-            round_solution = self._generate_round_team_balanced()
-            
-            if round_solution is None:
-                return False, []
-            
-            solution.append(round_solution)
-            self._update_constraints_after_round(round_solution)
-        
-        return True, solution
-    
-    def _dynamic_pairing_pure_random(self) -> Tuple[bool, List[List[List[Dict]]]]:
-        """Pure random dynamic pairing (original algorithm)."""
-        solution = []
-        
-        for round_num in range(1, self.swiss_rounds_count + 1):
-            round_solution = self._generate_round_dynamically(round_num)
-            
-            if round_solution is None:
-                return False, []
-            
-            solution.append(round_solution)
-            self._update_constraints_after_round(round_solution)
-        
-        return True, solution
-    
-    def _generate_round_with_constraint_guidance(self, constraint_graph: Dict[int, Set[int]]) -> Optional[List[List[Dict]]]:
-        """Generate a round using constraint graph guidance."""
-        available_players = self.players.copy()
-        
-        # Sort players by constraint degree (most constrained first)
-        constraint_degrees = self.constraint_solver.calculate_constraint_degrees(available_players, constraint_graph)
-        available_players.sort(key=lambda p: constraint_degrees[p['Player ID']], reverse=True)
-        
-        pods = []
-        used_players = set()
-        
-        # Create full 4-player pods first
-        for _ in range(self.pods_per_round):
-            pod = self._create_constraint_guided_pod(available_players, used_players, 4, constraint_graph)
-            if pod is None:
-                return None
-            
-            pods.append(pod)
-            used_players.update(p['Player ID'] for p in pod)
-        
-        # Create incomplete pod if needed
-        if self.incomplete_pod_size > 0:
-            remaining_players = [p for p in available_players if p['Player ID'] not in used_players]
-            if len(remaining_players) == self.incomplete_pod_size:
-                # Validate the remaining pod
-                if self._count_constraint_violations(remaining_players, constraint_graph) <= 2:  # Allow some violations for incomplete pods
-                    pods.append(remaining_players)
-                else:
-                    return None
-            else:
-                return None
-        
-        return pods
-    
-    def _create_constraint_guided_pod(self, available_players: List[Dict], used_players: Set[int], 
-                                    pod_size: int, constraint_graph: Dict[int, Set[int]]) -> Optional[List[Dict]]:
-        """Create a pod using constraint graph guidance."""
-        candidates = [p for p in available_players if p['Player ID'] not in used_players]
-        
-        if len(candidates) < pod_size:
-            return None
-        
-        if pod_size == 4:
-            # Use constraint-guided team separation
-            return self._create_team_separated_pod_guided(candidates, constraint_graph)
-        else:
-            # For partial pods, find best combination
-            return self.constraint_solver._build_partial_pod_with_constraints(candidates, pod_size, constraint_graph)
-    
-    def _create_team_separated_pod_guided(self, candidates: List[Dict], constraint_graph: Dict[int, Set[int]]) -> Optional[List[Dict]]:
-        """Create a 4-player pod with team separation using constraint guidance."""
-        # Group by team
-        players_by_team = {}
-        for player in candidates:
-            team = player['Team Name']
-            if team not in players_by_team:
-                players_by_team[team] = []
-            players_by_team[team].append(player)
-        
-        available_teams = [team for team, players in players_by_team.items() if len(players) > 0]
-        
-        if len(available_teams) < 4:
-            return None
-        
-        # Use constraint solver's method
-        return self.constraint_solver._find_constrained_team_combination(players_by_team, available_teams, constraint_graph)
-    
-    def _generate_round_team_balanced(self) -> Optional[List[List[Dict]]]:
-        """Generate a round with team balance optimization."""
-        available_players = self.players.copy()
-        
-        # Group players by team and track team usage
-        players_by_team = {}
-        for player in available_players:
-            team = player['Team Name']
-            if team not in players_by_team:
-                players_by_team[team] = []
-            players_by_team[team].append(player)
-        
-        pods = []
-        used_players = set()
-        
-        # Create full 4-player pods with team balance
-        for _ in range(self.pods_per_round):
-            pod = self._create_team_balanced_pod(players_by_team, used_players)
-            if pod is None:
-                return None
-            
-            pods.append(pod)
-            used_players.update(p['Player ID'] for p in pod)
-            
-            # Remove used players from team groups
-            for player in pod:
-                team = player['Team Name']
-                if player in players_by_team[team]:
-                    players_by_team[team].remove(player)
-        
-        # Handle incomplete pod
-        if self.incomplete_pod_size > 0:
-            remaining_players = [p for team_players in players_by_team.values() for p in team_players]
-            if len(remaining_players) == self.incomplete_pod_size:
-                pods.append(remaining_players)
-            else:
-                return None
-        
-        return pods
-    
-    def _create_team_balanced_pod(self, players_by_team: Dict[str, List[Dict]], used_players: Set[int]) -> Optional[List[Dict]]:
-        """Create a pod with optimal team balance."""
-        available_teams = [team for team, players in players_by_team.items() 
-                          if any(p['Player ID'] not in used_players for p in players)]
-        
-        if len(available_teams) < 4:
-            return None
-        
-        # Try to select one player from each of 4 different teams
-        for team_combo in combinations(available_teams, 4):
-            pod_candidates = []
-            
-            for team in team_combo:
-                team_players = [p for p in players_by_team[team] if p['Player ID'] not in used_players]
-                if not team_players:
-                    break
-                
-                # Select player with fewest previous opponents (most flexible)
-                best_player = min(team_players, key=lambda p: len(self.player_opponents.get(p['Player ID'], set())))
-                pod_candidates.append(best_player)
-            
-            if len(pod_candidates) == 4 and self._is_valid_pod(pod_candidates):
-                return pod_candidates
-        
-        return None
-    
-    def _count_constraint_violations(self, pod: List[Dict], constraint_graph: Dict[int, Set[int]]) -> int:
-        """Count constraint violations in a pod using the constraint graph."""
-        return self.constraint_solver._count_constraint_violations(pod, constraint_graph)
-    
-    def _generate_round_dynamically(self, round_num: int) -> Optional[List[List[Dict]]]:
-        """Generate a single round using dynamic pairing."""
-        available_players = self.players.copy()
-        random.shuffle(available_players)
-        
-        pods = []
-        used_players = set()
-        
-        # Create full 4-player pods first
-        for _ in range(self.pods_per_round):
-            pod = self._create_dynamic_pod(available_players, used_players, 4)
-            if pod is None:
-                return None
-            
-            pods.append(pod)
-            used_players.update(p['Player ID'] for p in pod)
-        
-        # Create incomplete pod if needed
-        if self.incomplete_pod_size > 0:
-            remaining_players = [p for p in available_players if p['Player ID'] not in used_players]
-            if len(remaining_players) == self.incomplete_pod_size:
-                pods.append(remaining_players)
-            else:
-                return None
-        
-        return pods
-    
-    def _create_dynamic_pod(self, available_players: List[Dict], used_players: Set[int], pod_size: int) -> Optional[List[Dict]]:
-        """Create a pod using dynamic selection."""
-        candidates = [p for p in available_players if p['Player ID'] not in used_players]
-        
-        if len(candidates) < pod_size:
-            return None
-        
-        # Try multiple random combinations
-        for _ in range(100):
-            pod = random.sample(candidates, pod_size)
-            if self._is_valid_pod(pod):
-                return pod
-        
-        return None
-    
-    def _solve_with_relaxed_constraints(self) -> Tuple[bool, List[List[List[Dict]]]]:
-        """
-        Last resort: Relaxed constraint optimization to minimize violations.
-        
-        This algorithm allows some constraint violations but attempts to minimize them
-        using optimization techniques.
-        
-        Returns:
-            Tuple of (success, solution)
-        """
-        print("  Using relaxed constraints - minimizing violations...")
-        
-        best_solution = None
-        best_violation_count = float('inf')
-        
-        # Try multiple optimization approaches
-        optimization_attempts = 50
-        
-        for attempt in range(optimization_attempts):
-            self._reset_constraint_tracking()
-            
-            solution = []
-            total_violations = 0
-            
-            success = True
-            for round_num in range(1, self.swiss_rounds_count + 1):
-                round_solution, round_violations = self._generate_round_with_minimal_violations(round_num)
-                
-                if round_solution is None:
-                    success = False
-                    break
-                
-                solution.append(round_solution)
-                total_violations += round_violations
-                self._update_constraints_after_round(round_solution)
-            
-            if success and total_violations < best_violation_count:
-                best_solution = solution
-                best_violation_count = total_violations
-                
-                print(f"    New best solution: {total_violations} violations")
-                
-                # If we found a perfect solution, use it
-                if total_violations == 0:
-                    break
-            
-            if (attempt + 1) % 10 == 0:
-                print(f"    Optimization attempt {attempt + 1}/{optimization_attempts}...")
-        
-        if best_solution is not None:
-            print(f"  [OK] Relaxed constraint optimization succeeded with {best_violation_count} violations")
-            return True, best_solution
-        
-        print("  [ERROR] Relaxed constraint optimization failed")
-        return False, []
-    
-    def _generate_round_with_minimal_violations(self, round_num: int) -> Tuple[Optional[List[List[Dict]]], int]:
-        """
-        Generate a round that minimizes constraint violations.
-        
-        Args:
-            round_num: The round number being generated
-            
-        Returns:
-            Tuple of (round_solution, violation_count) or (None, 0) if failed
-        """
-        available_players = self.players.copy()
-        random.shuffle(available_players)
-        
-        # Build constraint graph
-        constraint_graph = self.constraint_solver.build_constraint_graph(available_players)
-        
-        best_round = None
-        best_violations = float('inf')
-        
-        # Try multiple random arrangements
-        for _ in range(20):
-            random.shuffle(available_players)
-            
-            pods = []
-            used_players = set()
-            round_violations = 0
-            
-            # Create full 4-player pods
-            for _ in range(self.pods_per_round):
-                pod, pod_violations = self._create_pod_minimal_violations(available_players, used_players, 4, constraint_graph)
-                if pod is None:
-                    break
-                
-                pods.append(pod)
-                round_violations += pod_violations
-                used_players.update(p['Player ID'] for p in pod)
-            
-            # Create incomplete pod if needed
-            if self.incomplete_pod_size > 0 and len(pods) == self.pods_per_round:
-                remaining_players = [p for p in available_players if p['Player ID'] not in used_players]
-                if len(remaining_players) == self.incomplete_pod_size:
-                    pod_violations = self._count_constraint_violations(remaining_players, constraint_graph)
-                    pods.append(remaining_players)
-                    round_violations += pod_violations
-            
-            # Check if this is a complete round
-            expected_pods = self.pods_per_round + (1 if self.incomplete_pod_size > 0 else 0)
-            if len(pods) == expected_pods and round_violations < best_violations:
-                best_round = pods
-                best_violations = round_violations
-                
-                # If perfect round found, use it
-                if round_violations == 0:
-                    break
-        
-        return best_round, best_violations
-    
-    def _create_pod_minimal_violations(self, available_players: List[Dict], used_players: Set[int], 
-                                     pod_size: int, constraint_graph: Dict[int, Set[int]]) -> Tuple[Optional[List[Dict]], int]:
-        """
-        Create a pod that minimizes constraint violations.
-        
-        Args:
-            available_players: Available players
-            used_players: Already used players
-            pod_size: Required pod size
-            constraint_graph: Player constraints
-            
-        Returns:
-            Tuple of (pod, violation_count) or (None, 0) if impossible
-        """
-        candidates = [p for p in available_players if p['Player ID'] not in used_players]
-        
-        if len(candidates) < pod_size:
-            return None, 0
-        
-        if pod_size == 4:
-            return self._create_four_player_pod_minimal_violations(candidates, constraint_graph)
-        else:
-            return self._create_partial_pod_minimal_violations(candidates, pod_size, constraint_graph)
-    
-    def _create_four_player_pod_minimal_violations(self, candidates: List[Dict], 
-                                                 constraint_graph: Dict[int, Set[int]]) -> Tuple[Optional[List[Dict]], int]:
-        """Create a 4-player pod with minimal violations."""
-        # Group by team
-        players_by_team = {}
-        for player in candidates:
-            team = player['Team Name']
-            if team not in players_by_team:
-                players_by_team[team] = []
-            players_by_team[team].append(player)
-        
-        available_teams = list(players_by_team.keys())
-        
-        best_pod = None
-        best_violations = float('inf')
-        
-        # If we have 4+ teams, try team separation first
-        if len(available_teams) >= 4:
-            for team_combo in combinations(available_teams, 4):
-                for player_combo in self._cartesian_product([players_by_team[team] for team in team_combo]):
-                    pod = list(player_combo)
-                    violations = self._count_constraint_violations(pod, constraint_graph)
-                    
-                    if violations < best_violations:
-                        best_violations = violations
-                        best_pod = pod
-                        
-                        if violations == 0:
-                            return best_pod, best_violations
-        
-        # If team separation doesn't work well, try all 4-player combinations
-        if best_violations > 2:  # Only if team separation had many violations
-            for pod_combo in combinations(candidates, 4):
-                pod = list(pod_combo)
-                violations = self._count_constraint_violations(pod, constraint_graph)
-                
-                if violations < best_violations:
-                    best_violations = violations
-                    best_pod = pod
-                    
-                    if violations == 0:
-                        break
-        
-        return best_pod, best_violations
-    
-    def _create_partial_pod_minimal_violations(self, candidates: List[Dict], pod_size: int, 
-                                             constraint_graph: Dict[int, Set[int]]) -> Tuple[Optional[List[Dict]], int]:
-        """Create a partial pod with minimal violations."""
-        best_pod = None
-        best_violations = float('inf')
-        
-        for pod_combo in combinations(candidates, pod_size):
-            pod = list(pod_combo)
-            violations = self._count_constraint_violations(pod, constraint_graph)
-            
-            if violations < best_violations:
-                best_violations = violations
-                best_pod = pod
-                
-                if violations == 0:
-                    break
-        
-        return best_pod, best_violations
-    
     def _update_constraints_after_round(self, round_solution: List[List[Dict]]):
         """Update constraint tracking after a round is solved."""
         for pod in round_solution:
@@ -1561,7 +808,11 @@ class UnifiedSwissPairing:
         
         for round_num, round_pods in enumerate(solution, 1):
             # Validate round structure
-            expected_pods = self.pods_per_round + (1 if self.incomplete_pod_size > 0 else 0)
+            if self.is_individual_mode:
+                # Individual mode: remainder 1-2 = bye players (no pod), only remainder 3 = 3-player pod
+                expected_pods = self.pods_per_round + (1 if self.incomplete_pod_size == 3 else 0)
+            else:
+                expected_pods = self.pods_per_round + (1 if self.incomplete_pod_size > 0 else 0)
             if len(round_pods) != expected_pods:
                 structural_violations.append(f"Round {round_num}: Expected {expected_pods} pods, got {len(round_pods)}")
             
@@ -1724,48 +975,6 @@ class UnifiedSwissPairing:
 
         return all_pods
 
-    def _create_team_groups_for_round_OLD(self, round_num: int) -> Optional[List[List[str]]]:
-        """
-        OLD VERSION - Divide teams into groups of 4 for the round (Pod Consistency approach).
-
-        Kept for reference/rollback purposes.
-
-        Round 1: Random grouping
-        Rounds 2+: Create new groupings where teams face opponents they haven't met yet
-
-        Args:
-            round_num: The round number being generated (1-based)
-
-        Returns:
-            List of team groups, each containing 4 team names
-        """
-        available_teams = self.tournament_teams.copy()
-        num_groups = len(available_teams) // 4
-
-        if round_num == 1:
-            # Round 1: Random grouping
-            random.shuffle(available_teams)
-            team_groups = []
-            for i in range(num_groups):
-                group = available_teams[i*4:(i+1)*4]
-                team_groups.append(group)
-            return team_groups
-
-        # Rounds 2+: Create groups where teams face NEW opponents
-        # Use constraint-based approach to avoid repeat team matchups
-        team_groups = self._create_non_repeat_team_groups(available_teams, num_groups)
-
-        if team_groups is None:
-            # Fallback: If we can't avoid all repeats, use score-based grouping
-            # (This should only happen for 8 and 12 team tournaments)
-            print(f"    [WARNING] Could not avoid all repeat team matchups for round {round_num}")
-            available_teams = self._sort_teams_by_score(available_teams)
-            team_groups = []
-            for i in range(num_groups):
-                group = available_teams[i*4:(i+1)*4]
-                team_groups.append(group)
-
-        return team_groups
 
     def _create_team_groups_for_round(self, round_num: int) -> List[List[str]]:
         """
@@ -1828,84 +1037,6 @@ class UnifiedSwissPairing:
                 print(f"{'='*60}\n")
 
             return groups
-        else:
-            # POD CONSISTENCY: Use old algorithm (fallback/rollback)
-            return self._create_team_groups_for_round_OLD(round_num)
-
-    def _create_non_repeat_team_groups(self, teams: List[str], num_groups: int) -> Optional[List[List[str]]]:
-        """
-        Create team groups where teams face opponents they haven't met before.
-        Crucially, this prioritizes grouping high-scoring teams together (Swiss System).
-
-        Args:
-            teams: List of team names to group
-            num_groups: Number of groups to create (each with 4 teams)
-
-        Returns:
-            List of team groups, or None if no valid grouping exists
-        """
-        # Sort teams by score (Highest first) to ensure Swiss pairing
-        sorted_teams = self._sort_teams_by_score(teams)
-        groups = []
-
-        def can_form_group(candidate_teams: List[str]) -> bool:
-            """Check if 4 teams can form a group without repeat matchups."""
-            for i in range(len(candidate_teams)):
-                for j in range(i + 1, len(candidate_teams)):
-                    team1 = candidate_teams[i]
-                    team2 = candidate_teams[j]
-                    # Check if these teams have already faced each other
-                    if team2 in self.team_matchups.get(team1, set()):
-                        return False
-            return True
-
-        def backtrack(remaining: List[str], current_groups: List[List[str]]) -> bool:
-            """Recursively build valid team groups using score-ranked list."""
-            if not remaining:
-                return True
-
-            if len(remaining) < 4:
-                return False
-
-            # Always pick the highest-ranked remaining team first
-            first_team = remaining[0]
-            
-            # Candidates are other remaining teams that haven't played first_team
-            # They are already sorted by score because 'remaining' is sorted
-            candidates = []
-            for team in remaining[1:]:
-                if team not in self.team_matchups.get(first_team, set()):
-                    candidates.append(team)
-
-            # Optimization: If we don't have enough candidates to form a group of 4, fail early
-            if len(candidates) < 3:
-                return False
-
-            # Try combinations of 3 from candidates
-            # Since candidates are sorted by score, 'combinations' will produce
-            # pairings of highest-ranked accessible opponents first.
-            from itertools import combinations
-            for combo in combinations(candidates, 3):
-                group = [first_team] + list(combo)
-                
-                # Check if the 3 candidates can play each other
-                if can_form_group(group):
-                    current_groups.append(group)
-                    
-                    # Create new remaining list maintaining order
-                    group_set = set(group)
-                    new_remaining = [t for t in remaining if t not in group_set]
-                    
-                    if backtrack(new_remaining, current_groups):
-                        return True
-                    
-                    current_groups.pop()
-
-            return False
-
-        if backtrack(sorted_teams, groups):
-            return groups
-        return None
 
     def _sort_teams_by_score(self, teams: List[str]) -> List[str]:
         """

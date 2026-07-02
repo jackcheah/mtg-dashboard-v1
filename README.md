@@ -27,7 +27,6 @@ python tournament_dashboard.py
 ```
 
 ## Tournament Workflow
-
 ### Setup Flow
 1. Click **"Load Participants"** to start the setup wizard
 2. **Step 1**: Select Event Type (Team or Individual)
@@ -51,21 +50,24 @@ python tournament_dashboard.py
 ## Event Modes
 
 ### Team Mode
-| Teams | Players | Swiss Rounds | Playoffs | Total Rounds |
-|-------|---------|--------------|----------|--------------|
-| 8     | 32      | 4            | Finals (top 4) | 5 |
-| 12    | 48      | 4            | Finals (top 4) | 5 |
-| 16    | 64      | 4            | Top 8 Cut + Finals | 6 |
 
+| Teams | Players | Swiss Rounds | Playoffs           | Total Rounds |
+|-------|---------|--------------|--------------------|--------------|
+| 8     | 32      | 3-5          | Finals (top 4)     | 4-6          |
+| 12    | 48      | 3-5          | Finals (top 4)     | 4-6          |
+| 16    | 64      | 3-5          | Top 8 Cut + Finals | 5-7          |
+
+- Swiss rounds configurable (3, 4, or 5; default 4)
 - 4 players per team, team standings
 - Teammates never paired in same pod (hard constraint)
 - Tiebreakers: Team score → Best player → Average → Early wins
 
 ### Individual Mode
-| Players | Swiss Rounds | Playoffs | Total Rounds |
-|---------|--------------|----------|--------------|
-| 16      | 4            | Finals (top 4, 1 table) | 5 |
-| 17-64+  | 4            | Top Cut (top 10) + Finals | 6 |
+
+| Players | Swiss Rounds | Playoffs                   | Total Rounds |
+|---------|--------------|----------------------------|--------------|
+| 16      | 3-5          | Finals (top 4, 1 table)    | 4-6          |
+| 17-64+  | 3-5          | Top Cut (top 10) + Finals  | 5-7          |
 
 - Any number of players (minimum 16)
 - Non-multiple-of-4 handling: 3-player pods and bye system
@@ -197,11 +199,11 @@ python tests/e2e/test_concurrent.py
 
 ```bash
 docker-compose up -d --build
-# Access at http://localhost:5000
+# Access at http://localhost:5001
 ```
 
 ---
 
 ## System Requirements
-- Python 3.8+
+- Python 3.9+
 - Modern web browser (Chrome, Firefox, Edge, Safari)

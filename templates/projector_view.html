@@ -875,6 +875,7 @@
 
             // Detect state transition - reset tablesLoaded when phase changes
             let stateJustChanged = false;
+            const previousServerState = lastServerState;
             if (serverState !== lastServerState) {
                 console.log(`[Projector] State changed from ${lastServerState} to ${serverState}`);
                 tablesLoaded = false; // Force table re-fetch on state change
@@ -904,9 +905,12 @@
             }
 
             // Show Standings when:
-            // 1. phase is complete (swiss_complete, top8_complete) - waiting for admin to advance
+            // 1. phase just transitioned (swiss→top8, top8→finals) - detect via state change
             // 2. round is complete (all tables submitted) AND we're still in same state (not just transitioned)
-            const isPhaseComplete = serverState === 'swiss_complete' || serverState === 'top8_complete';
+            const isPhaseComplete = (
+                (previousServerState === 'swiss_in_progress' && serverState !== 'swiss_in_progress') ||
+                (previousServerState === 'top8_in_progress' && serverState !== 'top8_in_progress')
+            );
 
             // Skip roundComplete check if state just changed (prevents stale data from blocking new tables)
             if (isPhaseComplete || (roundComplete && !stateJustChanged)) {
@@ -979,6 +983,7 @@
                 grid.classList.remove('high-density');
             }
 
+            let allCardsHtml = '';
             sortedKeys.forEach(tableName => {
                 const players = tables[tableName];
                 let playersHtml = '';
@@ -995,14 +1000,14 @@
                     `;
                 });
 
-                const card = `
+                allCardsHtml += `
                     <div class="table-card">
                         <div class="table-header">${escapeHtml(tableName)}</div>
                         ${playersHtml}
                     </div>
                 `;
-                grid.innerHTML += card;
             });
+            grid.innerHTML += allCardsHtml;
         }
 
         async function fetchStandings() {
@@ -1016,8 +1021,7 @@
                     // Check if we're in Top Cut or Finals (show Swiss scores)
                     const isPlayoffPhase = data.current_state &&
                         (data.current_state.includes('top8') ||
-                            data.current_state.includes('finals') ||
-                            data.current_state.includes('swiss_complete'));
+                            data.current_state.includes('finals'));
 
                     data.standings.forEach(team => {
                         // Calculate current phase score (total - swiss)

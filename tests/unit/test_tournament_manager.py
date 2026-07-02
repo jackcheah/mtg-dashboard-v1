@@ -112,20 +112,28 @@ class TestMVP:
         tm.finals_data = {'advancing_teams': ['Team Alpha', 'Team Beta', 'Team Gamma', 'Team Delta']}
         tm.final_round_scores = {'Team Alpha': 10, 'Team Beta': 8, 'Team Gamma': 6, 'Team Delta': 4}
         tm.swiss_round_scores = {'Team Alpha': 10, 'Team Beta': 10, 'Team Gamma': 10, 'Team Delta': 10}
-        # Player on a non-Top-4 team has highest score
+        # Player 17 is on Team Epsilon (NOT in finals) with highest score
         tm.player_scores = {1: 5, 2: 5, 3: 5, 4: 5, 5: 3, 6: 3, 7: 3, 8: 3,
-                            9: 100, 10: 0, 11: 0, 12: 0}  # Player 9 (Team Gamma) has 100
+                            9: 4, 10: 4, 11: 4, 12: 4, 13: 2, 14: 2, 15: 2, 16: 2,
+                            17: 100, 18: 0, 19: 0, 20: 0}
         mvp = tm.get_mvp()
         assert mvp is not None
+        # MVP must be from a finalist team, NOT from Team Epsilon
+        assert mvp['team_name'] != 'Team Epsilon'
         assert mvp['team_name'] in ['Team Alpha', 'Team Beta', 'Team Gamma', 'Team Delta']
 
 
 class TestStateMachine:
     """Tests for tournament state transitions."""
 
-    def test_initial_state(self):
+    def test_setup_generates_round_1(self):
         tm = make_tournament()
-        assert tm.state == TournamentState.INITIAL
+        tm.transition_to(TournamentState.PARTICIPANTS_LOADED, "test")
+        success, msg = tm.setup_tournament()
+        assert success is True
+        assert tm.current_round == 1
+        assert 1 in tm.tables
+        assert len(tm.tables[1]) > 0
 
     def test_transition_logs_history(self):
         tm = make_tournament()
