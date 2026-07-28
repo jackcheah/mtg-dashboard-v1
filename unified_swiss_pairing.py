@@ -314,6 +314,11 @@ class UnifiedSwissPairing:
         # Store bye player info for caller (accessed via self.last_bye_players)
         self.last_bye_players = [p['Player ID'] for p in bye_players]
 
+        # Track cumulative bye history for future rounds
+        if not hasattr(self, '_previous_bye_ids'):
+            self._previous_bye_ids = set()
+        self._previous_bye_ids.update(self.last_bye_players)
+
         print(f"  [INDIVIDUAL] Generated {len(pods)} pods" +
               (f" ({len(bye_players)} byes)" if bye_players else ""))
         return pods
@@ -609,29 +614,10 @@ class UnifiedSwissPairing:
 
             all_pods.extend(pods)
 
-        # Step 3: Validate pod consistency BEFORE updating constraints
+        # Step 3: Validate pod consistency BEFORE constraints are updated
         if not self._validate_round_pod_consistency(all_pods, team_groups):
             print(f"[ERROR] Pod consistency validation failed for round {round_num}")
             return None
-
-        # Step 4: Update player opponent tracking (only after validation passes)
-        for pod in all_pods:
-            for player in pod:
-                player_id = player['Player ID']
-                opponents = [p['Player ID'] for p in pod if p['Player ID'] != player_id]
-
-                if player_id not in self.player_opponents:
-                    self.player_opponents[player_id] = set()
-
-                self.player_opponents[player_id].update(opponents)
-
-        # Step 5: Update team matchup tracking
-        for team_group in team_groups:
-            for team in team_group:
-                other_teams = [t for t in team_group if t != team]
-                if team not in self.team_matchups:
-                    self.team_matchups[team] = set()
-                self.team_matchups[team].update(other_teams)
 
         return all_pods
 
@@ -697,6 +683,8 @@ class UnifiedSwissPairing:
                 print(f"{'='*60}\n")
 
             return groups
+
+        raise ValueError(f"Non-traditional Swiss not implemented for round {round_num}")
 
     def _sort_teams_by_score(self, teams: List[str]) -> List[str]:
         """

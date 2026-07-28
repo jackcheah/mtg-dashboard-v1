@@ -794,11 +794,16 @@
         }
 
         // Polling Logic
+        function fetchWithTimeout(url, timeoutMs = 10000) {
+            const controller = new AbortController();
+            const id = setTimeout(() => controller.abort(), timeoutMs);
+            return fetch(url, { signal: controller.signal }).finally(() => clearTimeout(id));
+        }
+
         async function fetchState() {
             try {
                 // 1. Fetch Timer State (Lightweight)
-                // 1. Fetch Timer State (Lightweight)
-                const timerRes = await fetch(`/get_timer?t=${Date.now()}`);
+                const timerRes = await fetchWithTimeout(`/get_timer?t=${Date.now()}`);
                 const timerData = await timerRes.json();
 
                 if (timerData) {
@@ -816,8 +821,7 @@
                 }
 
                 // 2. Fetch Tournament State
-                // 2. Fetch Tournament State
-                const stateRes = await fetch(`/get_state_info?t=${Date.now()}`);
+                const stateRes = await fetchWithTimeout(`/get_state_info?t=${Date.now()}`);
                 const stateData = await stateRes.json();
 
                 // Sync scoring mode from server
@@ -832,11 +836,12 @@
                 // 3. Fetch Round Completion Status (if in progress or setup)
                 let roundComplete = false;
                 const currentState = stateData.current_state;
+                if (!currentState) return;
                 // Check during setup, swiss, top8, or finals in progress
                 if (stateData.success && (currentState.includes('in_progress') || currentState === 'tournament_setup')) {
                     const round = stateData.tournament_info.current_round;
                     try {
-                        const statusRes = await fetch(`/get_submission_status/${round}?t=${Date.now()}`);
+                        const statusRes = await fetchWithTimeout(`/get_submission_status/${round}?t=${Date.now()}`);
                         if (statusRes.ok) {
                             const statusData = await statusRes.json();
                             if (statusData.success && statusData.progress_percent === 100) {
@@ -1007,7 +1012,7 @@
                     </div>
                 `;
             });
-            grid.innerHTML += allCardsHtml;
+            grid.insertAdjacentHTML('beforeend', allCardsHtml);
         }
 
         async function fetchStandings() {

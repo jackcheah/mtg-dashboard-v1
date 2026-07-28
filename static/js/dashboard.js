@@ -4,7 +4,7 @@
 
             function escapeHtml(str) {
                 if (!str) return '';
-                return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+                return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
             }
 
             class ModalManager {
@@ -320,10 +320,10 @@
 
                 const btn = document.querySelector('button[onclick="toggleCompactMode()"] i');
                 if (isCompact) {
-                    btn.className = 'fas fa-expand-alt';
+                    if (btn) btn.className = 'fas fa-expand-alt';
                     showToast('View Mode', 'Compact mode enabled', 'info');
                 } else {
-                    btn.className = 'fas fa-compress-alt';
+                    if (btn) btn.className = 'fas fa-compress-alt';
                     showToast('View Mode', 'Standard mode enabled', 'info');
                 }
             }
@@ -682,6 +682,7 @@
                     .join(':');
 
                 const timerEl = document.getElementById('timer');
+                if (!timerEl) return;
                 timerEl.textContent = display;
 
                 // Dynamic Timer Visuals - countdown mode
@@ -1486,6 +1487,7 @@
                         // Restore submitted-table visual state from server
                         try {
                             const statusRes = await fetch(`/get_submission_status/${round}`);
+                            if (thisLoadId !== _loadRoundId) return;
                             const statusData = await statusRes.json();
                             if (statusData.success && statusData.submitted_tables) {
                                 statusData.submitted_tables.forEach(tableName => {
@@ -1551,6 +1553,8 @@
                     showToast('Error', 'Failed to load round tables: ' + error.message, 'error');
                     console.error(error);
                 }
+
+                if (thisLoadId !== _loadRoundId) return;
 
                 // Update progression tracker
                 updateProgressionTracker(parseInt(round));
@@ -2410,7 +2414,7 @@
                     }).join('')}
                     </div>
                     <div class="table-submit-container">
-                        <button class="submit-table-btn" onclick="submitTableResults('${tableName}')">
+                        <button class="submit-table-btn" onclick="submitTableResults('${tableName.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}')">
                             <i class="fas fa-check-circle"></i> Submit Table Results
                         </button>
                     </div>
@@ -3149,7 +3153,7 @@
             // Close modal when clicking outside
             document.addEventListener('DOMContentLoaded', () => {
                 const modal = document.getElementById('championship-modal');
-                modal.addEventListener('click', (e) => {
+                if (modal) modal.addEventListener('click', (e) => {
                     if (e.target === modal) {
                         closeChampionshipModal();
                     }
@@ -3221,8 +3225,9 @@
                             const teamName = result.team_name || result.team || '';
                             const tableName = result.table || findPlayerTable(result.player_id) || '';
                             const droppedBadge = result.dropped ? '<span class="search-dropped-badge">(Dropped)</span>' : '';
+                            const safePlayerId = String(result.player_id).replace(/'/g, "\\'");
                             return `
-                                <div class="search-result-item" onclick="selectSearchResult('${result.player_id}', '${escapeHtml(tableName)}')">
+                                <div class="search-result-item" onclick="selectSearchResult('${safePlayerId}', '${escapeHtml(tableName)}')">
                                     <div class="search-result-name">
                                         <i class="fas fa-user"></i>
                                         ${escapeHtml(playerName)} ${droppedBadge}
@@ -3355,6 +3360,7 @@
             // Event delegation for score buttons (XSS-safe)
             document.addEventListener('click', function (e) {
                 if (e.target.matches('.score-btn')) {
+                    if (!e.target.dataset.player || !e.target.dataset.points) return;
                     const tableName = e.target.dataset.table;
                     const playerId = parseInt(e.target.dataset.player);
                     const points = parseInt(e.target.dataset.points);
@@ -3365,7 +3371,10 @@
             // Session recovery: detect server restart and prompt backup restore
             let lastKnownState = null;
             let initialLoadDone = false;
+            let _checkServerRunning = false;
             async function checkServerState() {
+                if (_checkServerRunning) return;
+                _checkServerRunning = true;
                 try {
                     const res = await fetch('/get_state_info');
                     const data = await res.json();
@@ -3445,6 +3454,7 @@
                     lastKnownState = currentState;
                     initialStateLoaded = true;
                 } catch (e) { }
+                _checkServerRunning = false;
                 setTimeout(checkServerState, 5000);
             }
 

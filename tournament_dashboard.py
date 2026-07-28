@@ -30,7 +30,7 @@ def require_pin(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         if TOURNAMENT_PIN:
-            pin = request.headers.get('X-Tournament-Pin') or (request.json or {}).get('pin')
+            pin = request.headers.get('X-Tournament-Pin') or (request.get_json(silent=True) or {}).get('pin')
             if pin != TOURNAMENT_PIN:
                 return jsonify({'success': False, 'error': 'Invalid or missing PIN', 'requires_pin': True}), 403
         return f(*args, **kwargs)
@@ -192,6 +192,7 @@ class TournamentManager:
                 "_tournament_rounds": getattr(self, '_tournament_rounds', []),
                 "finals_data": getattr(self, 'finals_data', {}),
                 "semifinals": getattr(self, 'semifinals', {}),
+                "semifinals_data": getattr(self, 'semifinals_data', None),
                 "swiss_round_scores": self.swiss_round_scores,
                 "top8_cut_scores": getattr(self, 'top8_cut_scores', {}),
                 "semifinal_round_scores": self.semifinal_round_scores,
@@ -204,31 +205,32 @@ class TournamentManager:
         }
 
     def _write_state_to_disk(self, state, filepath='tournament_state.json.bak'):
-        """Write state dict to disk with rotation (slow I/O, no lock needed)."""
-        # Rotate existing backups (keep last 3)
-        for i in range(2, 0, -1):
-            old_file = f"{filepath}.{i}"
-            new_file = f"{filepath}.{i+1}"
-            if os.path.exists(old_file):
+        """Write state dict to disk with rotation. Uses _disk_write_lock to prevent concurrent writes."""
+        with _disk_write_lock:
+            # Rotate existing backups (keep last 3)
+            for i in range(2, 0, -1):
+                old_file = f"{filepath}.{i}"
+                new_file = f"{filepath}.{i+1}"
+                if os.path.exists(old_file):
+                    try:
+                        os.replace(old_file, new_file)
+                    except Exception as e:
+                        print(f"[BACKUP] Warning: Failed to rotate {old_file}: {e}")
+
+            if os.path.exists(filepath):
                 try:
-                    os.replace(old_file, new_file)
+                    os.replace(filepath, f"{filepath}.1")
                 except Exception as e:
-                    print(f"[BACKUP] Warning: Failed to rotate {old_file}: {e}")
+                    print(f"[BACKUP] Warning: Failed to rotate current backup: {e}")
 
-        if os.path.exists(filepath):
-            try:
-                os.replace(filepath, f"{filepath}.1")
-            except Exception as e:
-                print(f"[BACKUP] Warning: Failed to rotate current backup: {e}")
+            temp_path = filepath + '.tmp'
+            with open(temp_path, 'w') as f:
+                json.dump(state, f, indent=2)
 
-        temp_path = filepath + '.tmp'
-        with open(temp_path, 'w') as f:
-            json.dump(state, f, indent=2)
-
-        if os.path.exists(filepath):
-            os.replace(temp_path, filepath)
-        else:
-            os.rename(temp_path, filepath)
+            if os.path.exists(filepath):
+                os.replace(temp_path, filepath)
+            else:
+                os.rename(temp_path, filepath)
 
         return True
 
@@ -387,6 +389,7 @@ class TournamentManager:
             self._tournament_rounds = data.get('_tournament_rounds', [])
             self.finals_data = data.get('finals_data', {})
             self.semifinals = data.get('semifinals', {})
+            self.semifinals_data = data.get('semifinals_data', None)
 
             # Restore phase-specific score dicts
             self.swiss_round_scores = data.get('swiss_round_scores', {})
@@ -1194,11 +1197,11 @@ class TournamentManager:
                     # Update scores dict for individual mode
                     self.calculate_team_scores()
 
-            # Add to tournament rounds
-            self._tournament_rounds.append(round_solution)
-
             # Organize this round into tables structure
             self._organize_single_round_into_tables(round_num, round_solution)
+
+            # Add to tournament rounds (after organization succeeds)
+            self._tournament_rounds.append(round_solution)
 
             # Surface repeat-matchup warning
             if hasattr(self._unified_pairing, 'last_round_had_repeats') and self._unified_pairing.last_round_had_repeats:
@@ -1871,17 +1874,24 @@ class TournamentManager:
             for team_name in self.teams.keys():
                 self.top8_cut_scores[team_name] = 0
 
-        # Add points from this table submission to accumulating Top 8 Cut totals
-        for result in player_results:
-            player_id = result['player_id']
-            points = result['points']
-
-            # Find which team this player belongs to
+        if self.scoring_mode == ScoringMode.JAPANESE:
+            # Japanese mode: compute top8_cut_scores from actual player_scores delta since Swiss end
+            swiss_scores = getattr(self, 'swiss_round_scores', {})
             for team_name, players in self.teams.items():
-                for player in players:
-                    if player['Player ID'] == player_id:
-                        self.top8_cut_scores[team_name] += points
-                        break
+                current_team_score = sum(self.player_scores.get(p['Player ID'], 0) for p in players)
+                swiss_team_score = swiss_scores.get(team_name, 0)
+                self.top8_cut_scores[team_name] = current_team_score - swiss_team_score
+        else:
+            # Western mode: accumulate raw points
+            for result in player_results:
+                player_id = result['player_id']
+                points = result['points']
+
+                for team_name, players in self.teams.items():
+                    for player in players:
+                        if player['Player ID'] == player_id:
+                            self.top8_cut_scores[team_name] += points
+                            break
 
         print(f"[TOP 8 CUT] Scores updated: {self.top8_cut_scores}")
         print(f"[TOP 8 CUT] Swiss scores (tiebreaker): {self.swiss_round_scores}")
@@ -2071,6 +2081,12 @@ class TournamentManager:
         Top 10 players advance. Top 2 seeds get byes. Remaining 8 play in 2 tables of 4.
         """
         print(f"\n=== GENERATING INDIVIDUAL TOP CUT ===")
+
+        # Guard: if too few players remain after drops, skip to direct finals
+        active_players = [p for p in self.participants if p['Player ID'] not in self.dropped_players]
+        if len(active_players) < 10:
+            print(f"[WARNING] Only {len(active_players)} active players remain, switching to direct finals")
+            return self.generate_individual_finals(after_top_cut=False)
 
         # Get top 10 players by score with tiebreaker
         all_players_ranked = sorted(
@@ -2482,6 +2498,7 @@ tournament = TournamentManager()
 
 # Thread safety lock for concurrent access protection
 tournament_lock = threading.Lock()
+_disk_write_lock = threading.Lock()
 
 
 def periodic_backup_thread(tournament_obj, interval=300):
@@ -3212,6 +3229,10 @@ def submit_table_results():
         if round_num in tournament.finalized_rounds:
             return jsonify({'success': False, 'error': f'Round {round_num} has been finalized. Scores are locked.'}), 400
 
+        # Reject submissions for non-current rounds
+        if round_num != tournament.current_round:
+            return jsonify({'success': False, 'error': f'Cannot submit results for round {round_num}. Current active round is {tournament.current_round}.'}), 400
+
         # Validate table name
         table_name = data.get('table')
         if not table_name:
@@ -3259,6 +3280,13 @@ def submit_table_results():
                 return jsonify({'success': False, 'error': f'Result {idx}: player_id must be an integer, got {type(player_id).__name__}'}), 400
             if player_id not in tournament.player_scores:
                 return jsonify({'success': False, 'error': f'Result {idx}: Invalid player_id {player_id}. Player not found in tournament.'}), 400
+            if player_id in tournament.dropped_players:
+                return jsonify({'success': False, 'error': f'Result {idx}: Player {player_id} has been dropped from the tournament.'}), 400
+
+            # Validate player is assigned to this table
+            assigned_ids = {p['Player ID'] for p in tournament.tables[round_num][table_name]}
+            if player_id not in assigned_ids:
+                return jsonify({'success': False, 'error': f'Result {idx}: Player {player_id} is not assigned to {table_name} in round {round_num}.'}), 400
 
             # Validate points (must be 0, 1, or 5)
             points = result['points']
@@ -3842,11 +3870,6 @@ def edit_table_results():
                     swiss_team_score = swiss_scores.get(team_name, 0)
                     tournament.top8_cut_scores[team_name] = current_team_score - swiss_team_score
 
-            # Apply new phase-specific scores
-            if round_num == tournament.max_rounds:
-                tournament.update_final_round_scores(round_num, new_results)
-            if top8_cut_round and round_num == top8_cut_round:
-                tournament.update_top8_cut_scores(round_num, new_results)
 
             print(f"[OK] Table {table_name} results edited for round {round_num}")
 
@@ -3903,13 +3926,16 @@ def get_score_history(round_num, table_name):
 
         history = tournament.round_results[round_num].get('score_history', {}).get(table_name, [])
 
+        # Strip editor_ip from response for privacy
+        sanitized_history = [{k: v for k, v in entry.items() if k != 'editor_ip'} for entry in history]
+
         return jsonify({
             'success': True,
             'table': table_name,
             'round': round_num,
-            'edit_count': len(history),
-            'history': history,
-            'has_edits': len(history) > 0
+            'edit_count': len(sanitized_history),
+            'history': sanitized_history,
+            'has_edits': len(sanitized_history) > 0
         })
     except Exception as e:
         print(f"[ERROR] get_score_history failed: {e}")
@@ -3990,7 +4016,9 @@ def get_tournament_state():
         response_data['swiss_round_scores'] = tournament.swiss_round_scores
 
     # Add final standings (use cache to avoid recalculating on every poll)
-    final_standings = tournament._cached_final_standings or tournament.calculate_final_round_standings()
+    final_standings = tournament._cached_final_standings
+    if not final_standings and tournament.state in (TournamentState.FINALS_IN_PROGRESS, TournamentState.FINALS_COMPLETE):
+        final_standings = tournament.calculate_final_round_standings()
     if final_standings:
         response_data['final_standings'] = final_standings
 
@@ -4884,7 +4912,10 @@ def control_timer():
 
     # Allow setting duration with any action or standalone
     if 'duration' in data:
-        new_duration = int(data['duration'])
+        try:
+            new_duration = int(data['duration'])
+        except (ValueError, TypeError):
+            return jsonify({'success': False, 'error': 'Duration must be a valid integer (seconds)'}), 400
         if 60 <= new_duration <= 7200:
             tournament.timer_duration = new_duration
 
@@ -4966,10 +4997,20 @@ def unfinalize_round():
 
         # Remove the pairing history entry for the round that generated the next round
         if tournament._tournament_rounds and len(tournament._tournament_rounds) >= last_finalized:
-            tournament._tournament_rounds = tournament._tournament_rounds[:last_finalized - 1]
+            tournament._tournament_rounds = tournament._tournament_rounds[:last_finalized]
 
         # Force pairing engine rebuild to reset constraint state
         tournament._unified_pairing = None
+
+        # Revert state machine if the finalization triggered a phase transition
+        if tournament.state != TournamentState.SWISS_IN_PROGRESS and last_finalized <= tournament.swiss_rounds_count:
+            tournament.transition_to(TournamentState.SWISS_IN_PROGRESS, f"Reverted via unfinalize round {last_finalized}")
+            # Clear stale finals/semifinals data generated during the transition
+            tournament.finals_data = None
+            tournament.semifinals_data = None
+            tournament.final_round_scores = {}
+        elif tournament.state == TournamentState.FINALS_IN_PROGRESS and last_finalized == tournament.swiss_rounds_count + 1:
+            tournament.transition_to(TournamentState.TOP8_IN_PROGRESS, f"Reverted via unfinalize round {last_finalized}")
 
         tournament.bump_version()
         tournament.save_backup()
