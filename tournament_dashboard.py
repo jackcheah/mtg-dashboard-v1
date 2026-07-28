@@ -96,11 +96,6 @@ class TournamentManager:
         self.state = TournamentState.INITIAL
         self.state_history = []  # Track state transitions for debugging
 
-        # Timer State
-        self.timer_running = False
-        self.timer_start_time = None
-        self.timer_paused_at = 0  # Seconds elapsed when paused
-        self.timer_duration = 3000 # Default 50 mins
         self.backup_file = 'tournament_state.json.bak'
 
         # State version counter (incremented on every mutation for ETag support)
@@ -174,12 +169,6 @@ class TournamentManager:
                 "current_round": self.current_round,
                 "finalized_rounds": finalized_rounds_list,
                 "tournament_state": self.state.value
-            },
-            "timer": {
-                "running": self.timer_running,
-                "start_time": self.timer_start_time.isoformat() if self.timer_start_time else None,
-                "paused_at": self.timer_paused_at,
-                "duration": self.timer_duration
             },
             "data": {
                 "teams": self.teams,
@@ -346,15 +335,6 @@ class TournamentManager:
             except Exception as e:
                 print(f"[RECOVERY] Failed to self-heal round: {e}")
 
-            # Restore Timer State
-            timer_data = state_data.get('timer', {})
-            self.timer_running = timer_data.get('running', False)
-            start_time_str = timer_data.get('start_time')
-            self.timer_start_time = datetime.fromisoformat(start_time_str) if start_time_str else None
-            self.timer_paused_at = timer_data.get('paused_at', 0)
-            self.timer_duration = timer_data.get('duration', 3000)
-            print(f"[BACKUP] Timer restored: running={self.timer_running}, paused_at={self.timer_paused_at}s")
-
             # Restore Data
             data = state_data.get('data', {})
             self.teams = data.get('teams', {})
@@ -471,10 +451,6 @@ class TournamentManager:
         self._unified_pairing = None
         self._tournament_rounds = []
         self._cached_final_standings = None
-        self.timer_running = False
-        self.timer_start_time = None
-        self.timer_paused_at = 0
-        self.timer_duration = 3000
         self.scoring_mode = ScoringMode.WESTERN
         self.event_mode = EventMode.TEAM
         self.bye_players = {}
@@ -4878,81 +4854,6 @@ def reset_tournament_endpoint():
             'error': str(e),
             'message': 'Failed to reset tournament'
         })
-
-# ==========================================
-# TIMER ENDPOINTS
-# ==========================================
-
-@app.route('/get_timer')
-@with_lock
-def get_timer():
-    """Get current timer state with remaining time"""
-    elapsed = tournament.timer_paused_at
-    if tournament.timer_running and tournament.timer_start_time:
-        elapsed += (datetime.now() - tournament.timer_start_time).total_seconds()
-
-    elapsed_int = int(elapsed)
-    remaining = max(0, tournament.timer_duration - elapsed_int)
-    expired = elapsed_int >= tournament.timer_duration
-
-    return jsonify({
-        'running': tournament.timer_running,
-        'elapsed': elapsed_int,
-        'duration': tournament.timer_duration,
-        'remaining': remaining,
-        'expired': expired
-    })
-
-@app.route('/control_timer', methods=['POST'])
-@with_lock
-def control_timer():
-    """Control the tournament timer with optional duration configuration"""
-    data = request.json or {}
-    action = data.get('action')
-
-    # Allow setting duration with any action or standalone
-    if 'duration' in data:
-        try:
-            new_duration = int(data['duration'])
-        except (ValueError, TypeError):
-            return jsonify({'success': False, 'error': 'Duration must be a valid integer (seconds)'}), 400
-        if 60 <= new_duration <= 7200:
-            tournament.timer_duration = new_duration
-
-    if action == 'start':
-        if not tournament.timer_running:
-            tournament.timer_start_time = datetime.now()
-            tournament.timer_running = True
-
-    elif action == 'stop':
-        if tournament.timer_running:
-            elapsed_since_start = (datetime.now() - tournament.timer_start_time).total_seconds()
-            tournament.timer_paused_at += elapsed_since_start
-            tournament.timer_running = False
-            tournament.timer_start_time = None
-
-    elif action == 'reset':
-        tournament.timer_running = False
-        tournament.timer_start_time = None
-        tournament.timer_paused_at = 0
-
-    tournament.bump_version()
-    tournament.save_backup()
-
-    # Return full timer state
-    elapsed = tournament.timer_paused_at
-    if tournament.timer_running and tournament.timer_start_time:
-        elapsed += (datetime.now() - tournament.timer_start_time).total_seconds()
-    elapsed_int = int(elapsed)
-
-    return jsonify({
-        'success': True,
-        'running': tournament.timer_running,
-        'elapsed': elapsed_int,
-        'duration': tournament.timer_duration,
-        'remaining': max(0, tournament.timer_duration - elapsed_int),
-        'expired': elapsed_int >= tournament.timer_duration
-    })
 
 # ==========================================
 # UX IMPROVEMENT ENDPOINTS

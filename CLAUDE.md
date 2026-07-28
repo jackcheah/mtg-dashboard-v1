@@ -167,8 +167,6 @@ Swiss rounds are configurable: 3, 4 (default), or 5 via `setup_tournament(swiss_
 | `/validate_round/<round>` | GET | Validate Swiss pairings for a round |
 | `/bracket_groups/<round>` | GET | Bracket display groupings |
 | `/bracket_standings/<round>` | GET | Bracket standings for visualization |
-| `/control_timer` | POST | Start/stop/reset round timer |
-| `/get_timer` | GET | Current timer state |
 | `/list_backups` | GET | List available backup files |
 | `/backup_health` | GET | Backup health status |
 | `/tournament_statistics` | GET | Detailed stats and validation info |

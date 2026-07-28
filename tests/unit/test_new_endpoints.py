@@ -1,7 +1,7 @@
 """Tests for new tournament dashboard endpoints.
 
 Covers: /unfinalize_round, /undrop_player, /find_player, /search_player,
-/list_backups, /preview_finalize, and /control_timer.
+/list_backups, and /preview_finalize.
 
 Run: pytest tests/unit/test_new_endpoints.py -v
 """
@@ -387,64 +387,3 @@ class TestPreviewFinalize:
         assert 'tables submitted' in data['error']
 
 
-# ==========================================
-# Control Timer
-# ==========================================
-
-class TestControlTimer:
-    """Tests for POST /control_timer endpoint."""
-
-    def test_timer_start_returns_running(self, client):
-        resp = client.post('/control_timer', json={'action': 'start'})
-        assert resp.status_code == 200
-        data = resp.get_json()
-        assert data['success'] is True
-        assert data['running'] is True
-
-    def test_timer_stop_accumulates_elapsed(self, client):
-        # Start the timer and simulate time passing by backdating start_time
-        client.post('/control_timer', json={'action': 'start'})
-        from datetime import timedelta
-        tournament.timer_start_time -= timedelta(seconds=5)
-        resp = client.post('/control_timer', json={'action': 'stop'})
-        data = resp.get_json()
-        assert data['success'] is True
-        assert data['running'] is False
-        assert data['elapsed'] >= 4
-
-    def test_timer_reset_clears(self, client):
-        client.post('/control_timer', json={'action': 'start'})
-        from datetime import timedelta
-        tournament.timer_start_time -= timedelta(seconds=5)
-        client.post('/control_timer', json={'action': 'stop'})
-
-        resp = client.post('/control_timer', json={'action': 'reset'})
-        data = resp.get_json()
-        assert data['success'] is True
-        assert data['running'] is False
-        assert data['elapsed'] == 0
-
-    def test_timer_set_duration(self, client):
-        resp = client.post('/control_timer', json={'action': 'start', 'duration': 1800})
-        data = resp.get_json()
-        assert data['success'] is True
-        assert data['duration'] == 1800
-
-    def test_timer_rejects_duration_below_60(self, client):
-        # Set a valid duration first
-        client.post('/control_timer', json={'duration': 600})
-        # Attempt to set below minimum — should be silently ignored
-        resp = client.post('/control_timer', json={'duration': 30})
-        data = resp.get_json()
-        assert data['success'] is True
-        # Duration should remain at 600, not 30
-        assert data['duration'] == 600
-
-    def test_timer_returns_remaining_and_expired(self, client):
-        # Set a short duration and start
-        resp = client.post('/control_timer', json={'action': 'start', 'duration': 60})
-        data = resp.get_json()
-        assert 'remaining' in data
-        assert 'expired' in data
-        assert data['remaining'] <= 60
-        assert data['expired'] is False

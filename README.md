@@ -149,7 +149,6 @@ TOURNAMENT_PIN=1234 python tournament_dashboard.py
 ## Operator Features
 
 - **Auto-restore on refresh**: If a tournament is in progress, the dashboard automatically restores the active round view on page load
-- **Timer alarm**: Audible beep when the round timer reaches zero
 - **Batch submit**: Submit all completed tables at once
 - **Score editing**: Edit submitted scores before round finalization (with audit trail)
 - **Revert submission**: Completely undo a table submission if needed
@@ -171,7 +170,6 @@ TOURNAMENT_PIN=1234 python tournament_dashboard.py
 ## Projector View
 
 Access at `/projector` for audience-friendly display:
-- Large timer with visual warnings
 - Automatic view switching: Pairings → Standings → Champion
 - High-contrast dark theme for projectors
 - Champion display with MVP recognition

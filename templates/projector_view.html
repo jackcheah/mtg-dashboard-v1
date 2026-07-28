@@ -23,8 +23,6 @@
             --accent-secondary: #06b6d4;
             --bg-card: rgba(30, 41, 59, 0.8);
             --border-card: rgba(148, 163, 184, 0.2);
-            --timer-color: #fca5a5;
-            /* Bright red-ish for visibility */
             --gold: #fbbf24;
         }
 
@@ -44,7 +42,7 @@
             flex-direction: column;
         }
 
-        /* Large Header with Timer */
+        /* Header */
         .projector-header {
             display: grid;
             grid-template-columns: 1fr auto 1fr;
@@ -67,16 +65,6 @@
 
         .header-center {
             text-align: center;
-        }
-
-        .timer-display {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 6rem;
-            /* VERY LARGE */
-            font-weight: 700;
-            color: var(--timer-color);
-            line-height: 1;
-            text-shadow: 0 0 30px rgba(252, 165, 165, 0.4);
         }
 
         .round-info {
@@ -596,16 +584,6 @@
             transition: width 0.3s ease;
         }
 
-        /* Timer expired pulsing */
-        @keyframes timerPulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.4; }
-        }
-
-        .timer-expired {
-            animation: timerPulse 1s ease-in-out infinite;
-            color: #ef4444 !important;
-        }
     </style>
 </head>
 
@@ -616,7 +594,6 @@
             <h1>MTG Tournament</h1>
         </div>
         <div class="header-center">
-            <div id="timerDisplay" class="timer-display">00:00:00</div>
             <div id="roundInfo" class="round-info">Waiting to Start...</div>
             <div class="submission-progress" id="projector-submission-progress" style="display:none;">
                 <span id="projector-progress-text">0/0 tables reported</span>
@@ -708,13 +685,6 @@
 
         let winnersLoaded = false;
 
-        // CLIENT SIDE TIMER STATE
-        let timerState = {
-            running: false,
-            serverElapsed: 0,
-            duration: 3000,
-            lastSynced: 0
-        };
         let lastRound = 0;
         let lastState = '';
 
@@ -754,45 +724,6 @@
         setInterval(updateClock, 1000);
         updateClock();
 
-        // High frequency timer tick (Client Side Estimate) - COUNTDOWN MODE
-        setInterval(() => {
-            if (timerState.running) {
-                const now = Date.now();
-                // Calculate elapsed time based on last sync
-                const addedTime = (now - timerState.lastSynced) / 1000;
-                const estimatedElapsed = Math.floor(timerState.serverElapsed + addedTime);
-                // Convert to remaining time (countdown)
-                const remaining = Math.max(0, timerState.duration - estimatedElapsed);
-                renderTimer(remaining, timerState.duration);
-            }
-        }, 100); // 10fps update for smooth feel
-
-        function renderTimer(remaining, duration) {
-            // Format HH:MM:SS of remaining time
-            const h = Math.floor(remaining / 3600).toString().padStart(2, '0');
-            const m = Math.floor((remaining % 3600) / 60).toString().padStart(2, '0');
-            const s = Math.floor(remaining % 60).toString().padStart(2, '0');
-
-            const timerEl = document.getElementById('timerDisplay');
-            timerEl.textContent = `${h}:${m}:${s}`;
-
-            // Visual cues based on remaining time
-            if (remaining <= 0) {
-                timerEl.textContent = '00:00:00';
-                timerEl.style.color = '#ef4444'; // Red
-                timerEl.classList.add('timer-expired');
-                timerEl.classList.remove('blink');
-            } else if (remaining <= duration * 0.1) {
-                timerEl.style.color = '#f59e0b'; // Orange when <10% remaining
-                timerEl.classList.remove('timer-expired');
-                timerEl.classList.remove('blink');
-            } else {
-                timerEl.style.color = '#fca5a5'; // Default
-                timerEl.classList.remove('timer-expired');
-                timerEl.classList.remove('blink');
-            }
-        }
-
         // Polling Logic
         function fetchWithTimeout(url, timeoutMs = 10000) {
             const controller = new AbortController();
@@ -802,25 +733,7 @@
 
         async function fetchState() {
             try {
-                // 1. Fetch Timer State (Lightweight)
-                const timerRes = await fetchWithTimeout(`/get_timer?t=${Date.now()}`);
-                const timerData = await timerRes.json();
-
-                if (timerData) {
-                    // Update client state
-                    timerState.running = timerData.running;
-                    timerState.serverElapsed = timerData.elapsed;
-                    timerState.duration = timerData.duration;
-                    timerState.lastSynced = Date.now();
-
-                    // Specific render if stopped (force exact value as countdown)
-                    if (!timerState.running) {
-                        const remaining = Math.max(0, timerData.duration - timerData.elapsed);
-                        renderTimer(remaining, timerData.duration);
-                    }
-                }
-
-                // 2. Fetch Tournament State
+                // Fetch Tournament State
                 const stateRes = await fetchWithTimeout(`/get_state_info?t=${Date.now()}`);
                 const stateData = await stateRes.json();
 
@@ -1190,10 +1103,8 @@
         function updatePollInterval(state) {
             if (state === 'finals_complete' || state === 'initial') {
                 pollInterval = 10000;
-            } else if (timerState.running) {
-                pollInterval = 2000;
             } else {
-                pollInterval = 5000;
+                pollInterval = 3000;
             }
         }
         fetchState().then(() => schedulePoll());

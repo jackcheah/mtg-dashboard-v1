@@ -182,97 +182,69 @@
                 <div id="search-results-dropdown" class="search-results-dropdown"></div>
             </div>
 
-            <!-- Timer Section with Controls -->
-            <section class="timer-section">
-                <div class="timer-container">
-                    <!-- Left: Timer Display and Controls -->
-                    <div class="timer-left">
-                        <div class="timer-display" id="timer">00:00:00</div>
-                        <div class="timer-controls">
-                            <button class="btn btn-success" onclick="startTimer()" title="Start Timer">
-                                <i class="fas fa-play"></i>
-                                <span>Start</span>
-                            </button>
-                            <button class="btn btn-danger" onclick="stopTimer()" title="Stop Timer">
-                                <i class="fas fa-stop"></i>
-                                <span>Stop</span>
-                            </button>
-                            <button class="btn btn-warning" onclick="resetTimer()" title="Reset Timer">
-                                <i class="fas fa-redo"></i>
-                                <span>Reset</span>
-                            </button>
-                            <button class="btn btn-secondary" onclick="toggleCompactMode()" title="Toggle Compact Mode">
-                                <i class="fas fa-compress-alt"></i>
-                                <span>Compact</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Right: Tournament Controls -->
-                    <div class="timer-right">
-                        <!-- Setup Controls (hidden after tournament starts) -->
-                        <div class="setup-controls" id="setup-controls">
-                            <button class="btn btn-primary" onclick="loadParticipants()">
-                                <i class="fas fa-users"></i>
-                                <span>Load Participants</span>
-                            </button>
-                            <button class="btn btn-primary" onclick="setupTournament()">
-                                <i class="fas fa-trophy"></i>
-                                <span>Setup Tournament</span>
-                            </button>
-                            <button class="btn btn-primary" onclick="manualBackup()">
-                                <i class="fas fa-save"></i>
-                                <span>Save Backup Now</span>
-                            </button>
-                            <button class="btn btn-warning" onclick="restoreBackup()">
-                                <i class="fas fa-history"></i>
-                                <span>Restore Backup</span>
-                            </button>
-                            <button class="btn btn-danger" onclick="resetTournament()"
-                                title="Reset all tournament data and start fresh">
-                                <i class="fas fa-exclamation-triangle"></i>
-                                <span>Reset Tournament</span>
-                            </button>
-                        </div>
-
-                        <!-- Active Round Controls (shown when tournament is active) -->
-                        <div class="active-round-controls" id="active-round-controls">
-                            <div class="round-control-group">
-                                <label for="round-select"><i class="fas fa-layer-group"></i> Current Round:</label>
-                                <div class="round-selector">
-                                    <select id="round-select" onchange="loadRound()">
-                                        <option value="">Select Round</option>
-                                        <option value="1">Swiss Round 1</option>
-                                        <option value="2">Swiss Round 2</option>
-                                        <option value="3">Swiss Round 3</option>
-                                        <option value="4">Swiss Round 4</option>
-                                        <option value="5">Finals</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <button class="btn btn-primary batch-submit-btn" onclick="batchSubmitTables()"
-                                title="Submit all completed tables">
-                                <i class="fas fa-check-double"></i>
-                                <span>Batch Submit</span>
-                            </button>
-                            <button class="btn btn-success" onclick="submitRoundResults()">
-                                <i class="fas fa-check-circle"></i>
-                                <span>Submit Round Results</span>
-                            </button>
-                            <button class="btn btn-primary" onclick="manualBackup()"
-                                title="Save current tournament state">
-                                <i class="fas fa-save"></i>
-                                <span>Save Backup</span>
-                            </button>
-                            <button class="btn btn-danger" onclick="resetTournament()"
-                                title="Reset all tournament data and start fresh">
-                                <i class="fas fa-exclamation-triangle"></i>
-                                <span>Reset</span>
-                            </button>
-                        </div>
-                    </div>
+            <!-- Tournament Controls -->
+            <div class="tournament-controls">
+                <!-- Setup Controls (hidden after tournament starts) -->
+                <div class="setup-controls" id="setup-controls">
+                    <button class="btn btn-primary" onclick="loadParticipants()">
+                        <i class="fas fa-users"></i>
+                        <span>Load Participants</span>
+                    </button>
+                    <button class="btn btn-primary" onclick="setupTournament()">
+                        <i class="fas fa-trophy"></i>
+                        <span>Setup Tournament</span>
+                    </button>
+                    <button class="btn btn-primary" onclick="manualBackup()">
+                        <i class="fas fa-save"></i>
+                        <span>Save Backup Now</span>
+                    </button>
+                    <button class="btn btn-warning" onclick="restoreBackup()">
+                        <i class="fas fa-history"></i>
+                        <span>Restore Backup</span>
+                    </button>
+                    <button class="btn btn-danger" onclick="resetTournament()"
+                        title="Reset all tournament data and start fresh">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>Reset Tournament</span>
+                    </button>
                 </div>
-            </section>
+
+                <!-- Active Round Controls (shown when tournament is active) -->
+                <div class="active-round-controls" id="active-round-controls">
+                    <div class="round-control-group">
+                        <label for="round-select"><i class="fas fa-layer-group"></i> Current Round:</label>
+                        <div class="round-selector">
+                            <select id="round-select" onchange="loadRound()">
+                                <option value="">Select Round</option>
+                                <option value="1">Swiss Round 1</option>
+                                <option value="2">Swiss Round 2</option>
+                                <option value="3">Swiss Round 3</option>
+                                <option value="4">Swiss Round 4</option>
+                                <option value="5">Finals</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary batch-submit-btn" onclick="batchSubmitTables()"
+                        title="Submit all completed tables">
+                        <i class="fas fa-check-double"></i>
+                        <span>Batch Submit</span>
+                    </button>
+                    <button class="btn btn-success" onclick="submitRoundResults()">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Submit Round Results</span>
+                    </button>
+                    <button class="btn btn-primary" onclick="manualBackup()"
+                        title="Save current tournament state">
+                        <i class="fas fa-save"></i>
+                        <span>Save Backup</span>
+                    </button>
+                    <button class="btn btn-danger" onclick="resetTournament()"
+                        title="Reset all tournament data and start fresh">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>Reset</span>
+                    </button>
+                </div>
+            </div>
 
 
 
