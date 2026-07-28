@@ -1996,9 +1996,6 @@ class TournamentManager:
             # Store team order by score (highest first) for seating arrangement
             team_order_by_score = top_4_teams.copy()  # Already sorted by score from sorted_teams
 
-            # Initialize tables for finals round
-            if not hasattr(self, 'tables'):
-                self.tables = {}
             self.tables[finals_round_num] = {}
             
             for table_num in range(4):
@@ -2268,9 +2265,6 @@ class TournamentManager:
             semifinals_round_num = self.swiss_rounds_count + 1
             print(f"\n   Creating Top 8 Cut tables (Round {semifinals_round_num}):")
 
-            # Initialize tables for semifinals round
-            if not hasattr(self, 'tables'):
-                self.tables = {}
             self.tables[semifinals_round_num] = {}
 
             # Create 8 semifinals tables
@@ -2399,10 +2393,8 @@ class TournamentManager:
             }
             
             # Add Round 5 (finals) to tables
-            if not hasattr(self, 'tables'):
-                self.tables = {}
             self.tables[5] = semifinals_pods
-            
+
             # Initialize final round scores for the advancing teams
             self.final_round_scores = {}
             for team_name in advancing_teams:
@@ -2749,10 +2741,10 @@ def configure_swiss_rounds():
             'error': 'swiss_rounds parameter is required'
         })
 
-    if rounds not in [4, 5]:
+    if rounds not in [3, 4, 5]:
         return jsonify({
             'success': False,
-            'error': 'Swiss rounds must be either 4 or 5'
+            'error': 'Swiss rounds must be 3, 4, or 5'
         })
 
     success, message = tournament.configure_swiss_rounds(rounds)
@@ -3126,7 +3118,7 @@ def submit_player_results():
                     'error': f'Round {round_num} transition failed: {str(transition_err)}. Round NOT finalized — retry when ready.'
                 }), 500
 
-            if round_num >= tournament.swiss_rounds_count and next_round_generated is None and semifinals_data is None and tournament_winner_data is None:
+            if next_round_generated is None and semifinals_data is None and tournament_winner_data is None:
                 return jsonify({
                     'success': False,
                     'error': f'Round {round_num} transition failed (next round/finals not generated). Round NOT finalized — retry when ready.'
@@ -3161,6 +3153,13 @@ def submit_player_results():
                         'success': False,
                         'error': f'Round {round_num} transition failed: {str(transition_err)}. Round NOT finalized — retry when ready.'
                     }), 500
+
+                if next_round_generated is None and semifinals_data is None and tournament_winner_data is None:
+                    return jsonify({
+                        'success': False,
+                        'error': f'Round {round_num} transition failed (next round/finals not generated). Round NOT finalized — retry when ready.'
+                    }), 500
+
                 tournament.finalized_rounds.add(round_num)
                 response_data = _build_finalization_response(round_num, next_round_generated, semifinals_data, tournament_winner_data)
                 return jsonify(response_data)
@@ -3539,20 +3538,20 @@ def revert_table_submission():
         tournament.calculate_team_scores()
         tournament._cached_final_standings = None
 
-        # Reverse phase-specific scores
+        # Recalculate phase-specific scores from current player scores
         top8_cut_round = tournament.swiss_rounds_count + 1 if tournament.has_semifinals else None
         if round_num == tournament.max_rounds and tournament.final_round_scores:
-            for result in old_results:
-                for team_name, players in tournament.teams.items():
-                    if any(p['Player ID'] == result['player_id'] for p in players):
-                        tournament.final_round_scores[team_name] = tournament.final_round_scores.get(team_name, 0) - result['points']
-                        break
+            finals_start = getattr(tournament, '_player_scores_at_finals_start', {})
+            for team_name, players in tournament.teams.items():
+                current_team_score = sum(tournament.player_scores.get(p['Player ID'], 0) for p in players)
+                start_team_score = sum(finals_start.get(p['Player ID'], 0) for p in players)
+                tournament.final_round_scores[team_name] = current_team_score - start_team_score
         if top8_cut_round and round_num == top8_cut_round and tournament.top8_cut_scores:
-            for result in old_results:
-                for team_name, players in tournament.teams.items():
-                    if any(p['Player ID'] == result['player_id'] for p in players):
-                        tournament.top8_cut_scores[team_name] = tournament.top8_cut_scores.get(team_name, 0) - result['points']
-                        break
+            swiss_scores = getattr(tournament, 'swiss_round_scores', {})
+            for team_name, players in tournament.teams.items():
+                current_team_score = sum(tournament.player_scores.get(p['Player ID'], 0) for p in players)
+                swiss_team_score = swiss_scores.get(team_name, 0)
+                tournament.top8_cut_scores[team_name] = current_team_score - swiss_team_score
 
         submitted.discard(table_name)
         if table_name in tournament.round_results[round_num].get('table_submissions', {}):
@@ -3821,27 +3820,27 @@ def edit_table_results():
                         tournament.player_scores[player_id] += points
                         print(f"  [EDIT] Adding new score: Player {player_id} += {points}")
 
-            # Reverse old phase-specific scores before applying new ones
-            top8_cut_round = tournament.swiss_rounds_count + 1 if tournament.has_semifinals else None
-            if round_num == tournament.max_rounds and tournament.final_round_scores:
-                for result in old_results:
-                    for team_name, players in tournament.teams.items():
-                        if any(p['Player ID'] == result['player_id'] for p in players):
-                            tournament.final_round_scores[team_name] = tournament.final_round_scores.get(team_name, 0) - result['points']
-                            break
-            if top8_cut_round and round_num == top8_cut_round and tournament.top8_cut_scores:
-                for result in old_results:
-                    for team_name, players in tournament.teams.items():
-                        if any(p['Player ID'] == result['player_id'] for p in players):
-                            tournament.top8_cut_scores[team_name] = tournament.top8_cut_scores.get(team_name, 0) - result['points']
-                            break
-
             # Update stored results
             tournament.round_results[round_num]['table_submissions'][table_name] = new_results
 
             # Recalculate team scores
             tournament.calculate_team_scores()
             tournament._cached_final_standings = None
+
+            # Recalculate phase-specific scores from current player scores
+            top8_cut_round = tournament.swiss_rounds_count + 1 if tournament.has_semifinals else None
+            if round_num == tournament.max_rounds and tournament.final_round_scores:
+                finals_start = getattr(tournament, '_player_scores_at_finals_start', {})
+                for team_name, players in tournament.teams.items():
+                    current_team_score = sum(tournament.player_scores.get(p['Player ID'], 0) for p in players)
+                    start_team_score = sum(finals_start.get(p['Player ID'], 0) for p in players)
+                    tournament.final_round_scores[team_name] = current_team_score - start_team_score
+            if top8_cut_round and round_num == top8_cut_round and tournament.top8_cut_scores:
+                swiss_scores = getattr(tournament, 'swiss_round_scores', {})
+                for team_name, players in tournament.teams.items():
+                    current_team_score = sum(tournament.player_scores.get(p['Player ID'], 0) for p in players)
+                    swiss_team_score = swiss_scores.get(team_name, 0)
+                    tournament.top8_cut_scores[team_name] = current_team_score - swiss_team_score
 
             # Apply new phase-specific scores
             if round_num == tournament.max_rounds:
@@ -4101,7 +4100,7 @@ def validate_full_swiss():
         }
     }
     
-    for round_num in range(1, 5):  # Validate rounds 1-4
+    for round_num in range(1, tournament.swiss_rounds_count + 1):
         if round_num in tournament.tables:
             group_issues = tournament.validate_group_separation(round_num)
             repeat_issues = tournament.validate_swiss_no_repeats(round_num)
@@ -4627,6 +4626,7 @@ def export_standings_csv():
     else:
         writer.writerow(['Rank', 'Team', 'Total Score', 'Swiss Score', 'Top8 Score', 'Finals Score'])
 
+    rank = 0
     for rank, (team_name, total_score) in enumerate(sorted_teams, 1):
         if tournament.event_mode == EventMode.INDIVIDUAL:
             writer.writerow([rank, team_name, total_score, 'Active', ''])
@@ -4773,7 +4773,7 @@ def validate_integrity():
         issues.append('No tables generated')
 
     # Check 7: Swiss rounds configuration
-    if tournament.swiss_rounds_count not in [4, 5]:
+    if tournament.swiss_rounds_count not in [3, 4, 5]:
         issues.append(f'Invalid Swiss rounds: {tournament.swiss_rounds_count}')
     checks_performed.append('Swiss rounds configuration')
 
@@ -4959,6 +4959,18 @@ def unfinalize_round():
             tournament.round_results[last_finalized].pop('finalized', None)
             tournament.round_results[last_finalized].pop('submitted', None)
         tournament.current_round = last_finalized
+
+        # Clean up generated next-round tables (they were created during finalization)
+        if next_round in tournament.tables and next_round not in tournament.finalized_rounds:
+            del tournament.tables[next_round]
+
+        # Remove the pairing history entry for the round that generated the next round
+        if tournament._tournament_rounds and len(tournament._tournament_rounds) >= last_finalized:
+            tournament._tournament_rounds = tournament._tournament_rounds[:last_finalized - 1]
+
+        # Force pairing engine rebuild to reset constraint state
+        tournament._unified_pairing = None
+
         tournament.bump_version()
         tournament.save_backup()
 
@@ -5211,7 +5223,6 @@ if __name__ == '__main__':
     )
     backup_thread.start()
     print("[AUTO-BACKUP] Periodic backup thread started (interval: 5 minutes)")
-    import os
     debug_mode = os.getenv('FLASK_ENV') == 'development'
     app.run(
         debug=debug_mode,

@@ -287,13 +287,25 @@ class TournamentSimulator:
             page.reload()
             page.wait_for_load_state("networkidle")
         
-        # Load participants
+        # Load participants via setup wizard (event mode → scoring mode → auto-load)
         print("Loading participants...")
         load_btn = page.get_by_role("button", name="Load Participants")
         if load_btn.is_visible():
             load_btn.click()
 
-            # Wait for teams grid to populate
+            # Step 1: Event Mode modal - select Team
+            print("  Selecting Team event mode...")
+            page.wait_for_selector("#event-mode-overlay", state="visible", timeout=5000)
+            page.locator('.scoring-mode-card[data-mode="team"]').click()
+            page.locator("#confirm-event-mode-btn").click()
+
+            # Step 2: Scoring Mode modal - select Western
+            print("  Selecting Western scoring mode...")
+            page.wait_for_selector("#scoring-mode-overlay", state="visible", timeout=5000)
+            page.locator('.scoring-mode-card[data-mode="western"]').click()
+            page.locator("#confirm-scoring-mode-btn").click()
+
+            # Wait for teams grid to populate (auto-loaded after scoring mode confirmed)
             try:
                 expect(page.locator("#teams-grid")).not_to_be_empty(timeout=10000)
                 print("✅ Participants loaded successfully")

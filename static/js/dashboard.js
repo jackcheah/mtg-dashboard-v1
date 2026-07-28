@@ -70,8 +70,21 @@
                         <div class="custom-modal-header">${escapeHtml(title)}</div>
                         <div class="custom-modal-body">${escapeHtml(message).replace(/\n/g, '<br>')}</div>
                         <div class="custom-modal-actions">
-                            <button class="btn btn-secondary js-modal-cancel">${escapeHtml(cancelText)}</button>
+                            ${cancelText ? `<button class="btn btn-secondary js-modal-cancel">${escapeHtml(cancelText)}</button>` : ''}
                             <button class="btn btn-primary js-modal-confirm">${escapeHtml(confirmText)}</button>
+                        </div>
+                    </div>
+                `;
+                    return this._show(html);
+                }
+
+                async showHtml(title, bodyHtml, buttonText = 'Got it') {
+                    const html = `
+                    <div class="custom-modal">
+                        <div class="custom-modal-header">${escapeHtml(title)}</div>
+                        <div class="custom-modal-body">${bodyHtml}</div>
+                        <div class="custom-modal-actions">
+                            <button class="btn btn-primary js-modal-confirm">${escapeHtml(buttonText)}</button>
                         </div>
                     </div>
                 `;
@@ -142,11 +155,10 @@
                     </div>
                 `;
 
-                    modalManager.confirm(
+                    modalManager.showHtml(
                         'Keyboard Shortcuts',
                         helpContent,
-                        'Got it',
-                        null // No cancel button
+                        'Got it'
                     );
                 }
 
@@ -531,25 +543,12 @@
             }
 
             // Remove Japanese mode indicator
-            function removeJapaneseModeIndicator() {
-                const badge = document.getElementById('japanese-badge');
-                if (badge) badge.remove();
-            }
-
             // Format score based on current mode
             function formatScore(score) {
                 if (currentScoringMode === 'japanese') {
                     return score.toLocaleString() + ' pts';
                 }
                 return score + ' pts';
-            }
-
-            // Format player score for display
-            function formatPlayerScore(score) {
-                if (currentScoringMode === 'japanese') {
-                    return `<span class="japanese-score">${score.toLocaleString()}</span>`;
-                }
-                return score;
             }
 
             // Client-side timer with server persistence (no polling drift)
@@ -1907,7 +1906,7 @@
                 tableCard.classList.add('submitted');
 
                 // Add submitted badge to header
-                const header = tableCard.querySelector('.table-card-header');
+                const header = tableCard.querySelector('.table-header');
                 if (header && !header.querySelector('.submitted-badge')) {
                     const badge = document.createElement('span');
                     badge.className = 'submitted-badge';
@@ -1941,17 +1940,6 @@
             // ============================================
 
             // Add edit button to all submitted tables in a round
-            function addEditButtonToSubmittedTables(roundNum) {
-                const tableCards = document.querySelectorAll('.table-card');
-                tableCards.forEach(card => {
-                    const submitBtn = card.querySelector('.submit-table-btn');
-                    if (submitBtn && submitBtn.classList.contains('submitted')) {
-                        const tableName = card.id.replace('table-', '').replace(/-/g, ' ');
-                        addEditButton(card, tableName, roundNum);
-                    }
-                });
-            }
-
             // Add edit button to a specific table card
             function addEditButton(tableCard, tableName, roundNum) {
                 // Check if edit button already exists
@@ -2838,9 +2826,7 @@
                 }
 
                 // Check if all players have scores
-                const table = Object.values(window.currentTables).find(t =>
-                    Object.keys(window.currentTables).find(k => k === tableName)
-                );
+                const table = window.currentTables[tableName];
 
                 if (!table) {
                     showToast('Error', 'Table not found', 'error');

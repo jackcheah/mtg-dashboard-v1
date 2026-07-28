@@ -138,7 +138,7 @@ Swiss rounds are configurable: 3, 4 (default), or 5 via `setup_tournament(swiss_
 |----------|--------|-------------|
 | `/set_event_mode` | POST | Set event mode (team/individual) — must be INITIAL state |
 | `/set_scoring_mode` | POST | Set scoring mode (western/japanese) — before setup |
-| `/load_data` | POST | Load participants from Excel. Returns `offer_sample: true` if file missing (sample data requires explicit opt-in via `use_sample_data: true`) |
+| `/load_data` | GET, POST | Load participants from Excel. Returns `offer_sample: true` if file missing (sample data requires explicit opt-in via `use_sample_data: true`) |
 | `/setup_tournament` | POST | Initialize tournament, generate Round 1 |
 | `/submit_table_results` | POST | Submit scores for a specific table (PIN-protected) |
 | `/submit_player_results` | POST | Finalize round, trigger next round generation |
@@ -173,6 +173,16 @@ Swiss rounds are configurable: 3, 4 (default), or 5 via `setup_tournament(swiss_
 | `/backup_health` | GET | Backup health status |
 | `/tournament_statistics` | GET | Detailed stats and validation info |
 | `/get_score_history/<round>/<table>` | GET | Score edit audit trail |
+| `/projector` | GET | Projector audience view |
+| `/` | GET | Main dashboard page |
+| `/configure_swiss_rounds` | POST | Configure Swiss round count (alias for /set_swiss_rounds) |
+| `/setup_round/<round>` | GET | Get setup info for a specific round |
+| `/validate_full_swiss` | GET | Validate all Swiss rounds |
+| `/get_all_swiss_rounds` | GET | Get data for all Swiss rounds |
+| `/get_semifinals` | GET | Get semifinals/Top Cut data |
+| `/get_final_standings` | GET | Get final standings data |
+| `/get_finals` | GET | Get finals round data |
+| `/preview_finalize/<round>` | GET | Preview what finalization will produce |
 
 ---
 
@@ -234,13 +244,24 @@ mtg-dashboard-v1/
 │   └── projector_view.html          # Projector display
 ├── tests/
 │   ├── unit/
-│   │   └── test_tournament_manager.py  # pytest unit tests
+│   │   ├── test_tournament_manager.py  # Core tournament logic tests
+│   │   ├── test_individual_mode.py     # Individual mode tests
+│   │   ├── test_new_endpoints.py       # Endpoint tests
+│   │   ├── test_pairing.py            # Pairing algorithm tests
+│   │   ├── test_scoring.py            # Scoring logic tests
+│   │   ├── test_state_machine.py      # State machine tests
+│   │   └── test_validation.py         # Validation tests
 │   └── e2e/
 │       ├── simulate_full_tournament.py # Playwright E2E
+│       ├── simulate_tournament_flow.py # Flow simulation
 │       ├── test_concurrent.py          # Concurrent access tests
-│       └── generate_teams.py           # Test data generator
+│       ├── generate_teams.py           # Test data generator (8/12 teams)
+│       └── generate_16_teams.py        # Test data generator (16 teams)
 ├── participants/
 │   └── participant_team.xlsx        # Participant data
+├── Dockerfile                       # Docker container config
+├── docker-compose.yml               # Docker compose deployment
+├── JAPANESE-IMPLEMENTATION.md       # Japanese scoring mode documentation
 ├── requirements.txt                 # Production dependencies
 ├── requirements-dev.txt             # Dev/test dependencies
 ├── CLAUDE.md                        # This file

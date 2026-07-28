@@ -43,343 +43,6 @@ class TournamentStats:
     generation_time: float
     algorithm_used: str
 
-class HybridConstraintSolver:
-    """
-    Enhanced constraint satisfaction solver with intelligent backtracking.
-    
-    This solver implements advanced constraint satisfaction techniques including:
-    - Most-constrained-first heuristics
-    - Constraint propagation
-    - Intelligent backtracking with conflict analysis
-    - Multiple fallback strategies
-    """
-    
-    def __init__(self, pairing_system):
-        """Initialize the constraint solver with reference to the pairing system."""
-        self.pairing_system = pairing_system
-        self.constraint_graph = {}
-        self.domain_constraints = {}
-        self.backtrack_stats = {'nodes_explored': 0, 'backtracks': 0, 'pruned_branches': 0}
-    
-    def build_constraint_graph(self, available_players: List[Dict]) -> Dict[int, Set[int]]:
-        """
-        Build a constraint graph showing which players cannot be paired together.
-
-        Args:
-            available_players: List of players to build constraints for
-
-        Returns:
-            Dictionary mapping player IDs to sets of forbidden opponent IDs
-        """
-        constraint_graph = {}
-
-        for player in available_players:
-            player_id = player['Player ID']
-            player_team = player['Team Name']
-            forbidden = set()
-
-            # Add teammates as forbidden opponents
-            for other_player in available_players:
-                other_id = other_player['Player ID']
-                other_team = other_player['Team Name']
-
-                if other_id != player_id:
-                    # Forbid teammates (always enforced)
-                    if other_team == player_team:
-                        forbidden.add(other_id)
-
-                    # NEW: Forbid players from teams that have already faced each other
-                    # Only enforce if strict team matchup constraint is enabled
-                    if self.pairing_system.enforce_strict_team_matchups:
-                        if other_team in self.pairing_system.team_matchups.get(player_team, set()):
-                            forbidden.add(other_id)
-
-            # Add previous individual opponents as forbidden
-            if player_id in self.pairing_system.player_opponents:
-                forbidden.update(self.pairing_system.player_opponents[player_id])
-
-            constraint_graph[player_id] = forbidden
-
-        return constraint_graph
-    
-    def calculate_constraint_degrees(self, available_players: List[Dict], constraint_graph: Dict[int, Set[int]]) -> Dict[int, int]:
-        """
-        Calculate constraint degrees for most-constrained-first heuristic.
-        
-        Args:
-            available_players: List of available players
-            constraint_graph: Graph of player constraints
-            
-        Returns:
-            Dictionary mapping player IDs to their constraint degrees
-        """
-        degrees = {}
-        available_ids = {p['Player ID'] for p in available_players}
-        
-        for player in available_players:
-            player_id = player['Player ID']
-            # Count how many available players this player cannot be paired with
-            forbidden_available = constraint_graph[player_id] & available_ids
-            degrees[player_id] = len(forbidden_available)
-        
-        return degrees
-    
-    def propagate_constraints(self, partial_pod: List[Dict], available_players: List[Dict], 
-                            constraint_graph: Dict[int, Set[int]]) -> List[Dict]:
-        """
-        Apply constraint propagation to reduce the search space.
-        
-        Args:
-            partial_pod: Players already assigned to current pod
-            available_players: Remaining available players
-            constraint_graph: Graph of player constraints
-            
-        Returns:
-            Filtered list of players that can still be added to the pod
-        """
-        if not partial_pod:
-            return available_players
-        
-        valid_candidates = []
-        pod_player_ids = {p['Player ID'] for p in partial_pod}
-        pod_teams = {p['Team Name'] for p in partial_pod}
-        
-        for candidate in available_players:
-            candidate_id = candidate['Player ID']
-            candidate_team = candidate['Team Name']
-            
-            # Skip if already in pod
-            if candidate_id in pod_player_ids:
-                continue
-            
-            # For 4-player pods, enforce team separation
-            if len(partial_pod) < 4 and candidate_team in pod_teams:
-                continue
-            
-            # Check constraint violations
-            valid = True
-            for pod_player in partial_pod:
-                if pod_player['Player ID'] in constraint_graph.get(candidate_id, set()):
-                    valid = False
-                    break
-            
-            if valid:
-                valid_candidates.append(candidate)
-        
-        return valid_candidates
-    
-    
-    def _backtrack_with_constraints(self, available_players: List[Dict], current_pods: List[List[Dict]], 
-                                  constraint_graph: Dict[int, Set[int]]) -> Optional[List[List[Dict]]]:
-        """
-        Enhanced backtracking with constraint propagation and conflict analysis.
-        
-        Args:
-            available_players: Players not yet assigned
-            current_pods: Pods constructed so far
-            constraint_graph: Graph of player constraints
-            
-        Returns:
-            Complete list of pods or None if no solution
-        """
-        self.backtrack_stats['nodes_explored'] += 1
-        
-        # Safety limit to prevent infinite loops/timeouts
-        if self.backtrack_stats['nodes_explored'] > 500000:
-            raise Exception(f"Solver timeout - search space too large ({self.backtrack_stats['nodes_explored']} nodes)")
-        
-        # Base case: all pods filled
-        expected_pods = self.pairing_system.pods_per_round + (1 if self.pairing_system.incomplete_pod_size > 0 else 0)
-        
-        if len(current_pods) == expected_pods:
-            return current_pods if len(available_players) == 0 else None
-        
-        # Determine pod size for next pod
-        if len(current_pods) < self.pairing_system.pods_per_round:
-            pod_size = 4
-        else:
-            pod_size = self.pairing_system.incomplete_pod_size
-        
-        # Early pruning: check if enough players remain
-        remaining_pods = expected_pods - len(current_pods)
-        min_players_needed = (remaining_pods - 1) * 4 + pod_size
-        
-        if len(available_players) < min_players_needed:
-            self.backtrack_stats['pruned_branches'] += 1
-            return None
-        
-        # Try to build next pod with enhanced constraint satisfaction
-        pod_result = self._build_pod_with_constraints(available_players, pod_size, constraint_graph)
-        
-        if pod_result is None:
-            self.backtrack_stats['backtracks'] += 1
-            return None
-        
-        next_pod = pod_result
-        new_available = [p for p in available_players if p not in next_pod]
-        new_pods = current_pods + [next_pod]
-        
-        # Recursively solve remaining
-        result = self._backtrack_with_constraints(new_available, new_pods, constraint_graph)
-        
-        if result is not None:
-            return result
-        
-        # Backtrack and try alternative pod configurations
-        self.backtrack_stats['backtracks'] += 1
-        return self._try_alternative_pod_configurations(available_players, current_pods, pod_size, constraint_graph)
-    
-    def _build_pod_with_constraints(self, available_players: List[Dict], pod_size: int, 
-                                  constraint_graph: Dict[int, Set[int]]) -> Optional[List[Dict]]:
-        """
-        Build a single pod using constraint satisfaction techniques.
-        
-        Args:
-            available_players: Available players
-            pod_size: Required pod size
-            constraint_graph: Player constraints
-            
-        Returns:
-            Valid pod or None if impossible
-        """
-        if pod_size == 4:
-            return self._build_four_player_pod_with_constraints(available_players, constraint_graph)
-        else:
-            return self._build_partial_pod_with_constraints(available_players, pod_size, constraint_graph)
-    
-    def _build_four_player_pod_with_constraints(self, available_players: List[Dict], 
-                                              constraint_graph: Dict[int, Set[int]]) -> Optional[List[Dict]]:
-        """Build a 4-player pod with team separation using constraint satisfaction."""
-        # Group players by team
-        players_by_team = {}
-        for player in available_players:
-            team = player['Team Name']
-            if team not in players_by_team:
-                players_by_team[team] = []
-            players_by_team[team].append(player)
-        
-        # Need at least 4 teams with available players
-        available_teams = [team for team, players in players_by_team.items() if len(players) > 0]
-        
-        if len(available_teams) < 4:
-            return None
-        
-        # Use constraint satisfaction to find valid 4-team combination
-        return self._find_constrained_team_combination(players_by_team, available_teams, constraint_graph)
-    
-    def _find_constrained_team_combination(self, players_by_team: Dict[str, List[Dict]], 
-                                         available_teams: List[str], 
-                                         constraint_graph: Dict[int, Set[int]]) -> Optional[List[Dict]]:
-        """Find a valid combination of players from 4 different teams using constraint satisfaction."""
-        # Sort teams by constraint degree (most constrained first)
-        team_constraint_scores = {}
-        for team in available_teams:
-            total_constraints = 0
-            for player in players_by_team[team]:
-                player_id = player['Player ID']
-                total_constraints += len(constraint_graph.get(player_id, set()))
-            team_constraint_scores[team] = total_constraints / len(players_by_team[team])
-        
-        sorted_teams = sorted(available_teams, key=lambda t: team_constraint_scores[t], reverse=True)
-        
-        # Try combinations starting with most constrained teams
-        for team_combo in combinations(sorted_teams, 4):
-            pod = self._find_valid_player_combination(team_combo, players_by_team, constraint_graph)
-            if pod is not None:
-                return pod
-        
-        return None
-    
-    def _find_valid_player_combination(self, team_combo: Tuple[str, ...], 
-                                     players_by_team: Dict[str, List[Dict]], 
-                                     constraint_graph: Dict[int, Set[int]]) -> Optional[List[Dict]]:
-        """Find a valid combination of one player from each of the specified teams."""
-        team_players = [players_by_team[team] for team in team_combo]
-        
-        # Sort players within each team by constraint degree
-        for i, players in enumerate(team_players):
-            team_players[i] = sorted(players, 
-                                   key=lambda p: len(constraint_graph.get(p['Player ID'], set())), 
-                                   reverse=True)
-        
-        # Use constraint satisfaction to find valid combination
-        return self._recursive_player_selection(team_players, [], constraint_graph)
-    
-    def _recursive_player_selection(self, remaining_teams: List[List[Dict]], 
-                                  current_pod: List[Dict], 
-                                  constraint_graph: Dict[int, Set[int]]) -> Optional[List[Dict]]:
-        """Recursively select players using constraint satisfaction."""
-        if not remaining_teams:
-            return current_pod if len(current_pod) == 4 else None
-        
-        current_team_players = remaining_teams[0]
-        remaining_teams = remaining_teams[1:]
-        
-        for player in current_team_players:
-            player_id = player['Player ID']
-            
-            # Check if this player violates constraints with current pod
-            valid = True
-            for pod_player in current_pod:
-                if pod_player['Player ID'] in constraint_graph.get(player_id, set()):
-                    valid = False
-                    break
-            
-            if valid:
-                new_pod = current_pod + [player]
-                result = self._recursive_player_selection(remaining_teams, new_pod, constraint_graph)
-                if result is not None:
-                    return result
-        
-        return None
-    
-    def _build_partial_pod_with_constraints(self, available_players: List[Dict], pod_size: int, 
-                                          constraint_graph: Dict[int, Set[int]]) -> Optional[List[Dict]]:
-        """Build a partial pod (less than 4 players) with minimal constraint violations."""
-        best_pod = None
-        min_violations = float('inf')
-        
-        # Sort players by constraint degree
-        sorted_players = sorted(available_players, 
-                              key=lambda p: len(constraint_graph.get(p['Player ID'], set())), 
-                              reverse=True)
-        
-        for pod_combo in combinations(sorted_players, pod_size):
-            pod = list(pod_combo)
-            violations = self._count_constraint_violations(pod, constraint_graph)
-            
-            if violations < min_violations:
-                min_violations = violations
-                best_pod = pod
-                
-                # If we found a perfect pod, use it
-                if violations == 0:
-                    break
-        
-        return best_pod
-    
-    def _count_constraint_violations(self, pod: List[Dict], constraint_graph: Dict[int, Set[int]]) -> int:
-        """Count constraint violations in a pod."""
-        violations = 0
-        
-        for i in range(len(pod)):
-            for j in range(i + 1, len(pod)):
-                player1_id = pod[i]['Player ID']
-                player2_id = pod[j]['Player ID']
-                
-                if player2_id in constraint_graph.get(player1_id, set()):
-                    violations += 1
-        
-        return violations
-    
-    def _try_alternative_pod_configurations(self, available_players: List[Dict], 
-                                          current_pods: List[List[Dict]], pod_size: int, 
-                                          constraint_graph: Dict[int, Set[int]]) -> Optional[List[List[Dict]]]:
-        """Try alternative pod configurations when primary approach fails."""
-        # This could implement more sophisticated backtracking strategies
-        # For now, we'll return None to trigger the next algorithm level
-        return None
-
 
 class UnifiedSwissPairing:
     """
@@ -442,9 +105,6 @@ class UnifiedSwissPairing:
         self.team_matchups: Dict[str, Set[str]] = {}  # NEW: Track team-level matchups
         self.round_solutions: List[List[List[Dict]]] = []
         self.groups_needing_player_optimization: Dict[int, List[Tuple[str, str]]] = {}  # Track groups with unavoidable team repeats
-
-        # Initialize enhanced constraint solver
-        self.constraint_solver = HybridConstraintSolver(self)
 
         # Initialize player opponent tracking
         for player in self.players:
@@ -949,7 +609,12 @@ class UnifiedSwissPairing:
 
             all_pods.extend(pods)
 
-        # Step 3: Update player opponent tracking
+        # Step 3: Validate pod consistency BEFORE updating constraints
+        if not self._validate_round_pod_consistency(all_pods, team_groups):
+            print(f"[ERROR] Pod consistency validation failed for round {round_num}")
+            return None
+
+        # Step 4: Update player opponent tracking (only after validation passes)
         for pod in all_pods:
             for player in pod:
                 player_id = player['Player ID']
@@ -960,18 +625,13 @@ class UnifiedSwissPairing:
 
                 self.player_opponents[player_id].update(opponents)
 
-        # Step 4: Update team matchup tracking
+        # Step 5: Update team matchup tracking
         for team_group in team_groups:
             for team in team_group:
                 other_teams = [t for t in team_group if t != team]
                 if team not in self.team_matchups:
                     self.team_matchups[team] = set()
                 self.team_matchups[team].update(other_teams)
-
-        # Step 5: Validate pod consistency
-        if not self._validate_round_pod_consistency(all_pods, team_groups):
-            print(f"[ERROR] Pod consistency validation failed for round {round_num}")
-            return None
 
         return all_pods
 
