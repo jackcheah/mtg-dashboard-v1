@@ -399,9 +399,9 @@ class TournamentSimulator:
         num_tables = len(table_cards)
         print(f"Found {num_tables} tables")
         
-        # 8 teams -> 2 tables swiss, 1 table finals
-        # 12 teams -> 3 tables swiss, 1 table finals
-        # 16 teams -> 4 tables swiss, 2 tables top8, 1 table finals
+        # 8 teams -> 8 tables swiss, 4 tables finals
+        # 12 teams -> 12 tables swiss, 4 tables finals
+        # 16 teams -> 16 tables swiss, 8 tables top8, 4 tables finals
         
         # Record round data
         round_data = {

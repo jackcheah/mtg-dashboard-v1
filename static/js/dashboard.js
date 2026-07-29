@@ -131,7 +131,7 @@
                 showKeyboardHelp() {
                     const helpContent = `
                     <div style="text-align: left; line-height: 1.8;">
-                        <h3 style="margin-top: 0; color: var(--color-accent);">⌨️ Keyboard Shortcuts</h3>
+                        <h3 style="margin-top: 0; color: var(--color-primary);">⌨️ Keyboard Shortcuts</h3>
 
                         <div style="margin-bottom: 1rem;">
                             <strong style="color: var(--color-success);">Scoring:</strong><br>
@@ -141,7 +141,7 @@
                         </div>
 
                         <div style="margin-bottom: 1rem;">
-                            <strong style="color: var(--color-info);">Navigation:</strong><br>
+                            <strong style="color: var(--color-primary);">Navigation:</strong><br>
                             • <kbd>Tab</kbd> = Next player<br>
                             • <kbd>Shift</kbd>+<kbd>Tab</kbd> = Previous player<br>
                             • <kbd>Ctrl</kbd>+<kbd>Enter</kbd> = Submit active table
@@ -261,6 +261,8 @@
                     document.body.classList.add('compact-mode');
                     const btn = document.querySelector('button[onclick="toggleCompactMode()"] i');
                     if (btn) btn.className = 'fas fa-expand-alt';
+                    const label = document.querySelector('button[onclick="toggleCompactMode()"] span');
+                    if (label) label.textContent = 'Expand';
                 }
             });
 
@@ -297,13 +299,13 @@
                 );
 
                 if (confirmed) {
-                    showToast('Batch Submit', `Submitting ${filledTables.length} tables...`, 'info');
-                    for (const tableName of filledTables) {
-                        await submitTableResults(tableName);
+                    for (let i = 0; i < filledTables.length; i++) {
+                        showToast('Batch Submit', `Submitting ${i + 1}/${filledTables.length} tables...`, 'info');
+                        await submitTableResults(filledTables[i]);
                         // Small delay to prevent race conditions/UI jank
                         await new Promise(r => setTimeout(r, 300));
                     }
-                    showToast('Batch Complete', 'All selected tables submitted.', 'success');
+                    showToast('Batch Complete', `All ${filledTables.length} tables submitted.`, 'success');
                 }
             }
 
@@ -316,11 +318,14 @@
                 localStorage.setItem('compactMode', isCompact);
 
                 const btn = document.querySelector('button[onclick="toggleCompactMode()"] i');
+                const label = document.querySelector('button[onclick="toggleCompactMode()"] span');
                 if (isCompact) {
                     if (btn) btn.className = 'fas fa-expand-alt';
+                    if (label) label.textContent = 'Expand';
                     showToast('View Mode', 'Compact mode enabled', 'info');
                 } else {
                     if (btn) btn.className = 'fas fa-compress-alt';
+                    if (label) label.textContent = 'Compact';
                     showToast('View Mode', 'Standard mode enabled', 'info');
                 }
             }
@@ -412,8 +417,8 @@
                         const badge = document.createElement('span');
                         badge.id = 'individual-badge';
                         badge.className = 'japanese-mode-badge';
-                        badge.style.background = 'linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)';
-                        badge.style.boxShadow = '0 2px 10px rgba(139, 92, 246, 0.3)';
+                        badge.style.background = '#7c3aed';
+                        badge.style.boxShadow = 'none';
                         badge.innerHTML = '<i class="fas fa-user"></i> Individual';
                         badge.style.marginLeft = '10px';
                         header.appendChild(badge);
@@ -570,7 +575,7 @@
                 const colorClass = type === 'success' ? 'var(--color-success)' :
                     type === 'error' ? 'var(--color-danger)' :
                         type === 'warning' ? 'var(--color-warning)' :
-                            'var(--color-secondary)';
+                            'var(--color-primary)';
 
                 // Create toast element
                 const toast = document.createElement('div');
@@ -1269,7 +1274,7 @@
                     setTimeout(() => {
                         showToast(
                             'Tip: Compact Mode',
-                            `You have ${tableCount} tables. Try Compact Mode (header button) for easier viewing!`,
+                            `You have ${tableCount} tables. Try the Compact button in the controls bar for easier viewing!`,
                             'info',
                             8000 // 8 second duration
                         );
@@ -1719,9 +1724,9 @@
                 widget.style.display = 'block';
 
                 if (submissionStatus.is_complete) {
-                    widget.style.background = 'rgba(16, 185, 129, 0.15)';
-                    widget.style.border = '1px solid rgba(16, 185, 129, 0.4)';
-                    widget.style.color = '#10b981';
+                    widget.style.background = 'var(--color-success-light)';
+                    widget.style.border = '1px solid var(--color-success)';
+                    widget.style.color = 'var(--color-success)';
                     widget.innerHTML = '<i class="fas fa-check-circle"></i> All tables submitted! Ready to finalize.';
                 } else {
                     const submitted = submissionStatus.submitted_count || 0;
@@ -1729,9 +1734,9 @@
                     const remaining = submissionStatus.remaining_tables || [];
                     const remainingText = remaining.length > 0 ? remaining.map(t => escapeHtml(t)).join(', ') : '';
 
-                    widget.style.background = 'rgba(99, 102, 241, 0.1)';
-                    widget.style.border = '1px solid rgba(99, 102, 241, 0.3)';
-                    widget.style.color = 'rgba(255, 255, 255, 0.85)';
+                    widget.style.background = 'var(--color-primary-light)';
+                    widget.style.border = '1px solid var(--color-primary)';
+                    widget.style.color = 'var(--color-text)';
                     widget.innerHTML = `<i class="fas fa-clipboard-list"></i> ${submitted}/${total} tables submitted` +
                         (remainingText ? ` &bull; Remaining: ${remainingText}` : '');
                 }
@@ -1799,7 +1804,7 @@
 
                 const revertBtn = document.createElement('button');
                 revertBtn.className = 'edit-scores-btn';
-                revertBtn.style.background = 'rgba(239, 68, 68, 0.2)';
+                revertBtn.style.background = 'var(--color-danger-light)';
                 revertBtn.style.borderColor = 'var(--color-danger)';
                 revertBtn.innerHTML = '<i class="fas fa-undo"></i> Revert';
                 revertBtn.onclick = async (e) => {
@@ -2078,8 +2083,8 @@
                     modal.innerHTML = `
                     <div class="history-modal-content">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                            <h3 id="history-modal-title" style="margin: 0; color: #fff;"></h3>
-                            <button onclick="closeHistoryModal()" style="background: none; border: none; color: #fff; font-size: 24px; cursor: pointer;">&times;</button>
+                            <h3 id="history-modal-title" style="margin: 0; color: var(--color-text);"></h3>
+                            <button onclick="closeHistoryModal()" style="background: none; border: none; color: var(--color-text-secondary); font-size: 24px; cursor: pointer;">&times;</button>
                         </div>
                         <div id="history-modal-body"></div>
                     </div>
@@ -2095,7 +2100,7 @@
                 // Populate modal content
                 document.getElementById('history-modal-title').textContent = `Score History: ${tableName} (Round ${roundNum})`;
 
-                let bodyHTML = `<p style="color: #a0aec0; margin-bottom: 16px;">Total edits: ${history.length}</p>`;
+                let bodyHTML = `<p style="color: var(--color-text-secondary); margin-bottom: 16px;">Total edits: ${history.length}</p>`;
 
                 history.forEach((entry, index) => {
                     const timestamp = new Date(entry.timestamp).toLocaleString();
@@ -2318,9 +2323,9 @@
                         }).join('');
 
                         byeCard.innerHTML = `
-                            <div class="table-header" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.1));">
+                            <div class="table-header" style="background: var(--color-success-light);">
                                 <div class="table-name"><i class="fas fa-forward"></i> Bye This Round</div>
-                                <span class="submitted-badge" style="background: var(--color-success);">Auto-Win</span>
+                                <span class="submitted-badge" style="background: var(--color-success); color: white;">Auto-Win</span>
                             </div>
                             <div class="table-players">${playerNames}</div>
                         `;
@@ -2391,9 +2396,9 @@
 
                     // Build modal content
                     const playerListHtml = players.map(p => `
-                        <div style="display: flex; align-items: center; padding: 8px 12px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                        <div style="display: flex; align-items: center; padding: 8px 12px; border-bottom: 1px solid var(--color-border-subtle);">
                             <span style="flex: 1; font-weight: 500;">${escapeHtml(p.name)}</span>
-                            <span style="margin-right: 16px; opacity: 0.7;">${formatScore(p.score)}</span>
+                            <span style="margin-right: 16px; color: var(--color-text-secondary);">${formatScore(p.score)}</span>
                             <button class="btn btn-danger drop-player-btn" style="padding: 4px 12px; font-size: 0.75rem;"
                                 data-player-id="${p.id}"
                                 data-player-name="${escapeHtml(p.name)}">
@@ -2409,7 +2414,7 @@
                                     <i class="fas fa-user-minus"></i> Drop Players
                                 </h2>
                                 <p class="scoring-mode-subtitle">Select a player to remove from future rounds. Their score will be frozen.</p>
-                                <div style="margin: 16px 0; border-radius: 8px; background: rgba(0,0,0,0.2); overflow: hidden;">
+                                <div style="margin: 16px 0; border-radius: 8px; background: var(--color-surface-hover); overflow: hidden;">
                                     ${playerListHtml}
                                 </div>
                                 <div class="scoring-mode-actions">
@@ -2606,31 +2611,29 @@
                 console.log(`Set score: Table ${tableName}, Player ${playerId} = ${points} pts`);
 
                 // Auto-Fill Losers Logic (UX Improvement)
-                // If Win (5 points) is selected, set all OTHER players in this table to Loss (0)
-                // UNLESS they already have a score set
+                // If Win (5 points) is selected, clear any existing selections on other players
+                // and set them all to Loss (0). A winner means everyone else lost.
                 if (points === 5) {
                     const tableCard = button.closest('.table-card');
                     if (tableCard) {
-                        const allScoreBtns = tableCard.querySelectorAll('.score-btn-loss');
+                        const allLossBtns = tableCard.querySelectorAll('.score-btn-loss');
                         let autoFilledCount = 0;
 
-                        allScoreBtns.forEach(lossBtn => {
+                        allLossBtns.forEach(lossBtn => {
                             const otherPlayerId = parseInt(lossBtn.dataset.player);
-                            const otherPlayerRow = lossBtn.closest('.table-player');
-
-                            // Skip the winner (obviously)
                             if (otherPlayerId === playerId) return;
 
-                            // Check if this player already has a score selected
-                            // Look for active class on any button in this row
-                            const hasSelection = otherPlayerRow.querySelector('.score-btn.active');
+                            const otherPlayerRow = lossBtn.closest('.table-player');
 
-                            if (!hasSelection) {
-                                // Synthetically click the loss button to set the score
-                                // This triggers this same function recursively but for 0 points
-                                lossBtn.click();
-                                autoFilledCount++;
+                            // Clear any existing selection (e.g., draws) before setting loss
+                            const activeBtn = otherPlayerRow.querySelector('.score-btn.active');
+                            if (activeBtn) {
+                                activeBtn.classList.remove('active');
                             }
+
+                            // Set loss directly (avoid .click() to prevent redundant DOM event dispatch)
+                            setPlayerScore(tableName, otherPlayerId, 0, lossBtn);
+                            autoFilledCount++;
                         });
 
                         if (autoFilledCount > 0) {
@@ -2669,6 +2672,14 @@
 
                 if (!table) {
                     showToast('Error', 'Table not found', 'error');
+                    return;
+                }
+
+                const expectedCount = table.length;
+                const actualCount = Object.keys(tableScores[tableName]).length;
+                if (actualCount < expectedCount) {
+                    const missing = expectedCount - actualCount;
+                    showToast('Incomplete Scores', `${missing} player(s) at ${tableName} still need scores`, 'warning');
                     return;
                 }
 
@@ -2970,7 +2981,7 @@
                         <div class="standing-swiss">Swiss: ${team.swiss_points} pts</div>
                     </div>
                     <div class="standing-total">${team.total_points}</div>
-                    <div style="font-size: var(--text-xs); color: rgba(255,255,255,0.5);">pts</div>
+                    <div style="font-size: var(--text-xs); color: var(--color-text-tertiary);">pts</div>
                 `;
 
                     standingsList.appendChild(row);

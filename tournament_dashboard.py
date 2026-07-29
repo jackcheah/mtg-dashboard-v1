@@ -1926,7 +1926,7 @@ class TournamentManager:
                     print(f"  {rank}. {team_name}: Top8={top8_score}, Swiss={swiss_score}, Best={best_player}, Avg={avg_player:.1f}, Early={early_wins} [{status}]")
 
             else:
-                print("[TROPHY] Generating FINALS after Swiss rounds (8-team tournament)")
+                print(f"[TROPHY] Generating FINALS after Swiss rounds ({len(self.tournament_teams)}-team tournament)")
                 # Swiss scores already saved by submit_player_results before this method is called
 
                 # For 8-team: Use comprehensive tiebreaker to get top 4
@@ -3019,9 +3019,9 @@ def _handle_round_transition(round_num):
             tournament_winner_data = tournament.get_tournament_winner()
             if tournament_winner_data:
                 print(f"[OK] Champion: {tournament_winner_data['winning_team']}")
-                tournament.transition_to(TournamentState.FINALS_COMPLETE, "Tournament complete")
             else:
-                print("[ERROR] Failed to determine tournament winner")
+                print("[WARNING] Could not determine tournament winner now — will compute lazily on demand")
+            tournament.transition_to(TournamentState.FINALS_COMPLETE, "Tournament complete")
 
     return next_round_generated, semifinals_data, tournament_winner_data
 
@@ -3128,7 +3128,10 @@ def submit_player_results():
 
             print(f"Round {round_num} has been FINALIZED and SUBMITTED - preventing future submissions")
 
-            tournament.save_backup()
+            # Snapshot state under lock, defer disk I/O to avoid blocking concurrent requests
+            state_snapshot = tournament._build_state_dict()
+            threading.Thread(target=tournament._write_state_to_disk, args=(state_snapshot,), daemon=True).start()
+
             response_data = _build_finalization_response(round_num, next_round_generated, semifinals_data, tournament_winner_data, ' (points added via table submissions)')
             return jsonify(response_data)
         else:
@@ -4910,6 +4913,7 @@ def unfinalize_round():
             tournament.finals_data = None
             tournament.semifinals_data = None
             tournament.final_round_scores = {}
+            tournament.swiss_round_scores = {}
         elif tournament.state == TournamentState.FINALS_IN_PROGRESS and last_finalized == tournament.swiss_rounds_count + 1:
             tournament.transition_to(TournamentState.TOP8_IN_PROGRESS, f"Reverted via unfinalize round {last_finalized}")
 

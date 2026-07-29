@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
 
     <!-- Font Awesome for Icons -->
@@ -228,6 +228,11 @@
                         title="Submit all completed tables">
                         <i class="fas fa-check-double"></i>
                         <span>Batch Submit</span>
+                    </button>
+                    <button class="btn btn-secondary" onclick="toggleCompactMode()"
+                        title="Toggle compact view for large tournaments">
+                        <i class="fas fa-compress-alt"></i>
+                        <span>Compact</span>
                     </button>
                     <button class="btn btn-success" onclick="submitRoundResults()">
                         <i class="fas fa-check-circle"></i>

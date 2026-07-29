@@ -91,6 +91,29 @@ class TestValidTransitions:
         # After all Swiss rounds, should be in FINALS_IN_PROGRESS
         assert tournament.state == TournamentState.FINALS_IN_PROGRESS
 
+    def test_12_team_structure_no_top_cut(self, client):
+        """12-team tournament: 4 Swiss rounds, no Top 8 cut, direct to Finals."""
+        setup_via_api(client, event_mode='team', scoring_mode='western', num_teams=12)
+
+        assert tournament.swiss_rounds_count == 4
+        assert tournament.has_semifinals is False
+        assert tournament.max_rounds == 5
+
+        # Play through all 4 Swiss rounds
+        for round_num in range(1, 5):
+            submit_all_tables(client, round_num)
+            resp = client.post('/submit_player_results', json={'round': round_num, 'results': []})
+            assert resp.get_json()['success'] is True
+
+        # Should go directly to Finals (no Top 8 cut)
+        assert tournament.state == TournamentState.FINALS_IN_PROGRESS
+        assert tournament.current_round == 5
+
+        # Finals should have 4 tables (top 4 teams, 1 player per team per table)
+        resp = client.get('/get_tables/5')
+        tables = resp.get_json()['tables']
+        assert len(tables) == 4
+
 
 # ============================================================
 # Guard Checks - Invalid Operations
