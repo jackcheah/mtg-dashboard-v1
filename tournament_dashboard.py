@@ -118,6 +118,10 @@ class TournamentManager:
         self.top_cut_data = None  # Individual mode: top cut round data
         self.dropped_players = {}  # {player_id: {'name': str, 'score': int, 'dropped_after_round': int}}
 
+        # Anti-collusion pairing (snake interleave for late Swiss rounds)
+        self.anti_collusion_enabled = True
+        self.anti_collusion_start_round = 3
+
     def bump_version(self):
         """Increment state version counter for ETag/change detection."""
         self._state_version += 1
@@ -163,7 +167,9 @@ class TournamentManager:
                 "supported_team_counts": self.supported_team_counts,
                 "scoring_mode": self.scoring_mode.value,
                 "event_mode": self.event_mode.value,
-                "has_top_cut": getattr(self, 'has_top_cut', False)
+                "has_top_cut": getattr(self, 'has_top_cut', False),
+                "anti_collusion_enabled": self.anti_collusion_enabled,
+                "anti_collusion_start_round": self.anti_collusion_start_round
             },
             "state": {
                 "current_round": self.current_round,
@@ -304,7 +310,11 @@ class TournamentManager:
                 self.event_mode = EventMode.TEAM
                 print(f"[BACKUP] Event mode restored: TEAM")
             self.has_top_cut = config.get('has_top_cut', False)
-            
+
+            # Restore anti-collusion settings (backward compatible - default to enabled)
+            self.anti_collusion_enabled = config.get('anti_collusion_enabled', True)
+            self.anti_collusion_start_round = config.get('anti_collusion_start_round', 3)
+
             # Restore State
             state = state_data.get('state', {})
             self.current_round = state.get('current_round', 1)
@@ -402,7 +412,9 @@ class TournamentManager:
                     self.tournament_teams,
                     self.swiss_rounds_count,
                     self.scores,
-                    is_individual_mode=(self.event_mode == EventMode.INDIVIDUAL)
+                    is_individual_mode=(self.event_mode == EventMode.INDIVIDUAL),
+                    anti_collusion_enabled=self.anti_collusion_enabled,
+                    anti_collusion_start_round=self.anti_collusion_start_round
                 )
                 
                 # Replay history
@@ -1130,7 +1142,9 @@ class TournamentManager:
                 self._unified_pairing = UnifiedSwissPairing(
                     self.teams, self.tournament_teams,
                     self.swiss_rounds_count, self.scores,
-                    is_individual_mode=is_individual
+                    is_individual_mode=is_individual,
+                    anti_collusion_enabled=self.anti_collusion_enabled,
+                    anti_collusion_start_round=self.anti_collusion_start_round
                 )
                 # Replay existing history to preserve repeat-avoidance after drop
                 if hasattr(self, '_tournament_rounds') and self._tournament_rounds:

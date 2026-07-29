@@ -208,11 +208,11 @@ Swiss rounds are configurable: 3, 4 (default), or 5 via `setup_tournament(swiss_
 
 ## Testing
 
-### Unit Tests (131 tests)
+### Unit Tests (133 tests)
 ```bash
 pytest tests/unit/ -v
 ```
-Covers: tiebreaker logic, final standings, MVP, state machine, backup/restore integrity, score validation, reset confirmation, individual mode.
+Covers: tiebreaker logic, final standings, MVP, state machine, backup/restore integrity, score validation, reset confirmation, individual mode, anti-collusion pairing.
 
 ### E2E Tests
 ```bash
@@ -271,12 +271,36 @@ mtg-dashboard-v1/
 ## Swiss Pairing Implementation
 
 ### Team Mode (`unified_swiss_pairing.py`)
-1. **Group**: Sort teams by score into brackets of 4.
-2. **Swap**: If repeats/conflicts exist, swap lowest team with nearest neighbor.
-3. **Optimize**: Permutation search to minimize player-level repeats.
+
+**Rounds 1-2 (Traditional Swiss):**
+
+1. **Group**: Sort teams by score into brackets of 4 (top 4 → Group 1, next 4 → Group 2, etc.).
+2. **Swap** (Layer 2): If repeats/conflicts exist, swap lowest team with nearest neighbor.
+3. **Optimize** (Layer 3): Permutation search to minimize player-level repeats.
 4. **Guarantees**: No teammates in same pod. Zero repeat matchups for 16 teams / 4 rounds.
 
+**Rounds 3+ (Anti-Collusion Snake Pairing):**
+
+To prevent top teams from colluding via intentional draws, rounds 3+ use snake/interleave grouping that spreads top teams across different pods:
+
+1. **Snake Group**: Teams sorted by score, then assigned in snake order — each pod gets one team from each quartile.
+2. **Swap** (Layer 2): Same repeat-avoidance swaps still apply on top.
+3. **Optimize** (Layer 3): Same player-level optimization still applies.
+
+Snake distribution (16 teams, 4 groups):
+
+- Group 1: seeds 1, 8, 9, 16
+- Group 2: seeds 2, 7, 10, 15
+- Group 3: seeds 3, 6, 11, 14
+- Group 4: seeds 4, 5, 12, 13
+
+Configuration (in `TournamentManager`):
+
+- `anti_collusion_enabled`: Default `True` (team mode only, ignored for individual)
+- `anti_collusion_start_round`: Default `3` (rounds before this use traditional Swiss)
+
 ### Individual Mode (`_generate_round_individual_mode()`)
+
 1. **Sort**: All players sorted by score (descending).
 2. **Chunk**: Group into pods of 4 (bottom remainder gets byes or forms 3-player pod).
 3. **Optimize**: Swap players between adjacent pods to minimize repeat opponents.

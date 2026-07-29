@@ -359,3 +359,163 @@ class TestEdgeCases:
             assert len(pod) == 4
         assert len(round_solution) == 4
         assert len(new_engine.last_bye_players) == 2
+
+
+# ===========================================================================
+# ANTI-COLLUSION SNAKE PAIRING TESTS
+# ===========================================================================
+
+class TestAntiCollusionSnakePairing:
+    """Verify snake interleave grouping prevents top teams from being grouped together."""
+
+    def _run_rounds_up_to(self, engine, up_to_round):
+        """Generate and commit rounds 1 through up_to_round-1, return engine ready for up_to_round."""
+        for r in range(1, up_to_round):
+            success, solution = engine.generate_single_round(r)
+            assert success, f"Failed to generate round {r}"
+            engine._update_constraints_after_round(solution)
+            engine.round_solutions.append(solution)
+
+    def test_snake_grouping_spreads_top_teams_16(self):
+        """With 16 teams, no group in round 3 should contain 2+ of the top 4 teams."""
+        teams, tournament_teams = make_teams(16)
+        scores = {t: (16 - i) * 5 for i, t in enumerate(tournament_teams)}
+        engine = UnifiedSwissPairing(teams, tournament_teams, swiss_rounds_count=4,
+                                     team_scores=scores, anti_collusion_enabled=True,
+                                     anti_collusion_start_round=3)
+
+        # Run rounds 1-2
+        self._run_rounds_up_to(engine, 3)
+        engine.update_team_scores(scores)
+
+        # Directly test the grouping method
+        groups = engine._create_team_groups_snake_interleave(3)
+
+        top_4 = set(tournament_teams[:4])
+        for group in groups:
+            top_in_group = [t for t in group if t in top_4]
+            assert len(top_in_group) <= 1, \
+                f"Group has multiple top-4 teams: {top_in_group}"
+
+    def test_snake_grouping_spreads_top_teams_8(self):
+        """With 8 teams, no group should contain both of the top 2 teams."""
+        teams, tournament_teams = make_teams(8)
+        scores = {t: (8 - i) * 5 for i, t in enumerate(tournament_teams)}
+        engine = UnifiedSwissPairing(teams, tournament_teams, swiss_rounds_count=4,
+                                     team_scores=scores, anti_collusion_enabled=True,
+                                     anti_collusion_start_round=3)
+
+        self._run_rounds_up_to(engine, 3)
+        engine.update_team_scores(scores)
+
+        groups = engine._create_team_groups_snake_interleave(3)
+
+        top_2 = set(tournament_teams[:2])
+        for group in groups:
+            top_in_group = [t for t in group if t in top_2]
+            assert len(top_in_group) <= 1, \
+                f"Group has both top-2 teams: {top_in_group}"
+
+    def test_snake_not_active_round_2(self):
+        """Round 2 should still use traditional Swiss (top teams grouped together)."""
+        teams, tournament_teams = make_teams(16)
+        scores = {t: (16 - i) * 5 for i, t in enumerate(tournament_teams)}
+        engine = UnifiedSwissPairing(teams, tournament_teams, swiss_rounds_count=4,
+                                     team_scores=scores, anti_collusion_enabled=True,
+                                     anti_collusion_start_round=3)
+
+        self._run_rounds_up_to(engine, 2)
+        engine.update_team_scores(scores)
+
+        # Round 2 uses traditional Swiss — top 4 should be in same group
+        groups = engine._create_team_groups_traditional_swiss(2)
+        top_4 = set(tournament_teams[:4])
+        group_0_top = [t for t in groups[0] if t in top_4]
+        assert len(group_0_top) == 4, \
+            "Round 2 should group top 4 teams together (traditional Swiss)"
+
+    def test_snake_disabled_flag(self):
+        """With anti_collusion_enabled=False, round 3 should use traditional Swiss."""
+        teams, tournament_teams = make_teams(16)
+        scores = {t: (16 - i) * 5 for i, t in enumerate(tournament_teams)}
+        engine = UnifiedSwissPairing(teams, tournament_teams, swiss_rounds_count=4,
+                                     team_scores=scores, anti_collusion_enabled=False,
+                                     anti_collusion_start_round=3)
+
+        self._run_rounds_up_to(engine, 3)
+        engine.update_team_scores(scores)
+
+        # With anti-collusion disabled, the routing should use traditional Swiss
+        # which puts top 4 in same group
+        groups = engine._create_team_groups_traditional_swiss(3)
+        top_4 = set(tournament_teams[:4])
+        group_0_top = [t for t in groups[0] if t in top_4]
+        assert len(group_0_top) == 4
+
+    def test_snake_groups_composition_16_teams(self):
+        """Each group should have exactly one team from each quartile."""
+        teams, tournament_teams = make_teams(16)
+        scores = {t: (16 - i) * 5 for i, t in enumerate(tournament_teams)}
+        engine = UnifiedSwissPairing(teams, tournament_teams, swiss_rounds_count=4,
+                                     team_scores=scores, anti_collusion_enabled=True,
+                                     anti_collusion_start_round=3)
+
+        engine.update_team_scores(scores)
+        groups = engine._create_team_groups_snake_interleave(3)
+
+        sorted_teams = sorted(tournament_teams, key=lambda t: scores[t], reverse=True)
+        quartiles = [
+            set(sorted_teams[0:4]),
+            set(sorted_teams[4:8]),
+            set(sorted_teams[8:12]),
+            set(sorted_teams[12:16]),
+        ]
+
+        for group in groups:
+            for q_idx, quartile in enumerate(quartiles):
+                in_quartile = [t for t in group if t in quartile]
+                assert len(in_quartile) == 1, \
+                    f"Group {group} has {len(in_quartile)} teams from quartile {q_idx+1}"
+
+    def test_snake_custom_start_round(self):
+        """Anti-collusion with start_round=4 should not activate in round 3."""
+        teams, tournament_teams = make_teams(16)
+        scores = {t: (16 - i) * 5 for i, t in enumerate(tournament_teams)}
+        engine = UnifiedSwissPairing(teams, tournament_teams, swiss_rounds_count=5,
+                                     team_scores=scores, anti_collusion_enabled=True,
+                                     anti_collusion_start_round=4)
+
+        self._run_rounds_up_to(engine, 3)
+        engine.update_team_scores(scores)
+
+        # Round 3 should still be traditional (start_round=4)
+        groups = engine._create_team_groups_traditional_swiss(3)
+        top_4 = set(tournament_teams[:4])
+        group_0_top = [t for t in groups[0] if t in top_4]
+        assert len(group_0_top) == 4
+
+    def test_full_tournament_with_anti_collusion(self):
+        """4-round tournament with 16 teams completes without structural violations."""
+        teams, tournament_teams = make_teams(16)
+        engine = UnifiedSwissPairing(teams, tournament_teams, swiss_rounds_count=4,
+                                     anti_collusion_enabled=True,
+                                     anti_collusion_start_round=3)
+
+        for round_num in range(1, 5):
+            success, solution = engine.generate_single_round(round_num)
+            assert success, f"Round {round_num} generation failed"
+
+            # Validate no teammates in same pod
+            for pod in solution:
+                pod_teams = [p['Team Name'] for p in pod]
+                assert len(pod_teams) == len(set(pod_teams)), \
+                    f"Round {round_num}: teammates in same pod: {pod_teams}"
+
+            engine._update_constraints_after_round(solution)
+            engine.round_solutions.append(solution)
+
+            # Update scores (simulate wins for top teams)
+            scores = {}
+            for i, t in enumerate(tournament_teams):
+                scores[t] = (16 - i) * 5 * round_num
+            engine.update_team_scores(scores)

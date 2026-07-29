@@ -53,7 +53,7 @@ class UnifiedSwissPairing:
     to provide a robust solution that works for any valid tournament configuration.
     """
     
-    def __init__(self, teams: Dict[str, List[Dict]], tournament_teams: List[str], swiss_rounds_count: int = 4, team_scores: Dict[str, int] = None, use_traditional_swiss: bool = True, max_player_optimization_iterations: int = None, is_individual_mode: bool = False):
+    def __init__(self, teams: Dict[str, List[Dict]], tournament_teams: List[str], swiss_rounds_count: int = 4, team_scores: Dict[str, int] = None, use_traditional_swiss: bool = True, max_player_optimization_iterations: int = None, is_individual_mode: bool = False, anti_collusion_enabled: bool = True, anti_collusion_start_round: int = 3):
         """
         Initialize the unified Swiss pairing system.
 
@@ -67,6 +67,9 @@ class UnifiedSwissPairing:
             max_player_optimization_iterations: Cap for exhaustive player search.
                                                None = unlimited for groups with team repeats
             is_individual_mode: If True, skip team constraints and use individual pairing
+            anti_collusion_enabled: If True, use snake interleave grouping in later rounds
+                                    to prevent top teams from colluding via intentional draws
+            anti_collusion_start_round: Round number from which anti-collusion pairing activates
         """
         self.teams = teams
         self.tournament_teams = tournament_teams
@@ -78,6 +81,8 @@ class UnifiedSwissPairing:
         # Configuration flags
         self.use_traditional_swiss = use_traditional_swiss
         self.max_player_optimization_iterations = max_player_optimization_iterations
+        self.anti_collusion_enabled = anti_collusion_enabled and not is_individual_mode
+        self.anti_collusion_start_round = anti_collusion_start_round
         
         # Validate input parameters
         self._validate_tournament_configuration()
@@ -651,8 +656,11 @@ class UnifiedSwissPairing:
         if self.use_traditional_swiss:
             # TRADITIONAL SWISS: Three-layer repeat avoidance
 
-            # LAYER 1: Traditional Swiss score-based grouping
-            groups = self._create_team_groups_traditional_swiss(round_num)
+            # LAYER 1: Determine grouping strategy
+            if self.anti_collusion_enabled and round_num >= self.anti_collusion_start_round:
+                groups = self._create_team_groups_snake_interleave(round_num)
+            else:
+                groups = self._create_team_groups_traditional_swiss(round_num)
 
             # LAYER 2: Detect and resolve team-level repeats via swapping
             repeats = self._detect_repeat_matchups_in_groups(groups)
@@ -735,6 +743,44 @@ class UnifiedSwissPairing:
         for i in range(num_groups):
             group = sorted_teams[i*4:(i+1)*4]
             team_groups.append(group)
+
+        return team_groups
+
+    def _create_team_groups_snake_interleave(self, round_num: int) -> List[List[str]]:
+        """
+        Create team groups using snake/interleave pattern to prevent top-team collusion.
+
+        Instead of grouping top teams together (traditional Swiss), this spreads
+        them across groups so each group has one team from each quartile.
+
+        Snake pattern for N groups:
+          Row 0 (forward):  teams[0..N-1]   -> groups [0, 1, ..., N-1]
+          Row 1 (reverse):  teams[N..2N-1]  -> groups [N-1, N-2, ..., 0]
+          Row 2 (forward):  teams[2N..3N-1] -> groups [0, 1, ..., N-1]
+          Row 3 (reverse):  teams[3N..4N-1] -> groups [N-1, N-2, ..., 0]
+
+        Example (16 teams, 4 groups):
+          Group 0: seeds 1, 8, 9, 16
+          Group 1: seeds 2, 7, 10, 15
+          Group 2: seeds 3, 6, 11, 14
+          Group 3: seeds 4, 5, 12, 13
+        """
+        sorted_teams = self._sort_teams_by_score(self.tournament_teams.copy())
+        num_groups = len(sorted_teams) // 4
+
+        team_groups = [[] for _ in range(num_groups)]
+
+        for row in range(4):
+            start = row * num_groups
+            chunk = sorted_teams[start:start + num_groups]
+            if row % 2 == 0:
+                for i, team in enumerate(chunk):
+                    team_groups[i].append(team)
+            else:
+                for i, team in enumerate(chunk):
+                    team_groups[num_groups - 1 - i].append(team)
+
+        print(f"    [ANTI-COLLUSION] Round {round_num}: Using snake interleave grouping")
 
         return team_groups
 
