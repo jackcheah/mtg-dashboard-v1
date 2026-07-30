@@ -36,7 +36,7 @@ TOURNAMENT_PIN=1234 python tournament_dashboard.py
 ### 4. Run Tests
 ```bash
 pip install -r requirements-dev.txt
-pytest tests/unit/ -v                                        # 131 unit tests
+pytest tests/unit/ -v                                        # 133 unit tests
 python tests/e2e/simulate_full_tournament.py --teams 8       # E2E (server must be running)
 python tests/e2e/test_concurrent.py                          # Concurrent access tests
 ```
@@ -272,10 +272,16 @@ mtg-dashboard-v1/
 
 ### Team Mode (`unified_swiss_pairing.py`)
 
-**Rounds 1-2 (Traditional Swiss):**
+**Round 1 (Random Grouping):**
+
+1. **Group**: Teams are shuffled randomly into groups of 4.
+2. **Optimize** (Layer 3): Permutation search to minimize player-level repeats. Multiple perfect solutions collected and one chosen randomly for enhanced variety.
+3. **Guarantees**: No teammates in same pod.
+
+**Round 2 (Traditional Swiss):**
 
 1. **Group**: Sort teams by score into brackets of 4 (top 4 → Group 1, next 4 → Group 2, etc.).
-2. **Swap** (Layer 2): If repeats/conflicts exist, swap lowest team with nearest neighbor.
+2. **Swap** (Layer 2): If repeats/conflicts exist, swap lowest team with nearest neighbor in adjacent brackets.
 3. **Optimize** (Layer 3): Permutation search to minimize player-level repeats.
 4. **Guarantees**: No teammates in same pod. Zero repeat matchups for 16 teams / 4 rounds.
 
