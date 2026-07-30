@@ -53,7 +53,7 @@ class UnifiedSwissPairing:
     to provide a robust solution that works for any valid tournament configuration.
     """
     
-    def __init__(self, teams: Dict[str, List[Dict]], tournament_teams: List[str], swiss_rounds_count: int = 4, team_scores: Dict[str, int] = None, use_traditional_swiss: bool = True, max_player_optimization_iterations: int = None, is_individual_mode: bool = False, anti_collusion_enabled: bool = True, anti_collusion_start_round: int = 3):
+    def __init__(self, teams: Dict[str, List[Dict]], tournament_teams: List[str], swiss_rounds_count: int = 4, team_scores: Dict[str, int] = None, use_traditional_swiss: bool = True, max_player_optimization_iterations: int = None, is_individual_mode: bool = False, anti_collusion_enabled: bool = True, anti_collusion_start_round: int = 4):
         """
         Initialize the unified Swiss pairing system.
 

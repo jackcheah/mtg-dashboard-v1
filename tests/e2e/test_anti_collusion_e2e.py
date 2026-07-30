@@ -8,7 +8,7 @@ using Flask's test client. No browser or running server required.
 Validates:
 - All rounds generate successfully
 - No teammates in same pod (hard constraint)
-- Snake pairing activates in rounds 3+ (top teams separated)
+- Snake pairing activates in round 4+ (top teams separated)
 - Round transitions work correctly through finals
 - Score accumulation is correct
 - Final standings are produced
@@ -125,8 +125,8 @@ def validate_no_teammates_in_pod(tables_data):
 
 
 def validate_snake_separation(tables_data, tournament_teams, scores, round_num):
-    """Verify that in rounds 3+, top teams are separated across groups."""
-    if round_num < 3:
+    """Verify that in round 4+, top teams are separated across groups."""
+    if round_num < 4:
         return []
 
     sorted_teams = sorted(tournament_teams, key=lambda t: scores.get(t, 0), reverse=True)
@@ -226,8 +226,8 @@ def run_full_tournament(num_teams, verbose=True):
                 results['violations'].extend(
                     [f"Round {round_num} TEAMMATE VIOLATION: {v}" for v in teammate_violations])
 
-            # Validate snake separation (rounds 3+ of Swiss)
-            if is_swiss and round_num >= 3:
+            # Validate snake separation (round 4+ of Swiss)
+            if is_swiss and round_num >= 4:
                 snake_issues = validate_snake_separation(
                     tables_data, tournament.tournament_teams, tournament.scores, round_num)
                 if snake_issues:
@@ -381,7 +381,7 @@ def run_player_repeat_analysis(num_teams, verbose=True):
 def main():
     print("=" * 70)
     print("  ANTI-COLLUSION E2E TEST SUITE")
-    print("  Testing full tournament flow with snake pairing (rounds 3+)")
+    print("  Testing full tournament flow with snake pairing (round 4+)")
     print("=" * 70)
 
     all_results = []
@@ -413,8 +413,8 @@ def main():
         resp = client.post('/setup_tournament')
         assert resp.get_json()['success']
 
-        # Play rounds 1-2, finalize
-        for round_num in range(1, 3):
+        # Play rounds 1-3, finalize
+        for round_num in range(1, 4):
             tables_resp = get_tables(client, round_num)
             tables_data = tables_resp.get('tables', {})
             table_players = {}
@@ -429,8 +429,8 @@ def main():
             submit_round_scores(client, round_num, table_players)
             finalize_round(client, round_num)
 
-        # Round 3: Check that top 4 teams are NOT in the same group
-        tables_resp = get_tables(client, 3)
+        # Round 4: Check that top 4 teams are NOT in the same group
+        tables_resp = get_tables(client, 4)
         tables_data = tables_resp.get('tables', {})
 
         # Get current standings to identify top teams
@@ -460,7 +460,7 @@ def main():
                 print(f"  FAIL: Group has {len(top_in_group)} top-4 teams: {top_in_group}")
 
         if anti_collusion_working:
-            print("  PASS: Round 3 correctly separates top teams (max 1 per group)")
+            print("  PASS: Round 4 correctly separates top teams (max 1 per group)")
         else:
             all_passed = False
 
@@ -471,11 +471,11 @@ def main():
 
     setup_tournament_direct(16)
     tournament.anti_collusion_enabled = True
-    tournament.anti_collusion_start_round = 3
+    tournament.anti_collusion_start_round = 4
     state_dict = tournament._build_state_dict()
     config = state_dict['config']
     assert config['anti_collusion_enabled'] == True, "anti_collusion_enabled not in backup"
-    assert config['anti_collusion_start_round'] == 3, "anti_collusion_start_round not in backup"
+    assert config['anti_collusion_start_round'] == 4, "anti_collusion_start_round not in backup"
     print("  PASS: Anti-collusion settings preserved in state backup")
 
     # Final summary

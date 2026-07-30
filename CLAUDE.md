@@ -278,16 +278,16 @@ mtg-dashboard-v1/
 2. **Optimize** (Layer 3): Permutation search to minimize player-level repeats. Multiple perfect solutions collected and one chosen randomly for enhanced variety.
 3. **Guarantees**: No teammates in same pod.
 
-**Round 2 (Traditional Swiss):**
+**Rounds 2-3 (Traditional Swiss):**
 
 1. **Group**: Sort teams by score into brackets of 4 (top 4 → Group 1, next 4 → Group 2, etc.).
 2. **Swap** (Layer 2): If repeats/conflicts exist, swap lowest team with nearest neighbor in adjacent brackets.
 3. **Optimize** (Layer 3): Permutation search to minimize player-level repeats.
 4. **Guarantees**: No teammates in same pod. Zero repeat matchups for 16 teams / 4 rounds.
 
-**Rounds 3+ (Anti-Collusion Snake Pairing):**
+**Round 4+ (Anti-Collusion Snake Pairing):**
 
-To prevent top teams from colluding via intentional draws, rounds 3+ use snake/interleave grouping that spreads top teams across different pods:
+To prevent top teams from colluding via intentional draws, round 4+ uses snake/interleave grouping that spreads top teams across different pods:
 
 1. **Snake Group**: Teams sorted by score, then assigned in snake order — each pod gets one team from each quartile.
 2. **Swap** (Layer 2): Same repeat-avoidance swaps still apply on top.
@@ -303,7 +303,7 @@ Snake distribution (16 teams, 4 groups):
 Configuration (in `TournamentManager`):
 
 - `anti_collusion_enabled`: Default `True` (team mode only, ignored for individual)
-- `anti_collusion_start_round`: Default `3` (rounds before this use traditional Swiss)
+- `anti_collusion_start_round`: Default `4` (rounds before this use traditional Swiss)
 
 ### Individual Mode (`_generate_round_individual_mode()`)
 

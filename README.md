@@ -6,7 +6,7 @@ A production-ready web-based tournament management system for Magic: The Gatheri
 
 - **Dual Event Modes**: Team events (4 players/team, 8-16 teams) and Individual events (16+ solo players)
 - **Dual Scoring Systems**: Western (5/1/0) and Japanese (7% pool, 1000 starting points)
-- **Swiss-System Pairing**: Round 1 random grouping, then score-based Swiss with repeat-avoidance optimization and anti-collusion snake pairing for rounds 3+
+- **Swiss-System Pairing**: Round 1 random grouping, then score-based Swiss with repeat-avoidance optimization and anti-collusion snake pairing for round 4+
 - **Individual Mode Extras**: Bye system, 3-player pods, player drop mid-tournament, Top Cut (top 10)
 - **Production-Ready**: Auto-backups every 5 minutes, crash recovery, thread-safe operations
 - **Modern UI**: Responsive glassmorphism interface with step-by-step setup wizard
@@ -62,7 +62,7 @@ python tournament_dashboard.py
 - Teammates never paired in same pod (hard constraint)
 - **Round 1**: Random team grouping with player-level optimization
 - **Round 2**: Traditional score-based Swiss (top 4 teams together, etc.)
-- **Anti-collusion pairing** (rounds 3+): Snake interleave spreads top teams across pods to prevent intentional draws
+- **Anti-collusion pairing** (round 4+): Snake interleave spreads top teams across pods to prevent intentional draws
 - Tiebreakers: Team score → Best player → Average → Early wins
 
 ### Individual Mode

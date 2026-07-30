@@ -120,7 +120,7 @@ class TournamentManager:
 
         # Anti-collusion pairing (snake interleave for late Swiss rounds)
         self.anti_collusion_enabled = True
-        self.anti_collusion_start_round = 3
+        self.anti_collusion_start_round = 4
 
     def bump_version(self):
         """Increment state version counter for ETag/change detection."""
@@ -313,7 +313,7 @@ class TournamentManager:
 
             # Restore anti-collusion settings (backward compatible - default to enabled)
             self.anti_collusion_enabled = config.get('anti_collusion_enabled', True)
-            self.anti_collusion_start_round = config.get('anti_collusion_start_round', 3)
+            self.anti_collusion_start_round = config.get('anti_collusion_start_round', 4)
 
             # Restore State
             state = state_data.get('state', {})
@@ -3126,10 +3126,11 @@ def submit_player_results():
                 }), 500
 
             if next_round_generated is None and semifinals_data is None and tournament_winner_data is None:
-                return jsonify({
-                    'success': False,
-                    'error': f'Round {round_num} transition failed (next round/finals not generated). Round NOT finalized — retry when ready.'
-                }), 500
+                if tournament.state != TournamentState.FINALS_COMPLETE:
+                    return jsonify({
+                        'success': False,
+                        'error': f'Round {round_num} transition failed (next round/finals not generated). Round NOT finalized — retry when ready.'
+                    }), 500
 
             # Transition succeeded — NOW mark as finalized
             tournament.finalized_rounds.add(round_num)
@@ -3165,10 +3166,11 @@ def submit_player_results():
                     }), 500
 
                 if next_round_generated is None and semifinals_data is None and tournament_winner_data is None:
-                    return jsonify({
-                        'success': False,
-                        'error': f'Round {round_num} transition failed (next round/finals not generated). Round NOT finalized — retry when ready.'
-                    }), 500
+                    if tournament.state != TournamentState.FINALS_COMPLETE:
+                        return jsonify({
+                            'success': False,
+                            'error': f'Round {round_num} transition failed (next round/finals not generated). Round NOT finalized — retry when ready.'
+                        }), 500
 
                 tournament.finalized_rounds.add(round_num)
                 response_data = _build_finalization_response(round_num, next_round_generated, semifinals_data, tournament_winner_data)
