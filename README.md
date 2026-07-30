@@ -61,7 +61,7 @@ python tournament_dashboard.py
 - 4 players per team, team standings
 - Teammates never paired in same pod (hard constraint)
 - **Round 1**: Random team grouping with player-level optimization
-- **Round 2**: Traditional score-based Swiss (top 4 teams together, etc.)
+- **Rounds 2-3**: Traditional score-based Swiss (top 4 teams together, etc.)
 - **Anti-collusion pairing** (round 4+): Snake interleave spreads top teams across pods to prevent intentional draws
 - Tiebreakers: Team score → Best player → Average → Early wins
 
@@ -155,6 +155,8 @@ TOURNAMENT_PIN=1234 python tournament_dashboard.py
 - **Batch submit**: Submit all completed tables at once
 - **Score editing**: Edit submitted scores before round finalization (with audit trail)
 - **Revert submission**: Completely undo a table submission if needed
+- **Unfinalize round**: Undo the most recently finalized round if a mistake is discovered (PIN-protected)
+- **Undrop player**: Re-add a previously dropped player back into the tournament (PIN-protected)
 
 ## Keyboard Shortcuts
 

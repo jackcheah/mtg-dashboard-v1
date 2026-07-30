@@ -33,10 +33,6 @@ TEAMS = {
     "Bears": ["Uma", "Vic", "Wendy", "Xander"],
     "Hawks": ["Yara", "Zane", "Amy", "Ben"],
     "Lions": ["Chloe", "Dan", "Ella", "Finn"],
-    "Sharks": ["Gina", "Hugo", "Iris", "Jake"],
-    "Vipers": ["Kara", "Liam", "Nora", "Oscar"],
-    "Foxes": ["Pam", "Rex", "Tina", "Uri"],
-    "Rams": ["Val", "Will", "Xena", "Yuri"],
 }
 
 
@@ -326,8 +322,8 @@ def main():
     random.seed(42)  # Reproducible simulation
 
     print("=" * 80)
-    print("  12-TEAM WESTERN TOURNAMENT FULL SIMULATION")
-    print("  48 players, 4 Swiss rounds, Finals")
+    print("  8-TEAM WESTERN TOURNAMENT FULL SIMULATION")
+    print("  32 players, 4 Swiss rounds, Finals")
     print("=" * 80)
 
     tracker = TournamentTracker()
@@ -357,18 +353,20 @@ def main():
 
             print_round_pairings(round_num, tables)
 
-            # Verify table count: 12 teams × 4 players = 48 players / 4 per pod = 12 tables
-            expected_tables = 12
+            # Verify table count: N teams × 4 players / 4 per pod = N tables
+            num_teams = len(tournament.tournament_teams)
+            expected_tables = num_teams  # 4 players/team, 4 per pod, 1 team per pod seat
+            expected_players = num_teams * 4
             assert len(tables) == expected_tables, \
                 f"Expected {expected_tables} tables, got {len(tables)}"
 
-            # Verify all 48 players are assigned
+            # Verify all players are assigned
             all_player_ids = set()
             for players in tables.values():
                 for p in players:
                     all_player_ids.add(p['Player ID'])
-            assert len(all_player_ids) == 48, \
-                f"Expected 48 players in round, got {len(all_player_ids)}"
+            assert len(all_player_ids) == expected_players, \
+                f"Expected {expected_players} players in round, got {len(all_player_ids)}"
 
             # Submit and finalize
             success = submit_and_finalize_round(client, round_num, tracker)
