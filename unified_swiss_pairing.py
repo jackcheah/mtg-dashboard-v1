@@ -3,7 +3,7 @@
 Unified Swiss Pairing Algorithm - A robust, scalable solution for Swiss tournament pairings.
 
 This algorithm replaces the existing constraint satisfaction and dynamic pairing approaches
-with a unified system that supports 4-20 teams and guarantees optimal Swiss pairings
+with a unified system that supports 4-32 teams and guarantees optimal Swiss pairings
 with minimal repeat matchups.
 """
 
@@ -101,7 +101,7 @@ class UnifiedSwissPairing:
         if not self.is_individual_mode and len(self.tournament_teams) % 4 != 0:
             raise ValueError(
                 f"Team mode requires team count divisible by 4. "
-                f"Got {len(self.tournament_teams)} teams. Supported counts: 8, 12, 16."
+                f"Got {len(self.tournament_teams)} teams. Supported: any multiple of 4 up to 32."
             )
         
         # Initialize constraint tracking
@@ -163,8 +163,8 @@ class UnifiedSwissPairing:
         if team_count < 4:
             raise ValueError(f"Minimum 4 teams required, got {team_count}")
 
-        if team_count > 20:
-            raise ValueError(f"Maximum 20 teams supported, got {team_count}")
+        if team_count > 32:
+            raise ValueError(f"Maximum 32 teams supported, got {team_count}")
 
         if self.swiss_rounds_count not in [3, 4, 5]:
             raise ValueError(f"Swiss rounds must be 3, 4, or 5, got {self.swiss_rounds_count}")

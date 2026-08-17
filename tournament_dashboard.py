@@ -81,8 +81,8 @@ class TournamentManager:
         self.semifinal_round_scores = {}  # Track semifinal round scores separately
         self.swiss_round_scores = {}  # Track Swiss rounds scores
         self.top8_cut_scores = {}
-        self.supported_team_counts = [8, 12, 16]
-        self.max_teams = 16
+        self.supported_team_counts = [8, 12, 16, 20, 24, 28, 32]
+        self.max_teams = 32
         self.has_semifinals = False
         self.finalized_rounds = set()
         self.finals_data = None
@@ -685,7 +685,7 @@ class TournamentManager:
         team_count = len(self.teams)
 
         if team_count in [8, 12]:
-            # 8 or 12 teams: 4 Swiss rounds -> Direct to Finals (top 4)
+            # 8 or 12 teams: Swiss rounds -> Direct to Finals (top 4)
             if not self.swiss_rounds_configured:
                 self.swiss_rounds_count = 4  # Default: 4 Swiss rounds
             self.has_semifinals = False
@@ -696,13 +696,12 @@ class TournamentManager:
             print(f"  - Top 8 Cut: NO (top 4 teams advance directly to Finals)")
             print(f"  - Finals: YES (top 4 teams, 4 pods)")
             print(f"  - Total rounds: {self.max_rounds}")
-            if team_count in [8, 12]:
-                print(f"  [WARNING]  Note: Some repeat matchups may occur during Swiss rounds")
+            print(f"  [WARNING]  Note: Some repeat matchups may occur during Swiss rounds")
 
-        elif team_count == 16:
-            # 16 teams: 4 Swiss rounds -> Top 8 Cut -> Finals
+        elif team_count >= 16 and team_count <= 32 and team_count % 4 == 0:
+            # 16-32 teams: Swiss rounds -> Top 8 Cut -> Finals
             if not self.swiss_rounds_configured:
-                self.swiss_rounds_count = 4  # Default: 4 Swiss rounds
+                self.swiss_rounds_count = 5 if team_count >= 20 else 4
             self.has_semifinals = True  # "Top 8 Cut" uses the semifinals logic
             self.max_rounds = self.swiss_rounds_count + 2  # Swiss + Top8Cut + Finals
 
@@ -714,7 +713,7 @@ class TournamentManager:
 
         else:
             print(f"[WARNING]  Unsupported team count: {team_count}")
-            print(f"   Supported: 8, 12, or 16 teams")
+            print(f"   Supported: 8 to 32 teams (multiples of 4)")
             return False
 
         return True
@@ -879,7 +878,7 @@ class TournamentManager:
         """Create sample data if Excel file can't be loaded
 
         Args:
-            num_teams: Number of teams to create (8, 12, or 16, default: 8)
+            num_teams: Number of teams to create (any multiple of 4 from 8 to 32, default: 8)
         """
         all_teams = {
             'Team Alpha': [
@@ -973,23 +972,113 @@ class TournamentManager:
                 {'Player ID': 60, 'Player Name': 'Hank', 'Team Name': 'Team Omicron'}
             ],
             'Team Pi': [
-                {'Player ID': 61, 'Player Name': 'Iris', 'Team Name': 'Team Pi'},
-                {'Player ID': 62, 'Player Name': 'John', 'Team Name': 'Team Pi'},
-                {'Player ID': 63, 'Player Name': 'Kelly', 'Team Name': 'Team Pi'},
-                {'Player ID': 64, 'Player Name': 'Luke', 'Team Name': 'Team Pi'}
+                {'Player ID': 61, 'Player Name': 'Iris P', 'Team Name': 'Team Pi'},
+                {'Player ID': 62, 'Player Name': 'John P', 'Team Name': 'Team Pi'},
+                {'Player ID': 63, 'Player Name': 'Kelly P', 'Team Name': 'Team Pi'},
+                {'Player ID': 64, 'Player Name': 'Luke P', 'Team Name': 'Team Pi'}
+            ],
+            'Team Rho': [
+                {'Player ID': 65, 'Player Name': 'Megan', 'Team Name': 'Team Rho'},
+                {'Player ID': 66, 'Player Name': 'Nate', 'Team Name': 'Team Rho'},
+                {'Player ID': 67, 'Player Name': 'Opal', 'Team Name': 'Team Rho'},
+                {'Player ID': 68, 'Player Name': 'Phil', 'Team Name': 'Team Rho'}
+            ],
+            'Team Sigma': [
+                {'Player ID': 69, 'Player Name': 'Ruth', 'Team Name': 'Team Sigma'},
+                {'Player ID': 70, 'Player Name': 'Stan', 'Team Name': 'Team Sigma'},
+                {'Player ID': 71, 'Player Name': 'Tara', 'Team Name': 'Team Sigma'},
+                {'Player ID': 72, 'Player Name': 'Uri', 'Team Name': 'Team Sigma'}
+            ],
+            'Team Tau': [
+                {'Player ID': 73, 'Player Name': 'Vera', 'Team Name': 'Team Tau'},
+                {'Player ID': 74, 'Player Name': 'Walt', 'Team Name': 'Team Tau'},
+                {'Player ID': 75, 'Player Name': 'Xena', 'Team Name': 'Team Tau'},
+                {'Player ID': 76, 'Player Name': 'Yuri', 'Team Name': 'Team Tau'}
+            ],
+            'Team Upsilon': [
+                {'Player ID': 77, 'Player Name': 'Zara', 'Team Name': 'Team Upsilon'},
+                {'Player ID': 78, 'Player Name': 'Abel', 'Team Name': 'Team Upsilon'},
+                {'Player ID': 79, 'Player Name': 'Bree', 'Team Name': 'Team Upsilon'},
+                {'Player ID': 80, 'Player Name': 'Cole', 'Team Name': 'Team Upsilon'}
+            ],
+            'Team Phi': [
+                {'Player ID': 81, 'Player Name': 'Dawn', 'Team Name': 'Team Phi'},
+                {'Player ID': 82, 'Player Name': 'Earl', 'Team Name': 'Team Phi'},
+                {'Player ID': 83, 'Player Name': 'Faye', 'Team Name': 'Team Phi'},
+                {'Player ID': 84, 'Player Name': 'Glen', 'Team Name': 'Team Phi'}
+            ],
+            'Team Chi': [
+                {'Player ID': 85, 'Player Name': 'Hope', 'Team Name': 'Team Chi'},
+                {'Player ID': 86, 'Player Name': 'Ivan', 'Team Name': 'Team Chi'},
+                {'Player ID': 87, 'Player Name': 'Jade', 'Team Name': 'Team Chi'},
+                {'Player ID': 88, 'Player Name': 'Kyle', 'Team Name': 'Team Chi'}
+            ],
+            'Team Psi': [
+                {'Player ID': 89, 'Player Name': 'Leah', 'Team Name': 'Team Psi'},
+                {'Player ID': 90, 'Player Name': 'Mark', 'Team Name': 'Team Psi'},
+                {'Player ID': 91, 'Player Name': 'Nina', 'Team Name': 'Team Psi'},
+                {'Player ID': 92, 'Player Name': 'Owen', 'Team Name': 'Team Psi'}
+            ],
+            'Team Omega': [
+                {'Player ID': 93, 'Player Name': 'Pam', 'Team Name': 'Team Omega'},
+                {'Player ID': 94, 'Player Name': 'Rex', 'Team Name': 'Team Omega'},
+                {'Player ID': 95, 'Player Name': 'Sue', 'Team Name': 'Team Omega'},
+                {'Player ID': 96, 'Player Name': 'Todd', 'Team Name': 'Team Omega'}
+            ],
+            'Team Atlas': [
+                {'Player ID': 97, 'Player Name': 'Ursa', 'Team Name': 'Team Atlas'},
+                {'Player ID': 98, 'Player Name': 'Vick', 'Team Name': 'Team Atlas'},
+                {'Player ID': 99, 'Player Name': 'Wren', 'Team Name': 'Team Atlas'},
+                {'Player ID': 100, 'Player Name': 'Xavi', 'Team Name': 'Team Atlas'}
+            ],
+            'Team Bolt': [
+                {'Player ID': 101, 'Player Name': 'Yael', 'Team Name': 'Team Bolt'},
+                {'Player ID': 102, 'Player Name': 'Zeke', 'Team Name': 'Team Bolt'},
+                {'Player ID': 103, 'Player Name': 'Aria', 'Team Name': 'Team Bolt'},
+                {'Player ID': 104, 'Player Name': 'Beau', 'Team Name': 'Team Bolt'}
+            ],
+            'Team Crux': [
+                {'Player ID': 105, 'Player Name': 'Cleo', 'Team Name': 'Team Crux'},
+                {'Player ID': 106, 'Player Name': 'Dirk', 'Team Name': 'Team Crux'},
+                {'Player ID': 107, 'Player Name': 'Elsa', 'Team Name': 'Team Crux'},
+                {'Player ID': 108, 'Player Name': 'Finn', 'Team Name': 'Team Crux'}
+            ],
+            'Team Dusk': [
+                {'Player ID': 109, 'Player Name': 'Gwen', 'Team Name': 'Team Dusk'},
+                {'Player ID': 110, 'Player Name': 'Hart', 'Team Name': 'Team Dusk'},
+                {'Player ID': 111, 'Player Name': 'Isla', 'Team Name': 'Team Dusk'},
+                {'Player ID': 112, 'Player Name': 'Joss', 'Team Name': 'Team Dusk'}
+            ],
+            'Team Echo': [
+                {'Player ID': 113, 'Player Name': 'Kip', 'Team Name': 'Team Echo'},
+                {'Player ID': 114, 'Player Name': 'Lena', 'Team Name': 'Team Echo'},
+                {'Player ID': 115, 'Player Name': 'Moss', 'Team Name': 'Team Echo'},
+                {'Player ID': 116, 'Player Name': 'Nell', 'Team Name': 'Team Echo'}
+            ],
+            'Team Flux': [
+                {'Player ID': 117, 'Player Name': 'Otto', 'Team Name': 'Team Flux'},
+                {'Player ID': 118, 'Player Name': 'Prue', 'Team Name': 'Team Flux'},
+                {'Player ID': 119, 'Player Name': 'Rafe', 'Team Name': 'Team Flux'},
+                {'Player ID': 120, 'Player Name': 'Sage', 'Team Name': 'Team Flux'}
+            ],
+            'Team Gale': [
+                {'Player ID': 121, 'Player Name': 'Tess', 'Team Name': 'Team Gale'},
+                {'Player ID': 122, 'Player Name': 'Ugo', 'Team Name': 'Team Gale'},
+                {'Player ID': 123, 'Player Name': 'Val', 'Team Name': 'Team Gale'},
+                {'Player ID': 124, 'Player Name': 'Wes', 'Team Name': 'Team Gale'}
+            ],
+            'Team Hex': [
+                {'Player ID': 125, 'Player Name': 'Yuki', 'Team Name': 'Team Hex'},
+                {'Player ID': 126, 'Player Name': 'Zion', 'Team Name': 'Team Hex'},
+                {'Player ID': 127, 'Player Name': 'Aldo', 'Team Name': 'Team Hex'},
+                {'Player ID': 128, 'Player Name': 'Bria', 'Team Name': 'Team Hex'}
             ]
         }
 
-        # Select the appropriate number of teams
-        if num_teams == 8:
-            sample_teams = dict(list(all_teams.items())[:8])
-        elif num_teams == 12:
-            sample_teams = dict(list(all_teams.items())[:12])
-        elif num_teams == 16:
-            sample_teams = all_teams
-        else:
-            # Default to 8 teams
-            sample_teams = dict(list(all_teams.items())[:8])
+        # Select the appropriate number of teams (must be multiple of 4, 8-32)
+        if num_teams % 4 != 0 or num_teams < 8 or num_teams > 32:
+            num_teams = 8  # Default to 8 teams
+        sample_teams = dict(list(all_teams.items())[:num_teams])
 
         self.teams = sample_teams
         self.tournament_teams = list(sample_teams.keys())
@@ -1022,14 +1111,13 @@ class TournamentManager:
                 print(f"[X] VALIDATION FAILED: {error_msg}")
                 return False, error_msg
         else:
-            # STRICT VALIDATION: Only 8, 12, or 16 teams allowed
-            if len(self.teams) not in [8, 12, 16]:
+            # STRICT VALIDATION: Team count must be a multiple of 4, between 8 and 32
+            team_count = len(self.teams)
+            if team_count % 4 != 0 or team_count < 8 or team_count > 32:
                 error_msg = (
-                    f"Tournament only supports exactly 8, 12, or 16 teams. "
-                    f"Current teams loaded: {len(self.teams)}. "
-                    f"Please adjust your participant list to have exactly "
-                    f"8 teams (32 players), 12 teams (48 players), or "
-                    f"16 teams (64 players)."
+                    f"Tournament requires 8 to 32 teams (multiples of 4). "
+                    f"Current teams loaded: {team_count}. "
+                    f"Supported counts: 8, 12, 16, 20, 24, 28, 32."
                 )
                 print(f"[X] VALIDATION FAILED: {error_msg}")
                 return False, error_msg

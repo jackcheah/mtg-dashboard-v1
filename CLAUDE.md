@@ -36,7 +36,7 @@ TOURNAMENT_PIN=1234 python tournament_dashboard.py
 ### 4. Run Tests
 ```bash
 pip install -r requirements-dev.txt
-pytest tests/unit/ -v                                        # 133 unit tests
+pytest tests/unit/ -v                                        # 174 unit tests
 python tests/e2e/simulate_full_tournament.py --teams 8       # E2E (server must be running)
 python tests/e2e/test_concurrent.py                          # Concurrent access tests
 ```
@@ -48,7 +48,7 @@ python tests/e2e/test_concurrent.py                          # Concurrent access
 The system supports two event modes, selected before loading participants:
 
 ### Team Mode (default)
-- 4 players per team, 8/12/16 teams
+- 4 players per team, 8-32 teams (any multiple of 4)
 - Team standings (sum of player scores)
 - No teammates in same pod (hard constraint)
 - Tiebreakers: Team score → Best player → Average → Early wins
@@ -67,13 +67,13 @@ The system supports two event modes, selected before loading participants:
 
 ### Team Mode
 
-Swiss rounds are configurable: 3, 4 (default), or 5 via `setup_tournament(swiss_rounds=N)` or `/set_swiss_rounds`.
+Swiss rounds are configurable: 3, 4, or 5 via `setup_tournament(swiss_rounds=N)` or `/set_swiss_rounds`. Default is 4 for 8-16 teams, 5 for 20-32 teams.
 
-| Teams | Players | Swiss Rounds | Playoffs           | Total Rounds |
-|-------|---------|--------------|--------------------|--------------|
-| 8     | 32      | 3-5          | Finals             | 4-6          |
-| 12    | 48      | 3-5          | Finals             | 4-6          |
-| 16    | 64      | 3-5          | Top 8 Cut + Finals | 5-7          |
+| Teams  | Players | Swiss Rounds | Playoffs           | Total Rounds |
+|--------|---------|--------------|--------------------|--------------|
+| 8      | 32      | 3-5          | Finals             | 4-6          |
+| 12     | 48      | 3-5          | Finals             | 4-6          |
+| 16-32  | 64-128  | 3-5          | Top 8 Cut + Finals | 5-7          |
 
 ### Individual Mode
 
@@ -212,7 +212,7 @@ Swiss rounds are configurable: 3, 4 (default), or 5 via `setup_tournament(swiss_
 ```bash
 pytest tests/unit/ -v
 ```
-Covers: tiebreaker logic, final standings, MVP, state machine, backup/restore integrity, score validation, reset confirmation, individual mode, anti-collusion pairing.
+Covers: tiebreaker logic, final standings, MVP, state machine, backup/restore integrity, score validation, reset confirmation, individual mode, anti-collusion pairing, full tournament flow simulation (8-32 teams), pairing engine simulation.
 
 ### E2E Tests
 ```bash
