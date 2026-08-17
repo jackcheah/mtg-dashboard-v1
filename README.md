@@ -4,7 +4,7 @@ A production-ready web-based tournament management system for Magic: The Gatheri
 
 ## Features
 
-- **Dual Event Modes**: Team events (4 players/team, 8-16 teams) and Individual events (16+ solo players)
+- **Dual Event Modes**: Team events (4 players/team, 8-32 teams) and Individual events (16+ solo players)
 - **Dual Scoring Systems**: Western (5/1/0) and Japanese (7% pool, 1000 starting points)
 - **Swiss-System Pairing**: Round 1 random grouping, then score-based Swiss with repeat-avoidance optimization and anti-collusion snake pairing for round 4+
 - **Individual Mode Extras**: Bye system, 3-player pods, player drop mid-tournament, Top Cut (top 10)
@@ -41,7 +41,7 @@ python tournament_dashboard.py
 4. Click "Submit Round Results" to finalize and generate next round
 
 ### Finals
-- **Team mode**: Top 4 teams (or Top 8 Cut + Top 4 for 16 teams)
+- **Team mode**: Top 4 teams (or Top 8 Cut + Top 4 for 16-32 teams)
 - **Individual mode (≤16 players)**: Top 4 players advance directly to finals
 - **Individual mode (>16 players)**: Top 10 advance to Top Cut, then Top 4 to finals
 
@@ -51,13 +51,13 @@ python tournament_dashboard.py
 
 ### Team Mode
 
-| Teams | Players | Swiss Rounds | Playoffs           | Total Rounds |
-|-------|---------|--------------|--------------------|--------------|
-| 8     | 32      | 3-5          | Finals (top 4)     | 4-6          |
-| 12    | 48      | 3-5          | Finals (top 4)     | 4-6          |
-| 16    | 64      | 3-5          | Top 8 Cut + Finals | 5-7          |
+| Teams  | Players | Swiss Rounds | Playoffs           | Total Rounds |
+|--------|---------|--------------|--------------------|--------------|
+| 8      | 32      | 3-5          | Finals (top 4)     | 4-6          |
+| 12     | 48      | 3-5          | Finals (top 4)     | 4-6          |
+| 16-32  | 64-128  | 3-5          | Top 8 Cut + Finals | 5-7          |
 
-- Swiss rounds configurable (3, 4, or 5; default 4)
+- Swiss rounds configurable (3, 4, or 5; default 4 for 8-16 teams, 5 for 20-32 teams)
 - 4 players per team, team standings
 - Teammates never paired in same pod (hard constraint)
 - **Round 1**: Random team grouping with player-level optimization
@@ -132,7 +132,7 @@ Place an Excel file at `participants/participant_team.xlsx`:
 
 **Team mode columns:** `Player ID`, `Player Name`, `Team Name`
 - Teams must have exactly 4 players
-- Total teams: 8, 12, or 16
+- Total teams: 8 to 32 (any multiple of 4)
 
 **Individual mode:** Same Excel format — the Team Name column is ignored. Each row is one player.
 

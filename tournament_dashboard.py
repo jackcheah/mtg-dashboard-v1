@@ -646,13 +646,14 @@ class TournamentManager:
         """Determine tournament structure based on team/player count
 
         Team mode rules:
-        - 8 teams: 4 Swiss rounds -> Finals (top 4)
-        - 12 teams: 4 Swiss rounds -> Finals (top 4)
-        - 16 teams: 4 Swiss rounds -> Top 8 Cut (8 pods) -> Finals (top 4)
+        - 8 teams: Swiss rounds (default 4) -> Finals (top 4)
+        - 12 teams: Swiss rounds (default 4) -> Finals (top 4)
+        - 16 teams: Swiss rounds (default 4) -> Top 8 Cut (8 pods) -> Finals (top 4)
+        - 20-32 teams: Swiss rounds (default 5) -> Top 8 Cut (8 pods) -> Finals (top 4)
 
         Individual mode rules:
-        - 16 players or fewer: 4 Swiss rounds -> Finals (top 4 players, 1 table)
-        - 17+ players: 4 Swiss rounds -> Top Cut (top 10) -> Finals (top 4 players, 1 table)
+        - 16 players or fewer: Swiss rounds (default 4) -> Finals (top 4 players, 1 table)
+        - 17+ players: Swiss rounds (default 4) -> Top Cut (top 10) -> Finals (top 4 players, 1 table)
 
         Note: Repeat matchups may occur in 8 and 12 team tournaments
         """
@@ -2296,7 +2297,7 @@ class TournamentManager:
         return early_wins_score
 
     def generate_semifinals_round(self):
-        """Generate Top 8 Cut for 16-team tournaments - top 8 teams advance
+        """Generate Top 8 Cut for 16-32 team tournaments - top 8 teams advance
 
         Structure: 8 pods/tables with 4 players each (32 players total from 8 teams)
         - 2 groups of 4 teams each

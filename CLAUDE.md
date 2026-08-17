@@ -216,7 +216,7 @@ Covers: tiebreaker logic, final standings, MVP, state machine, backup/restore in
 
 ### E2E Tests
 ```bash
-python tests/e2e/simulate_full_tournament.py --teams [8|12|16]
+python tests/e2e/simulate_full_tournament.py --teams [8|12|16|20|24|28|32]
 ```
 Full simulation: setup → Swiss → playoffs → champion.
 

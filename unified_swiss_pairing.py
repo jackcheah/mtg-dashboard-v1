@@ -46,9 +46,9 @@ class TournamentStats:
 
 class UnifiedSwissPairing:
     """
-    Unified Swiss pairing algorithm that supports variable team counts (4-20 teams)
+    Unified Swiss pairing algorithm that supports variable team counts (4-32 teams)
     and guarantees optimal Swiss pairings with comprehensive validation.
-    
+
     This class combines constraint satisfaction, dynamic pairing, and heuristic approaches
     to provide a robust solution that works for any valid tournament configuration.
     """
@@ -59,7 +59,7 @@ class UnifiedSwissPairing:
 
         Args:
             teams: Dictionary mapping team names to lists of player dictionaries
-            tournament_teams: List of team names for the tournament (4-20 teams)
+            tournament_teams: List of team names for the tournament (4-32 teams)
             swiss_rounds_count: Number of Swiss rounds to generate (3, 4, or 5)
             team_scores: Optional dictionary of team scores for score-based pairing (rounds 2+)
             use_traditional_swiss: If True, use traditional Swiss (score-first).
