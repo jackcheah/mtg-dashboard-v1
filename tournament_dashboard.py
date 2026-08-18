@@ -2652,27 +2652,26 @@ def load_data():
     """Load participant data from Excel file and configure Swiss rounds"""
     try:
         # Get Swiss rounds configuration from request (if POST)
-        swiss_rounds = 4  # Default
         use_sample_data = False
         sample_team_count = 8  # Default for sample data
 
         if request.method == 'POST':
             data = request.get_json() or {}
-            swiss_rounds = data.get('swiss_rounds', 4)
+            swiss_rounds = data.get('swiss_rounds', None)
             use_sample_data = data.get('use_sample_data', False)
             sample_team_count = data.get('sample_team_count', 8)
 
             force_reload = data.get('force_reload', False)
 
-            # Configure Swiss rounds before loading participants
-            # Allow reconfiguration if the requested rounds differ from current configuration
-            if not tournament.swiss_rounds_configured or tournament.swiss_rounds_count != swiss_rounds:
-                success, message = tournament.configure_swiss_rounds(swiss_rounds)
-                if not success:
-                    return jsonify({
-                        'success': False,
-                        'message': message
-                    })
+            # Only configure Swiss rounds if explicitly provided in the request
+            if swiss_rounds is not None:
+                if not tournament.swiss_rounds_configured or tournament.swiss_rounds_count != swiss_rounds:
+                    success, message = tournament.configure_swiss_rounds(swiss_rounds)
+                    if not success:
+                        return jsonify({
+                            'success': False,
+                            'message': message
+                        })
 
         # Only reload from Excel if teams aren't already loaded or forced
         if not tournament.teams or (request.method == 'POST' and force_reload):
