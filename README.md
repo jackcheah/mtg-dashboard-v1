@@ -186,7 +186,7 @@ Access at `/projector` for audience-friendly display:
 ```bash
 pip install -r requirements-dev.txt
 
-# Unit tests (133 tests)
+# Unit tests (178 tests)
 pytest tests/unit/ -v
 
 # E2E (server must be running)

@@ -4,7 +4,7 @@
 
 ```bash
 source venv/bin/activate
-pytest tests/unit/ -v                    # 21 tests, <2s
+pytest tests/unit/ -v                    # 178 tests
 python tournament_dashboard.py &         # Start server
 python tests/e2e/test_concurrent.py      # 3 concurrent tests
 ```
@@ -23,7 +23,7 @@ Then in browser:
 ### Phase 1: Automated Tests
 
 ```bash
-# Unit tests (21 tests)
+# Unit tests (178 tests)
 pytest tests/unit/ -v
 
 # E2E tests (server must be running)

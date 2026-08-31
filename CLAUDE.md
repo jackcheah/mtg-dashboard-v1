@@ -36,7 +36,7 @@ TOURNAMENT_PIN=1234 python tournament_dashboard.py
 ### 4. Run Tests
 ```bash
 pip install -r requirements-dev.txt
-pytest tests/unit/ -v                                        # 174 unit tests
+pytest tests/unit/ -v                                        # 178 unit tests
 python tests/e2e/simulate_full_tournament.py --teams 8       # E2E (server must be running)
 python tests/e2e/test_concurrent.py                          # Concurrent access tests
 ```
@@ -208,7 +208,7 @@ Swiss rounds are configurable: 3, 4, or 5 via `setup_tournament(swiss_rounds=N)`
 
 ## Testing
 
-### Unit Tests (133 tests)
+### Unit Tests (178 tests)
 ```bash
 pytest tests/unit/ -v
 ```
