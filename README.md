@@ -55,7 +55,7 @@ python tournament_dashboard.py
 |--------|---------|--------------|--------------------|--------------|
 | 8      | 32      | 3-5          | Finals (top 4)     | 4-6          |
 | 12     | 48      | 3-5          | Finals (top 4)     | 4-6          |
-| 16-32  | 64-160  | 3-5          | Top 8 Cut + Finals | 5-7          |
+| 16-40  | 64-160  | 3-5          | Top 8 Cut + Finals | 5-7          |
 
 - Swiss rounds configurable (3, 4, or 5; default 4 for 8-16 teams, 5 for 20-40 teams)
 - 4 players per team, team standings

@@ -4917,13 +4917,13 @@ def validate_integrity():
     # Check 4: Team/player count validation
     if tournament.event_mode == EventMode.INDIVIDUAL:
         player_count = len(tournament.participants)
-        if player_count < 4:
-            issues.append(f'Too few players: {player_count} (minimum 4)')
+        if player_count < 16:
+            issues.append(f'Too few players: {player_count} (minimum 16)')
         checks_performed.append('Player count validation (individual mode)')
     else:
         team_count = len(tournament.teams)
-        if team_count not in [8, 12, 16]:
-            issues.append(f'Invalid team count: {team_count} (must be 8, 12, or 16)')
+        if team_count not in tournament.supported_team_counts:
+            issues.append(f'Invalid team count: {team_count} (must be a multiple of 4 from 8 to 40)')
         checks_performed.append('Team count validation')
 
         # Check 5: Player count validation
