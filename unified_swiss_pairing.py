@@ -3,7 +3,7 @@
 Unified Swiss Pairing Algorithm - A robust, scalable solution for Swiss tournament pairings.
 
 This algorithm replaces the existing constraint satisfaction and dynamic pairing approaches
-with a unified system that supports 4-32 teams and guarantees optimal Swiss pairings
+with a unified system that supports 4-40 teams and guarantees optimal Swiss pairings
 with minimal repeat matchups.
 """
 
@@ -46,7 +46,7 @@ class TournamentStats:
 
 class UnifiedSwissPairing:
     """
-    Unified Swiss pairing algorithm that supports variable team counts (4-32 teams)
+    Unified Swiss pairing algorithm that supports variable team counts (4-40 teams)
     and guarantees optimal Swiss pairings with comprehensive validation.
 
     This class combines constraint satisfaction, dynamic pairing, and heuristic approaches
@@ -59,7 +59,7 @@ class UnifiedSwissPairing:
 
         Args:
             teams: Dictionary mapping team names to lists of player dictionaries
-            tournament_teams: List of team names for the tournament (4-32 teams)
+            tournament_teams: List of team names for the tournament (4-40 teams)
             swiss_rounds_count: Number of Swiss rounds to generate (3, 4, or 5)
             team_scores: Optional dictionary of team scores for score-based pairing (rounds 2+)
             use_traditional_swiss: If True, use traditional Swiss (score-first).
@@ -101,7 +101,7 @@ class UnifiedSwissPairing:
         if not self.is_individual_mode and len(self.tournament_teams) % 4 != 0:
             raise ValueError(
                 f"Team mode requires team count divisible by 4. "
-                f"Got {len(self.tournament_teams)} teams. Supported: any multiple of 4 up to 32."
+                f"Got {len(self.tournament_teams)} teams. Supported: any multiple of 4 up to 40."
             )
         
         # Initialize constraint tracking
@@ -163,8 +163,8 @@ class UnifiedSwissPairing:
         if team_count < 4:
             raise ValueError(f"Minimum 4 teams required, got {team_count}")
 
-        if team_count > 32:
-            raise ValueError(f"Maximum 32 teams supported, got {team_count}")
+        if team_count > 40:
+            raise ValueError(f"Maximum 40 teams supported, got {team_count}")
 
         if self.swiss_rounds_count not in [3, 4, 5]:
             raise ValueError(f"Swiss rounds must be 3, 4, or 5, got {self.swiss_rounds_count}")

@@ -81,8 +81,8 @@ class TournamentManager:
         self.semifinal_round_scores = {}  # Track semifinal round scores separately
         self.swiss_round_scores = {}  # Track Swiss rounds scores
         self.top8_cut_scores = {}
-        self.supported_team_counts = [8, 12, 16, 20, 24, 28, 32]
-        self.max_teams = 32
+        self.supported_team_counts = [8, 12, 16, 20, 24, 28, 32, 36, 40]
+        self.max_teams = 40
         self.has_semifinals = False
         self.finalized_rounds = set()
         self.finals_data = None
@@ -649,7 +649,7 @@ class TournamentManager:
         - 8 teams: Swiss rounds (default 4) -> Finals (top 4)
         - 12 teams: Swiss rounds (default 4) -> Finals (top 4)
         - 16 teams: Swiss rounds (default 4) -> Top 8 Cut (8 pods) -> Finals (top 4)
-        - 20-32 teams: Swiss rounds (default 5) -> Top 8 Cut (8 pods) -> Finals (top 4)
+        - 20-40 teams: Swiss rounds (default 5) -> Top 8 Cut (8 pods) -> Finals (top 4)
 
         Individual mode rules:
         - 16 players or fewer: Swiss rounds (default 4) -> Finals (top 4 players, 1 table)
@@ -699,8 +699,8 @@ class TournamentManager:
             print(f"  - Total rounds: {self.max_rounds}")
             print(f"  [WARNING]  Note: Some repeat matchups may occur during Swiss rounds")
 
-        elif team_count >= 16 and team_count <= 32 and team_count % 4 == 0:
-            # 16-32 teams: Swiss rounds -> Top 8 Cut -> Finals
+        elif team_count >= 16 and team_count <= 40 and team_count % 4 == 0:
+            # 16-40 teams: Swiss rounds -> Top 8 Cut -> Finals
             if not self.swiss_rounds_configured:
                 self.swiss_rounds_count = 5 if team_count >= 20 else 4
             self.has_semifinals = True  # "Top 8 Cut" uses the semifinals logic
@@ -714,7 +714,7 @@ class TournamentManager:
 
         else:
             print(f"[WARNING]  Unsupported team count: {team_count}")
-            print(f"   Supported: 8 to 32 teams (multiples of 4)")
+            print(f"   Supported: 8 to 40 teams (multiples of 4)")
             return False
 
         return True
@@ -879,7 +879,7 @@ class TournamentManager:
         """Create sample data if Excel file can't be loaded
 
         Args:
-            num_teams: Number of teams to create (any multiple of 4 from 8 to 32, default: 8)
+            num_teams: Number of teams to create (any multiple of 4 from 8 to 40, default: 8)
         """
         all_teams = {
             'Team Alpha': [
@@ -1073,11 +1073,59 @@ class TournamentManager:
                 {'Player ID': 126, 'Player Name': 'Zion', 'Team Name': 'Team Hex'},
                 {'Player ID': 127, 'Player Name': 'Aldo', 'Team Name': 'Team Hex'},
                 {'Player ID': 128, 'Player Name': 'Bria', 'Team Name': 'Team Hex'}
+            ],
+            'Team Ion': [
+                {'Player ID': 129, 'Player Name': 'Clay', 'Team Name': 'Team Ion'},
+                {'Player ID': 130, 'Player Name': 'Dina', 'Team Name': 'Team Ion'},
+                {'Player ID': 131, 'Player Name': 'Elio', 'Team Name': 'Team Ion'},
+                {'Player ID': 132, 'Player Name': 'Fern', 'Team Name': 'Team Ion'}
+            ],
+            'Team Jinx': [
+                {'Player ID': 133, 'Player Name': 'Gage', 'Team Name': 'Team Jinx'},
+                {'Player ID': 134, 'Player Name': 'Hale', 'Team Name': 'Team Jinx'},
+                {'Player ID': 135, 'Player Name': 'Ines', 'Team Name': 'Team Jinx'},
+                {'Player ID': 136, 'Player Name': 'Joel', 'Team Name': 'Team Jinx'}
+            ],
+            'Team Knox': [
+                {'Player ID': 137, 'Player Name': 'Kaia', 'Team Name': 'Team Knox'},
+                {'Player ID': 138, 'Player Name': 'Lane', 'Team Name': 'Team Knox'},
+                {'Player ID': 139, 'Player Name': 'Milo', 'Team Name': 'Team Knox'},
+                {'Player ID': 140, 'Player Name': 'Nola', 'Team Name': 'Team Knox'}
+            ],
+            'Team Lynx': [
+                {'Player ID': 141, 'Player Name': 'Odin', 'Team Name': 'Team Lynx'},
+                {'Player ID': 142, 'Player Name': 'Pia', 'Team Name': 'Team Lynx'},
+                {'Player ID': 143, 'Player Name': 'Remy', 'Team Name': 'Team Lynx'},
+                {'Player ID': 144, 'Player Name': 'Shea', 'Team Name': 'Team Lynx'}
+            ],
+            'Team Mist': [
+                {'Player ID': 145, 'Player Name': 'Troy', 'Team Name': 'Team Mist'},
+                {'Player ID': 146, 'Player Name': 'Uma M', 'Team Name': 'Team Mist'},
+                {'Player ID': 147, 'Player Name': 'Vlad', 'Team Name': 'Team Mist'},
+                {'Player ID': 148, 'Player Name': 'Wynn', 'Team Name': 'Team Mist'}
+            ],
+            'Team Nova': [
+                {'Player ID': 149, 'Player Name': 'Xyla', 'Team Name': 'Team Nova'},
+                {'Player ID': 150, 'Player Name': 'York', 'Team Name': 'Team Nova'},
+                {'Player ID': 151, 'Player Name': 'Zola', 'Team Name': 'Team Nova'},
+                {'Player ID': 152, 'Player Name': 'Ash', 'Team Name': 'Team Nova'}
+            ],
+            'Team Onyx': [
+                {'Player ID': 153, 'Player Name': 'Beck', 'Team Name': 'Team Onyx'},
+                {'Player ID': 154, 'Player Name': 'Cass', 'Team Name': 'Team Onyx'},
+                {'Player ID': 155, 'Player Name': 'Drew', 'Team Name': 'Team Onyx'},
+                {'Player ID': 156, 'Player Name': 'Erin', 'Team Name': 'Team Onyx'}
+            ],
+            'Team Pyro': [
+                {'Player ID': 157, 'Player Name': 'Flynn', 'Team Name': 'Team Pyro'},
+                {'Player ID': 158, 'Player Name': 'Gaia', 'Team Name': 'Team Pyro'},
+                {'Player ID': 159, 'Player Name': 'Heath', 'Team Name': 'Team Pyro'},
+                {'Player ID': 160, 'Player Name': 'Ivy P', 'Team Name': 'Team Pyro'}
             ]
         }
 
-        # Select the appropriate number of teams (must be multiple of 4, 8-32)
-        if num_teams % 4 != 0 or num_teams < 8 or num_teams > 32:
+        # Select the appropriate number of teams (must be multiple of 4, 8-40)
+        if num_teams % 4 != 0 or num_teams < 8 or num_teams > 40:
             num_teams = 8  # Default to 8 teams
         sample_teams = dict(list(all_teams.items())[:num_teams])
 
@@ -1112,13 +1160,13 @@ class TournamentManager:
                 print(f"[X] VALIDATION FAILED: {error_msg}")
                 return False, error_msg
         else:
-            # STRICT VALIDATION: Team count must be a multiple of 4, between 8 and 32
+            # STRICT VALIDATION: Team count must be a multiple of 4, between 8 and 40
             team_count = len(self.teams)
-            if team_count % 4 != 0 or team_count < 8 or team_count > 32:
+            if team_count % 4 != 0 or team_count < 8 or team_count > 40:
                 error_msg = (
-                    f"Tournament requires 8 to 32 teams (multiples of 4). "
+                    f"Tournament requires 8 to 40 teams (multiples of 4). "
                     f"Current teams loaded: {team_count}. "
-                    f"Supported counts: 8, 12, 16, 20, 24, 28, 32."
+                    f"Supported counts: 8, 12, 16, 20, 24, 28, 32, 36, 40."
                 )
                 print(f"[X] VALIDATION FAILED: {error_msg}")
                 return False, error_msg
@@ -1679,20 +1727,25 @@ class TournamentManager:
             else:
                 print(f"  {team_name}: Final={final_round_points} pts, Swiss={swiss_round_points} pts, Total={total_points} pts")
 
-        # Sort by FINAL ROUND POINTS first (primary), then tiebreaker points (Swiss + Top 8 Cut for 16-team)
-        # This ensures the team with highest final round score wins
-        # Only if teams are tied on final points do we use tiebreaker (Swiss or Swiss+Top8Cut)
-        if has_top8_cut:
-            print(f"\n[ROTATING] Sorting by: (final_points DESC, swiss+top8cut DESC)")
-        else:
-            print(f"\n[ROTATING] Sorting by: (final_points DESC, swiss_points DESC)")
+        # Sort hierarchy:
+        # 1. Final round points (primary — whoever performed best in the finals)
+        # 2. Tiebreaker points (Swiss + Top 8 Cut combined)
+        # 3. Best individual player score on the team
+        # 4. Average player score on the team
+        # 5. Early wins (weighted score favoring earlier rounds)
+        def finals_sort_key(entry):
+            team_name = entry['team']
+            _, best_player, avg_player, early_wins = self.get_team_tiebreaker_key(team_name, entry['total_points'])
+            return (entry['final_points'], entry['tiebreaker_points'], best_player, avg_player, early_wins)
 
-        final_standings.sort(key=lambda x: (x['final_points'], x['tiebreaker_points']), reverse=True)
+        print(f"\n[ROTATING] Sorting by: (final_points, tiebreaker_points, best_player, avg_player, early_wins) DESC")
+
+        final_standings.sort(key=finals_sort_key, reverse=True)
 
         if len(final_standings) >= 2:
             a, b = final_standings[0], final_standings[1]
-            if (a['final_points'], a['tiebreaker_points']) == (b['final_points'], b['tiebreaker_points']):
-                print(f"[WARNING] TRUE TIE: {a['team']} and {b['team']} have identical finals ({a['final_points']}) and tiebreaker ({a['tiebreaker_points']}) points. Winner resolved by advancement order.")
+            if finals_sort_key(a) == finals_sort_key(b):
+                print(f"[WARNING] TRUE TIE: {a['team']} and {b['team']} have identical scores across all tiebreakers. Winner resolved by advancement order.")
 
         print(f"\n[OK] FINAL STANDINGS (sorted by FINAL points first, then tiebreaker):")
         for rank, s in enumerate(final_standings, 1):
@@ -1705,17 +1758,20 @@ class TournamentManager:
         if len(final_standings) > 1:
             winner = final_standings[0]
             runner_up = final_standings[1]
-            if winner['final_points'] == runner_up['final_points']:
-                if has_top8_cut:
-                    print(f"[WARNING] TIE on final points! Using Swiss+Top8Cut as tiebreaker:")
-                    print(f"   Winner: {winner['team']} (Tiebreaker: {winner['tiebreaker_points']} = Swiss {winner['swiss_points']} + Top8 {winner['top8_cut_points']})")
-                    print(f"   Runner-up: {runner_up['team']} (Tiebreaker: {runner_up['tiebreaker_points']} = Swiss {runner_up['swiss_points']} + Top8 {runner_up['top8_cut_points']})")
-                else:
-                    print(f"[WARNING] TIE on final points! Using Swiss points as tiebreaker:")
-                    print(f"   Winner: {winner['team']} (Swiss: {winner['swiss_points']} pts)")
-                    print(f"   Runner-up: {runner_up['team']} (Swiss: {runner_up['swiss_points']} pts)")
-            else:
+            w_key = finals_sort_key(winner)
+            r_key = finals_sort_key(runner_up)
+            if winner['final_points'] != runner_up['final_points']:
                 print(f"[OK] Winner determined by final round points: {winner['team']} ({winner['final_points']} pts)")
+            elif winner['tiebreaker_points'] != runner_up['tiebreaker_points']:
+                print(f"[OK] Tied on finals ({winner['final_points']}), broken by Swiss+Top8 tiebreaker: {winner['team']}({winner['tiebreaker_points']}) > {runner_up['team']}({runner_up['tiebreaker_points']})")
+            elif w_key[2] != r_key[2]:
+                print(f"[OK] Tied on finals+Swiss, broken by best player score: {winner['team']}({w_key[2]}) > {runner_up['team']}({r_key[2]})")
+            elif w_key[3] != r_key[3]:
+                print(f"[OK] Tied on finals+Swiss+best player, broken by average player score: {winner['team']} > {runner_up['team']}")
+            elif w_key[4] != r_key[4]:
+                print(f"[OK] Tied on finals+Swiss+best+avg, broken by early wins: {winner['team']}({w_key[4]}) > {runner_up['team']}({r_key[4]})")
+            else:
+                print(f"[WARNING] Complete tie across all tiebreakers — resolved by advancement order")
 
         self._cached_final_standings = final_standings
         return final_standings
@@ -2297,7 +2353,7 @@ class TournamentManager:
         return early_wins_score
 
     def generate_semifinals_round(self):
-        """Generate Top 8 Cut for 16-32 team tournaments - top 8 teams advance
+        """Generate Top 8 Cut for 16-40 team tournaments - top 8 teams advance
 
         Structure: 8 pods/tables with 4 players each (32 players total from 8 teams)
         - 2 groups of 4 teams each

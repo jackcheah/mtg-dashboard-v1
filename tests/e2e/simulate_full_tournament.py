@@ -3,15 +3,15 @@
 Full Tournament E2E Simulation
 
 This script simulates a complete tournament flow from start to finish.
-Supports 8 to 32 team configurations (multiples of 4).
+Supports 8 to 40 team configurations (multiples of 4).
 
 Flow:
 - 8/12 Teams: 4 Swiss Rounds -> Finals
 - 16 Teams: 4 Swiss Rounds -> Top 8 Cut -> Finals
-- 20-32 Teams: 5 Swiss Rounds -> Top 8 Cut -> Finals
+- 20-40 Teams: 5 Swiss Rounds -> Top 8 Cut -> Finals
 
 Usage:
-    python simulate_full_tournament.py --teams [8|12|16|20|24|28|32] [--no-gen]
+    python simulate_full_tournament.py --teams [8|12|16|20|24|28|32|36|40] [--no-gen]
 """
 
 import random
@@ -751,7 +751,7 @@ class TournamentSimulator:
 def main():
     """Main entry point."""
     parser = argparse.ArgumentParser(description="Simulate MTG Tournament")
-    parser.add_argument("--teams", type=int, default=16, choices=[8, 12, 16, 20, 24, 28, 32], help="Number of teams (8, 12, 16, 20, 24, 28, 32)")
+    parser.add_argument("--teams", type=int, default=16, choices=[8, 12, 16, 20, 24, 28, 32, 36, 40], help="Number of teams (8, 12, 16, 20, 24, 28, 32, 36, 40)")
     parser.add_argument("--no-gen", action="store_true", help="Skip data generation")
     
     args = parser.parse_args()

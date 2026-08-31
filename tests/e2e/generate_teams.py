@@ -8,7 +8,7 @@ in the format expected by the MTG Dashboard.
 Usage:
     python generate_teams.py [num_teams]
 
-    num_teams: any multiple of 4 from 8 to 32 (default: 16)
+    num_teams: any multiple of 4 from 8 to 40 (default: 16)
 """
 
 import os
@@ -18,8 +18,8 @@ import openpyxl
 def generate_teams(num_teams=16):
     """Generate teams with 4 players each."""
     
-    if num_teams % 4 != 0 or num_teams < 8 or num_teams > 32:
-        print(f"⚠️  Warning: {num_teams} is not a supported team count (8-32, multiples of 4). Generating anyway...")
+    if num_teams % 4 != 0 or num_teams < 8 or num_teams > 40:
+        print(f"⚠️  Warning: {num_teams} is not a supported team count (8-40, multiples of 4). Generating anyway...")
     
     # Target path required by the backend
     target_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../participants"))
@@ -37,7 +37,7 @@ def generate_teams(num_teams=16):
     # Generate teams with 4 players each
     player_id = 1
     
-    # Pool of team names (32 names to support max team count)
+    # Pool of team names (40 names to support max team count)
     team_names_pool = [
         "Alpha Strike", "Beta Force", "Gamma Wave", "Delta Squad",
         "Epsilon Elite", "Zeta Zealots", "Eta Hawks", "Theta Thunder",
@@ -46,7 +46,9 @@ def generate_teams(num_teams=16):
         "Rho Raiders", "Sigma Storm", "Tau Titans", "Upsilon Ultra",
         "Phi Phoenix", "Chi Champions", "Psi Power", "Omega Order",
         "Atlas Army", "Bolt Brigade", "Crux Crew", "Dusk Dynasty",
-        "Echo Elite", "Flux Force", "Gale Guard", "Hex Hawks"
+        "Echo Elite", "Flux Force", "Gale Guard", "Hex Hawks",
+        "Ion Impact", "Jinx Jokers", "Knox Knights", "Lynx Legends",
+        "Mist Mages", "Nova Nexus", "Onyx Order", "Pyro Phantoms"
     ]
     
     team_names = team_names_pool[:num_teams]

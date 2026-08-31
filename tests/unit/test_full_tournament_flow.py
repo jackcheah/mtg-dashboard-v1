@@ -416,8 +416,8 @@ class TestFullTournamentFlow20Teams:
             assert not teammate_errors, f"seed={seed}: {teammate_errors}"
 
 
-class TestFullTournamentFlow24_28_32Teams:
-    """Full tournament flow for 24, 28, 32 teams."""
+class TestFullTournamentFlow24_28_32_36_40Teams:
+    """Full tournament flow for 24, 28, 32, 36, 40 teams."""
 
     def test_24_teams_complete(self):
         """24 teams, 5 Swiss + Top 8 Cut + Finals."""
@@ -443,10 +443,26 @@ class TestFullTournamentFlow24_28_32Teams:
         assert len(sim.errors) == 0, f"Errors: {sim.errors}"
         assert sim.tm.state == TournamentState.FINALS_COMPLETE
 
-    def test_32_teams_no_teammate_violations(self):
-        """32 teams across multiple seeds."""
+    def test_36_teams_complete(self):
+        """36 teams, 5 Swiss + Top 8 Cut + Finals."""
+        sim = TournamentFlowSimulator(36, swiss_rounds=5, seed=42)
+        success = sim.run()
+        sim.print_report()
+        assert len(sim.errors) == 0, f"Errors: {sim.errors}"
+        assert sim.tm.state == TournamentState.FINALS_COMPLETE
+
+    def test_40_teams_complete(self):
+        """40 teams, 5 Swiss + Top 8 Cut + Finals."""
+        sim = TournamentFlowSimulator(40, swiss_rounds=5, seed=42)
+        success = sim.run()
+        sim.print_report()
+        assert len(sim.errors) == 0, f"Errors: {sim.errors}"
+        assert sim.tm.state == TournamentState.FINALS_COMPLETE
+
+    def test_40_teams_no_teammate_violations(self):
+        """40 teams across multiple seeds."""
         for seed in range(5):
-            sim = TournamentFlowSimulator(32, swiss_rounds=5, seed=seed)
+            sim = TournamentFlowSimulator(40, swiss_rounds=5, seed=seed)
             sim.run()
             teammate_errors = [e for e in sim.errors if "TEAMMATE" in e]
             assert not teammate_errors, f"seed={seed}: {teammate_errors}"
@@ -457,7 +473,7 @@ class TestTeamCountValidation:
 
     def test_manager_rejects_invalid_counts(self):
         """TournamentManager rejects non-multiples-of-4 and out-of-range."""
-        for n in [4, 7, 10, 14, 36]:
+        for n in [4, 7, 10, 14, 44]:
             tm = TournamentManager()
             tm.event_mode = EventMode.TEAM
             teams = {}
@@ -483,7 +499,7 @@ class TestTeamCountValidation:
 
     def test_20_plus_defaults_to_5_swiss_rounds(self):
         """20+ teams should default to 5 Swiss rounds."""
-        for n in [20, 24, 28, 32]:
+        for n in [20, 24, 28, 32, 36, 40]:
             tm = TournamentManager()
             tm.event_mode = EventMode.TEAM
             tm.create_sample_data(n)

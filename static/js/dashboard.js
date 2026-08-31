@@ -26,6 +26,10 @@
 
                 _show(html) {
                     return new Promise((resolve) => {
+                        if (this._cleanupTimer) {
+                            clearTimeout(this._cleanupTimer);
+                            this._cleanupTimer = null;
+                        }
                         this.overlay.innerHTML = html;
 
                         // Bind buttons
@@ -37,7 +41,10 @@
 
                         const close = (result) => {
                             this.overlay.classList.remove('show');
-                            setTimeout(() => this.overlay.innerHTML = '', 200); // clear after transition
+                            this._cleanupTimer = setTimeout(() => {
+                                this.overlay.innerHTML = '';
+                                this._cleanupTimer = null;
+                            }, 200);
                             resolve(result);
                         };
 
@@ -135,9 +142,9 @@
 
                         <div style="margin-bottom: 1rem;">
                             <strong style="color: var(--color-success);">Scoring:</strong><br>
-                            • <kbd>W</kbd> or <kbd>1</kbd> = Win (5 points)<br>
-                            • <kbd>D</kbd> or <kbd>2</kbd> = Draw (1 point)<br>
-                            • <kbd>L</kbd> or <kbd>3</kbd> = Loss (0 points)
+                            • <kbd>W</kbd> or <kbd>1</kbd> = Win<br>
+                            • <kbd>D</kbd> or <kbd>2</kbd> = Draw<br>
+                            • <kbd>L</kbd> or <kbd>3</kbd> = Loss
                         </div>
 
                         <div style="margin-bottom: 1rem;">
@@ -2137,7 +2144,8 @@
 
                 return results.map(r => {
                     const pointsLabel = r.points === 5 ? 'Win' : (r.points === 1 ? 'Draw' : 'Loss');
-                    return `<div style="font-size: 12px; margin: 4px 0;">Player ${r.player_id}: ${r.points} pts (${pointsLabel})</div>`;
+                    const scoreText = currentScoringMode === 'japanese' ? pointsLabel : `${r.points} pts (${pointsLabel})`;
+                    return `<div style="font-size: 12px; margin: 4px 0;">Player ${r.player_id}: ${scoreText}</div>`;
                 }).join('');
             }
 
@@ -2224,28 +2232,32 @@
                                         </div>
                                     </div>
                                     <div class="table-player-score" id="score-display-${playerId}">
-                                        ${playerScore === '-' ? '-' : playerScore + ' pts'}
+                                        ${currentRoundScore !== undefined
+                                            ? (currentScoringMode === 'japanese'
+                                                ? (currentRoundScore === 5 ? 'Win' : currentRoundScore === 1 ? 'Draw' : 'Loss')
+                                                : currentRoundScore + ' pts')
+                                            : (cumulativeScore + ' pts')}
                                     </div>
                                     <div class="score-buttons-inline">
                                         <button class="score-btn score-btn-win"
                                                 data-table="${tableName.replace(/'/g, '&#39;').replace(/"/g, '&quot;')}"
                                                 data-player="${playerId}"
                                                 data-points="5"
-                                                title="Win (5 points)">
+                                                title="${currentScoringMode === 'japanese' ? 'Win (takes pool)' : 'Win (5 points)'}">
                                             W
                                         </button>
                                         <button class="score-btn score-btn-draw"
                                                 data-table="${tableName.replace(/'/g, '&#39;').replace(/"/g, '&quot;')}"
                                                 data-player="${playerId}"
                                                 data-points="1"
-                                                title="Draw (1 point)">
+                                                title="${currentScoringMode === 'japanese' ? 'Draw (lose contribution)' : 'Draw (1 point)'}">
                                             D
                                         </button>
                                         <button class="score-btn score-btn-loss"
                                                 data-table="${tableName.replace(/'/g, '&#39;').replace(/"/g, '&quot;')}"
                                                 data-player="${playerId}"
                                                 data-points="0"
-                                                title="Loss (0 points)">
+                                                title="${currentScoringMode === 'japanese' ? 'Loss (lose contribution)' : 'Loss (0 points)'}">
                                             L
                                         </button>
                                     </div>
@@ -2596,7 +2608,12 @@
                 // Update score display next to player name
                 const scoreDisplay = document.getElementById(`score-display-${playerId}`);
                 if (scoreDisplay) {
-                    scoreDisplay.textContent = `${points} pts`;
+                    if (currentScoringMode === 'japanese') {
+                        const label = points === 5 ? 'Win' : points === 1 ? 'Draw' : 'Loss';
+                        scoreDisplay.textContent = label;
+                    } else {
+                        scoreDisplay.textContent = `${points} pts`;
+                    }
                 }
 
                 // Update button states (remove active from siblings)

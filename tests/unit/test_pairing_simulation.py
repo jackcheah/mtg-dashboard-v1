@@ -415,9 +415,21 @@ class TestPairingSimulation:
         sim.print_report()
         assert len(sim.errors) == 0, f"Errors: {sim.errors}"
 
+    def test_36_teams_5_rounds(self):
+        """36 teams, 5 Swiss rounds."""
+        sim = run_simulation(36, swiss_rounds=5, seed=42)
+        sim.print_report()
+        assert len(sim.errors) == 0, f"Errors: {sim.errors}"
+
+    def test_40_teams_5_rounds(self):
+        """40 teams, 5 Swiss rounds."""
+        sim = run_simulation(40, swiss_rounds=5, seed=42)
+        sim.print_report()
+        assert len(sim.errors) == 0, f"Errors: {sim.errors}"
+
     def test_no_teammate_violations_any_seed(self):
         """Run multiple seeds for various team counts to verify no teammate violations."""
-        for num_teams in [12, 16, 20, 24, 28, 32]:
+        for num_teams in [12, 16, 20, 24, 28, 32, 36, 40]:
             for seed in range(5):
                 sim = run_simulation(num_teams, swiss_rounds=4, seed=seed)
                 teammate_errors = [e for e in sim.errors if "TEAMMATE VIOLATION" in e]
@@ -427,7 +439,7 @@ class TestPairingSimulation:
 
     def test_all_players_participate_every_round(self):
         """Verify every player appears in exactly one pod per round."""
-        for num_teams in [12, 16, 20, 24, 28, 32]:
+        for num_teams in [12, 16, 20, 24, 28, 32, 36, 40]:
             sim = run_simulation(num_teams, swiss_rounds=4, seed=42)
             participation_errors = [e for e in sim.errors if "participated" in e]
             assert len(participation_errors) == 0, (
@@ -505,11 +517,11 @@ class TestTournamentManagerTeamCountRestrictions:
     """Tests for TournamentManager's team count validation."""
 
     def test_manager_accepts_all_valid_counts(self):
-        """TournamentManager accepts 8, 12, 16, 20, 24, 28, 32 teams."""
+        """TournamentManager accepts 8, 12, 16, 20, 24, 28, 32, 36, 40 teams."""
         sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
         from tournament_dashboard import TournamentManager, EventMode
 
-        for num_teams in [8, 12, 16, 20, 24, 28, 32]:
+        for num_teams in [8, 12, 16, 20, 24, 28, 32, 36, 40]:
             tm = TournamentManager()
             tm.event_mode = EventMode.TEAM
             tm.create_sample_data(num_teams)
@@ -521,7 +533,7 @@ class TestTournamentManagerTeamCountRestrictions:
         sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
         from tournament_dashboard import TournamentManager, EventMode
 
-        for num_teams in [4, 7, 10, 14, 36]:
+        for num_teams in [4, 7, 10, 14, 44]:
             tm = TournamentManager()
             tm.event_mode = EventMode.TEAM
             teams, names = generate_teams(num_teams)
@@ -536,9 +548,9 @@ class TestTournamentManagerTeamCountRestrictions:
             success, msg = tm.setup_tournament()
             assert not success, f"{num_teams} teams should be rejected"
 
-    def test_pairing_engine_supports_up_to_32(self):
-        """Verify pairing engine accepts up to 32 teams."""
-        for num_teams in [20, 24, 28, 32]:
+    def test_pairing_engine_supports_up_to_40(self):
+        """Verify pairing engine accepts up to 40 teams."""
+        for num_teams in [20, 24, 28, 32, 36, 40]:
             teams, names = generate_teams(num_teams)
             scores = {name: 0 for name in names}
             engine = UnifiedSwissPairing(teams, names, 4, scores)
@@ -546,16 +558,16 @@ class TestTournamentManagerTeamCountRestrictions:
             assert success
             assert len(pods) == num_teams
 
-    def test_pairing_engine_rejects_over_32(self):
-        """Verify pairing engine rejects >32 teams."""
-        teams, names = generate_teams(36)
+    def test_pairing_engine_rejects_over_40(self):
+        """Verify pairing engine rejects >40 teams."""
+        teams, names = generate_teams(44)
         scores = {name: 0 for name in names}
 
         try:
             engine = UnifiedSwissPairing(teams, names, 4, scores)
             assert False, "Should have raised ValueError"
         except ValueError as e:
-            assert "Maximum 32 teams" in str(e)
+            assert "Maximum 40 teams" in str(e)
 
 
 # ============================================================================
@@ -569,7 +581,7 @@ if __name__ == '__main__':
 
     all_results = {}
 
-    for num_teams in [12, 16, 20, 24, 28, 32]:
+    for num_teams in [12, 16, 20, 24, 28, 32, 36, 40]:
         for swiss_rounds in [4, 5]:
             print(f"\n{'#'*70}")
             print(f"# Simulating: {num_teams} teams, {swiss_rounds} Swiss rounds")
@@ -613,7 +625,7 @@ if __name__ == '__main__':
     print("\n" + "=" * 70)
     total_errors = sum(len(r['errors']) for r in all_results.values())
     if total_errors == 0:
-        print("ALL CONFIGURATIONS PASSED (8-32 teams)")
+        print("ALL CONFIGURATIONS PASSED (8-40 teams)")
     else:
         print(f"FAILURES DETECTED: {total_errors} total errors")
     print("=" * 70)
