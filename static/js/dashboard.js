@@ -1170,6 +1170,53 @@
                 }
             }
 
+            // TopDeck CSV Export
+            async function exportTopdeck() {
+                const round = document.getElementById('round-select').value;
+                if (!round) {
+                    showToast('No Round', 'Select a round before exporting.', 'error');
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/topdeck/validate/' + round);
+                    const data = await response.json();
+
+                    if (!response.ok && !data.errors) {
+                        showToast('Error', data.error || data.user_message || 'Cannot export in current state.', 'error');
+                        return;
+                    }
+
+                    if (data.errors && data.errors.length > 0) {
+                        const errorList = data.errors.map(e => `<li>${e}</li>`).join('');
+                        await modalManager.showHtml(
+                            'TopDeck Export Blocked',
+                            `<p>The following issues must be resolved before exporting:</p><ul style="text-align:left;margin:12px 0;padding-left:20px;">${errorList}</ul>`,
+                            'OK'
+                        );
+                        return;
+                    }
+
+                    if (data.warnings && data.warnings.length > 0) {
+                        const warnList = data.warnings.map(w => `<li>${w}</li>`).join('');
+                        const proceed = await modalManager.confirm(
+                            'TopDeck Export Warnings',
+                            `Warnings:\n${data.warnings.join('\n')}\n\nProceed with download?`,
+                            'Download',
+                            'Cancel'
+                        );
+                        if (!proceed) return;
+                    }
+
+                    const s = data.summary;
+                    window.location.href = '/topdeck/export/' + round;
+                    showToast('TopDeck CSV', `Round ${s.round}: ${s.tables} tables, ${s.players_exported} players exported.`, 'success');
+                } catch (error) {
+                    showToast('Error', 'TopDeck export failed: ' + error.message, 'error');
+                    console.error('TopDeck export error:', error);
+                }
+            }
+
             // Reset Tournament
             async function resetTournament() {
                 const confirmed = await modalManager.confirm(

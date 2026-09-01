@@ -8,6 +8,7 @@ A production-ready web-based tournament management system for Magic: The Gatheri
 - **Dual Scoring Systems**: Western (5/1/0) and Japanese (7% pool, 1000 starting points)
 - **Swiss-System Pairing**: Round 1 random grouping, then score-based Swiss with repeat-avoidance optimization and anti-collusion snake pairing for round 4+
 - **Individual Mode Extras**: Bye system, 3-player pods, player drop mid-tournament, Top Cut (top 10)
+- **TopDeck.gg Integration**: Export round pairings as CSV for TopDeck import — publish tournaments for public record and EDHTop16 consideration
 - **Production-Ready**: Auto-backups every 5 minutes, crash recovery, thread-safe operations
 - **Modern UI**: Responsive glassmorphism interface with step-by-step setup wizard
 - **Projector View**: Dedicated read-only audience display with champion/MVP showcases
@@ -157,6 +158,7 @@ TOURNAMENT_PIN=1234 python tournament_dashboard.py
 - **Revert submission**: Completely undo a table submission if needed
 - **Unfinalize round**: Undo the most recently finalized round if a mistake is discovered (PIN-protected)
 - **Undrop player**: Re-add a previously dropped player back into the tournament (PIN-protected)
+- **TopDeck CSV Export**: One-click export of round pairings for TopDeck.gg import (with pre-export validation)
 
 ## Keyboard Shortcuts
 
@@ -181,12 +183,105 @@ Access at `/projector` for audience-friendly display:
 
 ---
 
+## TopDeck.gg Integration
+
+The dashboard can export round pairings as CSV files for import into [TopDeck.gg](https://topdeck.gg), enabling public tournament records, decklist publication, and EDHTop16 submission.
+
+### How It Works
+
+After finalizing a round in the dashboard, click the **"TopDeck CSV"** button in the round controls bar. The system validates the round data, then downloads a CSV file you can upload directly to TopDeck.
+
+### Step-by-Step Workflow
+
+1. **Setup TopDeck event** (one-time): Create the event on TopDeck.gg with Game: `Magic: The Gathering`, Format: `EDH`, Team Size: `1`. Add your player roster. For team events, see "Team Mode Notes" below.
+
+2. **Each round:**
+   - Finalize the round in the dashboard (submit all tables → "Submit Round Results")
+   - Click **"TopDeck CSV"** in the controls bar
+   - Review any warnings in the modal, then confirm download
+   - In TopDeck: open the round → **Round actions → Import pairings** → upload the CSV
+   - Review TopDeck's reconciliation screen (check "New players" and "Not in file" lists)
+   - Apply pairings, then enter results in TopDeck manually
+   - End the TopDeck round when all tables are complete
+
+3. **After the tournament:** Compare TopDeck standings against the dashboard. Submit the TopDeck event URL to EDHTop16 if desired.
+
+### What Gets Exported
+
+The CSV contains pairings only (not results):
+
+```csv
+table,player 1,player 2,player 3,player 4
+1,Alice Tan,Ben Lim,Cheryl Ng,Daniel Lee
+2,Emma Wong,Faris Rahman,Grace Koh,Hassan Ali
+```
+
+- One row per pod, four players per row (confirmed format)
+- Sequential table numbers starting from 1
+- Player names match what's in your roster
+- UTF-8 encoded, CRLF line endings, standard CSV escaping
+- For three-player pods (individual mode), `player 4` is exported as an empty field. **This has not been verified with TopDeck's live importer** — test in an unpublished TopDeck event before using in production
+
+### Pre-Export Validation
+
+Before downloading, the system checks for:
+
+**Blocking errors** (must fix before export):
+- Round not finalized
+- Duplicate player names (TopDeck reconciles by name)
+- Missing player names
+- Wrong pod size in team mode (must be exactly 4)
+- Teammates in the same pod
+- Player assigned to multiple tables
+
+**Warnings** (export allowed, review recommended):
+- Dropped players absent from the round
+- Bye players not included
+- Three-player pods detected (unverified with TopDeck importer)
+
+### Team Mode Notes
+
+TopDeck does not support the dashboard's team format (4 teams contributing 1 player each to a pod). A team event must be mirrored on TopDeck as an **individual EDH event** (Team Size = 1). TopDeck will accurately record:
+
+- Player roster and four-player pods
+- Winner or draw of every pod
+- Individual player records and decklists
+
+TopDeck **will not** show: team scores, team standings, team-based advancement, or the winning team. The dashboard remains the authoritative source for team results.
+
+**Recommended TopDeck event name:** `[Your Event] — Individual Results`
+
+Include a description noting that advancement was determined by aggregate team score, not individual standings.
+
+### API Endpoints
+
+The export is also available via direct API calls:
+
+| Endpoint | Description |
+|----------|-------------|
+| `GET /topdeck/validate/<round>` | Returns JSON: `{success, errors, warnings, summary}` |
+| `GET /topdeck/export/<round>` | Downloads CSV file (validates first, returns 400 on error) |
+
+### Scoring Configuration
+
+Configure TopDeck scoring to match the dashboard:
+
+**Western mode:** Standard scoring — Win: 5, Draw: 1, Loss: 0
+
+**Japanese mode:** Not yet supported for TopDeck sync. Use manual entry in TopDeck until point-wager equivalence is confirmed.
+
+### Full Specification
+
+See `TopDeck_Integration_Specification.md` for the complete integration design, including: readback verification via the TopDeck API, webhook support, EDHTop16 submission workflow, and deferred features (results CSV, direct API sync).
+
+---
+
 ## Testing
 
 ```bash
 pip install -r requirements-dev.txt
 
-# Unit tests (178 tests)
+# Unit tests (222 tests)
 pytest tests/unit/ -v
 
 # E2E (server must be running)

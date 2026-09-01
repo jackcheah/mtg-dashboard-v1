@@ -5314,6 +5314,83 @@ def preview_finalize(round_num):
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
+# ==========================================
+# TopDeck.gg Integration Endpoints
+# ==========================================
+
+@app.route('/topdeck/validate/<int:round_num>')
+@with_lock
+@require_state(
+    TournamentState.TOURNAMENT_SETUP,
+    TournamentState.SWISS_IN_PROGRESS,
+    TournamentState.TOP8_IN_PROGRESS,
+    TournamentState.FINALS_IN_PROGRESS,
+    TournamentState.FINALS_COMPLETE
+)
+def topdeck_validate(round_num):
+    """Validate a round's data before TopDeck CSV export."""
+    import topdeck_exporter
+
+    tables = tournament.tables.get(round_num, {})
+    event_mode = tournament.event_mode.value if hasattr(tournament.event_mode, 'value') else str(tournament.event_mode)
+    result = topdeck_exporter.validate_round_for_topdeck(
+        tables=tables,
+        round_num=round_num,
+        finalized_rounds=tournament.finalized_rounds,
+        event_mode=event_mode,
+        teams=tournament.teams,
+        dropped_players=getattr(tournament, 'dropped_players', None),
+        bye_players=tournament.bye_players.get(round_num, []),
+    )
+    return jsonify({
+        'success': len(result['errors']) == 0,
+        'errors': result['errors'],
+        'warnings': result['warnings'],
+        'summary': result['summary'],
+    })
+
+
+@app.route('/topdeck/export/<int:round_num>')
+@with_lock
+@require_state(
+    TournamentState.TOURNAMENT_SETUP,
+    TournamentState.SWISS_IN_PROGRESS,
+    TournamentState.TOP8_IN_PROGRESS,
+    TournamentState.FINALS_IN_PROGRESS,
+    TournamentState.FINALS_COMPLETE
+)
+def topdeck_export(round_num):
+    """Export a round's pairings as TopDeck-compatible CSV."""
+    import topdeck_exporter
+    from flask import Response
+
+    tables = tournament.tables.get(round_num, {})
+    event_mode = tournament.event_mode.value if hasattr(tournament.event_mode, 'value') else str(tournament.event_mode)
+    validation = topdeck_exporter.validate_round_for_topdeck(
+        tables=tables,
+        round_num=round_num,
+        finalized_rounds=tournament.finalized_rounds,
+        event_mode=event_mode,
+        teams=tournament.teams,
+        dropped_players=getattr(tournament, 'dropped_players', None),
+        bye_players=tournament.bye_players.get(round_num, []),
+    )
+    if validation['errors']:
+        return jsonify({
+            'success': False,
+            'errors': validation['errors'],
+            'summary': validation['summary'],
+        }), 400
+
+    csv_bytes = topdeck_exporter.build_pairings_csv(tables, event_mode)
+    filename = topdeck_exporter.generate_export_filename(round_num)
+    return Response(
+        csv_bytes,
+        mimetype='text/csv',
+        headers={'Content-Disposition': f'attachment; filename={filename}'}
+    )
+
+
 if __name__ == '__main__':
     # Attempt to restore state from backup on startup
     if os.path.exists(tournament.backup_file):

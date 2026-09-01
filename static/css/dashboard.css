@@ -167,7 +167,7 @@
 
         .active-round-controls {
             display: grid;
-            grid-template-columns: auto 1fr repeat(5, auto);
+            grid-template-columns: auto 1fr repeat(6, auto);
             gap: var(--spacing-sm);
             align-items: center;
             background: var(--color-surface);
