@@ -445,20 +445,23 @@ class UnifiedSwissPairing:
                     pair = tuple(sorted([player1_id, player2_id]))
                     self.used_pairings.add(pair)
 
-                    # Add to opponent tracking
-                    self.player_opponents[player1_id].add(player2_id)
-                    self.player_opponents[player2_id].add(player1_id)
+                    # Add to opponent tracking (skip dropped players not in current engine)
+                    if player1_id in self.player_opponents:
+                        self.player_opponents[player1_id].add(player2_id)
+                    if player2_id in self.player_opponents:
+                        self.player_opponents[player2_id].add(player1_id)
 
-            # NEW: Update team matchup tracking for each team in the pod
+            # Update team matchup tracking for each team in the pod
             teams_in_pod = [player['Team Name'] for player in pod]
             for i in range(len(teams_in_pod)):
                 for j in range(i + 1, len(teams_in_pod)):
                     team1 = teams_in_pod[i]
                     team2 = teams_in_pod[j]
 
-                    # Record that these teams have faced each other
-                    self.team_matchups[team1].add(team2)
-                    self.team_matchups[team2].add(team1)
+                    if team1 in self.team_matchups:
+                        self.team_matchups[team1].add(team2)
+                    if team2 in self.team_matchups:
+                        self.team_matchups[team2].add(team1)
     
     def validate_solution(self, solution: List[List[List[Dict]]]) -> ValidationReport:
         """

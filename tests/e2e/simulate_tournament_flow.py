@@ -159,10 +159,10 @@ def run(playwright):
     # 4. Initialize Validator and tracking
     validator = PairingValidator()
     
-    # Tournament configuration (for 16 teams)
-    swiss_rounds_count = 4
-    has_semifinals = True  # 16 teams = True
-    max_rounds = 6  # 4 Swiss + Top8Cut + Finals
+    # Tournament configuration (for 16 teams: 3 Swiss + Finals, no Top 8 Cut)
+    swiss_rounds_count = 3
+    has_semifinals = False  # 8-16 teams = False (no Top 8 Cut)
+    max_rounds = 4  # 3 Swiss + Finals
     
     round_num = 1
     round_results = {}

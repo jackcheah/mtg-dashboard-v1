@@ -44,7 +44,7 @@ class TournamentState(Enum):
     TOURNAMENT_SETUP = "tournament_setup"         # Tournament initialized, Round 1 ready
     SWISS_IN_PROGRESS = "swiss_in_progress"       # Swiss rounds being played
 
-    TOP8_IN_PROGRESS = "top8_in_progress"         # Top 8 Cut in progress (16-team only)
+    TOP8_IN_PROGRESS = "top8_in_progress"         # Top 8 Cut in progress (36-40 teams only)
 
     FINALS_IN_PROGRESS = "finals_in_progress"     # Finals round in progress
     FINALS_COMPLETE = "finals_complete"           # Finals completed, champion determined
@@ -74,7 +74,7 @@ class TournamentManager:
         self.current_round = 1
         self.swiss_rounds_count = 4  # Configurable: 4 or 5 Swiss rounds (default: 4)
         self.swiss_rounds_configured = False  # Track if configuration is set
-        self.max_rounds = 6  # Will be recalculated: Swiss rounds + Semifinals (if 16 teams) + Finals
+        self.max_rounds = 6  # Will be recalculated by determine_tournament_structure()
         self.round_results = {}
         self.tables = {}  # Table assignments for each round
         self.final_round_scores = {}  # Track final round scores separately
@@ -1722,8 +1722,8 @@ class TournamentManager:
             swiss_round_points = self.swiss_round_scores.get(team_name, 0)
             top8_cut_points = self.top8_cut_scores.get(team_name, 0) if has_top8_cut else 0
 
-            # For 16-team: tiebreaker = Swiss + Top 8 Cut
-            # For 8-team: tiebreaker = Swiss only
+            # For 36-40 teams: tiebreaker = Swiss + Top 8 Cut
+            # For 8-32 teams: tiebreaker = Swiss only
             tiebreaker_points = swiss_round_points + top8_cut_points
             total_points = final_round_points + tiebreaker_points
 
@@ -1954,7 +1954,7 @@ class TournamentManager:
         """Update final round scores separately from Swiss round scores"""
         # Only process the actual finals round (last round of the tournament)
         if round_num != self.max_rounds:
-            return  # Only process the finals round (Round 5 for 8-team, Round 6 for 16-team)
+            return  # Only process the finals round (always the last round = max_rounds)
 
         # Initialize final round scores if not exists
         if not hasattr(self, 'final_round_scores') or not self.final_round_scores:
@@ -1989,11 +1989,11 @@ class TournamentManager:
         # Ensure Swiss round scores are preserved
         if not hasattr(self, 'swiss_round_scores') or not self.swiss_round_scores:
             # If swiss_round_scores not set, calculate it
-            # For 16-team: this should never happen as it's saved before Top 8 Cut
-            # For 8-team: calculate from total before finals
+            # For 36-40 teams: this should never happen as it's saved before Top 8 Cut
+            # For 8-32 teams: calculate from total before finals
             self.swiss_round_scores = {}
             for team_name in self.teams.keys():
-                # Total accumulated before finals = Swiss + (Top 8 Cut if 16-team tournament)
+                # Total accumulated before finals = Swiss + (Top 8 Cut if 36-40 team tournament)
                 total_before_finals = self.scores.get(team_name, 0) - self.final_round_scores.get(team_name, 0)
                 self.swiss_round_scores[team_name] = max(0, total_before_finals)
             print(f"[WARNING] Swiss scores not found - calculated from totals: {self.swiss_round_scores}")
@@ -2006,9 +2006,9 @@ class TournamentManager:
     def update_top8_cut_scores(self, round_num, player_results):
         """Update Top 8 Cut round scores separately from Swiss round scores
 
-        For 16-team tournaments:
-        - Top 8 Cut is Round 5 (swiss_rounds_count + 1)
-        - Scores earned in Round 5 are tracked separately
+        For 36-40 team tournaments (has_semifinals=True):
+        - Top 8 Cut is at round swiss_rounds_count + 1
+        - Scores earned in that round are tracked separately
         - Used to determine Finals advancement (with Swiss as tiebreaker)
         """
         # Determine if this is the Top 8 Cut round
@@ -2056,7 +2056,7 @@ class TournamentManager:
         """
         try:
             if after_semifinals:
-                print("[TROPHY] Generating FINALS after semifinals (16-team tournament)")
+                print("[TROPHY] Generating FINALS after Top 8 Cut (36-40 team tournament)")
                 # Use Top 8 Cut scores (primary) with comprehensive tiebreaker
                 # Top 8 Cut scores should be in self.top8_cut_scores
                 # Swiss scores should already be saved from generate_semifinals_round()
@@ -3546,7 +3546,7 @@ def submit_table_results():
                     # This should never happen due to validation above, but kept for safety
                     print(f"  WARNING: Player ID {player_id} not found in player_scores!")
 
-        # Handle Top 8 Cut round scoring separately (for 16-team tournaments)
+        # Handle Top 8 Cut round scoring separately (for 36-40 team tournaments)
         if hasattr(tournament, 'has_semifinals') and tournament.has_semifinals:
             tournament.update_top8_cut_scores(round_num, player_results)
 
@@ -4710,7 +4710,7 @@ def bracket_standings(round_num):
         # Finals round: show ONLY Finals scores
         # Get top 4 teams from previous round, show their Finals scores (or 0 if not yet scored)
         if has_semifinals:
-            # 16-team: Get top 4 from Top 8 Cut
+            # 36-40 teams: Get top 4 from Top 8 Cut
             top8_scores = tournament.top8_cut_scores if hasattr(tournament, 'top8_cut_scores') else {}
             swiss_scores = tournament.swiss_round_scores if hasattr(tournament, 'swiss_round_scores') else {}
 

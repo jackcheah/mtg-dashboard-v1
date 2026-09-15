@@ -358,13 +358,14 @@ class TestFullTournamentFlow16Teams:
         assert sim.tm.state == TournamentState.FINALS_COMPLETE
         assert not sim.tm.has_semifinals  # No Top 8 Cut for ≤16 teams
 
-    def test_16_teams_5_rounds_complete(self):
-        """16 teams, 5 Swiss + Top 8 Cut + Finals."""
+    def test_16_teams_5_rounds_override_complete(self):
+        """16 teams, 5 Swiss (operator override) + Finals. No Top 8 Cut for ≤16 teams."""
         sim = TournamentFlowSimulator(16, swiss_rounds=5, seed=42)
         success = sim.run()
         sim.print_report()
         assert len(sim.errors) == 0, f"Errors: {sim.errors}"
         assert sim.tm.state == TournamentState.FINALS_COMPLETE
+        assert not sim.tm.has_semifinals
 
     def test_16_teams_zero_swiss_repeat_matchups(self):
         """16 teams should have zero player-level repeat matchups in 4 Swiss rounds."""
@@ -420,28 +421,31 @@ class TestFullTournamentFlow24_28_32_36_40Teams:
     """Full tournament flow for 24, 28, 32, 36, 40 teams."""
 
     def test_24_teams_complete(self):
-        """24 teams, 5 Swiss + Top 8 Cut + Finals."""
-        sim = TournamentFlowSimulator(24, swiss_rounds=5, seed=42)
+        """24 teams, 4 Swiss + Finals (no Top 8 Cut for 20-32 teams)."""
+        sim = TournamentFlowSimulator(24, swiss_rounds=4, seed=42)
         success = sim.run()
         sim.print_report()
         assert len(sim.errors) == 0, f"Errors: {sim.errors}"
         assert sim.tm.state == TournamentState.FINALS_COMPLETE
+        assert not sim.tm.has_semifinals
 
     def test_28_teams_complete(self):
-        """28 teams, 5 Swiss + Top 8 Cut + Finals."""
-        sim = TournamentFlowSimulator(28, swiss_rounds=5, seed=42)
+        """28 teams, 4 Swiss + Finals (no Top 8 Cut for 20-32 teams)."""
+        sim = TournamentFlowSimulator(28, swiss_rounds=4, seed=42)
         success = sim.run()
         sim.print_report()
         assert len(sim.errors) == 0, f"Errors: {sim.errors}"
         assert sim.tm.state == TournamentState.FINALS_COMPLETE
+        assert not sim.tm.has_semifinals
 
     def test_32_teams_complete(self):
-        """32 teams, 5 Swiss + Top 8 Cut + Finals."""
-        sim = TournamentFlowSimulator(32, swiss_rounds=5, seed=42)
+        """32 teams, 4 Swiss + Finals (no Top 8 Cut for 20-32 teams)."""
+        sim = TournamentFlowSimulator(32, swiss_rounds=4, seed=42)
         success = sim.run()
         sim.print_report()
         assert len(sim.errors) == 0, f"Errors: {sim.errors}"
         assert sim.tm.state == TournamentState.FINALS_COMPLETE
+        assert not sim.tm.has_semifinals
 
     def test_36_teams_complete(self):
         """36 teams, 5 Swiss + Top 8 Cut + Finals."""

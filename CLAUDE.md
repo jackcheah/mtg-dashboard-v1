@@ -435,7 +435,7 @@ mtg-dashboard-v1/
 1. **Group**: Sort teams by score into brackets of 4 (top 4 → Group 1, next 4 → Group 2, etc.).
 2. **Swap** (Layer 2): If repeats/conflicts exist, swap lowest team with nearest neighbor in adjacent brackets.
 3. **Optimize** (Layer 3): Permutation search to minimize player-level repeats.
-4. **Guarantees**: No teammates in same pod. Zero repeat matchups for 16 teams / 4 rounds.
+4. **Guarantees**: No teammates in same pod. Zero repeat matchups for 16+ teams / 3 Swiss rounds.
 
 **Round 4+ (Anti-Collusion Snake Pairing):**
 

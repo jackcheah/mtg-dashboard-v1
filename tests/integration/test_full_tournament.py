@@ -43,7 +43,7 @@ def submit_table(client, round_num, table_name, players, winner_idx=0):
 
 
 class TestFull8TeamWestern:
-    """Complete 8-team Western scoring tournament: 4 Swiss + Finals."""
+    """Complete 8-team Western scoring tournament: 3 Swiss + Finals."""
 
     def test_full_flow(self, client):
         # Setup
@@ -52,8 +52,9 @@ class TestFull8TeamWestern:
         assert state['success']
         assert len(state['teams']) == 8
 
-        # Swiss Rounds 1-4
-        for round_num in range(1, 5):
+        # Swiss Rounds
+        swiss_count = tournament.swiss_rounds_count
+        for round_num in range(1, swiss_count + 1):
             results = submit_all_tables(client, round_num)
             assert all(r['success'] for r in results)
 
@@ -65,8 +66,8 @@ class TestFull8TeamWestern:
             resp = finalize_round(client)
             assert resp['success']
 
-        # After 4 Swiss rounds, should be in finals
-        assert tournament.state in (TournamentState.FINALS_IN_PROGRESS, TournamentState.SWISS_IN_PROGRESS)
+        # After Swiss rounds, should be in finals
+        assert tournament.state == TournamentState.FINALS_IN_PROGRESS
 
         # Finals round
         finals_round = tournament.current_round
@@ -87,28 +88,25 @@ class TestFull8TeamWestern:
 
 
 class TestFull16TeamWestern:
-    """Complete 16-team Western tournament: 4 Swiss + Top 8 + Finals."""
+    """Complete 16-team Western tournament: 3 Swiss + Finals (no Top 8 Cut)."""
 
     def test_full_flow(self, client):
         setup_via_api(client, event_mode='team', scoring_mode='western', num_teams=16)
         state = get_state(client)
         assert len(state['teams']) == 16
-        assert tournament.has_semifinals is True
+        assert tournament.has_semifinals is False
 
-        # Swiss Rounds 1-4
-        for round_num in range(1, 5):
+        # Swiss Rounds
+        swiss_count = tournament.swiss_rounds_count
+        for round_num in range(1, swiss_count + 1):
             submit_all_tables(client, round_num)
             finalize_round(client)
 
-        # Top 8 Cut round
-        top8_round = tournament.current_round
-        assert tournament.state == TournamentState.TOP8_IN_PROGRESS
-        submit_all_tables(client, top8_round)
-        finalize_round(client)
+        # Should go directly to Finals (no Top 8 Cut for ≤16 teams)
+        assert tournament.state == TournamentState.FINALS_IN_PROGRESS
 
         # Finals round
         finals_round = tournament.current_round
-        assert tournament.state == TournamentState.FINALS_IN_PROGRESS
         submit_all_tables(client, finals_round)
         finalize_round(client)
 
@@ -116,19 +114,21 @@ class TestFull16TeamWestern:
 
 
 class TestFull12TeamWestern:
-    """Complete 12-team Western tournament: 4 Swiss + Finals."""
+    """Complete 12-team Western tournament: 3 Swiss + Finals."""
 
     def test_full_flow(self, client):
         setup_via_api(client, event_mode='team', scoring_mode='western', num_teams=12)
         state = get_state(client)
         assert len(state['teams']) == 12
 
-        # Swiss Rounds 1-4
-        for round_num in range(1, 5):
+        # Swiss Rounds
+        swiss_count = tournament.swiss_rounds_count
+        for round_num in range(1, swiss_count + 1):
             submit_all_tables(client, round_num)
             finalize_round(client)
 
         # Finals
+        assert tournament.state == TournamentState.FINALS_IN_PROGRESS
         finals_round = tournament.current_round
         submit_all_tables(client, finals_round)
         finalize_round(client)
@@ -146,8 +146,9 @@ class TestFull8TeamJapanese:
         for pid, score in tournament.player_scores.items():
             assert score == 1000
 
-        # Swiss Rounds 1-4
-        for round_num in range(1, 5):
+        # Swiss Rounds
+        swiss_count = tournament.swiss_rounds_count
+        for round_num in range(1, swiss_count + 1):
             submit_all_tables(client, round_num)
             finalize_round(client)
 
@@ -157,6 +158,7 @@ class TestFull8TeamJapanese:
         assert min(scores) < 1000
 
         # Finals
+        assert tournament.state == TournamentState.FINALS_IN_PROGRESS
         finals_round = tournament.current_round
         submit_all_tables(client, finals_round)
         finalize_round(client)

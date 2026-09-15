@@ -82,7 +82,7 @@ class TestValidTransitions:
         """After all Swiss rounds complete, transition to FINALS_IN_PROGRESS."""
         setup_via_api(client, event_mode='team', scoring_mode='western', num_teams=8)
 
-        # Play through all 4 Swiss rounds
+        # Play through all Swiss rounds
         for round_num in range(1, tournament.swiss_rounds_count + 1):
             submit_all_tables(client, round_num)
             resp = client.post('/submit_player_results', json={'round': round_num, 'results': []})
