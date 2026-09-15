@@ -349,14 +349,14 @@ class TestFullTournamentFlow12Teams:
 class TestFullTournamentFlow16Teams:
     """Full tournament flow for 16 teams."""
 
-    def test_16_teams_4_rounds_complete(self):
-        """16 teams, 4 Swiss + Top 8 Cut + Finals = complete tournament."""
-        sim = TournamentFlowSimulator(16, swiss_rounds=4, seed=42)
+    def test_16_teams_3_rounds_complete(self):
+        """16 teams, 3 Swiss + Finals = complete tournament (TopDeck aligned)."""
+        sim = TournamentFlowSimulator(16, swiss_rounds=3, seed=42)
         success = sim.run()
         sim.print_report()
         assert len(sim.errors) == 0, f"Errors: {sim.errors}"
         assert sim.tm.state == TournamentState.FINALS_COMPLETE
-        assert sim.tm.has_semifinals  # Should have Top 8 Cut
+        assert not sim.tm.has_semifinals  # No Top 8 Cut for ≤16 teams
 
     def test_16_teams_5_rounds_complete(self):
         """16 teams, 5 Swiss + Top 8 Cut + Finals."""
@@ -390,18 +390,18 @@ class TestFullTournamentFlow16Teams:
 class TestFullTournamentFlow20Teams:
     """Full tournament flow for 20 teams."""
 
-    def test_20_teams_5_rounds_complete(self):
-        """20 teams, 5 Swiss + Top 8 Cut + Finals."""
-        sim = TournamentFlowSimulator(20, swiss_rounds=5, seed=42)
+    def test_20_teams_4_rounds_complete(self):
+        """20 teams, 4 Swiss + Finals (TopDeck aligned, no Top 8 Cut)."""
+        sim = TournamentFlowSimulator(20, swiss_rounds=4, seed=42)
         success = sim.run()
         sim.print_report()
         assert len(sim.errors) == 0, f"Errors: {sim.errors}"
         assert sim.tm.state == TournamentState.FINALS_COMPLETE
-        assert sim.tm.has_semifinals
+        assert not sim.tm.has_semifinals
 
-    def test_20_teams_4_rounds_complete(self):
-        """20 teams, 4 Swiss + Top 8 Cut + Finals."""
-        sim = TournamentFlowSimulator(20, swiss_rounds=4, seed=42)
+    def test_20_teams_5_rounds_override_complete(self):
+        """20 teams, 5 Swiss (operator override) + Finals."""
+        sim = TournamentFlowSimulator(20, swiss_rounds=5, seed=42)
         success = sim.run()
         sim.print_report()
         assert len(sim.errors) == 0, f"Errors: {sim.errors}"
@@ -497,15 +497,16 @@ class TestTeamCountValidation:
             success, msg = tm.setup_tournament(swiss_rounds=4)
             assert not success, f"{n} teams should be rejected"
 
-    def test_20_plus_defaults_to_5_swiss_rounds(self):
-        """20+ teams should default to 5 Swiss rounds."""
-        for n in [20, 24, 28, 32, 36, 40]:
+    def test_default_swiss_rounds_match_topdeck(self):
+        """Default Swiss rounds aligned with TopDeck: 3 for ≤16, 4 for 20-32, 5 for 36-40."""
+        expected = {8: 3, 12: 3, 16: 3, 20: 4, 24: 4, 28: 4, 32: 4, 36: 5, 40: 5}
+        for n, expected_rounds in expected.items():
             tm = TournamentManager()
             tm.event_mode = EventMode.TEAM
             tm.create_sample_data(n)
             tm.setup_tournament()
-            assert tm.swiss_rounds_count == 5, (
-                f"{n} teams should default to 5 Swiss rounds, got {tm.swiss_rounds_count}"
+            assert tm.swiss_rounds_count == expected_rounds, (
+                f"{n} teams should default to {expected_rounds} Swiss rounds, got {tm.swiss_rounds_count}"
             )
 
 
@@ -526,14 +527,14 @@ class TestEdgeCasesAndBugs:
         assert sim.tm.final_round_scores is not None
 
     def test_state_transitions_correct_order(self):
-        """Verify state machine transitions happen in correct order."""
-        sim = TournamentFlowSimulator(16, swiss_rounds=4, seed=42)
+        """Verify state machine transitions happen in correct order (with Top 8 Cut)."""
+        sim = TournamentFlowSimulator(36, swiss_rounds=5, seed=42)
         sim.run()
 
         # After full tournament, state should be FINALS_COMPLETE
         assert sim.tm.state == TournamentState.FINALS_COMPLETE
 
-        # State history should show progression
+        # State history should show progression including Top 8 Cut
         states_seen = [h['to'] for h in sim.tm.state_history]
         assert 'top8_in_progress' in states_seen
         assert 'finals_in_progress' in states_seen

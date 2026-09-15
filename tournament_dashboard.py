@@ -645,17 +645,17 @@ class TournamentManager:
     def determine_tournament_structure(self):
         """Determine tournament structure based on team/player count
 
-        Team mode rules:
-        - 8 teams: Swiss rounds (default 4) -> Finals (top 4)
-        - 12 teams: Swiss rounds (default 4) -> Finals (top 4)
-        - 16 teams: Swiss rounds (default 4) -> Top 8 Cut (8 pods) -> Finals (top 4)
-        - 20-40 teams: Swiss rounds (default 5) -> Top 8 Cut (8 pods) -> Finals (top 4)
+        Team mode rules (aligned with TopDeck.gg recommended structure):
+        - 8-16 teams: Swiss rounds (default 3) -> Finals (top 4)
+        - 20-32 teams: Swiss rounds (default 4) -> Finals (top 4)
+        - 36-40 teams: Swiss rounds (default 5) -> Top 8 Cut (8 pods) -> Finals (top 4)
 
         Individual mode rules:
         - 16 players or fewer: Swiss rounds (default 4) -> Finals (top 4 players, 1 table)
         - 17+ players: Swiss rounds (default 4) -> Top Cut (top 10) -> Finals (top 4 players, 1 table)
 
         Note: Repeat matchups may occur in 8 and 12 team tournaments
+        Anti-collusion snake pairing activates at round 4+ (only relevant for 4+ Swiss rounds)
         """
         if self.event_mode == EventMode.INDIVIDUAL:
             player_count = len(self.participants)
@@ -685,10 +685,10 @@ class TournamentManager:
 
         team_count = len(self.teams)
 
-        if team_count in [8, 12]:
-            # 8 or 12 teams: Swiss rounds -> Direct to Finals (top 4)
+        if team_count >= 8 and team_count <= 16 and team_count % 4 == 0:
+            # 8-16 teams: 3 Swiss rounds -> Direct to Finals (top 4)
             if not self.swiss_rounds_configured:
-                self.swiss_rounds_count = 4  # Default: 4 Swiss rounds
+                self.swiss_rounds_count = 3
             self.has_semifinals = False
             self.max_rounds = self.swiss_rounds_count + 1  # Swiss + Finals
 
@@ -697,13 +697,27 @@ class TournamentManager:
             print(f"  - Top 8 Cut: NO (top 4 teams advance directly to Finals)")
             print(f"  - Finals: YES (top 4 teams, 4 pods)")
             print(f"  - Total rounds: {self.max_rounds}")
-            print(f"  [WARNING]  Note: Some repeat matchups may occur during Swiss rounds")
+            if team_count <= 12:
+                print(f"  [WARNING]  Note: Some repeat matchups may occur during Swiss rounds")
 
-        elif team_count >= 16 and team_count <= 40 and team_count % 4 == 0:
-            # 16-40 teams: Swiss rounds -> Top 8 Cut -> Finals
+        elif team_count >= 20 and team_count <= 32 and team_count % 4 == 0:
+            # 20-32 teams: 4 Swiss rounds -> Direct to Finals (top 4)
             if not self.swiss_rounds_configured:
-                self.swiss_rounds_count = 5 if team_count >= 20 else 4
-            self.has_semifinals = True  # "Top 8 Cut" uses the semifinals logic
+                self.swiss_rounds_count = 4
+            self.has_semifinals = False
+            self.max_rounds = self.swiss_rounds_count + 1  # Swiss + Finals
+
+            print(f"[OK] Tournament structure: {team_count} teams")
+            print(f"  - Swiss rounds: {self.swiss_rounds_count}")
+            print(f"  - Top 8 Cut: NO (top 4 teams advance directly to Finals)")
+            print(f"  - Finals: YES (top 4 teams, 4 pods)")
+            print(f"  - Total rounds: {self.max_rounds}")
+
+        elif team_count >= 36 and team_count <= 40 and team_count % 4 == 0:
+            # 36-40 teams: 5 Swiss rounds -> Top 8 Cut -> Finals
+            if not self.swiss_rounds_configured:
+                self.swiss_rounds_count = 5
+            self.has_semifinals = True
             self.max_rounds = self.swiss_rounds_count + 2  # Swiss + Top8Cut + Finals
 
             print(f"[OK] Tournament structure: {team_count} teams")

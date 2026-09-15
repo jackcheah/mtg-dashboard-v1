@@ -67,13 +67,13 @@ The system supports two event modes, selected before loading participants:
 
 ### Team Mode
 
-Swiss rounds are configurable: 3, 4, or 5 via `setup_tournament(swiss_rounds=N)` or `/set_swiss_rounds`. Default is 4 for 8-16 teams, 5 for 20-40 teams.
+Swiss rounds are configurable: 3, 4, or 5 via `setup_tournament(swiss_rounds=N)` or `/set_swiss_rounds`. Defaults are aligned with TopDeck.gg recommended structure (each team = 1 "player" for TopDeck's table).
 
-| Teams  | Players | Swiss Rounds | Playoffs           | Total Rounds |
-|--------|---------|--------------|--------------------|--------------|
-| 8      | 32      | 3-5          | Finals             | 4-6          |
-| 12     | 48      | 3-5          | Finals             | 4-6          |
-| 16-40  | 64-160  | 3-5          | Top 8 Cut + Finals | 5-7          |
+| Teams  | Players | Swiss Rounds (default) | Playoffs           | Total Rounds |
+|--------|---------|-----------------------|--------------------|--------------|
+| 8-16   | 32-64   | 3                     | Finals (top 4)     | 4            |
+| 20-32  | 80-128  | 4                     | Finals (top 4)     | 5            |
+| 36-40  | 144-160 | 5                     | Top 8 Cut + Finals | 7            |
 
 ### Individual Mode
 
@@ -439,7 +439,7 @@ mtg-dashboard-v1/
 
 **Round 4+ (Anti-Collusion Snake Pairing):**
 
-To prevent top teams from colluding via intentional draws, round 4+ uses snake/interleave grouping that spreads top teams across different pods:
+To prevent top teams from colluding via intentional draws, round 4+ uses snake/interleave grouping that spreads top teams across different pods. This only activates for tournaments with 4+ Swiss rounds (20+ teams by default):
 
 1. **Snake Group**: Teams sorted by score, then assigned in snake order — each pod gets one team from each quartile.
 2. **Swap** (Layer 2): Same repeat-avoidance swaps still apply on top.

@@ -44,19 +44,22 @@ class TestEarlyWinsScore:
 
     def test_reads_from_table_submissions(self):
         tm = make_tournament()
+        # Weight for round 1 = 10^(swiss_rounds-1)
+        expected_weight = 10 ** (tm.swiss_rounds_count - 1)
         tm.round_results = {
             1: {'table_submissions': {'T1': [{'player_id': 1, 'points': 5}, {'player_id': 2, 'points': 1}]}},
         }
         score = tm.calculate_early_wins_score('Team Alpha')
-        assert score == (5 + 1) * 1000
+        assert score == (5 + 1) * expected_weight
 
     def test_reads_from_legacy_players_key(self):
         tm = make_tournament()
+        expected_weight = 10 ** (tm.swiss_rounds_count - 1)
         tm.round_results = {
             1: {'players': {1: 5, 2: 1}},
         }
         score = tm.calculate_early_wins_score('Team Alpha')
-        assert score == (5 + 1) * 1000
+        assert score == (5 + 1) * expected_weight
 
     def test_ignores_non_swiss_rounds(self):
         tm = make_tournament()

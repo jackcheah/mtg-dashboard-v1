@@ -42,7 +42,7 @@ python tournament_dashboard.py
 4. Click "Submit Round Results" to finalize and generate next round
 
 ### Finals
-- **Team mode**: Top 4 teams (or Top 8 Cut + Top 4 for 16-40 teams)
+- **Team mode**: Top 4 teams (or Top 8 Cut + Top 4 for 36-40 teams)
 - **Individual mode (≤16 players)**: Top 4 players advance directly to finals
 - **Individual mode (>16 players)**: Top 10 advance to Top Cut, then Top 4 to finals
 
@@ -52,18 +52,18 @@ python tournament_dashboard.py
 
 ### Team Mode
 
-| Teams  | Players | Swiss Rounds | Playoffs           | Total Rounds |
-|--------|---------|--------------|--------------------|--------------|
-| 8      | 32      | 3-5          | Finals (top 4)     | 4-6          |
-| 12     | 48      | 3-5          | Finals (top 4)     | 4-6          |
-| 16-40  | 64-160  | 3-5          | Top 8 Cut + Finals | 5-7          |
+| Teams  | Players | Swiss Rounds (default) | Playoffs           | Total Rounds |
+|--------|---------|-----------------------|--------------------|--------------|
+| 8-16   | 32-64   | 3                     | Finals (top 4)     | 4            |
+| 20-32  | 80-128  | 4                     | Finals (top 4)     | 5            |
+| 36-40  | 144-160 | 5                     | Top 8 Cut + Finals | 7            |
 
-- Swiss rounds configurable (3, 4, or 5; default 4 for 8-16 teams, 5 for 20-40 teams)
+- Swiss rounds configurable (3, 4, or 5). Defaults aligned with TopDeck.gg recommended structure
 - 4 players per team, team standings
 - Teammates never paired in same pod (hard constraint)
 - **Round 1**: Random team grouping with player-level optimization
 - **Rounds 2-3**: Traditional score-based Swiss (top 4 teams together, etc.)
-- **Anti-collusion pairing** (round 4+): Snake interleave spreads top teams across pods to prevent intentional draws
+- **Anti-collusion pairing** (round 4+): Snake interleave spreads top teams across pods to prevent intentional draws. Only activates for tournaments with 4+ Swiss rounds (20+ teams by default)
 - Tiebreakers: Team score → Best player → Average → Early wins
 
 ### Individual Mode
