@@ -230,3 +230,21 @@ class TestResetTournament:
         # Even if empty, resetting should clear it
         client.post('/reset_tournament', json={'confirm': 'RESET'})
         assert tournament.bye_players == {}
+
+    def test_reset_rejects_lowercase_confirmation(self, client):
+        """Sending 'reset' (lowercase) should be rejected."""
+        setup_via_api(client, event_mode='team', num_teams=8)
+        resp = client.post('/reset_tournament', json={'confirm': 'reset'})
+        assert resp.status_code == 400
+
+    def test_reset_rejects_wrong_confirmation(self, client):
+        """Sending a different confirmation string should be rejected."""
+        setup_via_api(client, event_mode='team', num_teams=8)
+        resp = client.post('/reset_tournament', json={'confirm': 'DELETE'})
+        assert resp.status_code == 400
+
+    def test_reset_rejects_empty_confirmation(self, client):
+        """Sending empty confirmation should be rejected."""
+        setup_via_api(client, event_mode='team', num_teams=8)
+        resp = client.post('/reset_tournament', json={'confirm': ''})
+        assert resp.status_code == 400

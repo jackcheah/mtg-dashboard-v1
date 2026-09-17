@@ -285,8 +285,9 @@
                         const tableName = card.id.replace('table-', '').replace(/-/g, ' ');
 
                         // Check if scores are filled (by checking JS state)
+                        const realPlayerCount = card.querySelectorAll('.table-player:not(.ghost-player-row)').length;
                         const hasScores = tableScores[tableName] &&
-                            Object.keys(tableScores[tableName]).length === card.querySelectorAll('.table-player').length;
+                            Object.keys(tableScores[tableName]).length === realPlayerCount;
 
                         if (hasScores) {
                             filledTables.push(tableName);
@@ -1020,14 +1021,18 @@
                         const card = document.createElement('div');
                         card.className = 'team-card';
 
+                        const hasGhosts = players.some(p => p.is_dropped || (p['Player Name'] || '').includes('(Dropped)'));
+                        const ghostIndicator = hasGhosts ? '<span class="ghost-team-indicator">has dropped player(s)</span>' : '';
+
                         card.innerHTML = `
                         <div class="team-header">
-                            <div class="team-name">${escapeHtml(teamName)}</div>
+                            <div class="team-name">${escapeHtml(teamName)} ${ghostIndicator}</div>
                             <div class="team-score">${teamScore} pts</div>
                         </div>
                         <div class="player-list">
                             ${players.map(player => {
                             const playerId = player['Player ID'] || player.id;
+                            const isGhost = player.is_dropped || (player['Player Name'] || '').includes('(Dropped)');
                             let playerScore = 0;
                             if (playerScores) {
                                 playerScore = playerScores[playerId] || playerScores[String(playerId)] || 0;
@@ -1035,9 +1040,9 @@
                                 playerScore = player.score || 0;
                             }
                             return `
-                                    <div class="player-item">
+                                    <div class="player-item ${isGhost ? 'ghost-player-standing' : ''}">
                                         <div class="player-id">${playerId}</div>
-                                        <div class="player-name">${escapeHtml(player['Player Name'] || player.name)}</div>
+                                        <div class="player-name">${escapeHtml(player['Player Name'] || player.name)}${isGhost ? ' <span class="ghost-badge">DROPPED</span>' : ''}</div>
                                         <div class="player-score">${playerScore} pts</div>
                                     </div>
                                 `;
@@ -1736,8 +1741,8 @@
                         // Update remaining tables widget
                         updateRemainingTablesWidget(data);
 
-                        // Show drop player button when all tables submitted (individual mode only)
-                        if (data.is_complete && currentEventMode === 'individual') {
+                        // Show drop player button when all tables submitted (individual or team mode)
+                        if (data.is_complete) {
                             showDropPlayersButton();
                         } else {
                             hideDropPlayersButton();
@@ -2248,11 +2253,17 @@
                     card.className = 'table-card';
                     card.id = `table-${tableName.replace(/\s+/g, '-')}`;
 
+                    // Detect ghost players at this table
+                    const ghostCount = players.filter(p => p.is_dropped || (p['Player Name'] || '').includes('(Dropped)')).length;
+                    const realPlayerCount = players.length - ghostCount;
+                    const ghostPodBadge = ghostCount > 0 ? `<span class="ghost-pod-badge">${realPlayerCount}-player pod</span>` : '';
+
                     // Create card with inline score buttons
                     card.innerHTML = `
                     <div class="table-header">
                         <i class="fas fa-chair"></i>
                         ${tableName}
+                        ${ghostPodBadge}
                     </div>
                     <div class="table-score-legend">
                         <i class="fas fa-star"></i> ${currentScoringMode === 'japanese' ? '7% Pool | Winner takes all | Losers contribute' : 'Win=5pts | Draw=1pt | Loss=0pts'}
@@ -2260,11 +2271,33 @@
                     <div class="table-players">
                         ${players.map(player => {
                         const playerId = player['Player ID'] || player.id;
+                        const isGhost = player.is_dropped || (player['Player Name'] || '').includes('(Dropped)');
                         // Show cumulative score from previous rounds, or '-' if no score yet
                         const cumulativeScore = window.playerScores?.[playerId] || window.playerScores?.[String(playerId)] || 0;
                         // Show current round score being entered, or cumulative if not entered yet
                         const currentRoundScore = window.currentRoundScores?.[tableName]?.[playerId];
                         const playerScore = currentRoundScore !== undefined ? currentRoundScore : cumulativeScore;
+
+                        if (isGhost) {
+                            return `
+                                <div class="table-player ghost-player-row">
+                                    <div class="table-player-info">
+                                        <i class="fas fa-ghost" style="color: var(--color-text-tertiary);"></i>
+                                        <div class="table-player-details">
+                                            <div class="table-player-name">
+                                                ${escapeHtml(player['Player Name'] || player.name || 'Unknown')}
+                                                <span class="ghost-badge">DROPPED</span>
+                                            </div>
+                                            <div class="table-player-team" ${currentEventMode === 'individual' ? 'style="display:none"' : ''}>
+                                                ${escapeHtml(player['Team Name'] || player.team || 'Unknown Team')}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="table-player-score ghost-auto-score">auto: 0 pts</div>
+                                </div>
+                            `;
+                        }
+
                         return `
                                 <div class="table-player">
                                     <div class="table-player-info">
@@ -2394,12 +2427,10 @@
             }
 
             // ============================================
-            // PLAYER DROP FEATURE (Individual Events Only)
+            // PLAYER DROP FEATURE (Individual & Team Events)
             // ============================================
 
             function showDropPlayersButton() {
-                if (currentEventMode !== 'individual') return;
-
                 // Remove any existing drop button
                 const existing = document.getElementById('drop-players-btn');
                 if (existing) existing.remove();
@@ -2412,7 +2443,7 @@
                 btn.className = 'btn btn-danger';
                 btn.title = 'Drop players from future rounds';
                 btn.innerHTML = '<i class="fas fa-user-minus"></i><span>Drop Player</span>';
-                btn.onclick = showDropPlayerModal;
+                btn.onclick = currentEventMode === 'team' ? showTeamDropPlayerModal : showDropPlayerModal;
                 activeControls.appendChild(btn);
             }
 
@@ -2544,6 +2575,227 @@
                 }
             }
 
+            // ============================================
+            // TEAM PLAYER DROP FEATURE (Ghost Seat)
+            // ============================================
+
+            async function showTeamDropPlayerModal() {
+                const currentRound = document.getElementById('round-select').value;
+                if (!currentRound) {
+                    showToast('Error', 'No round selected', 'error');
+                    return;
+                }
+
+                try {
+                    const res = await fetch('/get_tournament_state');
+                    const data = await res.json();
+
+                    const teams = data.teams || {};
+                    const playerScores = data.player_scores || {};
+                    const droppedTeamPlayers = data.dropped_team_players || {};
+                    const scoringMode = data.scoring_mode || 'western';
+
+                    // Build team options
+                    const teamEntries = Object.entries(teams).map(([teamName, players]) => {
+                        const activeCount = players.filter(p => !p.is_dropped).length;
+                        return { teamName, players, activeCount };
+                    }).sort((a, b) => a.teamName.localeCompare(b.teamName));
+
+                    const teamOptionsHtml = teamEntries.map(t =>
+                        `<option value="${escapeHtml(t.teamName)}">${escapeHtml(t.teamName)} (${t.activeCount} active)</option>`
+                    ).join('');
+
+                    // Build undrop section
+                    const droppedEntries = Object.entries(droppedTeamPlayers);
+                    let undropHtml = '';
+                    if (droppedEntries.length > 0) {
+                        undropHtml = droppedEntries.map(([pid, info]) => {
+                            const currentScore = playerScores[pid] || playerScores[String(pid)] || 0;
+                            return `
+                                <div style="display: flex; align-items: center; padding: 8px 12px; border-bottom: 1px solid var(--color-border-subtle);">
+                                    <div style="flex: 1;">
+                                        <div style="font-weight: 500;">${escapeHtml(info.original_name)}</div>
+                                        <div style="font-size: 0.7rem; color: var(--color-text-tertiary);">${escapeHtml(info.team)} &middot; Dropped R${info.dropped_after_round} &middot; Score: ${currentScore} pts</div>
+                                    </div>
+                                    <button class="btn btn-secondary undrop-team-btn" style="padding: 4px 12px; font-size: 0.75rem;" data-player-id="${pid}" data-player-name="${escapeHtml(info.original_name)}">
+                                        <i class="fas fa-undo"></i> Restore
+                                    </button>
+                                </div>`;
+                        }).join('');
+                    } else {
+                        undropHtml = '<div style="padding: 12px; color: var(--color-text-tertiary); text-align: center; font-size: 0.8rem;">No dropped players</div>';
+                    }
+
+                    const modalHtml = `
+                        <div id="drop-player-overlay" class="scoring-mode-overlay show" style="z-index: 10001;">
+                            <div class="scoring-mode-modal" style="max-width: 550px; max-height: 85vh; overflow-y: auto;">
+                                <h2 class="scoring-mode-title">
+                                    <i class="fas fa-user-minus"></i> Drop / Restore Team Player
+                                </h2>
+                                <p class="scoring-mode-subtitle">Drop a player from a team. They become a ghost — still paired, but auto-lose each round.</p>
+
+                                <div style="margin: 12px 0;">
+                                    <label style="font-weight: 600; font-size: 0.8rem; display: block; margin-bottom: 4px;">Select Team</label>
+                                    <select id="team-drop-select" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                                        <option value="">-- Select a team --</option>
+                                        ${teamOptionsHtml}
+                                    </select>
+                                </div>
+
+                                <div id="team-player-list" style="margin: 12px 0; border-radius: 8px; background: var(--color-surface-hover); overflow: hidden; display: none;">
+                                </div>
+
+                                <div style="margin-top: 16px; border-top: 1px solid var(--color-border);">
+                                    <h3 style="font-size: 0.85rem; font-weight: 600; margin: 12px 0 8px; color: var(--color-text-secondary);">
+                                        <i class="fas fa-undo"></i> Restore Dropped Players
+                                    </h3>
+                                    <div style="border-radius: 8px; background: var(--color-surface-hover); overflow: hidden;">
+                                        ${undropHtml}
+                                    </div>
+                                </div>
+
+                                <div class="scoring-mode-actions" style="margin-top: 16px;">
+                                    <button class="btn btn-secondary" onclick="closeDropPlayerModal()">
+                                        <i class="fas fa-times"></i> Close
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    const existingModal = document.getElementById('drop-player-overlay');
+                    if (existingModal) existingModal.remove();
+                    document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+                    // Team select handler
+                    document.getElementById('team-drop-select').addEventListener('change', function() {
+                        const selectedTeam = this.value;
+                        const playerList = document.getElementById('team-player-list');
+                        if (!selectedTeam) {
+                            playerList.style.display = 'none';
+                            return;
+                        }
+
+                        const teamPlayers = teams[selectedTeam] || [];
+                        const activePlayers = teamPlayers.filter(p => !p.is_dropped);
+
+                        if (activePlayers.length === 0) {
+                            playerList.innerHTML = '<div style="padding: 12px; text-align: center; color: var(--color-text-tertiary);">No active players</div>';
+                            playerList.style.display = 'block';
+                            return;
+                        }
+
+                        playerList.innerHTML = activePlayers.map(p => {
+                            const pid = p['Player ID'];
+                            const score = playerScores[pid] || playerScores[String(pid)] || 0;
+                            const canDrop = activePlayers.length > 2;
+                            return `
+                                <div style="display: flex; align-items: center; padding: 8px 12px; border-bottom: 1px solid var(--color-border-subtle);">
+                                    <span style="flex: 1; font-weight: 500;">${escapeHtml(p['Player Name'])}</span>
+                                    <span style="margin-right: 12px; color: var(--color-text-secondary);">${score} pts</span>
+                                    <button class="btn btn-danger drop-team-player-btn" style="padding: 4px 12px; font-size: 0.75rem;" data-player-id="${pid}" data-player-name="${escapeHtml(p['Player Name'])}" data-team-name="${escapeHtml(selectedTeam)}" ${!canDrop ? 'disabled title="Minimum 2 active players required"' : ''}>
+                                        <i class="fas fa-times"></i> Drop
+                                    </button>
+                                </div>`;
+                        }).join('');
+                        playerList.style.display = 'block';
+
+                        // Attach drop handlers
+                        playerList.querySelectorAll('.drop-team-player-btn').forEach(btn => {
+                            btn.addEventListener('click', function() {
+                                confirmTeamDropPlayer(
+                                    parseInt(this.dataset.playerId),
+                                    this.dataset.playerName,
+                                    this.dataset.teamName,
+                                    scoringMode
+                                );
+                            });
+                        });
+                    });
+
+                    // Attach undrop handlers
+                    document.querySelectorAll('.undrop-team-btn').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            confirmTeamUndropPlayer(parseInt(this.dataset.playerId), this.dataset.playerName);
+                        });
+                    });
+
+                } catch (error) {
+                    console.error('Error showing team drop modal:', error);
+                    showToast('Error', 'Failed to load team data', 'error');
+                }
+            }
+
+            async function confirmTeamDropPlayer(playerId, playerName, teamName, scoringMode) {
+                let warningText = `Drop ${playerName} from ${teamName}?\n\n`;
+                warningText += '• They become a ghost player (still paired, auto-lose each round)\n';
+                warningText += '• Their score will be frozen (Western) or decay 7% per round (Japanese)\n';
+                warningText += '• Opponents at their table play a 3-player pod\n';
+                warningText += '• This can be reversed with "Restore"';
+
+                const confirmed = await modalManager.confirm(
+                    'Drop Team Player',
+                    warningText,
+                    'Drop Player',
+                    'Cancel'
+                );
+                if (!confirmed) return;
+
+                const currentRound = document.getElementById('round-select').value;
+
+                try {
+                    const response = await fetch('/drop_team_player', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ player_id: playerId, round: parseInt(currentRound) })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        showToast('Player Dropped', data.message, 'warning', 4000);
+                        closeDropPlayerModal();
+                        refreshTeamScores();
+                    } else {
+                        showToast('Error', data.message || data.error || 'Failed to drop player', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error dropping team player:', error);
+                    showToast('Error', 'Network error dropping player', 'error');
+                }
+            }
+
+            async function confirmTeamUndropPlayer(playerId, playerName) {
+                const confirmed = await modalManager.confirm(
+                    'Restore Player',
+                    `Restore ${playerName} to active play?\n\nThey will rejoin with their current score (which may have decayed in Japanese mode).`,
+                    'Restore',
+                    'Cancel'
+                );
+                if (!confirmed) return;
+
+                try {
+                    const response = await fetch('/undrop_team_player', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ player_id: playerId })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        showToast('Player Restored', data.message, 'success', 4000);
+                        closeDropPlayerModal();
+                        refreshTeamScores();
+                    } else {
+                        showToast('Error', data.message || data.error || 'Failed to restore player', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error undropping team player:', error);
+                    showToast('Error', 'Network error restoring player', 'error');
+                }
+            }
+
             // Update Stats
             function updateStats(data) {
                 const statsProgressContainer = document.getElementById('stats-progress-container');
@@ -2604,6 +2856,9 @@
                         // Update dropped players cache from server response
                         if (currentEventMode === 'individual') {
                             window._droppedPlayersCache = data.dropped_players || {};
+                        }
+                        if (currentEventMode === 'team') {
+                            window._droppedTeamPlayersCache = data.dropped_team_players || {};
                         }
 
                         // Update team display with fresh scores
@@ -2739,7 +2994,9 @@
                     return;
                 }
 
-                const expectedCount = table.length;
+                // Exclude ghost players from expected count
+                const realPlayers = table.filter(p => !p.is_dropped && !(p['Player Name'] || '').includes('(Dropped)'));
+                const expectedCount = realPlayers.length;
                 const actualCount = Object.keys(tableScores[tableName]).length;
                 if (actualCount < expectedCount) {
                     const missing = expectedCount - actualCount;
@@ -2747,7 +3004,7 @@
                     return;
                 }
 
-                // Build results array
+                // Build results array (real players only — ghosts are auto-scored by backend)
                 const results = [];
                 for (const playerId in tableScores[tableName]) {
                     results.push({

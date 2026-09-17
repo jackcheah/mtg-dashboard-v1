@@ -419,3 +419,40 @@ class TestJapaneseRevertEdit:
             f"Loser should have 930, got {tournament.player_scores[pid0]}"
         assert tournament.player_scores[pid2] == 930
         assert tournament.player_scores[pid3] == 930
+
+
+class TestJapaneseDrawsPointDestruction:
+    """Document that all-draw outcomes in Japanese mode destroy points."""
+
+    def test_japanese_all_draw_reduces_total_points(self, client):
+        """In Japanese mode, an all-draw outcome causes everyone to lose
+        their 7% contribution with no one gaining it. Points are destroyed.
+        This is intentional design behavior, not a bug."""
+        setup_via_api(client, event_mode='team', scoring_mode='japanese', num_teams=8)
+
+        total_before = sum(tournament.player_scores.values())
+        assert total_before == 1000 * len(tournament.player_scores)
+
+        resp = client.get('/get_tables/1')
+        tables = resp.get_json()['tables']
+        table_name = list(tables.keys())[0]
+        players = tables[table_name]
+
+        draw_results = [
+            {'player_id': p['Player ID'], 'points': 1}
+            for p in players
+        ]
+        resp = client.post('/submit_table_results', json={
+            'round': 1, 'table': table_name, 'results': draw_results
+        })
+        assert resp.status_code == 200
+
+        draw_total = sum(
+            tournament.player_scores[p['Player ID']] for p in players
+        )
+        original_total = 1000 * len(players)
+        assert draw_total < original_total, (
+            f"All-draw should destroy points: {draw_total} should be less "
+            f"than {original_total}. Each player loses 7% (70 pts) and nobody "
+            f"gains, so 280 pts are removed from the system."
+        )

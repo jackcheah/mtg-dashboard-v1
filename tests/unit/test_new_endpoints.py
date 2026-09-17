@@ -387,3 +387,66 @@ class TestPreviewFinalize:
         assert 'tables submitted' in data['error']
 
 
+# ==========================================
+# Projector View
+# ==========================================
+
+class TestProjectorView:
+    """Tests for the /projector read-only audience display."""
+
+    def test_projector_returns_200(self, client):
+        """GET /projector should return 200 and render the template."""
+        resp = client.get('/projector')
+        assert resp.status_code == 200
+
+    def test_projector_returns_html(self, client):
+        """Projector view should return HTML content."""
+        resp = client.get('/projector')
+        assert b'<!DOCTYPE html>' in resp.data or b'<html' in resp.data
+
+
+# ==========================================
+# Previously Untested Read Endpoints
+# ==========================================
+
+class TestUncoveredReadEndpoints:
+    """Smoke tests for read endpoints that had zero test coverage."""
+
+    def test_tournament_statistics(self, client):
+        """GET /tournament_statistics returns 200."""
+        setup_via_api(client, event_mode='team', num_teams=8)
+        resp = client.get('/tournament_statistics')
+        assert resp.status_code == 200
+
+    def test_backup_health(self, client):
+        """GET /backup_health returns 200."""
+        resp = client.get('/backup_health')
+        assert resp.status_code == 200
+
+    def test_bracket_groups_no_tables(self, client):
+        """GET /bracket_groups/1 returns gracefully when no tables."""
+        setup_via_api(client, event_mode='team', num_teams=8)
+        resp = client.get('/bracket_groups/1')
+        assert resp.status_code in (200, 400)
+
+    def test_bracket_standings(self, client):
+        """GET /bracket_standings/1 returns after setup."""
+        setup_via_api(client, event_mode='team', num_teams=8)
+        resp = client.get('/bracket_standings/1')
+        assert resp.status_code in (200, 400)
+
+    def test_export_standings_csv(self, client):
+        """GET /export/standings returns CSV."""
+        setup_via_api(client, event_mode='team', num_teams=8)
+        resp = client.get('/export/standings')
+        assert resp.status_code == 200
+        assert 'text/csv' in resp.content_type or 'application/octet-stream' in resp.content_type
+
+    def test_get_score_history(self, client):
+        """GET /get_score_history returns after submission."""
+        setup_via_api(client, event_mode='team', num_teams=8)
+        submit_all_tables(client, 1)
+        resp = client.get('/get_score_history/1/Table 1')
+        assert resp.status_code == 200
+
+

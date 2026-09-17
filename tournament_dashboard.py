@@ -117,6 +117,7 @@ class TournamentManager:
         self.has_top_cut = False  # Individual mode: top cut round for >16 players
         self.top_cut_data = None  # Individual mode: top cut round data
         self.dropped_players = {}  # {player_id: {'name': str, 'score': int, 'dropped_after_round': int}}
+        self.dropped_team_players = {}  # {player_id: {'original_name': str, 'team': str, 'score_at_drop': int, 'dropped_after_round': int}}
 
         # Anti-collusion pairing (snake interleave for late Swiss rounds)
         self.anti_collusion_enabled = True
@@ -195,7 +196,9 @@ class TournamentManager:
                 "bye_players": self.bye_players,
                 "top_cut_data": getattr(self, 'top_cut_data', None),
                 "dropped_players": self.dropped_players,
-                "_player_scores_at_finals_start": getattr(self, '_player_scores_at_finals_start', {})
+                "dropped_team_players": self.dropped_team_players,
+                "_player_scores_at_finals_start": getattr(self, '_player_scores_at_finals_start', {}),
+                "_next_player_id": self._next_player_id
             }
         }
 
@@ -394,9 +397,15 @@ class TournamentManager:
             raw_dropped = data.get('dropped_players', {})
             self.dropped_players = {int(k) if str(k).isdigit() else k: v for k, v in raw_dropped.items()}
 
+            raw_dropped_team = data.get('dropped_team_players', {})
+            self.dropped_team_players = {int(k) if str(k).isdigit() else k: v for k, v in raw_dropped_team.items()}
+
             # Restore Japanese finals snapshot
             raw_finals_start = data.get('_player_scores_at_finals_start', {})
             self._player_scores_at_finals_start = {int(k) if str(k).isdigit() else k: v for k, v in raw_finals_start.items()}
+
+            # Restore player ID counter
+            self._next_player_id = data.get('_next_player_id', 10000)
 
             # === CRITICAL: REHYDRATE PAIRING ENGINE ===
             # We must recreate the UnifiedSwissPairing instance and replay the history
@@ -407,6 +416,7 @@ class TournamentManager:
                 from unified_swiss_pairing import UnifiedSwissPairing
 
                 # Initialize fresh engine
+                ghost_ids = set(self.dropped_team_players.keys()) if self.event_mode == EventMode.TEAM else set()
                 self._unified_pairing = UnifiedSwissPairing(
                     self.teams,
                     self.tournament_teams,
@@ -414,9 +424,10 @@ class TournamentManager:
                     self.scores,
                     is_individual_mode=(self.event_mode == EventMode.INDIVIDUAL),
                     anti_collusion_enabled=self.anti_collusion_enabled,
-                    anti_collusion_start_round=self.anti_collusion_start_round
+                    anti_collusion_start_round=self.anti_collusion_start_round,
+                    ghost_player_ids=ghost_ids
                 )
-                
+
                 # Replay history
                 if self._tournament_rounds:
                     print(f"[BACKUP] Replaying {len(self._tournament_rounds)} rounds of history...")
@@ -469,6 +480,13 @@ class TournamentManager:
         self.has_top_cut = False
         self.top_cut_data = None
         self.dropped_players = {}
+        self.dropped_team_players = {}
+        self.state_history = []
+        self._player_scores_at_finals_start = {}
+        self.anti_collusion_enabled = True
+        self.anti_collusion_start_round = 4
+        self._next_player_id = 10000
+        self.semifinals = {}
         self.transition_to(TournamentState.INITIAL, "Tournament reset by operator")
         print("[RESET] Tournament state fully reset to INITIAL")
 
@@ -641,6 +659,119 @@ class TournamentManager:
         print(f"[DROP] Active players remaining: {len(self.participants)}")
 
         return True, f"{player_name} has been dropped from the tournament"
+
+    def drop_team_player(self, player_id: int, round_num: int) -> tuple:
+        """
+        Drop an individual player from a team in a team event. The player
+        becomes a ghost placeholder that remains in the roster for pairing
+        but auto-loses every round.
+        """
+        if self.event_mode != EventMode.TEAM:
+            return False, "Team player drop is only available for team events"
+
+        if self.state not in [TournamentState.SWISS_IN_PROGRESS, TournamentState.TOURNAMENT_SETUP,
+                              TournamentState.TOP8_IN_PROGRESS, TournamentState.FINALS_IN_PROGRESS]:
+            return False, "Cannot drop players outside of active rounds"
+
+        round_data = self.round_results.get(round_num, {})
+        submitted_tables = round_data.get('submitted_tables', set())
+        total_tables = len(self.tables.get(round_num, {}))
+        if total_tables == 0:
+            return False, "Cannot drop players before tables are generated for this round"
+        if len(submitted_tables) < total_tables:
+            return False, "All tables must be submitted before dropping players"
+
+        if round_num in self.finalized_rounds:
+            return False, "Cannot drop players after round has been finalized"
+
+        if player_id in self.dropped_team_players:
+            return False, "Player has already been dropped"
+
+        if player_id not in self.player_scores:
+            return False, "Player not found in tournament"
+
+        player_entry = None
+        team_name = None
+        for tname, players in self.teams.items():
+            for p in players:
+                if p.get('Player ID') == player_id:
+                    player_entry = p
+                    team_name = tname
+                    break
+            if player_entry:
+                break
+
+        if player_entry is None:
+            return False, "Player not found in any team"
+
+        if player_entry.get('is_dropped'):
+            return False, "Player has already been dropped"
+
+        active_count = sum(1 for p in self.teams[team_name] if not p.get('is_dropped'))
+        if active_count <= 2:
+            return False, f"Cannot drop player: {team_name} has only {active_count} active players. Minimum 2 required — withdraw the entire team instead."
+
+        original_name = player_entry['Player Name']
+        self.dropped_team_players[player_id] = {
+            'original_name': original_name,
+            'team': team_name,
+            'score_at_drop': self.player_scores[player_id],
+            'dropped_after_round': round_num
+        }
+
+        player_entry['Player Name'] = f"{original_name} (Dropped)"
+        player_entry['is_dropped'] = True
+
+        for p in self.participants:
+            if p.get('Player ID') == player_id:
+                p['Player Name'] = f"{original_name} (Dropped)"
+                p['is_dropped'] = True
+                break
+
+        self.bump_version()
+
+        print(f"[DROP-TEAM] {original_name} (ID: {player_id}) dropped from {team_name} after round {round_num}")
+        active_remaining = sum(1 for p in self.teams[team_name] if not p.get('is_dropped'))
+        print(f"[DROP-TEAM] {team_name} now has {active_remaining} active players")
+
+        return True, f"{original_name} has been dropped from {team_name}. The team will continue with {active_remaining} active players."
+
+    def undrop_team_player(self, player_id: int) -> tuple:
+        """Restore a previously dropped team player back to active status."""
+        if self.event_mode != EventMode.TEAM:
+            return False, "Team player undrop is only available for team events"
+
+        if self.state not in [TournamentState.SWISS_IN_PROGRESS, TournamentState.TOURNAMENT_SETUP,
+                              TournamentState.TOP8_IN_PROGRESS, TournamentState.FINALS_IN_PROGRESS]:
+            return False, "Cannot undrop players outside of active rounds"
+
+        if player_id not in self.dropped_team_players:
+            return False, "Player is not in the dropped list"
+
+        drop_info = self.dropped_team_players[player_id]
+        original_name = drop_info['original_name']
+        team_name = drop_info['team']
+
+        for p in self.teams.get(team_name, []):
+            if p.get('Player ID') == player_id:
+                p['Player Name'] = original_name
+                p.pop('is_dropped', None)
+                break
+
+        for p in self.participants:
+            if p.get('Player ID') == player_id:
+                p['Player Name'] = original_name
+                p.pop('is_dropped', None)
+                break
+
+        current_score = self.player_scores.get(player_id, drop_info['score_at_drop'])
+        del self.dropped_team_players[player_id]
+
+        self.bump_version()
+
+        print(f"[UNDROP-TEAM] {original_name} (ID: {player_id}) restored to {team_name} with score {current_score}")
+
+        return True, f"{original_name} has been restored to {team_name} with score {current_score}."
 
     def determine_tournament_structure(self):
         """Determine tournament structure based on team/player count
@@ -1290,12 +1421,14 @@ class TournamentManager:
             # Initialize or get the pairing system
             if not hasattr(self, '_unified_pairing') or self._unified_pairing is None:
                 # Create new pairing system (first round or after player drop)
+                ghost_ids = set(self.dropped_team_players.keys()) if self.event_mode == EventMode.TEAM else set()
                 self._unified_pairing = UnifiedSwissPairing(
                     self.teams, self.tournament_teams,
                     self.swiss_rounds_count, self.scores,
                     is_individual_mode=is_individual,
                     anti_collusion_enabled=self.anti_collusion_enabled,
-                    anti_collusion_start_round=self.anti_collusion_start_round
+                    anti_collusion_start_round=self.anti_collusion_start_round,
+                    ghost_player_ids=ghost_ids
                 )
                 # Replay existing history to preserve repeat-avoidance after drop
                 if hasattr(self, '_tournament_rounds') and self._tournament_rounds:
@@ -3020,6 +3153,81 @@ def drop_player_endpoint():
         traceback.print_exc()
         return jsonify({'success': False, 'message': str(e)}), 500
 
+@app.route('/drop_team_player', methods=['POST'])
+@with_lock
+@require_pin
+def drop_team_player_endpoint():
+    """Drop an individual player from a team event (ghost seat)."""
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'success': False, 'error': 'No data provided'}), 400
+
+        player_id = data.get('player_id')
+        round_num = data.get('round')
+
+        if player_id is None or round_num is None:
+            return jsonify({'success': False, 'error': 'player_id and round are required'}), 400
+
+        player_id = int(player_id)
+        round_num = int(round_num)
+
+        success, message = tournament.drop_team_player(player_id, round_num)
+
+        tournament.save_backup()
+
+        active_count = 0
+        team_name = None
+        if success:
+            drop_info = tournament.dropped_team_players.get(player_id, {})
+            team_name = drop_info.get('team')
+            if team_name and team_name in tournament.teams:
+                active_count = sum(1 for p in tournament.teams[team_name] if not p.get('is_dropped'))
+
+        return jsonify({
+            'success': success,
+            'message': message,
+            'dropped_team_players': {str(k): v for k, v in tournament.dropped_team_players.items()},
+            'team': team_name,
+            'active_players_in_team': active_count
+        })
+
+    except Exception as e:
+        print(f"Error in drop_team_player: {e}")
+        traceback.print_exc()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/undrop_team_player', methods=['POST'])
+@with_lock
+@require_pin
+def undrop_team_player_endpoint():
+    """Restore a previously dropped team player."""
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'success': False, 'error': 'No data provided'}), 400
+
+        player_id = data.get('player_id')
+        if player_id is None:
+            return jsonify({'success': False, 'error': 'player_id is required'}), 400
+
+        player_id = int(player_id)
+
+        success, message = tournament.undrop_team_player(player_id)
+
+        tournament.save_backup()
+
+        return jsonify({
+            'success': success,
+            'message': message,
+            'dropped_team_players': {str(k): v for k, v in tournament.dropped_team_players.items()}
+        })
+
+    except Exception as e:
+        print(f"Error in undrop_team_player: {e}")
+        traceback.print_exc()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 @app.route('/setup_tournament', methods=['POST'])
 @with_lock
 @require_state(TournamentState.PARTICIPANTS_LOADED, TournamentState.TOURNAMENT_SETUP)
@@ -3411,11 +3619,23 @@ def submit_table_results():
         if len(player_results) == 0:
             return jsonify({'success': False, 'error': 'No player results provided'}), 400
 
-        expected_player_count = len(tournament.tables.get(round_num, {}).get(table_name, []))
-        if expected_player_count > 0 and len(player_results) != expected_player_count:
-            return jsonify({'success': False, 'error': f'Expected {expected_player_count} player results for {table_name}, got {len(player_results)}'}), 400
+        # Detect ghost (dropped team) players at this table
+        table_players_all = tournament.tables.get(round_num, {}).get(table_name, [])
+        ghost_ids_at_table = {p['Player ID'] for p in table_players_all if p.get('is_dropped')}
+        real_player_count = len(table_players_all) - len(ghost_ids_at_table)
+
+        # Reject submissions that include ghost player IDs
+        submitted_ids = {r.get('player_id') for r in player_results if isinstance(r, dict)}
+        ghost_in_submission = submitted_ids & ghost_ids_at_table
+        if ghost_in_submission:
+            return jsonify({'success': False, 'error': f'Cannot submit scores for dropped (ghost) players: {ghost_in_submission}. Submit only active player scores.'}), 400
+
+        # Expected count is real players only (ghosts are auto-scored)
+        if real_player_count > 0 and len(player_results) != real_player_count:
+            return jsonify({'success': False, 'error': f'Expected {real_player_count} player results for {table_name} ({len(ghost_ids_at_table)} ghost player(s) auto-scored), got {len(player_results)}'}), 400
 
         # Validate each player result
+        assigned_real_ids = {p['Player ID'] for p in table_players_all if not p.get('is_dropped')}
         for idx, result in enumerate(player_results):
             # Check result is a dict
             if not isinstance(result, dict):
@@ -3436,10 +3656,9 @@ def submit_table_results():
             if player_id in tournament.dropped_players:
                 return jsonify({'success': False, 'error': f'Result {idx}: Player {player_id} has been dropped from the tournament.'}), 400
 
-            # Validate player is assigned to this table
-            assigned_ids = {p['Player ID'] for p in tournament.tables[round_num][table_name]}
-            if player_id not in assigned_ids:
-                return jsonify({'success': False, 'error': f'Result {idx}: Player {player_id} is not assigned to {table_name} in round {round_num}.'}), 400
+            # Validate player is assigned to this table (as a real, non-ghost player)
+            if player_id not in assigned_real_ids:
+                return jsonify({'success': False, 'error': f'Result {idx}: Player {player_id} is not an active player assigned to {table_name} in round {round_num}.'}), 400
 
             # Validate points (must be 0, 1, or 5)
             points = result['points']
@@ -3448,7 +3667,7 @@ def submit_table_results():
             if points not in [0, 1, 5]:
                 return jsonify({'success': False, 'error': f'Result {idx}: Invalid points value {points}. Must be 0 (Loss), 1 (Draw), or 5 (Win)'}), 400
 
-        # Validate score combination based on pod size
+        # Validate score combination based on real player count (ghost players excluded)
         pod_size = len(player_results)
         win_count = sum(1 for r in player_results if r['points'] == 5)
         draw_count = sum(1 for r in player_results if r['points'] == 1)
@@ -3459,7 +3678,15 @@ def submit_table_results():
         if win_count == 1 and draw_count > 0:
             return jsonify({'success': False, 'error': f'Invalid scores at {table_name}: a win (5pts) means all others must be losses (0pts), not draws.'}), 400
 
-        if pod_size == 3:
+        if pod_size == 2:
+            # 2-player pod (2 ghosts at table): valid combos are (5,0) or (1,1)
+            valid_2p = (
+                (win_count == 1 and loss_count == 1 and draw_count == 0) or
+                (win_count == 0 and draw_count == 2 and loss_count == 0)
+            )
+            if not valid_2p:
+                return jsonify({'success': False, 'error': f'Invalid scores at {table_name}: For a 2-player pod, valid outcomes are (1 win + 1 loss) or (2 draws).'}), 400
+        elif pod_size == 3:
             # 3-player pod: valid combos are (5,0,0), (1,1,1), (1,1,0)
             valid_3p = (
                 (win_count == 1 and loss_count == 2 and draw_count == 0) or
@@ -3502,18 +3729,25 @@ def submit_table_results():
                 'already_submitted': True
             }), 400
 
-        # Store table-specific results
-        tournament.round_results[round_num]['table_submissions'][table_name] = player_results
+        # Auto-inject ghost results (0 points / auto-loss) into the results list
+        all_results = list(player_results)
+        for ghost_id in ghost_ids_at_table:
+            all_results.append({'player_id': ghost_id, 'points': 0, 'is_ghost': True})
+            print(f"  [GHOST] Auto-injected loss for ghost player {ghost_id}")
+
+        # Store table-specific results (including ghost auto-results)
+        tournament.round_results[round_num]['table_submissions'][table_name] = all_results
 
         # Update individual player scores based on scoring mode
         if tournament.scoring_mode == ScoringMode.JAPANESE:
             # Japanese Swiss Point Mode: 7% pool contribution, winner takes all
+            # Ghost players contribute 7% and lose it (auto-loss)
             table_players = tournament.tables[round_num][table_name]
-            
-            # Determine winner from results (exactly 1 win = winner, else draw)
+
+            # Determine winner from real player results only
             winner_id = tournament.get_table_winner_id(player_results)
-            
-            # Calculate Japanese scoring
+
+            # Calculate Japanese scoring (includes all players — ghosts contribute to pool)
             score_changes = tournament.calculate_japanese_table_scores(table_players, winner_id)
 
             # Store Japanese deltas for accurate revert/edit
@@ -3527,23 +3761,23 @@ def submit_table_results():
                     old_score = tournament.player_scores[player_id]
                     tournament.player_scores[player_id] += change
                     new_score = tournament.player_scores[player_id]
-                    print(f"  [JAPANESE] Player {player_id}: {old_score} -> {new_score} ({'+' if change >= 0 else ''}{change})")
+                    ghost_tag = " [GHOST]" if player_id in ghost_ids_at_table else ""
+                    print(f"  [JAPANESE]{ghost_tag} Player {player_id}: {old_score} -> {new_score} ({'+' if change >= 0 else ''}{change})")
         else:
             # Western Mode: Traditional 5/1/0 point system
-            for result in player_results:
+            for result in all_results:
                 player_id = result['player_id']
                 points = result['points']
 
-                print(f"  Processing player_id={player_id}, points={points}")
+                ghost_tag = " [GHOST]" if player_id in ghost_ids_at_table else ""
+                print(f"  Processing{ghost_tag} player_id={player_id}, points={points}")
 
                 if player_id in tournament.player_scores:
-                    # Add points to player's total
                     old_score = tournament.player_scores[player_id]
                     tournament.player_scores[player_id] += points
                     new_score = tournament.player_scores[player_id]
                     print(f"  Updated player {player_id}: {old_score} -> {new_score}")
                 else:
-                    # This should never happen due to validation above, but kept for safety
                     print(f"  WARNING: Player ID {player_id} not found in player_scores!")
 
         # Handle Top 8 Cut round scoring separately (for 36-40 team tournaments)
@@ -3844,11 +4078,22 @@ def edit_table_results():
                 'suggestion': 'Results must be an array of player scores.'
             }), 400
 
-        if len(new_results) not in (3, 4):
+        table_players_all = tournament.tables.get(round_num, {}).get(table_name, [])
+        ghost_ids_at_table = {p['Player ID'] for p in table_players_all if p.get('is_dropped')}
+        real_player_count = len(table_players_all) - len(ghost_ids_at_table)
+
+        if real_player_count > 0 and len(new_results) != real_player_count:
             return jsonify({
                 'success': False,
-                'error': f'Expected 3 or 4 player results, got {len(new_results)}',
-                'user_message': 'Each table must have 3 or 4 player scores.',
+                'error': f'Expected {real_player_count} player results, got {len(new_results)}',
+                'user_message': f'This table has {real_player_count} active players. Please provide scores for all of them.',
+                'suggestion': 'Provide scores for all non-dropped players at the table.'
+            }), 400
+        elif real_player_count == 0 and len(new_results) not in (2, 3, 4):
+            return jsonify({
+                'success': False,
+                'error': f'Expected 2-4 player results, got {len(new_results)}',
+                'user_message': 'Each table must have 2-4 player scores.',
                 'suggestion': 'Please provide scores for all players at the table.'
             }), 400
 
@@ -3904,7 +4149,7 @@ def edit_table_results():
                     'suggestion': 'Use W=5, D=1, L=0 for scoring.'
                 }), 400
 
-        # 8. Validate score combination based on pod size
+        # 8. Validate score combination based on pod size (real players only)
         pod_size = len(new_results)
         win_count = sum(1 for r in new_results if r['points'] == 5)
         draw_count = sum(1 for r in new_results if r['points'] == 1)
@@ -3915,7 +4160,14 @@ def edit_table_results():
         if win_count == 1 and draw_count > 0:
             return jsonify({'success': False, 'error': 'A win means all others must be losses, not draws.', 'user_message': 'If there is a winner, all others must be losses.'}), 400
 
-        if pod_size == 3:
+        if pod_size == 2:
+            valid_2p = (
+                (win_count == 1 and loss_count == 1 and draw_count == 0) or
+                (win_count == 0 and draw_count == 2 and loss_count == 0)
+            )
+            if not valid_2p:
+                return jsonify({'success': False, 'error': 'Invalid 2-player pod scores. Valid: (1W+1L) or (2D).', 'user_message': 'Invalid score combination for 2-player pod.'}), 400
+        elif pod_size == 3:
             valid_3p = (
                 (win_count == 1 and loss_count == 2 and draw_count == 0) or
                 (win_count == 0 and draw_count == 3 and loss_count == 0) or
@@ -3981,6 +4233,11 @@ def edit_table_results():
                         tournament.player_scores[player_id] -= points
                         print(f"  [EDIT] Subtracting old score: Player {player_id} -= {points}")
 
+            # Auto-inject ghost results (0 points) to match submit_table_results behavior
+            all_new_results = list(new_results)
+            for ghost_id in ghost_ids_at_table:
+                all_new_results.append({'player_id': ghost_id, 'points': 0, 'is_ghost': True})
+
             # Add new scores to player totals
             if tournament.scoring_mode == ScoringMode.JAPANESE:
                 table_players = tournament.tables[round_num][table_name]
@@ -3994,15 +4251,15 @@ def edit_table_results():
                     tournament.round_results[round_num]['japanese_deltas'] = {}
                 tournament.round_results[round_num]['japanese_deltas'][table_name] = new_deltas
             else:
-                for result in new_results:
+                for result in all_new_results:
                     player_id = result['player_id']
                     points = result['points']
                     if player_id in tournament.player_scores:
                         tournament.player_scores[player_id] += points
                         print(f"  [EDIT] Adding new score: Player {player_id} += {points}")
 
-            # Update stored results
-            tournament.round_results[round_num]['table_submissions'][table_name] = new_results
+            # Update stored results (includes ghost entries)
+            tournament.round_results[round_num]['table_submissions'][table_name] = all_new_results
 
             # Recalculate team scores
             tournament.calculate_team_scores()
@@ -4155,7 +4412,8 @@ def get_tournament_state():
         'is_individual_mode': tournament.event_mode == EventMode.INDIVIDUAL,
         'has_top_cut': getattr(tournament, 'has_top_cut', False),
         'bye_players': tournament.bye_players,
-        'dropped_players': tournament.dropped_players
+        'dropped_players': tournament.dropped_players,
+        'dropped_team_players': {str(k): v for k, v in tournament.dropped_team_players.items()}
     }
 
     # Add legacy group support for backward compatibility (all teams in single group)
@@ -4369,6 +4627,7 @@ def get_semifinals():
         })
 
 @app.route('/get_final_standings')
+@with_lock
 def get_final_standings():
     """Get final round standings with Swiss round tiebreaker info"""
     standings = tournament.calculate_final_round_standings()
@@ -4532,6 +4791,7 @@ def get_player_scores():
     })
 
 @app.route('/standings')
+@with_lock
 def standings():
     """Get current standings (sorted by score)"""
     # Get Swiss round scores for reference (if available)
@@ -4766,6 +5026,7 @@ def bracket_standings(round_num):
     })
 
 @app.route('/final_standings')
+@with_lock
 def final_standings():
     """Get final standings after tournament completion"""
     # Check if tournament is complete

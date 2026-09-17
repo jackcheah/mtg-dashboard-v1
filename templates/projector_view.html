@@ -906,21 +906,28 @@
                 const players = tables[tableName];
                 let playersHtml = '';
 
+                let ghostCount = 0;
                 players.forEach(p => {
                     const pName = escapeHtml(p['Player Name'] || p.name || 'Unknown');
                     const pTeam = escapeHtml(p['Team Name'] || p.team || '');
+                    const isGhost = p.is_dropped || pName.includes('(Dropped)');
+
+                    if (isGhost) ghostCount++;
 
                     playersHtml += `
-                        <div class="player-row">
+                        <div class="player-row" ${isGhost ? 'style="opacity: 0.4; font-style: italic;"' : ''}>
                             <span class="player-name">${pName}</span>
                             <span class="player-team">${pTeam}</span>
                         </div>
                     `;
                 });
 
+                const realCount = players.length - ghostCount;
+                const podBadge = ghostCount > 0 ? ` <span style="font-size:0.6em;background:#f59e0b;color:#000;padding:1px 6px;border-radius:6px;margin-left:6px;">${realCount}-player pod</span>` : '';
+
                 allCardsHtml += `
                     <div class="table-card">
-                        <div class="table-header">${escapeHtml(tableName)}</div>
+                        <div class="table-header">${escapeHtml(tableName)}${podBadge}</div>
                         ${playersHtml}
                     </div>
                 `;

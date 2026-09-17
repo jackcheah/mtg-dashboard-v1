@@ -378,3 +378,75 @@ class TestBackupRestoreMidTournament:
         assert tournament.current_round >= 3
         assert 1 in tournament.finalized_rounds
         assert 2 in tournament.finalized_rounds
+
+
+class TestFull36TeamWestern:
+    """Complete 36-team Western tournament: 5 Swiss + Top 8 Cut + Finals."""
+
+    def test_full_flow(self, client):
+        setup_via_api(client, event_mode='team', scoring_mode='western', num_teams=36)
+        state = get_state(client)
+        assert len(state['teams']) == 36
+        assert tournament.has_semifinals is True
+        assert tournament.swiss_rounds_count == 5
+
+        # 5 Swiss rounds
+        for round_num in range(1, 6):
+            submit_all_tables(client, round_num)
+            resp = finalize_round(client)
+            assert resp['success'], f"Finalize round {round_num} failed: {resp}"
+
+        # Top 8 Cut round
+        assert tournament.state == TournamentState.TOP8_IN_PROGRESS
+        top8_round = tournament.current_round
+        submit_all_tables(client, top8_round)
+        resp = finalize_round(client)
+        assert resp['success'], f"Finalize Top 8 Cut failed: {resp}"
+
+        # Finals round
+        assert tournament.state == TournamentState.FINALS_IN_PROGRESS
+        finals_round = tournament.current_round
+        submit_all_tables(client, finals_round)
+        resp = finalize_round(client)
+        assert resp['success'], f"Finalize Finals failed: {resp}"
+
+        assert tournament.state == TournamentState.FINALS_COMPLETE
+
+        # Verify final standings exist
+        resp = client.get('/final_standings')
+        data = resp.get_json()
+        assert data['success']
+
+
+class TestFull16TeamJapanese:
+    """Complete 16-team Japanese scoring tournament through full lifecycle."""
+
+    def test_full_flow(self, client):
+        setup_via_api(client, event_mode='team', scoring_mode='japanese', num_teams=16)
+        state = get_state(client)
+        assert len(state['teams']) == 16
+
+        # Verify starting scores are 1000
+        for pid, score in tournament.player_scores.items():
+            assert score == 1000, f"Player {pid} should start at 1000, got {score}"
+
+        # Swiss Rounds
+        swiss_count = tournament.swiss_rounds_count
+        for round_num in range(1, swiss_count + 1):
+            submit_all_tables(client, round_num)
+            resp = finalize_round(client)
+            assert resp['success'], f"Finalize round {round_num} failed: {resp}"
+
+        # Scores should have diverged from 1000
+        scores = list(tournament.player_scores.values())
+        assert max(scores) > 1000, "Some players should have gained points"
+        assert min(scores) < 1000, "Some players should have lost points"
+
+        # Finals
+        assert tournament.state == TournamentState.FINALS_IN_PROGRESS
+        finals_round = tournament.current_round
+        submit_all_tables(client, finals_round)
+        resp = finalize_round(client)
+        assert resp['success']
+
+        assert tournament.state == TournamentState.FINALS_COMPLETE

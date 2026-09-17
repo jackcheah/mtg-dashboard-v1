@@ -57,15 +57,24 @@ def validate_round_for_topdeck(tables, round_num, finalized_rounds, event_mode,
     seen_player_ids = {}
     seen_player_names = {}
 
+    ghost_tables = []
+
     for table_name, players in tables.items():
         tnum = extract_table_number(table_name)
         table_numbers.append(tnum)
+
+        ghost_count = sum(1 for p in players if p.get('is_dropped'))
+        real_count = len(players) - ghost_count
+        if ghost_count > 0:
+            ghost_tables.append((table_name, ghost_count, real_count))
 
         if event_mode == 'team' and len(players) != 4:
             errors.append(f"{table_name}: team-mode pod contains {len(players)} players (expected 4).")
 
         team_names_in_pod = []
         for p in players:
+            if p.get('is_dropped'):
+                continue
             player_count += 1
             pid = p.get('Player ID')
             pname = (p.get('Player Name') or '').strip()
@@ -121,8 +130,16 @@ def validate_round_for_topdeck(tables, round_num, finalized_rounds, event_mode,
             "has not been verified against TopDeck's live importer. Test in an unpublished event first."
         )
 
-    return _build_result(errors, warnings, round_num, len(tables), player_count,
-                         0, duplicate_name_count, team_conflict_count)
+    if ghost_tables:
+        for tname, gcount, rcount in ghost_tables:
+            warnings.append(
+                f"{tname} has {gcount} dropped player(s) — exported as {rcount}-player pod."
+            )
+
+    players_omitted = sum(gc for _, gc, _ in ghost_tables)
+    return _build_result(errors, warnings, round_num, len(tables),
+                         player_count,
+                         players_omitted, duplicate_name_count, team_conflict_count)
 
 
 def _build_result(errors, warnings, round_num, table_count, player_count,
@@ -162,7 +179,8 @@ def build_pairings_csv(tables, event_mode):
 
     for seq_num, (table_name, players) in enumerate(sorted_tables, 1):
         row = {"table": seq_num}
-        for i, player in enumerate(players):
+        real_players = [p for p in players if not p.get('is_dropped')]
+        for i, player in enumerate(real_players):
             row[f"player {i + 1}"] = (player.get("Player Name") or "").strip()
         writer.writerow(row)
 
