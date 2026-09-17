@@ -53,7 +53,7 @@ class UnifiedSwissPairing:
     to provide a robust solution that works for any valid tournament configuration.
     """
     
-    def __init__(self, teams: Dict[str, List[Dict]], tournament_teams: List[str], swiss_rounds_count: int = 4, team_scores: Dict[str, int] = None, use_traditional_swiss: bool = True, max_player_optimization_iterations: int = None, is_individual_mode: bool = False, anti_collusion_enabled: bool = True, anti_collusion_start_round: int = 4, ghost_player_ids: Set[int] = None):
+    def __init__(self, teams: Dict[str, List[Dict]], tournament_teams: List[str], swiss_rounds_count: int = 4, team_scores: Dict[str, int] = None, use_traditional_swiss: bool = True, max_player_optimization_iterations: int = None, is_individual_mode: bool = False, anti_collusion_enabled: bool = True, anti_collusion_start_round: int = 4):
         """
         Initialize the unified Swiss pairing system.
 
@@ -77,7 +77,6 @@ class UnifiedSwissPairing:
         self.team_scores = team_scores or {}
         self.start_time = time.time()
         self.is_individual_mode = is_individual_mode
-        self.ghost_player_ids = ghost_player_ids or set()
 
         # Configuration flags
         self.use_traditional_swiss = use_traditional_swiss
@@ -98,12 +97,8 @@ class UnifiedSwissPairing:
         self.pods_per_round = self.total_players // 4
         self.incomplete_pod_size = self.total_players % 4
         
-        # Team mode requires team count divisible by 4
-        if not self.is_individual_mode and len(self.tournament_teams) % 4 != 0:
-            raise ValueError(
-                f"Team mode requires team count divisible by 4. "
-                f"Got {len(self.tournament_teams)} teams. Supported: any multiple of 4 up to 40."
-            )
+        # Team mode: with 4 players per team, the wraparound pod construction
+        # produces exactly N pods of 4 for ANY N >= 4 (no divisible-by-4 rule).
         
         # Initialize constraint tracking
         self.used_pairings: Set[Tuple[int, int]] = set()
@@ -178,10 +173,9 @@ class UnifiedSwissPairing:
             if len(self.teams[team_name]) != 4:
                 raise ValueError(f"Team '{team_name}' must have exactly 4 players, got {len(self.teams[team_name])}")
 
-        # Special validation for team counts that don't divide evenly by 4
-        if team_count % 4 != 0:
-            print(f"[WARNING]  Warning: {team_count} teams will result in incomplete pods")
-            print(f"   Each round will have {team_count // 4} full pods and 1 pod with {team_count % 4} players")
+        # No divisible-by-4 requirement in team mode: the wraparound construction
+        # yields exactly team_count pods of 4, each with 4 distinct teams, for any
+        # team_count >= 4.
     
     def _build_player_list(self):
         """Build the complete player list from tournament teams."""
@@ -600,8 +594,143 @@ class UnifiedSwissPairing:
         Returns:
             List of pods for the round, or None if generation failed
         """
-        print(f"    [WRENCH] Using pod-consistency algorithm for Round {round_num}")
+        print(f"    [WRENCH] Using wraparound pod construction for Round {round_num}")
+        return self._generate_round_wraparound(round_num)
 
+    def _generate_round_wraparound(self, round_num: int) -> Optional[List[List[Dict]]]:
+        """
+        Build one round of pods using modular ("wraparound") arithmetic.
+
+        Order the N teams (randomly in round 1, by score in rounds 2+), then form
+        pod j (for j in 0..N-1) from the four consecutive teams
+        ordered[j], ordered[j+1], ordered[j+2], ordered[j+3] (indices mod N).
+        This yields exactly N pods of 4, each holding four DIFFERENT teams, for any
+        N >= 4 with no divisible-by-4 requirement and no leftover teams.
+
+        Within that fixed team layout there is still freedom in which of a team's
+        four players lands in which of the four pods that team appears in; we use
+        that freedom to minimise player-level repeat opponents in rounds 2+.
+
+        Returns:
+            List of N pods (each a list of 4 player dicts), or None on failure.
+        """
+        ordered = self._order_teams_for_round(round_num)
+        n = len(ordered)
+        if n < 4:
+            print(f"[ERROR] Wraparound needs at least 4 teams, got {n}")
+            return None
+
+        # Pod j -> the four team names it draws one player from.
+        pod_teams = [[ordered[(j + k) % n] for k in range(4)] for j in range(n)]
+
+        # For each team, the ordered list of pod indices it must supply a player to.
+        # Team at ordered-position i appears in pods i-3, i-2, i-1, i (mod n) -> the
+        # four windows that cover it. We collect them in ascending pod order so each
+        # of the team's four players maps to one distinct pod.
+        team_pod_slots: Dict[str, List[int]] = {t: [] for t in ordered}
+        for j in range(n):
+            for t in pod_teams[j]:
+                team_pod_slots[t].append(j)
+        # Each team should now own exactly 4 pod slots.
+        for t, slots in team_pod_slots.items():
+            if len(slots) != 4:
+                print(f"[ERROR] Team {t} mapped to {len(slots)} pods (expected 4)")
+                return None
+
+        # Assign concrete players. pods[j] accumulates one player per member team.
+        pods: List[List[Dict]] = [[] for _ in range(n)]
+
+        # Round 1: random player->slot assignment per team (fresh, no history).
+        # Rounds 2+: greedily pick the team-player ordering that adds the fewest
+        # repeat opponents, using the same permutation search idea as before but
+        # applied per team across its four pods.
+        for t in ordered:
+            players = self.teams[t][:]
+            slots = team_pod_slots[t]  # four distinct pod indices
+
+            if round_num == 1:
+                random.shuffle(players)
+                chosen = players
+            else:
+                chosen = self._best_player_slot_assignment(players, slots, pods)
+
+            for player, pod_idx in zip(chosen, slots):
+                pods[pod_idx].append(player)
+
+        # Sanity: every pod must hold 4 players from 4 distinct teams.
+        for j, pod in enumerate(pods):
+            if len(pod) != 4:
+                print(f"[ERROR] Pod {j} has {len(pod)} players (expected 4)")
+                return None
+            if len({p['Team Name'] for p in pod}) != 4:
+                print(f"[ERROR] Pod {j} has a same-team collision")
+                return None
+
+        if not self._validate_round_pod_consistency(pods, pod_teams):
+            print(f"[ERROR] Pod consistency validation failed for round {round_num}")
+            return None
+
+        return pods
+
+    def _order_teams_for_round(self, round_num: int) -> List[str]:
+        """
+        Produce the team ordering the wraparound walks over.
+
+        Round 1: random order.
+        Rounds 2+: by score (highest first), or snake-interleaved by score when
+        anti-collusion is active, so score-adjacent teams share pods.
+        """
+        teams = self.tournament_teams.copy()
+        if round_num == 1:
+            random.shuffle(teams)
+            return teams
+
+        if self.anti_collusion_enabled and round_num >= self.anti_collusion_start_round:
+            return self._snake_interleave_order(self._sort_teams_by_score(teams))
+        return self._sort_teams_by_score(teams)
+
+    def _snake_interleave_order(self, sorted_teams: List[str]) -> List[str]:
+        """
+        Spread score quartiles across the ring instead of clustering the top seeds,
+        which discourages top-team collusion while keeping a single linear order for
+        the wraparound to walk. Folds the ranked list into ~4 bands and reads them
+        in a boustrophedon (snake) pattern.
+        """
+        n = len(sorted_teams)
+        if n < 8:
+            return sorted_teams
+        band = max(1, n // 4)
+        rows = [sorted_teams[i:i + band] for i in range(0, n, band)]
+        out: List[str] = []
+        for idx, row in enumerate(rows):
+            out.extend(row if idx % 2 == 0 else list(reversed(row)))
+        return out
+
+    def _best_player_slot_assignment(self, players: List[Dict], slots: List[int],
+                                     pods: List[List[Dict]]) -> List[Dict]:
+        """
+        Choose which of a team's four players goes to which of its four pods so as
+        to add the fewest repeat opponents against players already placed in those
+        pods. Tries all 24 permutations (4 players) and keeps the best.
+        """
+        from itertools import permutations
+        best_order = players
+        best_cost = float('inf')
+        for perm in permutations(players):
+            cost = 0
+            for player, pod_idx in zip(perm, slots):
+                for other in pods[pod_idx]:
+                    if other['Player ID'] in self.player_opponents.get(player['Player ID'], set()):
+                        cost += 1
+            if cost < best_cost:
+                best_cost = cost
+                best_order = list(perm)
+                if cost == 0:
+                    break
+        return best_order
+
+    def _legacy_generate_round_with_pod_consistency_block(self, round_num: int) -> Optional[List[List[Dict]]]:
+        """Deprecated block-of-4 builder, retained for reference only."""
         # Step 1: Group teams into sets of 4
         team_groups = self._create_team_groups_for_round(round_num)
 
@@ -1225,22 +1354,12 @@ class UnifiedSwissPairing:
                             else:
                                 repeat_count += self._count_repeat_matchups_in_pod(pod)
 
-                    # Add heavy penalty for multi-ghost pods
-                    ghost_penalty = 0
-                    if self.ghost_player_ids and len(pods) == 4:
-                        for pod in pods:
-                            ghost_count = sum(1 for p in pod if p['Player ID'] in self.ghost_player_ids)
-                            if ghost_count >= 2:
-                                ghost_penalty += 1000 * (ghost_count - 1)
-
-                    total_score = repeat_count + ghost_penalty
-
-                    if len(pods) == 4 and total_score < best_repeat_count:
+                    if len(pods) == 4 and repeat_count < best_repeat_count:
                         best_pods = pods
-                        best_repeat_count = total_score
+                        best_repeat_count = repeat_count
                         best_repeat_details = repeat_details
 
-                        if total_score == 0:
+                        if repeat_count == 0:
                             # Round 1: Collect multiple perfect solutions for randomization
                             if round_num == 1 and perfect_solutions is not None:
                                 # Deep copy the pods to avoid reference issues
@@ -1360,41 +1479,44 @@ class UnifiedSwissPairing:
         """
         Validate that pods maintain consistency requirements.
 
-        Checks:
-        1. Each team matchup group has exactly 4 pods
-        2. Each team has exactly 1 player per pod
-        3. All 4 players from each team participate
+        Wraparound invariants (any N >= 4 teams -> N pods of 4):
+        1. Every pod has exactly 4 players from 4 distinct teams
+        2. Each team contributes exactly 4 players, spread across 4 distinct pods
+        3. Every player appears exactly once in the round
 
         Args:
             all_pods: All pods in the round
-            team_groups: The team groups that were used
+            team_groups: Per-pod team lists (pod_teams[j] = 4 team names for pod j)
 
         Returns:
             True if validation passes, False otherwise
         """
-        # Group pods by team sets
-        pods_by_team_set = {}
-
-        for pod in all_pods:
-            teams_in_pod = frozenset([p['Team Name'] for p in pod])
-
-            if teams_in_pod not in pods_by_team_set:
-                pods_by_team_set[teams_in_pod] = []
-
-            pods_by_team_set[teams_in_pod].append(pod)
-
-        # Verify each team set has exactly 4 pods
-        for team_set, pods in pods_by_team_set.items():
-            if len(pods) != 4:
-                print(f"[ERROR] Validation failed: Team set {team_set} has {len(pods)} pods (expected 4)")
+        # 1. Each pod: 4 players, 4 distinct teams.
+        for j, pod in enumerate(all_pods):
+            if len(pod) != 4:
+                print(f"[ERROR] Validation failed: Pod {j} has {len(pod)} players (expected 4)")
+                return False
+            if len({p['Team Name'] for p in pod}) != 4:
+                print(f"[ERROR] Validation failed: Pod {j} has two players from the same team")
                 return False
 
-            # Verify each team has exactly 1 player per pod
-            for team in team_set:
-                for pod in pods:
-                    team_players_in_pod = [p for p in pod if p['Team Name'] == team]
-                    if len(team_players_in_pod) != 1:
-                        print(f"[ERROR] Validation failed: {team} has {len(team_players_in_pod)} players in a pod")
-                        return False
+        # 2. Each team: exactly 4 players across 4 distinct pods (<=1 per pod).
+        team_pod_indices: Dict[str, List[int]] = {}
+        for j, pod in enumerate(all_pods):
+            for p in pod:
+                team_pod_indices.setdefault(p['Team Name'], []).append(j)
+        for team, idxs in team_pod_indices.items():
+            if len(idxs) != 4:
+                print(f"[ERROR] Validation failed: {team} placed {len(idxs)} players (expected 4)")
+                return False
+            if len(set(idxs)) != 4:
+                print(f"[ERROR] Validation failed: {team} has two players in the same pod")
+                return False
+
+        # 3. Every player used exactly once.
+        seen_ids = [p['Player ID'] for pod in all_pods for p in pod]
+        if len(seen_ids) != len(set(seen_ids)):
+            print(f"[ERROR] Validation failed: a player appears in more than one pod")
+            return False
 
         return True

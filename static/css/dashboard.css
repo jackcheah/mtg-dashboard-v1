@@ -2167,3 +2167,56 @@
             font-weight: 700;
             color: var(--color-text);
         }
+
+        /* Ghost (Dropped Team Player) Styles */
+        .ghost-player-row {
+            opacity: 0.45;
+            background: var(--color-surface-hover);
+            pointer-events: none;
+        }
+        .ghost-player-row .score-buttons-inline {
+            display: none !important;
+        }
+        .ghost-badge {
+            display: inline-block;
+            font-size: 0.6rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: var(--color-danger);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 8px;
+            margin-left: 6px;
+        }
+        .ghost-auto-score {
+            font-size: 0.7rem;
+            color: var(--color-text-tertiary);
+            font-style: italic;
+        }
+        .ghost-pod-badge {
+            display: inline-block;
+            font-size: 0.6rem;
+            font-weight: 600;
+            background: var(--color-warning);
+            color: #000;
+            padding: 2px 8px;
+            border-radius: 8px;
+            margin-left: 8px;
+        }
+        .ghost-team-indicator {
+            display: inline-block;
+            font-size: 0.6rem;
+            font-weight: 600;
+            background: var(--color-danger);
+            color: white;
+            padding: 1px 6px;
+            border-radius: 6px;
+            margin-left: 6px;
+        }
+        .ghost-player-standing {
+            opacity: 0.5;
+        }
+        .ghost-player-standing .player-name {
+            text-decoration: line-through;
+        }
