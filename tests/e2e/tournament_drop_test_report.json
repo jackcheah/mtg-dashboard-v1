@@ -1,0 +1,123 @@
+{
+  "timestamp": "2026-09-17T13:00:27.159092",
+  "config": {
+    "teams": 28,
+    "swiss_rounds": 4,
+    "scoring": "western"
+  },
+  "rounds": {
+    "1": {
+      "type": "Swiss",
+      "tables": 28,
+      "ghost_tables": 0
+    },
+    "2": {
+      "type": "Swiss",
+      "tables": 28,
+      "ghost_tables": 2
+    },
+    "3": {
+      "type": "Swiss",
+      "tables": 28,
+      "ghost_tables": 3
+    },
+    "4": {
+      "type": "Swiss",
+      "tables": 28,
+      "ghost_tables": 3
+    },
+    "5": {
+      "type": "Finals",
+      "tables": 4,
+      "ghost_tables": 0
+    }
+  },
+  "drops": {
+    "1": {
+      "name": "Captain_Alpha",
+      "team": "Alpha Strike",
+      "dropped_round": 1
+    },
+    "2": {
+      "name": "Scout_Alpha",
+      "team": "Alpha Strike",
+      "dropped_round": 1
+    },
+    "13": {
+      "name": "Captain_Delta",
+      "team": "Delta Squad",
+      "dropped_round": 2
+    }
+  },
+  "ghost_verifications": {
+    "passed": 8,
+    "total": 8,
+    "details": [
+      {
+        "round": 2,
+        "table": "Table 17",
+        "badge": true,
+        "auto_score": true,
+        "text": "auto: 0 pts",
+        "pass": true
+      },
+      {
+        "round": 2,
+        "table": "Table 18",
+        "badge": true,
+        "auto_score": true,
+        "text": "auto: 0 pts",
+        "pass": true
+      },
+      {
+        "round": 3,
+        "table": "Table 17",
+        "badge": true,
+        "auto_score": true,
+        "text": "auto: 0 pts",
+        "pass": true
+      },
+      {
+        "round": 3,
+        "table": "Table 18",
+        "badge": true,
+        "auto_score": true,
+        "text": "auto: 0 pts",
+        "pass": true
+      },
+      {
+        "round": 3,
+        "table": "Table 27",
+        "badge": true,
+        "auto_score": true,
+        "text": "auto: 0 pts",
+        "pass": true
+      },
+      {
+        "round": 4,
+        "table": "Table 10",
+        "badge": true,
+        "auto_score": true,
+        "text": "auto: 0 pts",
+        "pass": true
+      },
+      {
+        "round": 4,
+        "table": "Table 25",
+        "badge": true,
+        "auto_score": true,
+        "text": "auto: 0 pts",
+        "pass": true
+      },
+      {
+        "round": 4,
+        "table": "Table 26",
+        "badge": true,
+        "auto_score": true,
+        "text": "auto: 0 pts",
+        "pass": true
+      }
+    ]
+  },
+  "errors": []
+}
